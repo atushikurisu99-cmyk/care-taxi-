@@ -1,68 +1,663 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<title>Care Taxi UI</title>
-<style>
-body { margin:0; font-family:sans-serif; background:#e5e7eb; }
-.header { background:#5da8c7; color:white; display:flex; justify-content:space-between; padding:20px; font-size:32px; font-weight:bold; }
-.timeline { background:white; margin:10px; padding:10px; position:relative; height:300px; }
-.time-row { display:flex; font-size:12px; }
-.time-cell { flex:1; text-align:center; }
-.red-line { position:absolute; top:0; bottom:0; width:2px; background:red; }
-.booking { position:absolute; background:orange; color:white; border-radius:20px; padding:5px 10px; font-size:14px; }
-.bottom { display:flex; gap:10px; margin:10px; }
-.two-week { flex:2; background:#cfe7f3; padding:10px; }
-.drivers { flex:1; background:#cfe7f3; padding:10px; }
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Care Taxi Admin UI Trace</title>
+  <style>
+    :root {
+      --bg: #dfe3e7;
+      --panel-bg: #f8f8f8;
+      --grid-bg: #fafafa;
+      --header-blue: #63b4d6;
+      --sub-blue: #bfd9e8;
+      --line: #9a9a9a;
+      --line-light: #b9b9b9;
+      --text: #111;
+      --danger: #e1251b;
+      --orange: #eb7546;
+    }
+
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      background: var(--bg);
+      font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", "Meiryo", sans-serif;
+      color: var(--text);
+      overflow: hidden;
+    }
+
+    .app {
+      width: 100%;
+      height: 100%;
+      padding: 10px 12px 12px;
+      background: var(--bg);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .header {
+      height: 78px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      flex: 0 0 auto;
+    }
+
+    .date-ribbon {
+      flex: 1 1 auto;
+      height: 48px;
+      background: var(--header-blue);
+      border-radius: 0 18px 18px 0;
+      display: flex;
+      align-items: center;
+      padding: 0 18px;
+      font-weight: 800;
+      font-size: 32px;
+      line-height: 1;
+      letter-spacing: 0.5px;
+      box-shadow: inset 0 -1px 0 rgba(255,255,255,0.25);
+      min-width: 0;
+    }
+
+    .clock-box {
+      flex: 0 0 auto;
+      display: flex;
+      align-items: flex-start;
+      justify-content: flex-end;
+      min-width: 160px;
+      padding-right: 6px;
+      gap: 6px;
+    }
+
+    .clock-ampm {
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      font-weight: 800;
+      font-size: 18px;
+      line-height: 0.82;
+      letter-spacing: 1px;
+      padding-top: 8px;
+    }
+
+    .clock-time {
+      font-weight: 900;
+      font-size: 52px;
+      line-height: 1;
+      letter-spacing: 0.5px;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .schedule-panel {
+      flex: 1 1 auto;
+      min-height: 0;
+      background: var(--panel-bg);
+      border: 1px solid #d8d8d8;
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .time-header {
+      height: 42px;
+      border-bottom: 1px solid var(--line-light);
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      align-items: center;
+      padding: 0 2.2%;
+      background: rgba(255,255,255,0.5);
+      font-size: 13px;
+      font-weight: 500;
+    }
+
+    .time-header span {
+      text-align: center;
+      white-space: nowrap;
+    }
+
+    .grid-wrap {
+      position: relative;
+      flex: 1 1 auto;
+      min-height: 0;
+      background: var(--grid-bg);
+      overflow: hidden;
+      margin: 0 2px 2px;
+    }
+
+    .grid-vertical,
+    .grid-horizontal,
+    .now-line,
+    .bookings-layer {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+    }
+
+    .grid-vertical {
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+    }
+
+    .grid-vertical div {
+      border-left: 1px solid var(--line-light);
+    }
+
+    .grid-vertical div:last-child {
+      border-right: 1px solid var(--line-light);
+    }
+
+    .grid-horizontal {
+      display: grid;
+      grid-template-rows: repeat(10, 1fr);
+    }
+
+    .grid-horizontal div {
+      border-top: 1px solid var(--line);
+    }
+
+    .grid-horizontal div:last-child {
+      border-bottom: 1px solid var(--line);
+    }
+
+    .now-line {
+      z-index: 3;
+    }
+
+    .now-line::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: var(--now-left, 50%);
+      width: 2px;
+      background: var(--danger);
+      transform: translateX(-1px);
+    }
+
+    .bookings-layer {
+      z-index: 4;
+      pointer-events: auto;
+    }
+
+    .booking {
+      position: absolute;
+      height: 44px;
+      border-radius: 18px;
+      background: var(--orange);
+      color: #fff;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 0 12px;
+      font-size: 14px;
+      line-height: 1;
+      box-shadow: inset 0 -1px 0 rgba(0,0,0,0.08);
+      white-space: nowrap;
+      overflow: hidden;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    .booking .start,
+    .booking .end {
+      flex: 0 0 auto;
+      font-weight: 700;
+      min-width: 20px;
+      text-align: center;
+    }
+
+    .booking .center {
+      flex: 1 1 auto;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: clip;
+      white-space: nowrap;
+      font-weight: 700;
+    }
+
+    .bottom-row {
+      flex: 0 0 208px;
+      display: grid;
+      grid-template-columns: 64% 36%;
+      gap: 8px;
+      min-height: 0;
+    }
+
+    .sub-panel {
+      background: var(--sub-blue);
+      border: 1px solid #c5d6df;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .sub-title {
+      flex: 0 0 44px;
+      display: flex;
+      align-items: center;
+      padding: 0 12px;
+      font-size: 18px;
+      font-weight: 800;
+      border-bottom: 1px solid rgba(0,0,0,0.08);
+    }
+
+    .two-week-body {
+      flex: 1 1 auto;
+      background: rgba(255,255,255,0.42);
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      margin: 0 10px 10px;
+      border: 1px solid #c8d2d8;
+      min-height: 0;
+    }
+
+    .day-col {
+      border-right: 1px solid #c9d1d6;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+    }
+
+    .day-col:last-child {
+      border-right: 0;
+    }
+
+    .day-head {
+      height: 34px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 14px;
+      font-weight: 700;
+      border-bottom: 1px solid #c9d1d6;
+      background: rgba(255,255,255,0.28);
+    }
+
+    .day-body {
+      flex: 1 1 auto;
+      position: relative;
+      padding: 8px 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+
+    .mini-bar {
+      height: 18px;
+      border-radius: 0;
+    }
+
+    .drivers-body {
+      flex: 1 1 auto;
+      background: rgba(255,255,255,0.42);
+      margin: 0 10px 10px;
+      border: 1px solid #c8d2d8;
+      padding: 10px 12px;
+      overflow-y: auto;
+    }
+
+    .driver-row {
+      display: grid;
+      grid-template-columns: 1fr auto;
+      align-items: center;
+      gap: 12px;
+      padding: 6px 0;
+      border-bottom: 1px solid rgba(0,0,0,0.12);
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .driver-row:last-child {
+      border-bottom: 0;
+    }
+
+    .other-count {
+      padding-top: 8px;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .modal {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.28);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      padding: 24px;
+      z-index: 20;
+    }
+
+    .modal.show {
+      display: flex;
+    }
+
+    .modal-card {
+      width: min(560px, 100%);
+      background: #fff;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 10px 40px rgba(0,0,0,0.18);
+    }
+
+    .modal-title {
+      font-size: 22px;
+      font-weight: 800;
+      margin-bottom: 14px;
+    }
+
+    .modal-grid {
+      display: grid;
+      grid-template-columns: 120px 1fr;
+      gap: 10px 12px;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .modal-grid .label {
+      font-weight: 800;
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      margin-top: 18px;
+    }
+
+    .close-btn {
+      border: 0;
+      border-radius: 10px;
+      padding: 10px 16px;
+      background: #3c82d6;
+      color: #fff;
+      font-size: 15px;
+      font-weight: 700;
+      cursor: pointer;
+    }
+
+    @media (max-width: 1024px) {
+      .date-ribbon {
+        font-size: 26px;
+      }
+      .clock-time {
+        font-size: 42px;
+      }
+      .bottom-row {
+        flex-basis: 190px;
+      }
+      .sub-title {
+        font-size: 16px;
+      }
+    }
+  </style>
 </head>
-
 <body>
+  <div class="app">
+    <div class="header">
+      <div class="date-ribbon" id="dateText">2026/04/21</div>
+      <div class="clock-box">
+        <div class="clock-ampm" id="ampm">AM</div>
+        <div class="clock-time" id="clockText">3:23</div>
+      </div>
+    </div>
 
-<div class="header">
-  <div>2026/04/21</div>
-  <div id="clock"></div>
-</div>
+    <section class="schedule-panel">
+      <div class="time-header" id="timeHeader"></div>
+      <div class="grid-wrap">
+        <div class="grid-vertical" id="gridVertical"></div>
+        <div class="grid-horizontal" id="gridHorizontal"></div>
+        <div class="now-line" id="nowLine"></div>
+        <div class="bookings-layer" id="bookingsLayer"></div>
+      </div>
+    </section>
 
-<div class="timeline">
-  <div class="time-row">
-    <div class="time-cell">7:00</div>
-    <div class="time-cell">8:00</div>
-    <div class="time-cell">9:00</div>
-    <div class="time-cell">10:00</div>
-    <div class="time-cell">11:00</div>
-    <div class="time-cell">12:00</div>
-    <div class="time-cell">13:00</div>
-    <div class="time-cell">14:00</div>
-    <div class="time-cell">15:00</div>
-    <div class="time-cell">16:00</div>
-    <div class="time-cell">17:00</div>
-    <div class="time-cell">18:00</div>
-    <div class="time-cell">19:00</div>
-    <div class="time-cell">20:00</div>
+    <section class="bottom-row">
+      <div class="sub-panel">
+        <div class="sub-title">2週間分の予定</div>
+        <div class="two-week-body" id="twoWeekBody"></div>
+      </div>
+
+      <div class="sub-panel">
+        <div class="sub-title">協力業者さんの一覧</div>
+        <div class="drivers-body" id="driversBody"></div>
+      </div>
+    </section>
   </div>
-</div>
 
-<div class="bottom">
-  <div class="two-week"><b>2週間分の予定</b></div>
-  <div class="drivers">
-    <b>協力業者さんの一覧</b><br>
-    田中　待機<br>
-    佐藤　対応中<br>
-    山本　空き<br>
-    他20件
+  <div class="modal" id="detailModal">
+    <div class="modal-card">
+      <div class="modal-title">予約詳細</div>
+      <div class="modal-grid" id="detailGrid"></div>
+      <div class="modal-actions">
+        <button class="close-btn" id="closeModal">閉じる</button>
+      </div>
+    </div>
   </div>
-</div>
 
-<script>
-function updateClock(){
-  const now=new Date();
-  document.getElementById('clock').innerText=
-    now.getHours()+':'+String(now.getMinutes()).padStart(2,'0');
-}
-setInterval(updateClock,1000);
-updateClock();
-</script>
+  <script>
+    const selectedDate = new Date('2026-04-21T12:01:00');
+    const scheduleStartHour = 7;
+    const scheduleEndHour = 20;
+    const totalColumns = scheduleEndHour - scheduleStartHour + 1;
 
+    const bookings = [
+      {
+        start: '2026-04-21T08:00:00',
+        end: '2026-04-21T10:10:00',
+        patient: '佐藤 様',
+        destination: 'A 病院',
+        row: 0,
+        color: '#79a95a',
+      },
+      {
+        start: '2026-04-21T10:50:00',
+        end: '2026-04-21T14:40:00',
+        patient: '鈴木 様',
+        destination: 'R クリニック',
+        row: 1,
+        color: '#d19a35',
+      },
+      {
+        start: '2026-04-21T12:40:00',
+        end: '2026-04-21T15:30:00',
+        patient: '山田 様',
+        destination: 'C 病院',
+        row: 2,
+        color: '#4389c9',
+      },
+    ];
+
+    const twoWeek = [
+      { date: '4/20', bars: ['#6eb8e5', '#ef8c2f'] },
+      { date: '4/21', bars: ['#4d90d9', '#7fbe41'] },
+      { date: '4/22', bars: ['#6eb8e5'] },
+      { date: '4/22', bars: ['#6eb8e5', '#7fbe41'] },
+      { date: '4/23', bars: ['#e47e74'] },
+      { date: '4/24', bars: ['#4d90d9'] },
+      { date: '4/25', bars: ['#4d90d9'] },
+    ];
+
+    const drivers = [
+      { name: '田中', status: '待機' },
+      { name: '佐藤', status: '対応中' },
+      { name: '山本', status: '空き' },
+    ];
+
+    const timeHeader = document.getElementById('timeHeader');
+    const gridVertical = document.getElementById('gridVertical');
+    const gridHorizontal = document.getElementById('gridHorizontal');
+    const bookingsLayer = document.getElementById('bookingsLayer');
+    const nowLine = document.getElementById('nowLine');
+    const twoWeekBody = document.getElementById('twoWeekBody');
+    const driversBody = document.getElementById('driversBody');
+    const dateText = document.getElementById('dateText');
+    const ampm = document.getElementById('ampm');
+    const clockText = document.getElementById('clockText');
+    const detailModal = document.getElementById('detailModal');
+    const detailGrid = document.getElementById('detailGrid');
+    const closeModal = document.getElementById('closeModal');
+
+    function formatDateJP(date) {
+      const y = date.getFullYear();
+      const m = String(date.getMonth() + 1).padStart(2, '0');
+      const d = String(date.getDate()).padStart(2, '0');
+      return `${y}/${m}/${d}`;
+    }
+
+    function renderHeader() {
+      dateText.textContent = formatDateJP(selectedDate);
+      const hours = selectedDate.getHours();
+      const mins = String(selectedDate.getMinutes()).padStart(2, '0');
+      const hour12 = ((hours + 11) % 12) + 1;
+      ampm.textContent = hours >= 12 ? 'PM' : 'AM';
+      clockText.textContent = `${hour12}:${mins}`;
+    }
+
+    function renderTimeAxis() {
+      timeHeader.innerHTML = '';
+      gridVertical.innerHTML = '';
+      gridHorizontal.innerHTML = '';
+
+      for (let h = scheduleStartHour; h <= scheduleEndHour; h++) {
+        const span = document.createElement('span');
+        span.textContent = `${h}:00`;
+        timeHeader.appendChild(span);
+
+        const v = document.createElement('div');
+        gridVertical.appendChild(v);
+      }
+
+      for (let i = 0; i < 10; i++) {
+        const row = document.createElement('div');
+        gridHorizontal.appendChild(row);
+      }
+    }
+
+    function minutesFromStart(dateStr) {
+      const d = new Date(dateStr);
+      return (d.getHours() - scheduleStartHour) * 60 + d.getMinutes();
+    }
+
+    function renderNowLine() {
+      const now = selectedDate;
+      const mins = (now.getHours() - scheduleStartHour) * 60 + now.getMinutes();
+      const total = (scheduleEndHour - scheduleStartHour) * 60;
+      const left = Math.max(0, Math.min(100, (mins / total) * 100));
+      nowLine.style.setProperty('--now-left', `${left}%`);
+    }
+
+    function renderBookings() {
+      bookingsLayer.innerHTML = '';
+      const total = (scheduleEndHour - scheduleStartHour) * 60;
+      const topBase = 38;
+      const rowHeight = 57;
+
+      bookings.forEach((item) => {
+        const startMin = minutesFromStart(item.start);
+        const endMin = minutesFromStart(item.end);
+        const startDate = new Date(item.start);
+        const endDate = new Date(item.end);
+
+        const left = (startMin / total) * 100;
+        const width = ((endMin - startMin) / total) * 100;
+        const startLabel = String(startDate.getMinutes()).padStart(2, '0');
+        const endLabel = String(endDate.getMinutes()).padStart(2, '0');
+
+        const el = document.createElement('button');
+        el.type = 'button';
+        el.className = 'booking';
+        el.style.left = `${left}%`;
+        el.style.width = `${width}%`;
+        el.style.top = `${topBase + item.row * rowHeight}px`;
+        el.style.background = item.color;
+        el.innerHTML = `
+          <span class="start">${startLabel}</span>
+          <span class="center">${item.patient}　${item.destination}</span>
+          <span class="end">${endLabel}</span>
+        `;
+        el.addEventListener('click', () => openDetail(item));
+        bookingsLayer.appendChild(el);
+      });
+    }
+
+    function renderTwoWeek() {
+      twoWeekBody.innerHTML = '';
+      twoWeek.forEach((item) => {
+        const col = document.createElement('div');
+        col.className = 'day-col';
+
+        const head = document.createElement('div');
+        head.className = 'day-head';
+        head.textContent = item.date;
+
+        const body = document.createElement('div');
+        body.className = 'day-body';
+
+        item.bars.forEach((color) => {
+          const bar = document.createElement('div');
+          bar.className = 'mini-bar';
+          bar.style.background = color;
+          body.appendChild(bar);
+        });
+
+        col.appendChild(head);
+        col.appendChild(body);
+        twoWeekBody.appendChild(col);
+      });
+    }
+
+    function renderDrivers() {
+      driversBody.innerHTML = '';
+      drivers.forEach((d) => {
+        const row = document.createElement('div');
+        row.className = 'driver-row';
+        row.innerHTML = `<span>${d.name}</span><span>${d.status}</span>`;
+        driversBody.appendChild(row);
+      });
+
+      const other = document.createElement('div');
+      other.className = 'other-count';
+      other.textContent = '他20件';
+      driversBody.appendChild(other);
+    }
+
+    function openDetail(item) {
+      const start = new Date(item.start);
+      const end = new Date(item.end);
+      detailGrid.innerHTML = `
+        <div class="label">患者名</div><div>${item.patient}</div>
+        <div class="label">行き先</div><div>${item.destination}</div>
+        <div class="label">開始</div><div>${String(start.getHours()).padStart(2,'0')}:${String(start.getMinutes()).padStart(2,'0')}</div>
+        <div class="label">終了</div><div>${String(end.getHours()).padStart(2,'0')}:${String(end.getMinutes()).padStart(2,'0')}</div>
+      `;
+      detailModal.classList.add('show');
+    }
+
+    closeModal.addEventListener('click', () => detailModal.classList.remove('show'));
+    detailModal.addEventListener('click', (e) => {
+      if (e.target === detailModal) detailModal.classList.remove('show');
+    });
+
+    renderHeader();
+    renderTimeAxis();
+    renderNowLine();
+    renderBookings();
+    renderTwoWeek();
+    renderDrivers();
+  </script>
 </body>
 </html>
