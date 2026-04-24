@@ -1,420 +1,186 @@
-import React, { useMemo, useState } from "react";
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>介護タクシー管理アプリ｜確認用モック</title>
+  <style>
+    * { box-sizing: border-box; }
+    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#eef2f6; color:#172033; }
+    button { font: inherit; cursor:pointer; }
+    .view-switch { position:fixed; right:18px; top:18px; z-index:50; background:rgba(255,255,255,.92); padding:8px; border-radius:999px; box-shadow:0 8px 24px rgba(0,0,0,.18); display:flex; gap:6px; }
+    .view-switch button { border:0; border-radius:999px; padding:10px 18px; font-weight:800; color:#334155; background:transparent; }
+    .view-switch button.active-ipad { background:#1d4ed8; color:#fff; }
+    .view-switch button.active-pc { background:#15803d; color:#fff; }
+    .screen { display:none; min-height:100vh; padding:26px; }
+    .screen.active { display:block; }
+    .ipad-shell { max-width:1250px; margin:0 auto; border:10px solid #111827; border-radius:36px; overflow:hidden; background:#fff; box-shadow:0 25px 70px rgba(0,0,0,.28); }
+    .ipad-top { height:76px; display:flex; align-items:center; justify-content:space-between; background:#1d4ed8; color:#fff; padding:0 26px; }
+    .ipad-top .left { display:flex; gap:22px; align-items:center; font-weight:900; font-size:24px; }
+    .top-btn { background:#fff; color:#1d4ed8; border:0; padding:12px 18px; border-radius:12px; font-weight:900; }
+    .ipad-main { display:grid; grid-template-columns:1fr 315px; min-height:560px; }
+    .timeline-head { display:grid; grid-template-columns:130px 1fr; border-bottom:1px solid #d7dee8; background:#fff; }
+    .timeline-label { padding:16px; font-size:13px; font-weight:900; border-right:1px solid #d7dee8; }
+    .hours { display:grid; grid-template-columns:repeat(14,1fr); font-size:13px; text-align:center; }
+    .hours div { padding:16px 4px; border-right:1px solid #d7dee8; font-weight:800; }
+    .hours .now-hour { color:#dc2626; }
+    .timeline-body { display:grid; grid-template-columns:130px 1fr; }
+    .rows { background:#f8fafc; }
+    .row-name { height:78px; padding:18px 12px; border-right:1px solid #d7dee8; border-bottom:1px solid #d7dee8; font-weight:900; }
+    .grid { position:relative; height:468px; background-image:linear-gradient(to right,#d7dee8 1px,transparent 1px),linear-gradient(to bottom,#d7dee8 1px,transparent 1px); background-size:7.142% 78px; }
+    .now-line { position:absolute; left:43%; top:0; bottom:0; width:2px; background:#ef4444; z-index:1; }
+    .appt { position:absolute; z-index:2; color:white; border:0; border-radius:10px; padding:8px 10px; box-shadow:0 6px 16px rgba(0,0,0,.2); font-weight:900; text-align:left; font-size:13px; line-height:1.35; }
+    .appt.selected { outline:5px solid rgba(147,197,253,.85); }
+    .green { background:#16a34a; } .blue { background:#2563eb; } .purple { background:#7c3aed; } .orange { background:#f97316; }
+    .detail { border-left:1px solid #d7dee8; padding:24px; background:#fff; }
+    .detail-title { font-size:19px; font-weight:900; margin-bottom:26px; }
+    .label { color:#64748b; font-size:13px; font-weight:800; margin-top:18px; }
+    .value { margin-top:5px; font-size:20px; font-weight:900; }
+    .small { font-size:14px; color:#334155; line-height:1.6; }
+    .amount-pair { display:flex; gap:12px; align-items:baseline; white-space:nowrap; }
+    .estimate { color:#2563eb; }
+    .estimate.changed { text-decoration-line:line-through; text-decoration-thickness:.5px; text-decoration-color:#475569; }
+    .actual { color:#111827; font-weight:950; }
+    .diff { color:#dc2626; font-size:13px; font-weight:900; }
+    .badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
+    .badge { display:inline-flex; align-items:center; border:1px solid; border-radius:8px; padding:6px 9px; font-size:12px; font-weight:900; }
+    .b-orange { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
+    .b-blue { background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; }
+    .b-purple { background:#faf5ff; color:#7e22ce; border-color:#d8b4fe; }
+    .b-red { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
+    .b-green { background:#f0fdf4; color:#15803d; border-color:#86efac; }
+    .ipad-bottom { display:grid; grid-template-columns:1fr 1fr; gap:16px; background:#f8fafc; padding:16px; }
+    .card { background:#fff; border:1px solid #d7dee8; border-radius:16px; padding:16px; box-shadow:0 3px 12px rgba(15,23,42,.06); }
+    .card h3 { margin:0 0 12px; color:#1d4ed8; }
+    .mini-week { display:grid; grid-template-columns:repeat(7,1fr); gap:7px; }
+    .day { height:90px; border:1px solid #d7dee8; border-radius:10px; text-align:center; padding:7px; font-weight:800; }
+    .day.active { border-color:#2563eb; background:#eff6ff; }
+    .bar { height:7px; width:60%; margin:12px auto 0; border-radius:999px; background:#2563eb; }
+    .bar.greenbar { background:#22c55e; margin-top:8px; }
+    .bar.orangebar { background:#fb923c; margin-top:8px; }
+    .flow { max-width:1250px; margin:18px auto 0; display:grid; grid-template-columns:1fr 48px 1fr 48px 1fr; gap:10px; align-items:center; text-align:center; }
+    .flow-box { border:1px solid #cbd5e1; border-radius:16px; padding:15px; background:#fff; font-weight:900; }
+    .flow-blue { background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; }
+    .flow-green { background:#f0fdf4; color:#15803d; border-color:#86efac; }
+    .arrow { font-size:30px; color:#94a3b8; font-weight:900; }
+    .pc-wrap { display:grid; grid-template-columns:235px 1fr; min-height:100vh; margin:-26px; }
+    .sidebar { background:#14532d; color:#fff; padding:24px; }
+    .brand { font-size:21px; font-weight:950; margin-bottom:28px; }
+    .nav { padding:13px 14px; border-radius:10px; margin-bottom:8px; font-weight:900; color:#dcfce7; }
+    .nav.active { background:#15803d; color:#fff; }
+    .side-card { margin-top:42px; border:1px solid #22c55e; border-radius:16px; padding:16px; }
+    .side-row { display:flex; justify-content:space-between; font-size:14px; margin-top:12px; }
+    .pc-main { padding:30px; overflow:auto; }
+    .pc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
+    .pc-header h1 { margin:0; color:#166534; font-size:31px; }
+    .pc-actions { display:flex; gap:10px; }
+    .pc-actions button { border:1px solid #cbd5e1; border-radius:10px; background:white; padding:10px 14px; color:#166534; font-weight:900; }
+    .pc-actions button.primary { background:#15803d; color:#fff; border-color:#15803d; }
+    .filters { display:grid; grid-template-columns:repeat(6,1fr); gap:13px; background:#fff; border:1px solid #d7dee8; border-radius:16px; padding:16px; margin-bottom:18px; }
+    .filter-label { font-size:12px; color:#64748b; font-weight:900; margin-bottom:6px; }
+    .filter-box { border:1px solid #d7dee8; background:#f8fafc; border-radius:9px; padding:10px; font-size:13px; }
+    .table-box { border:1px solid #d7dee8; border-radius:18px; background:#fff; overflow:auto; box-shadow:0 3px 12px rgba(15,23,42,.06); }
+    table { border-collapse:collapse; min-width:1520px; width:100%; font-size:13px; }
+    th { background:#f1f5f9; padding:12px 8px; border:1px solid #d7dee8; font-size:12px; white-space:nowrap; }
+    td { padding:12px 8px; border:1px solid #d7dee8; white-space:nowrap; }
+    tbody tr:hover { background:#f0fdf4; }
+    .center { text-align:center; }
+    .bold { font-weight:900; }
+    .red { color:#dc2626; font-weight:900; }
+    .muted { color:#64748b; }
+    .summary { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:18px; }
+    .summary h3 { margin:0 0 12px; color:#166534; }
+    @media (max-width: 980px) {
+      .ipad-main { grid-template-columns:1fr; }
+      .detail { border-left:0; border-top:1px solid #d7dee8; }
+      .ipad-bottom, .summary, .filters { grid-template-columns:1fr; }
+      .pc-wrap { grid-template-columns:1fr; }
+      .sidebar { display:none; }
+      .flow { grid-template-columns:1fr; }
+      .arrow { transform:rotate(90deg); }
+    }
+  </style>
+</head>
+<body>
+  <div class="view-switch">
+    <button id="btnIpad" class="active-ipad" onclick="showView('ipad')">iPad画面</button>
+    <button id="btnPc" onclick="showView('pc')">PC画面</button>
+  </div>
 
-const appointments = [
-  {
-    id: "A-20260421-001",
-    date: "2026/04/21",
-    start: "08:30",
-    end: "09:30",
-    patient: "田中 様",
-    billingTo: "A病院",
-    contractor: "協力業者A",
-    staff: "佐藤 太郎",
-    purpose: "通院",
-    fromTo: "自宅 → A病院",
-    estimate: 4000,
-    actual: 4800,
-    diffReason: "診察待ち時間30分",
-    patientPeriod: "4/21〜4/30",
-    patientDeadline: "05/05",
-    contractorPeriod: "05/01〜5/10",
-    contractorPayDate: "05/15",
-    invoiceStatus: "未請求",
-    paymentStatus: "未入金",
-    payoutStatus: "未支払",
-    reInvoiceCount: 0,
-    note: "車椅子 / 付き添いあり",
-    color: "bg-green-600",
-    row: 0,
-    left: "12%",
-    width: "12%",
-  },
-  {
-    id: "A-20260421-002",
-    date: "2026/04/21",
-    start: "10:00",
-    end: "10:50",
-    patient: "鈴木 様",
-    billingTo: "本人",
-    contractor: "協力業者B",
-    staff: "鈴木 花子",
-    purpose: "退院",
-    fromTo: "B病院 → 自宅",
-    estimate: 5500,
-    actual: 5500,
-    diffReason: "-",
-    patientPeriod: "4/21〜4/30",
-    patientDeadline: "05/05",
-    contractorPeriod: "05/01〜5/10",
-    contractorPayDate: "05/15",
-    invoiceStatus: "請求済",
-    paymentStatus: "未入金",
-    payoutStatus: "未支払",
-    reInvoiceCount: 0,
-    note: "",
-    color: "bg-blue-600",
-    row: 1,
-    left: "27%",
-    width: "10%",
-  },
-  {
-    id: "A-20260420-001",
-    date: "2026/04/20",
-    start: "09:00",
-    end: "10:00",
-    patient: "佐藤 様",
-    billingTo: "Cクリニック",
-    contractor: "協力業者A",
-    staff: "山田 一郎",
-    purpose: "転院・施設",
-    fromTo: "薬局 → 施設",
-    estimate: 3500,
-    actual: 3800,
-    diffReason: "経由あり",
-    patientPeriod: "4/11〜4/20",
-    patientDeadline: "04/25",
-    contractorPeriod: "4/21〜4/30",
-    contractorPayDate: "05/05",
-    invoiceStatus: "請求済",
-    paymentStatus: "入金済",
-    payoutStatus: "未支払",
-    reInvoiceCount: 0,
-    note: "経由先追加",
-    color: "bg-purple-600",
-    row: 4,
-    left: "18%",
-    width: "11%",
-  },
-  {
-    id: "A-20260419-001",
-    date: "2026/04/19",
-    start: "13:30",
-    end: "14:30",
-    patient: "伊藤 様",
-    billingTo: "A病院",
-    contractor: "協力業者C",
-    staff: "佐藤 太郎",
-    purpose: "検査・リハビリ",
-    fromTo: "自宅 → A病院",
-    estimate: 8000,
-    actual: 8000,
-    diffReason: "-",
-    patientPeriod: "4/01〜4/10",
-    patientDeadline: "04/15",
-    contractorPeriod: "4/11〜4/20",
-    contractorPayDate: "04/25",
-    invoiceStatus: "請求済",
-    paymentStatus: "入金済",
-    payoutStatus: "支払済",
-    reInvoiceCount: 0,
-    note: "",
-    color: "bg-blue-700",
-    row: 2,
-    left: "55%",
-    width: "13%",
-  },
-  {
-    id: "A-20260418-001",
-    date: "2026/04/18",
-    start: "14:00",
-    end: "15:00",
-    patient: "高橋 様",
-    billingTo: "D病院",
-    contractor: "協力業者B",
-    staff: "鈴木 花子",
-    purpose: "通院",
-    fromTo: "自宅 → D病院",
-    estimate: 6000,
-    actual: 6500,
-    diffReason: "階段介助",
-    patientPeriod: "4/11〜4/20",
-    patientDeadline: "04/25",
-    contractorPeriod: "4/21〜4/30",
-    contractorPayDate: "05/05",
-    invoiceStatus: "再請求中",
-    paymentStatus: "未入金",
-    payoutStatus: "未支払",
-    reInvoiceCount: 1,
-    note: "再請求 4/28",
-    color: "bg-orange-500",
-    row: 4,
-    left: "59%",
-    width: "12%",
-  },
-];
-
-const statusClass = {
-  未請求: "bg-orange-50 text-orange-700 border-orange-300",
-  請求済: "bg-blue-50 text-blue-700 border-blue-300",
-  再請求中: "bg-purple-50 text-purple-700 border-purple-300",
-  未入金: "bg-red-50 text-red-700 border-red-300",
-  入金済: "bg-green-50 text-green-700 border-green-300",
-  未支払: "bg-red-50 text-red-700 border-red-300",
-  支払済: "bg-green-50 text-green-700 border-green-300",
-};
-
-function yen(value) {
-  return value.toLocaleString("ja-JP");
-}
-
-function AmountPair({ estimate, actual, showDetail = false }) {
-  const changed = estimate !== actual;
-  return (
-    <div className="flex items-center gap-2 whitespace-nowrap">
-      <span className={`text-blue-600 ${changed ? "line-through decoration-[0.5px] decoration-slate-500" : ""}`}>
-        {yen(estimate)}
-      </span>
-      <span className="text-slate-900 font-semibold">{yen(actual)}</span>
-      {showDetail && changed ? (
-        <span className="text-red-600 text-xs font-semibold">+{yen(actual - estimate)}</span>
-      ) : null}
-    </div>
-  );
-}
-
-function StatusBadge({ value }) {
-  return <span className={`inline-flex rounded-md border px-2 py-1 text-xs font-semibold ${statusClass[value] || "bg-slate-50 text-slate-700 border-slate-300"}`}>{value}</span>;
-}
-
-function DataFlowCard() {
-  return (
-    <div className="rounded-2xl border bg-white p-4 shadow-sm">
-      <div className="text-sm font-bold text-slate-800 mb-3">どこがつながるか</div>
-      <div className="grid grid-cols-5 items-center gap-2 text-center text-xs">
-        <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 font-bold text-blue-800">iPad<br />予約・実績入力</div>
-        <div className="text-2xl text-slate-400">→</div>
-        <div className="rounded-xl bg-slate-100 border border-slate-300 p-3 font-bold text-slate-800">同じデータ<br />案件台帳</div>
-        <div className="text-2xl text-slate-400">→</div>
-        <div className="rounded-xl bg-green-50 border border-green-200 p-3 font-bold text-green-800">PC<br />締め・請求・支払</div>
+  <section id="ipad" class="screen active">
+    <div class="ipad-shell">
+      <div class="ipad-top">
+        <div class="left"><span>☰</span><span>2026/04/21（火）</span><button class="top-btn">今日</button></div>
+        <button class="top-btn">＋ 予約登録</button>
       </div>
-      <div className="mt-3 text-xs text-slate-600 leading-relaxed">
-        iPadで入力した「患者・業者・見積・実金額・メモ」が同じ案件IDに保存され、PCではその同じ案件を「締め・請求・入金・支払」の列として見る構成。
-      </div>
-    </div>
-  );
-}
-
-function IPadView({ selected, setSelected }) {
-  const rows = ["佐藤 太郎", "鈴木 花子", "山田 一郎", "協力業者A", "協力業者B", "協力業者C"];
-  return (
-    <div className="min-h-screen bg-slate-100 p-5">
-      <div className="mx-auto max-w-7xl rounded-[2rem] border-8 border-slate-900 bg-white shadow-2xl overflow-hidden">
-        <div className="flex h-20 items-center justify-between bg-blue-700 px-6 text-white">
-          <div className="flex items-center gap-5">
-            <div className="text-3xl">☰</div>
-            <div className="text-2xl font-bold">2026/04/21（火）</div>
-            <button className="rounded-lg border border-blue-300 px-4 py-2 font-bold">今日</button>
-          </div>
-          <button className="rounded-xl bg-white px-5 py-3 text-lg font-bold text-blue-700">＋ 予約登録</button>
-        </div>
-
-        <div className="grid grid-cols-[1fr_300px] gap-0">
-          <div>
-            <div className="grid grid-cols-[130px_1fr] border-b bg-white">
-              <div className="border-r p-4 text-sm font-bold">担当者 / 業者</div>
-              <div className="grid grid-cols-14 text-center text-sm">
-                {["7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"].map((t) => (
-                  <div key={t} className={`border-r p-4 ${t === "12:00" ? "text-red-600 font-bold" : ""}`}>{t}</div>
-                ))}
-              </div>
-            </div>
-            <div className="grid grid-cols-[130px_1fr]">
-              <div className="bg-slate-50">
-                {rows.map((r) => <div key={r} className="h-20 border-b border-r p-4 font-bold">{r}</div>)}
-              </div>
-              <div className="relative h-[480px] bg-[linear-gradient(to_right,#dbe3ee_1px,transparent_1px),linear-gradient(to_bottom,#dbe3ee_1px,transparent_1px)] bg-[size:7.14%_80px]">
-                <div className="absolute left-[43%] top-0 h-full w-0.5 bg-red-500" />
-                {appointments.map((a) => (
-                  <button
-                    key={a.id}
-                    onClick={() => setSelected(a)}
-                    className={`absolute rounded-lg ${a.color} px-3 py-2 text-white shadow-md text-sm font-bold ${selected.id === a.id ? "ring-4 ring-blue-200" : ""}`}
-                    style={{ top: a.row * 80 + 22, left: a.left, width: a.width }}
-                  >
-                    <div>{a.start}〜{a.end}</div>
-                    <div>{a.patient}</div>
-                  </button>
-                ))}
-              </div>
+      <div class="ipad-main">
+        <div>
+          <div class="timeline-head">
+            <div class="timeline-label">担当者 / 業者</div>
+            <div class="hours">
+              <div>7:00</div><div>8:00</div><div>9:00</div><div>10:00</div><div>11:00</div><div class="now-hour">12:00</div><div>13:00</div><div>14:00</div><div>15:00</div><div>16:00</div><div>17:00</div><div>18:00</div><div>19:00</div><div>20:00</div>
             </div>
           </div>
-
-          <div className="border-l bg-white p-6">
-            <div className="text-lg font-bold">{selected.date} {selected.start}〜{selected.end}</div>
-            <div className="mt-6 text-sm text-slate-500">患者名</div>
-            <div className="mt-1 text-xl font-bold">{selected.patient}</div>
-            <div className="mt-5 text-sm text-slate-500">予約内容</div>
-            <div className="mt-1 font-bold">{selected.fromTo}</div>
-            <div className="mt-1 text-sm">{selected.note || "メモなし"}</div>
-            <div className="my-5 border-t" />
-            <div className="text-sm text-slate-500">金額</div>
-            <div className="mt-1 text-lg"><AmountPair estimate={selected.estimate} actual={selected.actual} showDetail /></div>
-            <div className="mt-5 flex gap-2 text-sm">
-              <StatusBadge value={selected.invoiceStatus} />
-              <StatusBadge value={selected.paymentStatus} />
-              <StatusBadge value={selected.payoutStatus} />
+          <div class="timeline-body">
+            <div class="rows">
+              <div class="row-name">佐藤 太郎</div><div class="row-name">鈴木 花子</div><div class="row-name">山田 一郎</div><div class="row-name">協力業者A</div><div class="row-name">協力業者B</div><div class="row-name">協力業者C</div>
+            </div>
+            <div class="grid">
+              <div class="now-line"></div>
+              <button class="appt green selected" style="top:22px; left:12%; width:12%;" onclick="selectAppt(0)"><div>08:30〜09:30</div><div>田中 様</div></button>
+              <button class="appt blue" style="top:100px; left:27%; width:10%;" onclick="selectAppt(1)"><div>10:00〜10:50</div><div>鈴木 様</div></button>
+              <button class="appt purple" style="top:334px; left:18%; width:11%;" onclick="selectAppt(2)"><div>09:00〜10:00</div><div>佐藤 様</div></button>
+              <button class="appt blue" style="top:178px; left:55%; width:13%;" onclick="selectAppt(3)"><div>13:30〜14:30</div><div>伊藤 様</div></button>
+              <button class="appt orange" style="top:334px; left:59%; width:12%;" onclick="selectAppt(4)"><div>14:00〜15:00</div><div>高橋 様</div></button>
             </div>
           </div>
         </div>
-
-        <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4">
-          <div className="rounded-xl border bg-white p-4">
-            <div className="mb-3 text-lg font-bold text-blue-700">2週間分の予定</div>
-            <div className="grid grid-cols-7 gap-1">
-              {["4/20", "4/21", "4/22", "4/23", "4/24", "4/25", "4/26"].map((d, i) => (
-                <div key={d} className={`h-24 rounded-lg border p-2 text-center ${i === 1 ? "border-blue-500 bg-blue-50" : "bg-white"}`}>
-                  <div className="font-bold">{d}</div>
-                  <div className="mx-auto mt-4 h-2 w-14 rounded-full bg-blue-600" />
-                  {i < 4 ? <div className="mx-auto mt-3 h-2 w-14 rounded-full bg-green-500" /> : null}
-                  {i === 0 ? <div className="mx-auto mt-3 h-2 w-14 rounded-full bg-orange-500" /> : null}
-                </div>
-              ))}
-            </div>
-          </div>
-          <div className="rounded-xl border bg-white p-4">
-            <div className="mb-3 text-lg font-bold text-blue-700">協力業者さんの一覧</div>
-            <div className="space-y-2 text-lg">
-              <div>田中　待機中</div>
-              <div>佐藤　対応中</div>
-              <div>山本　空き</div>
-              <div>他20件</div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div className="mx-auto mt-5 max-w-7xl"><DataFlowCard /></div>
-    </div>
-  );
-}
-
-function PCView() {
-  const summary = useMemo(() => {
-    const estimate = appointments.reduce((s, a) => s + a.estimate, 0);
-    const actual = appointments.reduce((s, a) => s + a.actual, 0);
-    const unpaid = appointments.filter((a) => a.paymentStatus === "未入金").length;
-    const unpayout = appointments.filter((a) => a.payoutStatus === "未支払").length;
-    return { estimate, actual, diff: actual - estimate, unpaid, unpayout };
-  }, []);
-
-  return (
-    <div className="min-h-screen bg-slate-50 text-slate-900">
-      <div className="grid min-h-screen grid-cols-[240px_1fr]">
-        <aside className="bg-green-900 p-5 text-white">
-          <div className="mb-8 text-xl font-bold">🚕 介護タクシー管理</div>
-          {["ダッシュボード", "案件台帳", "締め・請求管理", "入金管理", "支払管理", "再請求管理", "マスター管理", "帳票出力", "設定"].map((n, i) => (
-            <div key={n} className={`mb-2 rounded-lg px-4 py-3 font-bold ${i === 1 ? "bg-green-700" : "text-green-50"}`}>{n}</div>
-          ))}
-          <div className="mt-20 rounded-xl border border-green-600 p-4">
-            <div className="mb-4 font-bold">本日のサマリー</div>
-            <div className="space-y-3 text-sm">
-              <div className="flex justify-between"><span>未請求</span><b>1件</b></div>
-              <div className="flex justify-between"><span>未入金</span><b>{summary.unpaid}件</b></div>
-              <div className="flex justify-between"><span>未支払</span><b>{summary.unpayout}件</b></div>
-              <div className="pt-4 text-red-300">差額 +¥{yen(summary.diff)}</div>
-            </div>
-          </div>
+        <aside class="detail">
+          <div id="detailTitle" class="detail-title">2026/04/21 08:30〜09:30</div>
+          <div class="label">患者名</div><div id="detailPatient" class="value">田中 様</div>
+          <div class="label">予約内容</div><div id="detailRoute" class="value small">自宅 → A病院</div>
+          <div id="detailNote" class="small">車椅子 / 付き添いあり</div>
+          <div class="label">金額</div><div id="detailAmount" class="value"></div>
+          <div id="detailBadges" class="badges"></div>
         </aside>
-
-        <main className="p-7">
-          <div className="mb-6 flex items-center justify-between">
-            <h1 className="text-3xl font-bold text-green-800">案件台帳一覧</h1>
-            <div className="flex gap-3">
-              <button className="rounded-lg border bg-white px-4 py-2 font-bold text-green-700">↓ エクスポート（CSV）</button>
-              <button className="rounded-lg bg-green-700 px-4 py-2 font-bold text-white">＋ 新規登録</button>
-            </div>
-          </div>
-
-          <div className="mb-5 grid grid-cols-6 gap-4 rounded-2xl border bg-white p-4 shadow-sm">
-            {[
-              ["利用日", "2026/04/01 〜 2026/04/30"],
-              ["請求状態", "すべて"],
-              ["入金状態", "すべて"],
-              ["支払状態", "すべて"],
-              ["業者", "すべて"],
-              ["詳細検索", "検索"],
-            ].map(([label, value]) => (
-              <div key={label}>
-                <div className="mb-1 text-xs font-bold text-slate-500">{label}</div>
-                <div className="rounded-lg border bg-slate-50 px-3 py-2 text-sm">{value}</div>
-              </div>
-            ))}
-          </div>
-
-          <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
-            <table className="w-full border-collapse text-sm">
-              <thead className="bg-slate-100 text-xs">
-                <tr>
-                  {[
-                    "利用日", "患者名", "請求先", "業者", "担当者", "見積/実額", "差額", "差額理由", "患者締め", "請求〆切", "業者締め", "支払予定", "請求", "入金", "支払", "再請求", "メモ"
-                  ].map((h) => <th key={h} className="border px-2 py-3">{h}</th>)}
-                </tr>
-              </thead>
-              <tbody>
-                {appointments.map((a) => (
-                  <tr key={a.id} className="hover:bg-green-50">
-                    <td className="border px-2 py-4 text-center">{a.date.slice(5)}</td>
-                    <td className="border px-2 py-4 font-bold">{a.patient}</td>
-                    <td className="border px-2 py-4">{a.billingTo}</td>
-                    <td className="border px-2 py-4">{a.contractor}</td>
-                    <td className="border px-2 py-4">{a.staff.split(" ")[0]}</td>
-                    <td className="border px-2 py-4"><AmountPair estimate={a.estimate} actual={a.actual} /></td>
-                    <td className={`border px-2 py-4 text-center font-bold ${a.actual !== a.estimate ? "text-red-600" : "text-slate-500"}`}>{a.actual - a.estimate === 0 ? "0" : `+${yen(a.actual - a.estimate)}`}</td>
-                    <td className="border px-2 py-4">{a.diffReason}</td>
-                    <td className="border px-2 py-4 text-center">{a.patientPeriod}</td>
-                    <td className="border px-2 py-4 text-center">{a.patientDeadline}</td>
-                    <td className="border px-2 py-4 text-center">{a.contractorPeriod}</td>
-                    <td className="border px-2 py-4 text-center">{a.contractorPayDate}</td>
-                    <td className="border px-2 py-4 text-center"><StatusBadge value={a.invoiceStatus} /></td>
-                    <td className="border px-2 py-4 text-center"><StatusBadge value={a.paymentStatus} /></td>
-                    <td className="border px-2 py-4 text-center"><StatusBadge value={a.payoutStatus} /></td>
-                    <td className="border px-2 py-4 text-center">{a.reInvoiceCount}</td>
-                    <td className="border px-2 py-4 text-xs">{a.note || "-"}</td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          <div className="mt-5 grid grid-cols-4 gap-4">
-            <div className="rounded-2xl border bg-white p-4 shadow-sm">
-              <div className="mb-3 font-bold text-green-800">金額サマリー</div>
-              <div className="space-y-3 text-sm">
-                <div className="flex justify-between"><span>見積合計</span><b>¥{yen(summary.estimate)}</b></div>
-                <div className="flex justify-between"><span>実額合計</span><b>¥{yen(summary.actual)}</b></div>
-                <div className="flex justify-between text-red-600"><span>差額合計</span><b>+¥{yen(summary.diff)}</b></div>
-              </div>
-            </div>
-            <div className="rounded-2xl border bg-white p-4 shadow-sm">
-              <div className="mb-3 font-bold text-green-800">締め・期限情報</div>
-              <div className="text-sm leading-8">患者側締め 12件<br />業者側締め 10件<br />期限切れ 2件</div>
-            </div>
-            <div className="rounded-2xl border bg-white p-4 shadow-sm">
-              <div className="mb-3 font-bold text-green-800">状態サマリー</div>
-              <div className="flex flex-wrap gap-2"><StatusBadge value="未請求" /><StatusBadge value="未入金" /><StatusBadge value="未支払" /><StatusBadge value="再請求中" /></div>
-            </div>
-            <div className="rounded-2xl border bg-white p-4 shadow-sm">
-              <div className="mb-3 font-bold text-green-800">差額理由</div>
-              <div className="text-sm leading-8">待機 1件<br />経由 1件<br />階段介助 1件</div>
-            </div>
-          </div>
-          <div className="mt-5"><DataFlowCard /></div>
-        </main>
+      </div>
+      <div class="ipad-bottom">
+        <div class="card"><h3>2週間分の予定</h3><div class="mini-week"><div class="day"><b>4/20</b><div class="bar"></div><div class="bar orangebar"></div></div><div class="day active"><b>4/21</b><div class="bar"></div><div class="bar greenbar"></div></div><div class="day"><b>4/22</b><div class="bar"></div></div><div class="day"><b>4/23</b><div class="bar greenbar"></div></div><div class="day"><b>4/24</b></div><div class="day"><b>4/25</b></div><div class="day"><b>4/26</b></div></div></div>
+        <div class="card"><h3>協力業者さんの一覧</h3><div class="small" style="font-size:18px; line-height:2; font-weight:800;">田中　待機中<br>佐藤　対応中<br>山本　空き<br>他20件</div></div>
       </div>
     </div>
-  );
-}
+    <div class="flow"><div class="flow-box flow-blue">iPad<br>予約・実績入力</div><div class="arrow">→</div><div class="flow-box">同じデータ<br>案件台帳</div><div class="arrow">→</div><div class="flow-box flow-green">PC<br>締め・請求・支払</div></div>
+  </section>
 
-export default function CareTaxiPrototype() {
-  const [view, setView] = useState("ipad");
-  const [selected, setSelected] = useState(appointments[0]);
-
-  return (
-    <div className="font-sans">
-      <div className="fixed right-4 top-4 z-50 flex gap-2 rounded-full bg-white/90 p-2 shadow-lg backdrop-blur">
-        <button onClick={() => setView("ipad")} className={`rounded-full px-4 py-2 text-sm font-bold ${view === "ipad" ? "bg-blue-700 text-white" : "text-slate-700"}`}>iPad画面</button>
-        <button onClick={() => setView("pc")} className={`rounded-full px-4 py-2 text-sm font-bold ${view === "pc" ? "bg-green-700 text-white" : "text-slate-700"}`}>PC画面</button>
-      </div>
-      {view === "ipad" ? <IPadView selected={selected} setSelected={setSelected} /> : <PCView />}
+  <section id="pc" class="screen">
+    <div class="pc-wrap">
+      <aside class="sidebar"><div class="brand">🚕 介護タクシー管理</div><div class="nav">ダッシュボード</div><div class="nav active">案件台帳</div><div class="nav">締め・請求管理</div><div class="nav">入金管理</div><div class="nav">支払管理</div><div class="nav">再請求管理</div><div class="nav">マスター管理</div><div class="nav">帳票出力</div><div class="nav">設定</div><div class="side-card"><b>本日のサマリー</b><div class="side-row"><span>未請求</span><b>1件</b></div><div class="side-row"><span>未入金</span><b>3件</b></div><div class="side-row"><span>未支払</span><b>4件</b></div><div class="side-row red"><span>差額</span><b>+1,600</b></div></div></aside>
+      <main class="pc-main">
+        <div class="pc-header"><h1>案件台帳一覧</h1><div class="pc-actions"><button>↓ CSV出力</button><button class="primary">＋ 新規登録</button></div></div>
+        <div class="filters"><div><div class="filter-label">利用日</div><div class="filter-box">2026/04/01〜04/30</div></div><div><div class="filter-label">請求状態</div><div class="filter-box">すべて</div></div><div><div class="filter-label">入金状態</div><div class="filter-box">すべて</div></div><div><div class="filter-label">支払状態</div><div class="filter-box">すべて</div></div><div><div class="filter-label">業者</div><div class="filter-box">すべて</div></div><div><div class="filter-label">詳細検索</div><div class="filter-box">検索</div></div></div>
+        <div class="table-box"><table><thead><tr><th>利用日</th><th>患者名</th><th>請求先</th><th>業者</th><th>担当者</th><th>見積/実額</th><th>差額</th><th>差額理由</th><th>患者締め</th><th>請求〆切</th><th>業者締め</th><th>支払予定</th><th>請求</th><th>入金</th><th>支払</th><th>再請求</th><th>メモ</th></tr></thead><tbody id="pcRows"></tbody></table></div>
+        <div class="summary"><div class="card"><h3>金額サマリー</h3><div class="side-row"><span>見積合計</span><b>27,000</b></div><div class="side-row"><span>実額合計</span><b>28,600</b></div><div class="side-row red"><span>差額合計</span><b>+1,600</b></div></div><div class="card"><h3>締め・期限情報</h3><div class="small">患者側締め 12件<br>業者側締め 10件<br>期限切れ 2件</div></div><div class="card"><h3>状態サマリー</h3><div class="badges"><span class="badge b-orange">未請求</span><span class="badge b-red">未入金</span><span class="badge b-red">未支払</span><span class="badge b-purple">再請求中</span></div></div><div class="card"><h3>差額理由</h3><div class="small">待機 1件<br>経由 1件<br>階段介助 1件</div></div></div>
+        <div class="flow"><div class="flow-box flow-blue">iPad入力</div><div class="arrow">→</div><div class="flow-box">同じ案件ID</div><div class="arrow">→</div><div class="flow-box flow-green">PCで締め処理</div></div>
+      </main>
     </div>
-  );
-}
+  </section>
+
+<script>
+const data=[
+ {date:'2026/04/21',start:'08:30',end:'09:30',patient:'田中 様',billingTo:'A病院',contractor:'協力業者A',staff:'佐藤 太郎',route:'自宅 → A病院',estimate:4000,actual:4800,reason:'診察待ち時間30分',patientPeriod:'4/21〜4/30',deadline:'05/05',contractorPeriod:'05/01〜5/10',payDate:'05/15',invoice:'未請求',payment:'未入金',payout:'未支払',re:0,note:'車椅子 / 付き添いあり'},
+ {date:'2026/04/21',start:'10:00',end:'10:50',patient:'鈴木 様',billingTo:'本人',contractor:'協力業者B',staff:'鈴木 花子',route:'B病院 → 自宅',estimate:5500,actual:5500,reason:'-',patientPeriod:'4/21〜4/30',deadline:'05/05',contractorPeriod:'05/01〜5/10',payDate:'05/15',invoice:'請求済',payment:'未入金',payout:'未支払',re:0,note:''},
+ {date:'2026/04/20',start:'09:00',end:'10:00',patient:'佐藤 様',billingTo:'Cクリニック',contractor:'協力業者A',staff:'山田 一郎',route:'薬局 → 施設',estimate:3500,actual:3800,reason:'経由あり',patientPeriod:'4/11〜4/20',deadline:'04/25',contractorPeriod:'4/21〜4/30',payDate:'05/05',invoice:'請求済',payment:'入金済',payout:'未支払',re:0,note:'経由先追加'},
+ {date:'2026/04/19',start:'13:30',end:'14:30',patient:'伊藤 様',billingTo:'A病院',contractor:'協力業者C',staff:'佐藤 太郎',route:'自宅 → A病院',estimate:8000,actual:8000,reason:'-',patientPeriod:'4/01〜4/10',deadline:'04/15',contractorPeriod:'4/11〜4/20',payDate:'04/25',invoice:'請求済',payment:'入金済',payout:'支払済',re:0,note:''},
+ {date:'2026/04/18',start:'14:00',end:'15:00',patient:'高橋 様',billingTo:'D病院',contractor:'協力業者B',staff:'鈴木 花子',route:'自宅 → D病院',estimate:6000,actual:6500,reason:'階段介助',patientPeriod:'4/11〜4/20',deadline:'04/25',contractorPeriod:'4/21〜4/30',payDate:'05/05',invoice:'再請求中',payment:'未入金',payout:'未支払',re:1,note:'再請求 4/28'}
+];
+const yen=n=>n.toLocaleString('ja-JP');
+function badgeClass(v){ if(v==='未請求')return'b-orange'; if(v==='請求済')return'b-blue'; if(v==='再請求中')return'b-purple'; if(v==='未入金'||v==='未支払')return'b-red'; if(v==='入金済'||v==='支払済')return'b-green'; return''; }
+function amountHTML(a, detail=false){ const ch=a.estimate!==a.actual; return `<span class="amount-pair"><span class="estimate ${ch?'changed':''}">${yen(a.estimate)}</span><span class="actual">${yen(a.actual)}</span>${detail&&ch?`<span class="diff">+${yen(a.actual-a.estimate)}</span>`:''}</span>`; }
+function statusHTML(v){return `<span class="badge ${badgeClass(v)}">${v}</span>`}
+function showView(v){document.getElementById('ipad').classList.toggle('active',v==='ipad');document.getElementById('pc').classList.toggle('active',v==='pc');document.getElementById('btnIpad').className=v==='ipad'?'active-ipad':'';document.getElementById('btnPc').className=v==='pc'?'active-pc':'';}
+function selectAppt(i){document.querySelectorAll('.appt').forEach((b,idx)=>b.classList.toggle('selected',idx===i)); const a=data[i]; document.getElementById('detailTitle').textContent=`${a.date} ${a.start}〜${a.end}`; document.getElementById('detailPatient').textContent=a.patient; document.getElementById('detailRoute').textContent=a.route; document.getElementById('detailNote').textContent=a.note||'メモなし'; document.getElementById('detailAmount').innerHTML=amountHTML(a,true); document.getElementById('detailBadges').innerHTML=statusHTML(a.invoice)+statusHTML(a.payment)+statusHTML(a.payout);}
+function renderPc(){document.getElementById('pcRows').innerHTML=data.map(a=>`<tr><td class="center">${a.date.slice(5)}</td><td class="bold">${a.patient}</td><td>${a.billingTo}</td><td>${a.contractor}</td><td>${a.staff.split(' ')[0]}</td><td>${amountHTML(a)}</td><td class="center ${a.actual!==a.estimate?'red':'muted'}">${a.actual-a.estimate===0?'0':'+'+yen(a.actual-a.estimate)}</td><td>${a.reason}</td><td class="center">${a.patientPeriod}</td><td class="center">${a.deadline}</td><td class="center">${a.contractorPeriod}</td><td class="center">${a.payDate}</td><td class="center">${statusHTML(a.invoice)}</td><td class="center">${statusHTML(a.payment)}</td><td class="center">${statusHTML(a.payout)}</td><td class="center">${a.re}</td><td>${a.note||'-'}</td></tr>`).join('')}
+selectAppt(0); renderPc();
+</script>
+</body>
+</html>
