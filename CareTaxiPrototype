@@ -1,0 +1,420 @@
+import React, { useMemo, useState } from "react";
+
+const appointments = [
+  {
+    id: "A-20260421-001",
+    date: "2026/04/21",
+    start: "08:30",
+    end: "09:30",
+    patient: "田中 様",
+    billingTo: "A病院",
+    contractor: "協力業者A",
+    staff: "佐藤 太郎",
+    purpose: "通院",
+    fromTo: "自宅 → A病院",
+    estimate: 4000,
+    actual: 4800,
+    diffReason: "診察待ち時間30分",
+    patientPeriod: "4/21〜4/30",
+    patientDeadline: "05/05",
+    contractorPeriod: "05/01〜5/10",
+    contractorPayDate: "05/15",
+    invoiceStatus: "未請求",
+    paymentStatus: "未入金",
+    payoutStatus: "未支払",
+    reInvoiceCount: 0,
+    note: "車椅子 / 付き添いあり",
+    color: "bg-green-600",
+    row: 0,
+    left: "12%",
+    width: "12%",
+  },
+  {
+    id: "A-20260421-002",
+    date: "2026/04/21",
+    start: "10:00",
+    end: "10:50",
+    patient: "鈴木 様",
+    billingTo: "本人",
+    contractor: "協力業者B",
+    staff: "鈴木 花子",
+    purpose: "退院",
+    fromTo: "B病院 → 自宅",
+    estimate: 5500,
+    actual: 5500,
+    diffReason: "-",
+    patientPeriod: "4/21〜4/30",
+    patientDeadline: "05/05",
+    contractorPeriod: "05/01〜5/10",
+    contractorPayDate: "05/15",
+    invoiceStatus: "請求済",
+    paymentStatus: "未入金",
+    payoutStatus: "未支払",
+    reInvoiceCount: 0,
+    note: "",
+    color: "bg-blue-600",
+    row: 1,
+    left: "27%",
+    width: "10%",
+  },
+  {
+    id: "A-20260420-001",
+    date: "2026/04/20",
+    start: "09:00",
+    end: "10:00",
+    patient: "佐藤 様",
+    billingTo: "Cクリニック",
+    contractor: "協力業者A",
+    staff: "山田 一郎",
+    purpose: "転院・施設",
+    fromTo: "薬局 → 施設",
+    estimate: 3500,
+    actual: 3800,
+    diffReason: "経由あり",
+    patientPeriod: "4/11〜4/20",
+    patientDeadline: "04/25",
+    contractorPeriod: "4/21〜4/30",
+    contractorPayDate: "05/05",
+    invoiceStatus: "請求済",
+    paymentStatus: "入金済",
+    payoutStatus: "未支払",
+    reInvoiceCount: 0,
+    note: "経由先追加",
+    color: "bg-purple-600",
+    row: 4,
+    left: "18%",
+    width: "11%",
+  },
+  {
+    id: "A-20260419-001",
+    date: "2026/04/19",
+    start: "13:30",
+    end: "14:30",
+    patient: "伊藤 様",
+    billingTo: "A病院",
+    contractor: "協力業者C",
+    staff: "佐藤 太郎",
+    purpose: "検査・リハビリ",
+    fromTo: "自宅 → A病院",
+    estimate: 8000,
+    actual: 8000,
+    diffReason: "-",
+    patientPeriod: "4/01〜4/10",
+    patientDeadline: "04/15",
+    contractorPeriod: "4/11〜4/20",
+    contractorPayDate: "04/25",
+    invoiceStatus: "請求済",
+    paymentStatus: "入金済",
+    payoutStatus: "支払済",
+    reInvoiceCount: 0,
+    note: "",
+    color: "bg-blue-700",
+    row: 2,
+    left: "55%",
+    width: "13%",
+  },
+  {
+    id: "A-20260418-001",
+    date: "2026/04/18",
+    start: "14:00",
+    end: "15:00",
+    patient: "高橋 様",
+    billingTo: "D病院",
+    contractor: "協力業者B",
+    staff: "鈴木 花子",
+    purpose: "通院",
+    fromTo: "自宅 → D病院",
+    estimate: 6000,
+    actual: 6500,
+    diffReason: "階段介助",
+    patientPeriod: "4/11〜4/20",
+    patientDeadline: "04/25",
+    contractorPeriod: "4/21〜4/30",
+    contractorPayDate: "05/05",
+    invoiceStatus: "再請求中",
+    paymentStatus: "未入金",
+    payoutStatus: "未支払",
+    reInvoiceCount: 1,
+    note: "再請求 4/28",
+    color: "bg-orange-500",
+    row: 4,
+    left: "59%",
+    width: "12%",
+  },
+];
+
+const statusClass = {
+  未請求: "bg-orange-50 text-orange-700 border-orange-300",
+  請求済: "bg-blue-50 text-blue-700 border-blue-300",
+  再請求中: "bg-purple-50 text-purple-700 border-purple-300",
+  未入金: "bg-red-50 text-red-700 border-red-300",
+  入金済: "bg-green-50 text-green-700 border-green-300",
+  未支払: "bg-red-50 text-red-700 border-red-300",
+  支払済: "bg-green-50 text-green-700 border-green-300",
+};
+
+function yen(value) {
+  return value.toLocaleString("ja-JP");
+}
+
+function AmountPair({ estimate, actual, showDetail = false }) {
+  const changed = estimate !== actual;
+  return (
+    <div className="flex items-center gap-2 whitespace-nowrap">
+      <span className={`text-blue-600 ${changed ? "line-through decoration-[0.5px] decoration-slate-500" : ""}`}>
+        {yen(estimate)}
+      </span>
+      <span className="text-slate-900 font-semibold">{yen(actual)}</span>
+      {showDetail && changed ? (
+        <span className="text-red-600 text-xs font-semibold">+{yen(actual - estimate)}</span>
+      ) : null}
+    </div>
+  );
+}
+
+function StatusBadge({ value }) {
+  return <span className={`inline-flex rounded-md border px-2 py-1 text-xs font-semibold ${statusClass[value] || "bg-slate-50 text-slate-700 border-slate-300"}`}>{value}</span>;
+}
+
+function DataFlowCard() {
+  return (
+    <div className="rounded-2xl border bg-white p-4 shadow-sm">
+      <div className="text-sm font-bold text-slate-800 mb-3">どこがつながるか</div>
+      <div className="grid grid-cols-5 items-center gap-2 text-center text-xs">
+        <div className="rounded-xl bg-blue-50 border border-blue-200 p-3 font-bold text-blue-800">iPad<br />予約・実績入力</div>
+        <div className="text-2xl text-slate-400">→</div>
+        <div className="rounded-xl bg-slate-100 border border-slate-300 p-3 font-bold text-slate-800">同じデータ<br />案件台帳</div>
+        <div className="text-2xl text-slate-400">→</div>
+        <div className="rounded-xl bg-green-50 border border-green-200 p-3 font-bold text-green-800">PC<br />締め・請求・支払</div>
+      </div>
+      <div className="mt-3 text-xs text-slate-600 leading-relaxed">
+        iPadで入力した「患者・業者・見積・実金額・メモ」が同じ案件IDに保存され、PCではその同じ案件を「締め・請求・入金・支払」の列として見る構成。
+      </div>
+    </div>
+  );
+}
+
+function IPadView({ selected, setSelected }) {
+  const rows = ["佐藤 太郎", "鈴木 花子", "山田 一郎", "協力業者A", "協力業者B", "協力業者C"];
+  return (
+    <div className="min-h-screen bg-slate-100 p-5">
+      <div className="mx-auto max-w-7xl rounded-[2rem] border-8 border-slate-900 bg-white shadow-2xl overflow-hidden">
+        <div className="flex h-20 items-center justify-between bg-blue-700 px-6 text-white">
+          <div className="flex items-center gap-5">
+            <div className="text-3xl">☰</div>
+            <div className="text-2xl font-bold">2026/04/21（火）</div>
+            <button className="rounded-lg border border-blue-300 px-4 py-2 font-bold">今日</button>
+          </div>
+          <button className="rounded-xl bg-white px-5 py-3 text-lg font-bold text-blue-700">＋ 予約登録</button>
+        </div>
+
+        <div className="grid grid-cols-[1fr_300px] gap-0">
+          <div>
+            <div className="grid grid-cols-[130px_1fr] border-b bg-white">
+              <div className="border-r p-4 text-sm font-bold">担当者 / 業者</div>
+              <div className="grid grid-cols-14 text-center text-sm">
+                {["7:00", "8:00", "9:00", "10:00", "11:00", "12:00", "13:00", "14:00", "15:00", "16:00", "17:00", "18:00", "19:00", "20:00"].map((t) => (
+                  <div key={t} className={`border-r p-4 ${t === "12:00" ? "text-red-600 font-bold" : ""}`}>{t}</div>
+                ))}
+              </div>
+            </div>
+            <div className="grid grid-cols-[130px_1fr]">
+              <div className="bg-slate-50">
+                {rows.map((r) => <div key={r} className="h-20 border-b border-r p-4 font-bold">{r}</div>)}
+              </div>
+              <div className="relative h-[480px] bg-[linear-gradient(to_right,#dbe3ee_1px,transparent_1px),linear-gradient(to_bottom,#dbe3ee_1px,transparent_1px)] bg-[size:7.14%_80px]">
+                <div className="absolute left-[43%] top-0 h-full w-0.5 bg-red-500" />
+                {appointments.map((a) => (
+                  <button
+                    key={a.id}
+                    onClick={() => setSelected(a)}
+                    className={`absolute rounded-lg ${a.color} px-3 py-2 text-white shadow-md text-sm font-bold ${selected.id === a.id ? "ring-4 ring-blue-200" : ""}`}
+                    style={{ top: a.row * 80 + 22, left: a.left, width: a.width }}
+                  >
+                    <div>{a.start}〜{a.end}</div>
+                    <div>{a.patient}</div>
+                  </button>
+                ))}
+              </div>
+            </div>
+          </div>
+
+          <div className="border-l bg-white p-6">
+            <div className="text-lg font-bold">{selected.date} {selected.start}〜{selected.end}</div>
+            <div className="mt-6 text-sm text-slate-500">患者名</div>
+            <div className="mt-1 text-xl font-bold">{selected.patient}</div>
+            <div className="mt-5 text-sm text-slate-500">予約内容</div>
+            <div className="mt-1 font-bold">{selected.fromTo}</div>
+            <div className="mt-1 text-sm">{selected.note || "メモなし"}</div>
+            <div className="my-5 border-t" />
+            <div className="text-sm text-slate-500">金額</div>
+            <div className="mt-1 text-lg"><AmountPair estimate={selected.estimate} actual={selected.actual} showDetail /></div>
+            <div className="mt-5 flex gap-2 text-sm">
+              <StatusBadge value={selected.invoiceStatus} />
+              <StatusBadge value={selected.paymentStatus} />
+              <StatusBadge value={selected.payoutStatus} />
+            </div>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-2 gap-4 bg-slate-50 p-4">
+          <div className="rounded-xl border bg-white p-4">
+            <div className="mb-3 text-lg font-bold text-blue-700">2週間分の予定</div>
+            <div className="grid grid-cols-7 gap-1">
+              {["4/20", "4/21", "4/22", "4/23", "4/24", "4/25", "4/26"].map((d, i) => (
+                <div key={d} className={`h-24 rounded-lg border p-2 text-center ${i === 1 ? "border-blue-500 bg-blue-50" : "bg-white"}`}>
+                  <div className="font-bold">{d}</div>
+                  <div className="mx-auto mt-4 h-2 w-14 rounded-full bg-blue-600" />
+                  {i < 4 ? <div className="mx-auto mt-3 h-2 w-14 rounded-full bg-green-500" /> : null}
+                  {i === 0 ? <div className="mx-auto mt-3 h-2 w-14 rounded-full bg-orange-500" /> : null}
+                </div>
+              ))}
+            </div>
+          </div>
+          <div className="rounded-xl border bg-white p-4">
+            <div className="mb-3 text-lg font-bold text-blue-700">協力業者さんの一覧</div>
+            <div className="space-y-2 text-lg">
+              <div>田中　待機中</div>
+              <div>佐藤　対応中</div>
+              <div>山本　空き</div>
+              <div>他20件</div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="mx-auto mt-5 max-w-7xl"><DataFlowCard /></div>
+    </div>
+  );
+}
+
+function PCView() {
+  const summary = useMemo(() => {
+    const estimate = appointments.reduce((s, a) => s + a.estimate, 0);
+    const actual = appointments.reduce((s, a) => s + a.actual, 0);
+    const unpaid = appointments.filter((a) => a.paymentStatus === "未入金").length;
+    const unpayout = appointments.filter((a) => a.payoutStatus === "未支払").length;
+    return { estimate, actual, diff: actual - estimate, unpaid, unpayout };
+  }, []);
+
+  return (
+    <div className="min-h-screen bg-slate-50 text-slate-900">
+      <div className="grid min-h-screen grid-cols-[240px_1fr]">
+        <aside className="bg-green-900 p-5 text-white">
+          <div className="mb-8 text-xl font-bold">🚕 介護タクシー管理</div>
+          {["ダッシュボード", "案件台帳", "締め・請求管理", "入金管理", "支払管理", "再請求管理", "マスター管理", "帳票出力", "設定"].map((n, i) => (
+            <div key={n} className={`mb-2 rounded-lg px-4 py-3 font-bold ${i === 1 ? "bg-green-700" : "text-green-50"}`}>{n}</div>
+          ))}
+          <div className="mt-20 rounded-xl border border-green-600 p-4">
+            <div className="mb-4 font-bold">本日のサマリー</div>
+            <div className="space-y-3 text-sm">
+              <div className="flex justify-between"><span>未請求</span><b>1件</b></div>
+              <div className="flex justify-between"><span>未入金</span><b>{summary.unpaid}件</b></div>
+              <div className="flex justify-between"><span>未支払</span><b>{summary.unpayout}件</b></div>
+              <div className="pt-4 text-red-300">差額 +¥{yen(summary.diff)}</div>
+            </div>
+          </div>
+        </aside>
+
+        <main className="p-7">
+          <div className="mb-6 flex items-center justify-between">
+            <h1 className="text-3xl font-bold text-green-800">案件台帳一覧</h1>
+            <div className="flex gap-3">
+              <button className="rounded-lg border bg-white px-4 py-2 font-bold text-green-700">↓ エクスポート（CSV）</button>
+              <button className="rounded-lg bg-green-700 px-4 py-2 font-bold text-white">＋ 新規登録</button>
+            </div>
+          </div>
+
+          <div className="mb-5 grid grid-cols-6 gap-4 rounded-2xl border bg-white p-4 shadow-sm">
+            {[
+              ["利用日", "2026/04/01 〜 2026/04/30"],
+              ["請求状態", "すべて"],
+              ["入金状態", "すべて"],
+              ["支払状態", "すべて"],
+              ["業者", "すべて"],
+              ["詳細検索", "検索"],
+            ].map(([label, value]) => (
+              <div key={label}>
+                <div className="mb-1 text-xs font-bold text-slate-500">{label}</div>
+                <div className="rounded-lg border bg-slate-50 px-3 py-2 text-sm">{value}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="overflow-hidden rounded-2xl border bg-white shadow-sm">
+            <table className="w-full border-collapse text-sm">
+              <thead className="bg-slate-100 text-xs">
+                <tr>
+                  {[
+                    "利用日", "患者名", "請求先", "業者", "担当者", "見積/実額", "差額", "差額理由", "患者締め", "請求〆切", "業者締め", "支払予定", "請求", "入金", "支払", "再請求", "メモ"
+                  ].map((h) => <th key={h} className="border px-2 py-3">{h}</th>)}
+                </tr>
+              </thead>
+              <tbody>
+                {appointments.map((a) => (
+                  <tr key={a.id} className="hover:bg-green-50">
+                    <td className="border px-2 py-4 text-center">{a.date.slice(5)}</td>
+                    <td className="border px-2 py-4 font-bold">{a.patient}</td>
+                    <td className="border px-2 py-4">{a.billingTo}</td>
+                    <td className="border px-2 py-4">{a.contractor}</td>
+                    <td className="border px-2 py-4">{a.staff.split(" ")[0]}</td>
+                    <td className="border px-2 py-4"><AmountPair estimate={a.estimate} actual={a.actual} /></td>
+                    <td className={`border px-2 py-4 text-center font-bold ${a.actual !== a.estimate ? "text-red-600" : "text-slate-500"}`}>{a.actual - a.estimate === 0 ? "0" : `+${yen(a.actual - a.estimate)}`}</td>
+                    <td className="border px-2 py-4">{a.diffReason}</td>
+                    <td className="border px-2 py-4 text-center">{a.patientPeriod}</td>
+                    <td className="border px-2 py-4 text-center">{a.patientDeadline}</td>
+                    <td className="border px-2 py-4 text-center">{a.contractorPeriod}</td>
+                    <td className="border px-2 py-4 text-center">{a.contractorPayDate}</td>
+                    <td className="border px-2 py-4 text-center"><StatusBadge value={a.invoiceStatus} /></td>
+                    <td className="border px-2 py-4 text-center"><StatusBadge value={a.paymentStatus} /></td>
+                    <td className="border px-2 py-4 text-center"><StatusBadge value={a.payoutStatus} /></td>
+                    <td className="border px-2 py-4 text-center">{a.reInvoiceCount}</td>
+                    <td className="border px-2 py-4 text-xs">{a.note || "-"}</td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+
+          <div className="mt-5 grid grid-cols-4 gap-4">
+            <div className="rounded-2xl border bg-white p-4 shadow-sm">
+              <div className="mb-3 font-bold text-green-800">金額サマリー</div>
+              <div className="space-y-3 text-sm">
+                <div className="flex justify-between"><span>見積合計</span><b>¥{yen(summary.estimate)}</b></div>
+                <div className="flex justify-between"><span>実額合計</span><b>¥{yen(summary.actual)}</b></div>
+                <div className="flex justify-between text-red-600"><span>差額合計</span><b>+¥{yen(summary.diff)}</b></div>
+              </div>
+            </div>
+            <div className="rounded-2xl border bg-white p-4 shadow-sm">
+              <div className="mb-3 font-bold text-green-800">締め・期限情報</div>
+              <div className="text-sm leading-8">患者側締め 12件<br />業者側締め 10件<br />期限切れ 2件</div>
+            </div>
+            <div className="rounded-2xl border bg-white p-4 shadow-sm">
+              <div className="mb-3 font-bold text-green-800">状態サマリー</div>
+              <div className="flex flex-wrap gap-2"><StatusBadge value="未請求" /><StatusBadge value="未入金" /><StatusBadge value="未支払" /><StatusBadge value="再請求中" /></div>
+            </div>
+            <div className="rounded-2xl border bg-white p-4 shadow-sm">
+              <div className="mb-3 font-bold text-green-800">差額理由</div>
+              <div className="text-sm leading-8">待機 1件<br />経由 1件<br />階段介助 1件</div>
+            </div>
+          </div>
+          <div className="mt-5"><DataFlowCard /></div>
+        </main>
+      </div>
+    </div>
+  );
+}
+
+export default function CareTaxiPrototype() {
+  const [view, setView] = useState("ipad");
+  const [selected, setSelected] = useState(appointments[0]);
+
+  return (
+    <div className="font-sans">
+      <div className="fixed right-4 top-4 z-50 flex gap-2 rounded-full bg-white/90 p-2 shadow-lg backdrop-blur">
+        <button onClick={() => setView("ipad")} className={`rounded-full px-4 py-2 text-sm font-bold ${view === "ipad" ? "bg-blue-700 text-white" : "text-slate-700"}`}>iPad画面</button>
+        <button onClick={() => setView("pc")} className={`rounded-full px-4 py-2 text-sm font-bold ${view === "pc" ? "bg-green-700 text-white" : "text-slate-700"}`}>PC画面</button>
+      </div>
+      {view === "ipad" ? <IPadView selected={selected} setSelected={setSelected} /> : <PCView />}
+    </div>
+  );
+}
