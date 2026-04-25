@@ -12,6 +12,7 @@
     .view-switch button { border:0; border-radius:999px; padding:10px 18px; font-weight:800; color:#334155; background:transparent; }
     .view-switch button.active-ipad { background:#1d4ed8; color:#fff; }
     .view-switch button.active-pc { background:#15803d; color:#fff; }
+    .settings-btn { text-decoration:none; border:0; border-radius:999px; padding:10px 18px; font-weight:900; color:#fff; background:#475569; display:inline-flex; align-items:center; }
     .screen { display:none; min-height:100vh; padding:26px; }
     .screen.active { display:block; }
     .ipad-shell { max-width:1250px; margin:0 auto; border:10px solid #111827; border-radius:36px; overflow:hidden; background:#fff; box-shadow:0 25px 70px rgba(0,0,0,.28); }
@@ -68,6 +69,7 @@
     .brand { font-size:21px; font-weight:950; margin-bottom:28px; }
     .nav { padding:13px 14px; border-radius:10px; margin-bottom:8px; font-weight:900; color:#dcfce7; }
     .nav.active { background:#15803d; color:#fff; }
+    .settings-nav { display:block; text-decoration:none; }
     .side-card { margin-top:42px; border:1px solid #22c55e; border-radius:16px; padding:16px; }
     .side-row { display:flex; justify-content:space-between; font-size:14px; margin-top:12px; }
     .pc-main { padding:30px; overflow:auto; }
@@ -105,6 +107,7 @@
   <div class="view-switch">
     <button id="btnIpad" class="active-ipad" onclick="showView('ipad')">iPad画面</button>
     <button id="btnPc" onclick="showView('pc')">PC画面</button>
+    <a class="settings-btn" href="settings.html">設定</a>
   </div>
 
   <section id="ipad" class="screen active">
@@ -154,7 +157,7 @@
 
   <section id="pc" class="screen">
     <div class="pc-wrap">
-      <aside class="sidebar"><div class="brand">🚕 介護タクシー管理</div><div class="nav">ダッシュボード</div><div class="nav active">案件台帳</div><div class="nav">締め・請求管理</div><div class="nav">入金管理</div><div class="nav">支払管理</div><div class="nav">再請求管理</div><div class="nav">マスター管理</div><div class="nav">帳票出力</div><div class="nav">設定</div><div class="side-card"><b>本日のサマリー</b><div class="side-row"><span>未請求</span><b>1件</b></div><div class="side-row"><span>未入金</span><b>3件</b></div><div class="side-row"><span>未支払</span><b>4件</b></div><div class="side-row red"><span>差額</span><b>+1,600</b></div></div></aside>
+      <aside class="sidebar"><div class="brand">🚕 介護タクシー管理</div><div class="nav">ダッシュボード</div><div class="nav active">案件台帳</div><div class="nav">締め・請求管理</div><div class="nav">入金管理</div><div class="nav">支払管理</div><div class="nav">再請求管理</div><div class="nav">マスター管理</div><div class="nav">帳票出力</div><a class="nav settings-nav" href="settings.html">設定</a><div class="side-card"><b>本日のサマリー</b><div class="side-row"><span>未請求</span><b>1件</b></div><div class="side-row"><span>未入金</span><b>3件</b></div><div class="side-row"><span>未支払</span><b>4件</b></div><div class="side-row red"><span>差額</span><b>+1,600</b></div></div></aside>
       <main class="pc-main">
         <div class="pc-header"><h1>案件台帳一覧</h1><div class="pc-actions"><button>↓ CSV出力</button><button class="primary">＋ 新規登録</button></div></div>
         <div class="filters"><div><div class="filter-label">利用日</div><div class="filter-box">2026/04/01〜04/30</div></div><div><div class="filter-label">請求状態</div><div class="filter-box">すべて</div></div><div><div class="filter-label">入金状態</div><div class="filter-box">すべて</div></div><div><div class="filter-label">支払状態</div><div class="filter-box">すべて</div></div><div><div class="filter-label">業者</div><div class="filter-box">すべて</div></div><div><div class="filter-label">詳細検索</div><div class="filter-box">検索</div></div></div>
