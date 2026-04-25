@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>介護タクシー管理アプリ｜設定</title>
+<style>
+:root{
+  --bg:#f2f3f7;--card:#fff;--text:#111;--sub:#777b83;--line:#e3e5ea;
+  --blue:#1d7fd3;--green:#7FC84E;--green2:#9ED36A;--orange:#ff9500;--purple:#5856d6;
+  --radius:28px;
+}
+*{box-sizing:border-box}
+html,body{margin:0;min-height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Hiragino Sans","Yu Gothic",Meiryo,sans-serif;background:var(--bg);color:var(--text)}
+body{padding:38px 28px 48px}
+.app{max-width:760px;margin:0 auto}
+.status{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 24px;font-size:26px;font-weight:900}
+.status-right{display:flex;gap:12px;align-items:center;font-size:19px}
+.battery{border:3px solid #111;border-radius:7px;padding:2px 8px;font-size:17px;line-height:1}
+.header{margin-top:96px;margin-bottom:22px}
+h1{font-size:56px;line-height:1;margin:0;font-weight:900;letter-spacing:-.04em}
+.group{background:var(--card);border-radius:var(--radius);overflow:hidden;margin:0 0 28px;box-shadow:0 1px 0 rgba(0,0,0,.03)}
+.row{min-height:86px;display:grid;grid-template-columns:58px 1fr auto 28px;gap:16px;align-items:center;padding:0 26px;border-bottom:1px solid var(--line);text-decoration:none;color:inherit}
+.row:last-child{border-bottom:none}
+.icon{width:42px;height:42px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:22px;color:white;font-weight:900}
+.basic{background:#34a853}.patient{background:#1d7fd3}.vendor{background:#ff9500}.display{background:#5856d6}.storage{background:#00a884}.master{background:#8e8e93}.lock{background:#3a3a3c}.help{background:#64c7e8}
+.title{font-size:29px;font-weight:900;letter-spacing:-.02em}
+.desc{font-size:18px;color:var(--sub);font-weight:700;margin-top:4px;line-height:1.28}
+.value{font-size:21px;color:var(--sub);font-weight:800;white-space:nowrap}
+.chev{font-size:46px;line-height:1;color:#8b8d93;font-weight:800;transform:translateY(-1px)}
+.section-title{margin:28px 8px 12px;color:#747982;font-size:22px;font-weight:900;letter-spacing:.02em}
+.search{position:sticky;bottom:18px;margin:34px auto 0;max-width:680px;height:72px;background:rgba(255,255,255,.92);border:2px solid #1f2328;border-radius:38px;display:flex;align-items:center;gap:18px;padding:0 28px;backdrop-filter:blur(18px);box-shadow:0 12px 34px rgba(0,0,0,.08);color:#777;font-size:28px;font-weight:900}
+.search .mag{font-size:36px;color:#111}
+.detail-page{display:none}.detail-page.active{display:block}.top-page.hidden{display:none}
+.nav{margin-top:38px;height:60px;display:grid;grid-template-columns:80px 1fr 80px;align-items:center}
+.back{width:58px;height:58px;border-radius:50%;border:2px solid #242424;background:white;display:flex;align-items:center;justify-content:center;font-size:42px;font-weight:900;line-height:1;cursor:pointer}
+.nav-title{text-align:center;font-size:30px;font-weight:900}
+.detail-body{margin-top:52px}
+.setting-row{min-height:78px;display:grid;grid-template-columns:1fr auto 28px;gap:16px;align-items:center;padding:0 26px;border-bottom:1px solid var(--line);cursor:pointer}
+.setting-row:last-child{border-bottom:none}
+.setting-title{font-size:26px;font-weight:850}
+.setting-value{font-size:24px;color:#6f737b;font-weight:850}
+.switch{width:86px;height:48px;border-radius:30px;background:#8e8e93;position:relative}
+.switch.on{background:#0a9f45}
+.switch:before{content:"";position:absolute;width:40px;height:40px;border-radius:50%;background:white;top:4px;left:4px;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.switch.on:before{left:42px}
+.memo{font-size:17px;color:#777;line-height:1.5;margin:12px 12px 28px}
+.pill{display:inline-flex;align-items:center;border-radius:999px;padding:9px 12px;background:#eff8ea;color:#347b20;font-weight:900;font-size:15px}
+@media (max-width:560px){
+ body{padding:28px 18px 40px}h1{font-size:48px}.header{margin-top:72px}
+ .row{grid-template-columns:48px 1fr auto 24px;padding:0 20px;min-height:78px}
+ .title{font-size:25px}.desc{font-size:16px}.value{font-size:18px}.chev{font-size:40px}.icon{width:38px;height:38px}.setting-title{font-size:23px}.setting-value{font-size:21px}
+}
+</style>
+</head>
+<body>
+<main class="app">
+<div class="top-page" id="topPage">
+  <div class="status"><div>4:00</div><div class="status-right"><span>▮▮▮</span><span>Wi‑Fi</span><span class="battery">92</span></div></div>
+  <div class="header"><h1>設定</h1></div>
+
+  <div class="group">
+    <a class="row" href="#basic" data-page="basic"><div class="icon basic">基</div><div><div class="title">基本設定</div><div class="desc">全体の基準日・初期ルール</div></div><div class="value">共通</div><div class="chev">›</div></a>
+    <a class="row" href="#patient" data-page="patient"><div class="icon patient">請</div><div><div class="title">患者・請求</div><div class="desc">請求先・締め・入金・再請求</div></div><div class="value">お金入る側</div><div class="chev">›</div></a>
+    <a class="row" href="#vendor" data-page="vendor"><div class="icon vendor">払</div><div><div class="title">業者・支払</div><div class="desc">仕切り率・支払日・先払い</div></div><div class="value">お金出る側</div><div class="chev">›</div></a>
+  </div>
+
+  <div class="group">
+    <a class="row" href="#display" data-page="display"><div class="icon display">表</div><div><div class="title">表示</div><div class="desc">色・見積額・実金額の見せ方</div></div><div class="value">画面ルール</div><div class="chev">›</div></a>
+    <a class="row" href="#storage" data-page="storage"><div class="icon storage">保</div><div><div class="title">保存・アカウント</div><div class="desc">Google連携・保存先スプレッド</div></div><div class="value">未接続</div><div class="chev">›</div></a>
+    <a class="row" href="#master" data-page="master"><div class="icon master">台</div><div><div class="title">マスター管理</div><div class="desc">患者・業者・請求先の登録</div></div><div class="value">一覧</div><div class="chev">›</div></a>
+  </div>
+
+  <div class="group">
+    <a class="row" href="#lock" data-page="lock"><div class="icon lock">錠</div><div><div class="title">セキュリティ</div><div class="desc">暗証番号・自動ロック</div></div><div class="value">OFF</div><div class="chev">›</div></a>
+  </div>
+
+  <div class="section-title">確認</div>
+  <div class="group">
+    <a class="row" href="#about" data-page="about"><div class="icon help">?</div><div><div class="title">この設定の考え方</div><div class="desc">各画面は設定値を参照して動作します</div></div><div class="value"></div><div class="chev">›</div></a>
+  </div>
+  <div class="search"><span class="mag">⌕</span><span>検索</span></div>
+</div>
+
+<section class="detail-page" id="page-basic">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">基本設定</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">患者側の基本締め日</div><div class="setting-value">月末</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">患者側の基本請求書締切</div><div class="setting-value">翌月5日</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">患者側の基本入金予定日</div><div class="setting-value">翌月末</div><div class="chev">›</div></div>
+    </div>
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">業者側の基本締め日</div><div class="setting-value">月末</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">業者側の基本請求書締切</div><div class="setting-value">翌月5日</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">業者側の基本支払予定日</div><div class="setting-value">翌月15日</div><div class="chev">›</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="detail-page" id="page-patient">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">患者・請求</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">請求先別設定</div><div class="setting-value">0件</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">患者別設定</div><div class="setting-value">0件</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">役所案件の請求設定</div><div class="setting-value">未設定</div><div class="chev">›</div></div>
+    </div>
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">再請求を使う</div><div class="switch on"></div><div></div></div>
+      <div class="setting-row"><div class="setting-title">再請求の確認日</div><div class="setting-value">入金予定後7日</div><div class="chev">›</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="detail-page" id="page-vendor">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">業者・支払</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">基本仕切り率</div><div class="setting-value">80%</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">端数処理</div><div class="setting-value">四捨五入</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">案件ごとの上書き</div><div class="switch on"></div><div></div></div>
+    </div>
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">業者別仕切り設定</div><div class="setting-value">0件</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">先払い設定</div><div class="setting-value">手動</div><div class="chev">›</div></div>
+    </div>
+    <p class="memo">優先順位：案件個別設定 ＞ 業者別設定 ＞ 基本仕切り率</p>
+  </div>
+</section>
+
+<section class="detail-page" id="page-display">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">表示</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">見積額の色</div><div class="setting-value" style="color:#1d7fd3;">青</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">実金額の色</div><div class="setting-value" style="color:#111;">黒</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">見積額の細い斜線</div><div class="switch on"></div><div></div></div>
+      <div class="setting-row"><div class="setting-title">差額表示</div><div class="switch on"></div><div></div></div>
+    </div>
+    <p class="memo"><span class="pill">表示例</span> 見積 4,000円 → 実金額 4,800円。差がある時だけ見積に細い斜線。</p>
+  </div>
+</section>
+
+<section class="detail-page" id="page-storage">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">保存・アカウント</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">Googleアカウント連携</div><div class="setting-value">未接続</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">保存先スプレッド</div><div class="setting-value">未設定</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">テスト保存</div><div class="setting-value">未実行</div><div class="chev">›</div></div>
+    </div>
+    <p class="memo">データはクライアント側のGoogleアカウントに保存する前提。</p>
+  </div>
+</section>
+
+<section class="detail-page" id="page-master">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">マスター管理</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">患者一覧</div><div class="setting-value">0件</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">業者一覧</div><div class="setting-value">0件</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">請求先一覧</div><div class="setting-value">0件</div><div class="chev">›</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="detail-page" id="page-lock">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">セキュリティ</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div class="setting-row"><div class="setting-title">アプリロック</div><div class="switch"></div><div></div></div>
+      <div class="setting-row"><div class="setting-title">暗証番号変更</div><div class="setting-value">未設定</div><div class="chev">›</div></div>
+      <div class="setting-row"><div class="setting-title">自動ロック時間</div><div class="setting-value">5分</div><div class="chev">›</div></div>
+    </div>
+  </div>
+</section>
+
+<section class="detail-page" id="page-about">
+  <div class="nav"><button class="back">‹</button><div class="nav-title">この設定の考え方</div><div></div></div>
+  <div class="detail-body">
+    <div class="group">
+      <div style="padding:26px;font-size:22px;line-height:1.65;font-weight:650;">
+        このアプリでは、締め日・請求書締切・支払日・仕切り率・保存先などをコードに固定せず、設定画面の値を参照して動かします。<br><br>
+        通常画面を軽くするためではなく、運用後に変更できることを目的にしています。
+      </div>
+    </div>
+  </div>
+</section>
+</main>
+<script>
+const topPage=document.getElementById('topPage');
+const pages=[...document.querySelectorAll('.detail-page')];
+function showPage(key){topPage.classList.add('hidden');pages.forEach(p=>p.classList.remove('active'));const page=document.getElementById('page-'+key);if(page)page.classList.add('active');window.scrollTo(0,0);}
+function showTop(){pages.forEach(p=>p.classList.remove('active'));topPage.classList.remove('hidden');window.scrollTo(0,0);}
+document.querySelectorAll('[data-page]').forEach(a=>a.addEventListener('click',e=>{e.preventDefault();showPage(a.dataset.page);}));
+document.querySelectorAll('.back').forEach(b=>b.addEventListener('click',showTop));
+</script>
+</body>
+</html>
