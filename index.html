@@ -1,34 +1,48 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>介護タクシー管理</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>介護タクシー管理アプリ｜確認用モック</title>
 
 <style>
 *{box-sizing:border-box}
+
 html,body{
   margin:0;
+  width:100%;
   height:100%;
   overflow:hidden;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#eef2f6;
+  color:#172033;
 }
-
-/* ===== 画面 ===== */
 
 .screen{
   width:100vw;
   height:100vh;
+  display:flex;
+  flex-direction:column;
   overflow:hidden;
+}
+
+/* ===== iPad ===== */
+
+.ipad-shell{
+  width:100%;
+  height:100%;
+  border:10px solid #111827;
+  border-radius:36px;
+  overflow:hidden;
+  background:#fff;
   display:flex;
   flex-direction:column;
 }
 
-/* ===== ヘッダー ===== */
+/* 上 */
 
-.top{
-  height:70px;
+.ipad-top{
+  height:76px;
   background:#1d4ed8;
   color:#fff;
   display:flex;
@@ -38,16 +52,9 @@ html,body{
   font-weight:900;
 }
 
-.btn{
-  background:#fff;
-  color:#1d4ed8;
-  border-radius:10px;
-  padding:10px 14px;
-}
+/* メイン */
 
-/* ===== メイン ===== */
-
-.main{
+.ipad-main{
   flex:1;
   display:flex;
   overflow:hidden;
@@ -59,19 +66,29 @@ html,body{
   flex:1;
   display:flex;
   overflow:hidden;
-  background:#fff;
 }
 
-/* 左列 */
-.names{
-  width:120px;
-  border-right:1px solid #ddd;
+/* 左固定 */
+
+.timeline-left{
+  width:130px;
   display:flex;
   flex-direction:column;
+  border-right:1px solid #ddd;
+  background:#f8fafc;
 }
 
-.name{
-  height:80px;
+.timeline-label{
+  height:60px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-weight:900;
+  border-bottom:1px solid #ddd;
+}
+
+.row-name{
+  height:78px;
   display:flex;
   align-items:center;
   justify-content:center;
@@ -80,16 +97,24 @@ html,body{
 }
 
 /* 右 */
-.right{
+
+.timeline-right{
   flex:1;
   display:flex;
   flex-direction:column;
   overflow:hidden;
 }
 
-/* 時間ヘッダー */
+/* 横スクロール */
+
+.timeline-x{
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+
+/* 時間 */
+
 .hours{
-  height:50px;
   display:grid;
   grid-template-columns:repeat(14,120px);
   border-bottom:1px solid #ddd;
@@ -101,37 +126,40 @@ html,body{
 
 .hours div{
   text-align:center;
-  padding:10px;
+  padding:14px;
   font-weight:900;
   border-right:1px solid #eee;
 }
 
-/* スクロールエリア */
-.scroll{
-  flex:1;
-  overflow:auto;
+/* 縦スクロール */
+
+.timeline-y{
+  height:100%;
+  overflow-y:auto;
 }
 
 /* グリッド */
+
 .grid{
+  position:relative;
   display:grid;
   grid-template-columns:repeat(14,120px);
-  grid-auto-rows:80px;
+  grid-auto-rows:78px;
 }
 
-/* セル */
 .cell{
   border-right:1px solid #eee;
   border-bottom:1px solid #eee;
 }
 
 /* 予約 */
+
 .appt{
   position:absolute;
   height:60px;
   background:#2563eb;
   color:#fff;
-  border-radius:8px;
+  border-radius:10px;
   padding:6px;
   font-size:12px;
   font-weight:900;
@@ -140,33 +168,35 @@ html,body{
 /* ===== 詳細 ===== */
 
 .detail{
-  width:260px;
+  width:300px;
   border-left:1px solid #ddd;
+  padding:20px;
   background:#fff;
-  padding:16px;
 }
 
 /* ===== 下カード ===== */
 
-.bottom{
+.ipad-bottom{
   height:40px;
   background:#ddd;
   text-align:center;
   line-height:40px;
   font-weight:900;
+  transition:.3s;
+  overflow:hidden;
 }
 
-.bottom.open{
-  height:200px;
-}
-
-.bottomContent{
-  display:none;
+.ipad-bottom.open{
   height:160px;
+}
+
+.bottom-inner{
+  display:none;
+  height:120px;
   background:#fff;
 }
 
-.bottom.open .bottomContent{
+.ipad-bottom.open .bottom-inner{
   display:flex;
 }
 
@@ -175,6 +205,12 @@ html,body{
   padding:10px;
   border-right:1px solid #eee;
 }
+
+/* ===== PC（そのまま） ===== */
+
+.pc{
+  display:none;
+}
 </style>
 </head>
 
@@ -182,48 +218,55 @@ html,body{
 
 <div class="screen">
 
-  <div class="top">
+<div class="ipad-shell">
+
+  <div class="ipad-top">
     <div>2026/04/21</div>
-    <div class="btn">＋予約</div>
+    <div>＋予約</div>
   </div>
 
-  <div class="main">
+  <div class="ipad-main">
 
+    <!-- タイムライン -->
     <div class="timeline">
 
       <!-- 左 -->
-      <div class="names">
-        <div class="name">佐藤</div>
-        <div class="name">鈴木</div>
-        <div class="name">山田</div>
-        <div class="name">業者A</div>
-        <div class="name">業者B</div>
+      <div class="timeline-left">
+        <div class="timeline-label">担当</div>
+        <div class="row-name">佐藤 太郎</div>
+        <div class="row-name">鈴木 花子</div>
+        <div class="row-name">山田 一郎</div>
+        <div class="row-name">協力業者A</div>
+        <div class="row-name">協力業者B</div>
+        <div class="row-name">協力業者C</div>
       </div>
 
       <!-- 右 -->
-      <div class="right">
+      <div class="timeline-right">
 
-        <div class="hours">
-          <div>7</div><div>8</div><div>9</div><div>10</div>
-          <div>11</div><div>12</div><div>13</div><div>14</div>
-          <div>15</div><div>16</div><div>17</div><div>18</div>
-          <div>19</div><div>20</div>
-        </div>
+        <div class="timeline-x">
 
-        <div class="scroll">
+          <div class="hours">
+            <div>7:00</div><div>8:00</div><div>9:00</div><div>10:00</div>
+            <div>11:00</div><div>12:00</div><div>13:00</div><div>14:00</div>
+            <div>15:00</div><div>16:00</div><div>17:00</div><div>18:00</div>
+            <div>19:00</div><div>20:00</div>
+          </div>
 
-          <div style="position:relative">
+          <div class="timeline-y">
 
             <div class="grid">
+
               <!-- 5行分 -->
               <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
               <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
               <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
               <div class="cell"></div><div class="cell"></div>
-            </div>
 
-            <div class="appt" style="top:90px; left:120px; width:120px;">
-              8:30 田中
+              <div class="appt" style="top:20px; left:120px; width:120px;">
+                田中
+              </div>
+
             </div>
 
           </div>
@@ -234,15 +277,17 @@ html,body{
 
     </div>
 
+    <!-- 詳細 -->
     <div class="detail">
       詳細
     </div>
 
   </div>
 
-  <div class="bottom" onclick="toggleBottom()">
+  <!-- 下 -->
+  <div class="ipad-bottom" onclick="this.classList.toggle('open')">
     ▲
-    <div class="bottomContent">
+    <div class="bottom-inner">
       <div class="card">2週間予定</div>
       <div class="card">業者一覧</div>
     </div>
@@ -250,17 +295,14 @@ html,body{
 
 </div>
 
-<script>
-function toggleBottom(){
-  document.querySelector('.bottom').classList.toggle('open')
-}
+</div>
 
-/* iPadスクロール制御 */
+<script>
 document.addEventListener('touchmove', function(e){
-  if(!e.target.closest('.scroll')){
-    e.preventDefault()
+  if(!e.target.closest('.timeline-x') && !e.target.closest('.timeline-y')){
+    e.preventDefault();
   }
-},{passive:false})
+},{passive:false});
 </script>
 
 </body>
