@@ -1,48 +1,49 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
 <title>介護タクシー管理</title>
-
 <style>
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: #eef2f5;
-}
-
-/* ＋予約ボタン */
-.add-btn {
-  position: fixed;
-  right: 24px;
-  bottom: 24px;
-
-  width: 90px;
-  height: 90px;
-  border-radius: 50%;
-
-  border: none;
-  background: #7fc84e;
-  color: #10220b;
-
-  font-size: 40px;
-  font-weight: bold;
-
-  box-shadow: 0 10px 20px rgba(0,0,0,0.2);
-  cursor: pointer;
-}
+body{margin:0;font-family:sans-serif;background:#eef2f6}
+.top{display:flex;justify-content:space-between;padding:16px;background:#1d4ed8;color:#fff}
+.btn{background:#fff;border:0;padding:10px 16px;border-radius:10px;font-weight:900}
+.list{padding:16px}
+.card{background:#fff;padding:14px;border-radius:12px;margin-bottom:10px}
+.small{font-size:12px;color:#666}
 </style>
-
 </head>
 <body>
 
-<h1 style="padding:20px;">スケジュール（仮）</h1>
+<div class="top">
+  <button class="btn" onclick="goSettings()">設定</button>
+  <div>介護タクシー</div>
+  <button class="btn" onclick="goBooking()">＋予約</button>
+</div>
 
-<!-- ここが予約ボタン -->
-<button class="add-btn" onclick="location.href='booking-input.html'">
-＋
-</button>
+<div class="list" id="list"></div>
+
+<script>
+function goBooking(){ location.href="booking.html" }
+function goSettings(){ location.href="settings.html" }
+
+function load(){
+  const data=JSON.parse(localStorage.getItem("bookings")||"[]")
+  const el=document.getElementById("list")
+  if(!data.length){
+    el.innerHTML="仮予約なし"
+    return
+  }
+  el.innerHTML=data.map(b=>`
+    <div class="card">
+      <div><b>${b.patientName||"未入力"}</b></div>
+      <div class="small">${b.useDate||""} ${b.useTime||""}</div>
+      <div class="small">${b.createdTime} 登録</div>
+    </div>
+  `).join("")
+}
+load()
+</script>
 
 </body>
 </html>
