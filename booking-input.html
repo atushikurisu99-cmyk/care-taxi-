@@ -2,50 +2,186 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <title>予約入力</title>
 <style>
-body{margin:0;font-family:sans-serif;background:#eef2f5}
-.wrap{padding:20px}
-input{width:100%;height:60px;margin-bottom:10px;font-size:20px}
-button{height:60px;width:100%;font-size:20px;font-weight:900}
+*{box-sizing:border-box}
+html,body{
+  margin:0;
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#eef2f5;
+  color:#172033;
+}
+body{
+  height:100vh;
+}
+.app{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+  padding:14px;
+  gap:12px;
+}
+.header{
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:110px 1fr;
+  gap:12px;
+}
+button{
+  border:0;
+  border-radius:18px;
+  font-size:22px;
+  font-weight:950;
+  height:64px;
+  background:#1d4ed8;
+  color:white;
+}
+.back{
+  background:#475569;
+}
+.main{
+  flex:1 1 auto;
+  min-height:0;
+  display:flex;
+  flex-direction:column;
+  gap:12px;
+}
+.card{
+  background:white;
+  border-radius:22px;
+  padding:16px;
+  box-shadow:0 6px 18px rgba(15,23,42,.08);
+}
+.title{
+  font-size:24px;
+  font-weight:950;
+  margin-bottom:8px;
+}
+.note{
+  font-size:15px;
+  font-weight:800;
+  color:#64748b;
+  line-height:1.45;
+}
+.form{
+  flex:1 1 auto;
+  min-height:0;
+  display:grid;
+  grid-template-rows:auto auto 1fr;
+  gap:12px;
+}
+input{
+  width:100%;
+  height:66px;
+  border:2px solid #d7dee8;
+  border-radius:18px;
+  padding:0 18px;
+  font-size:24px;
+  font-weight:850;
+  background:white;
+}
+.date-row{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px;
+}
+.memo{
+  width:100%;
+  min-height:0;
+  border:2px solid #d7dee8;
+  border-radius:18px;
+  padding:16px 18px;
+  font-size:22px;
+  font-weight:800;
+  resize:none;
+  outline:none;
+  font-family:inherit;
+}
+.footer{
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:1fr;
+}
+.save{
+  height:72px;
+  background:#16a34a;
+  font-size:26px;
+}
+.warning{
+  margin-top:8px;
+  font-size:14px;
+  color:#64748b;
+  font-weight:800;
+  text-align:center;
+}
 </style>
 </head>
 <body>
 
-<div class="wrap">
-  <button onclick="back()">←戻る</button>
+<div class="app">
+  <div class="header">
+    <button class="back" onclick="back()">← 戻る</button>
+    <div class="card">
+      <div class="title">予約入力</div>
+      <div class="note">名前と日時だけでも仮登録できます。あとから修正できます。</div>
+    </div>
+  </div>
 
-  <input id="name" placeholder="名前">
-  <input id="date" type="date">
-  <input id="time" type="time">
+  <div class="main">
+    <div class="form">
+      <input id="name" placeholder="名前">
 
-  <button onclick="save()">保存</button>
+      <div class="date-row">
+        <input id="date" type="date">
+        <input id="time" type="time">
+      </div>
+
+      <textarea id="memo" class="memo" placeholder="メモ・行き先・請求先など&#10;※あとから入力でOK"></textarea>
+    </div>
+  </div>
+
+  <div class="footer">
+    <button class="save" onclick="save()">仮登録する</button>
+    <div class="warning">登録した時刻も自動で残ります</div>
+  </div>
 </div>
 
 <script>
 function back(){
-  location.href="index.html"
+  location.href="index.html";
+}
+
+function pad(n){
+  return String(n).padStart(2,"0");
 }
 
 function save(){
-  const now=new Date()
+  const now=new Date();
 
   const booking={
     id:Date.now(),
-    patientName:document.getElementById("name").value,
+    patientName:document.getElementById("name").value.trim(),
     useDate:document.getElementById("date").value,
     useTime:document.getElementById("time").value,
+    memo:document.getElementById("memo").value.trim(),
+
     createdAt:now.toISOString(),
-    createdTime:now.getHours()+":"+String(now.getMinutes()).padStart(2,"0"),
-    status:"temporary"
-  }
+    createdDate:`${now.getFullYear()}-${pad(now.getMonth()+1)}-${pad(now.getDate())}`,
+    createdTime:`${pad(now.getHours())}:${pad(now.getMinutes())}`,
 
-  const list=JSON.parse(localStorage.getItem("bookings")||"[]")
-  list.unshift(booking)
-  localStorage.setItem("bookings",JSON.stringify(list))
+    status:"temporary",
+    checked:false
+  };
 
-  location.href="index.html"
+  const list=JSON.parse(localStorage.getItem("bookings")||"[]");
+  list.unshift(booking);
+  localStorage.setItem("bookings",JSON.stringify(list));
+
+  location.href="index.html";
 }
 </script>
 
