@@ -2,7 +2,7 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
   <title>介護タクシー管理アプリ｜確認用モック</title>
   <style>
     * { box-sizing: border-box; }
@@ -24,6 +24,7 @@
       display: none;
       width: 100vw;
       height: 100vh;
+      height: 100dvh;
       padding: 6px;
       overflow: hidden;
     }
@@ -40,6 +41,7 @@
       font-size: 30px;
       font-weight: 950;
       box-shadow: 0 6px 18px rgba(0,0,0,.16);
+      flex: 0 0 auto;
     }
 
     .drawer {
@@ -89,6 +91,7 @@
       box-shadow: 0 20px 60px rgba(0,0,0,.22);
       display: flex;
       flex-direction: column;
+      min-height: 0;
     }
 
     .ipad-top {
@@ -100,6 +103,7 @@
       background: #1d4ed8;
       color: #fff;
       padding: 0 26px;
+      min-width: 0;
     }
 
     .ipad-top .left {
@@ -108,6 +112,13 @@
       align-items: center;
       font-weight: 900;
       font-size: 24px;
+      min-width: 0;
+    }
+
+    .top-date {
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
     }
 
     .top-btn {
@@ -118,11 +129,13 @@
       border-radius: 12px;
       font-weight: 900;
       text-decoration: none;
+      white-space: nowrap;
     }
 
     .top-booking {
       font-size: 18px;
       padding: 15px 22px;
+      flex: 0 0 auto;
     }
 
     .ipad-main {
@@ -138,6 +151,7 @@
       min-height: 0;
       overflow: auto;
       background: #fff;
+      overscroll-behavior: contain;
     }
 
     .timeline-head {
@@ -381,6 +395,7 @@
       color: #fff;
       padding: 24px;
       overflow: hidden;
+      min-height: 0;
     }
 
     .brand {
@@ -423,16 +438,21 @@
     }
 
     .pc-main {
-      padding: 30px;
-      overflow: auto;
+      padding: 24px 30px;
+      overflow: hidden;
       min-width: 0;
+      min-height: 0;
+      height: 100%;
+      display: flex;
+      flex-direction: column;
     }
 
     .pc-header {
+      flex: 0 0 auto;
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 18px;
+      margin-bottom: 14px;
     }
 
     .pc-header h1 {
@@ -465,14 +485,15 @@
     }
 
     .filters {
+      flex: 0 0 auto;
       display: grid;
       grid-template-columns: repeat(6,1fr);
       gap: 13px;
       background: #fff;
       border: 1px solid #d7dee8;
       border-radius: 16px;
-      padding: 16px;
-      margin-bottom: 18px;
+      padding: 14px 16px;
+      margin-bottom: 14px;
     }
 
     .filter-label {
@@ -491,11 +512,15 @@
     }
 
     .table-box {
+      flex: 1 1 auto;
+      min-height: 0;
       border: 1px solid #d7dee8;
       border-radius: 18px;
       background: #fff;
-      overflow: auto;
+      overflow-x: auto;
+      overflow-y: hidden;
       box-shadow: 0 3px 12px rgba(15,23,42,.06);
+      overscroll-behavior: contain;
     }
 
     table {
@@ -526,10 +551,17 @@
     .muted { color: #64748b; }
 
     .summary {
+      flex: 0 0 138px;
       display: grid;
       grid-template-columns: repeat(4,1fr);
       gap: 16px;
-      margin-top: 18px;
+      margin-top: 14px;
+      overflow: hidden;
+    }
+
+    .summary .card {
+      height: 138px;
+      padding: 16px;
     }
 
     .summary h3 {
@@ -544,6 +576,22 @@
       .ipad-shell {
         border-width: 8px;
         border-radius: 30px;
+      }
+
+      .ipad-top {
+        flex-basis: 68px;
+        height: 68px;
+        padding: 0 18px;
+      }
+
+      .ipad-top .left {
+        gap: 14px;
+        font-size: 20px;
+      }
+
+      .menu-btn {
+        width: 50px;
+        height: 50px;
       }
 
       .ipad-main {
@@ -567,6 +615,10 @@
         display: none;
       }
 
+      .pc-main {
+        padding: 18px;
+      }
+
       .filters,
       .summary {
         grid-template-columns: 1fr;
@@ -587,7 +639,7 @@
       <div class="ipad-top">
         <div class="left">
           <button class="menu-btn" onclick="toggleDrawer()">☰</button>
-          <span>2026/04/21（火）</span>
+          <span class="top-date">2026/04/21（火）</span>
           <button class="top-btn">今日</button>
         </div>
         <a class="top-btn top-booking" href="booking-input.html">＋ 予約登録</a>
