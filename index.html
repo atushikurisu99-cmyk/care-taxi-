@@ -6,195 +6,581 @@
   <title>介護タクシー管理アプリ｜確認用モック</title>
   <style>
     * { box-sizing: border-box; }
-    body { margin:0; font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif; background:#eef2f6; color:#172033; }
-    button { font: inherit; cursor:pointer; }
+
+    html, body {
+      margin: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      background: #eef2f6;
+      color: #172033;
+    }
+
+    button { font: inherit; cursor: pointer; }
     a { color: inherit; }
 
-    .screen { display:none; min-height:100vh; padding:26px; }
-    .screen.active { display:block; }
-
-    .menu-btn{
-      border:0;
-      background:rgba(255,255,255,.95);
-      color:#1d4ed8;
-      width:54px;
-      height:54px;
-      border-radius:16px;
-      font-size:30px;
-      font-weight:950;
-      box-shadow:0 6px 18px rgba(0,0,0,.16);
+    .screen {
+      display: none;
+      width: 100vw;
+      height: 100vh;
+      padding: 6px;
+      overflow: hidden;
     }
 
-    .drawer{
-      position:fixed;
-      left:22px;
-      top:92px;
-      z-index:100;
-      width:230px;
-      background:#fff;
-      border-radius:22px;
-      box-shadow:0 16px 40px rgba(0,0,0,.24);
-      padding:12px;
-      display:none;
+    .screen.active { display: block; }
+
+    .menu-btn {
+      border: 0;
+      background: rgba(255,255,255,.95);
+      color: #1d4ed8;
+      width: 54px;
+      height: 54px;
+      border-radius: 16px;
+      font-size: 30px;
+      font-weight: 950;
+      box-shadow: 0 6px 18px rgba(0,0,0,.16);
     }
 
-    .drawer.open{ display:block; }
+    .drawer {
+      position: fixed;
+      left: 22px;
+      top: 92px;
+      z-index: 100;
+      width: 230px;
+      background: #fff;
+      border-radius: 22px;
+      box-shadow: 0 16px 40px rgba(0,0,0,.24);
+      padding: 12px;
+      display: none;
+    }
+
+    .drawer.open { display: block; }
 
     .drawer button,
-    .drawer a{
-      width:100%;
-      border:0;
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      justify-content:flex-start;
-      height:50px;
-      padding:0 14px;
-      border-radius:14px;
-      background:#f1f5f9;
-      margin-bottom:8px;
-      font-weight:900;
-      color:#334155;
+    .drawer a {
+      width: 100%;
+      border: 0;
+      text-decoration: none;
+      display: flex;
+      align-items: center;
+      justify-content: flex-start;
+      height: 50px;
+      padding: 0 14px;
+      border-radius: 14px;
+      background: #f1f5f9;
+      margin-bottom: 8px;
+      font-weight: 900;
+      color: #334155;
     }
 
-    .drawer a.settings{
-      background:#475569;
-      color:#fff;
+    .drawer a.settings {
+      background: #475569;
+      color: #fff;
     }
 
-    .quick-booking{
-      position:fixed;
-      right:28px;
-      bottom:28px;
-      z-index:90;
-      width:116px;
-      height:116px;
-      border-radius:50%;
-      border:0;
-      background:#7FC84E;
-      color:#10220b;
-      font-size:54px;
-      font-weight:950;
-      text-decoration:none;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-shadow:0 16px 34px rgba(0,0,0,.28);
+    .ipad-shell {
+      width: 100%;
+      height: 100%;
+      border: 10px solid #111827;
+      border-radius: 36px;
+      overflow: hidden;
+      background: #fff;
+      box-shadow: 0 20px 60px rgba(0,0,0,.22);
+      display: flex;
+      flex-direction: column;
     }
 
-    .quick-booking span{
-      transform:translateY(-3px);
+    .ipad-top {
+      flex: 0 0 76px;
+      height: 76px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      background: #1d4ed8;
+      color: #fff;
+      padding: 0 26px;
     }
 
-    .ipad-shell { max-width:1250px; margin:0 auto; border:10px solid #111827; border-radius:36px; overflow:hidden; background:#fff; box-shadow:0 25px 70px rgba(0,0,0,.28); }
-    .ipad-top { height:76px; display:flex; align-items:center; justify-content:space-between; background:#1d4ed8; color:#fff; padding:0 26px; }
-    .ipad-top .left { display:flex; gap:22px; align-items:center; font-weight:900; font-size:24px; }
-    .top-btn { background:#fff; color:#1d4ed8; border:0; padding:12px 18px; border-radius:12px; font-weight:900; text-decoration:none; }
-    .top-booking{ font-size:18px; padding:15px 22px; }
+    .ipad-top .left {
+      display: flex;
+      gap: 22px;
+      align-items: center;
+      font-weight: 900;
+      font-size: 24px;
+    }
 
-    .ipad-main { display:grid; grid-template-columns:1fr 315px; min-height:560px; }
-    .timeline-head { display:grid; grid-template-columns:130px 1fr; border-bottom:1px solid #d7dee8; background:#fff; }
-    .timeline-label { padding:16px; font-size:13px; font-weight:900; border-right:1px solid #d7dee8; }
-    .hours { display:grid; grid-template-columns:repeat(14,1fr); font-size:13px; text-align:center; }
-    .hours div { padding:16px 4px; border-right:1px solid #d7dee8; font-weight:800; }
-    .hours .now-hour { color:#dc2626; }
-    .timeline-body { display:grid; grid-template-columns:130px 1fr; }
-    .rows { background:#f8fafc; }
-    .row-name { height:78px; padding:18px 12px; border-right:1px solid #d7dee8; border-bottom:1px solid #d7dee8; font-weight:900; }
-    .grid { position:relative; height:468px; background-image:linear-gradient(to right,#d7dee8 1px,transparent 1px),linear-gradient(to bottom,#d7dee8 1px,transparent 1px); background-size:7.142% 78px; }
-    .now-line { position:absolute; left:43%; top:0; bottom:0; width:2px; background:#ef4444; z-index:1; }
-    .appt { position:absolute; z-index:2; color:white; border:0; border-radius:10px; padding:8px 10px; box-shadow:0 6px 16px rgba(0,0,0,.2); font-weight:900; text-align:left; font-size:13px; line-height:1.35; }
-    .appt.selected { outline:5px solid rgba(147,197,253,.85); }
-    .green { background:#16a34a; } .blue { background:#2563eb; } .purple { background:#7c3aed; } .orange { background:#f97316; }
-    .detail { border-left:1px solid #d7dee8; padding:24px; background:#fff; }
-    .detail-title { font-size:19px; font-weight:900; margin-bottom:26px; }
-    .label { color:#64748b; font-size:13px; font-weight:800; margin-top:18px; }
-    .value { margin-top:5px; font-size:20px; font-weight:900; }
-    .small { font-size:14px; color:#334155; line-height:1.6; }
-    .amount-pair { display:flex; gap:12px; align-items:baseline; white-space:nowrap; }
-    .estimate { color:#2563eb; }
-    .estimate.changed { text-decoration-line:line-through; text-decoration-thickness:.5px; text-decoration-color:#475569; }
-    .actual { color:#111827; font-weight:950; }
-    .diff { color:#dc2626; font-size:13px; font-weight:900; }
-    .badges { display:flex; flex-wrap:wrap; gap:8px; margin-top:20px; }
-    .badge { display:inline-flex; align-items:center; border:1px solid; border-radius:8px; padding:4px 7px; font-size:10.5px; font-weight:900; }
+    .top-btn {
+      background: #fff;
+      color: #1d4ed8;
+      border: 0;
+      padding: 12px 18px;
+      border-radius: 12px;
+      font-weight: 900;
+      text-decoration: none;
+    }
+
+    .top-booking {
+      font-size: 18px;
+      padding: 15px 22px;
+    }
+
+    .ipad-main {
+      flex: 1 1 auto;
+      min-height: 0;
+      display: grid;
+      grid-template-columns: 1fr 315px;
+      overflow: hidden;
+    }
+
+    .timeline-panel {
+      min-width: 0;
+      min-height: 0;
+      overflow: auto;
+      background: #fff;
+    }
+
+    .timeline-head {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      border-bottom: 1px solid #d7dee8;
+      background: #fff;
+      min-width: 900px;
+    }
+
+    .timeline-label {
+      padding: 16px;
+      font-size: 13px;
+      font-weight: 900;
+      border-right: 1px solid #d7dee8;
+    }
+
+    .hours {
+      display: grid;
+      grid-template-columns: repeat(14, 1fr);
+      font-size: 13px;
+      text-align: center;
+    }
+
+    .hours div {
+      padding: 16px 4px;
+      border-right: 1px solid #d7dee8;
+      font-weight: 800;
+    }
+
+    .hours .now-hour { color: #dc2626; }
+
+    .timeline-body {
+      display: grid;
+      grid-template-columns: 130px 1fr;
+      min-width: 900px;
+    }
+
+    .rows { background: #f8fafc; }
+
+    .row-name {
+      height: 78px;
+      padding: 18px 12px;
+      border-right: 1px solid #d7dee8;
+      border-bottom: 1px solid #d7dee8;
+      font-weight: 900;
+    }
+
+    .grid {
+      position: relative;
+      height: 468px;
+      background-image:
+        linear-gradient(to right,#d7dee8 1px,transparent 1px),
+        linear-gradient(to bottom,#d7dee8 1px,transparent 1px);
+      background-size: 7.142% 78px;
+    }
+
+    .now-line {
+      position: absolute;
+      left: 43%;
+      top: 0;
+      bottom: 0;
+      width: 2px;
+      background: #ef4444;
+      z-index: 1;
+    }
+
+    .appt {
+      position: absolute;
+      z-index: 2;
+      color: white;
+      border: 0;
+      border-radius: 10px;
+      padding: 8px 10px;
+      box-shadow: 0 6px 16px rgba(0,0,0,.2);
+      font-weight: 900;
+      text-align: left;
+      font-size: 13px;
+      line-height: 1.35;
+    }
+
+    .appt.selected { outline: 5px solid rgba(147,197,253,.85); }
+    .green { background: #16a34a; }
+    .blue { background: #2563eb; }
+    .purple { background: #7c3aed; }
+    .orange { background: #f97316; }
+
+    .detail {
+      min-height: 0;
+      border-left: 1px solid #d7dee8;
+      padding: 24px;
+      background: #fff;
+      overflow: hidden;
+    }
+
+    .detail-title {
+      font-size: 19px;
+      font-weight: 900;
+      margin-bottom: 26px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .label {
+      color: #64748b;
+      font-size: 13px;
+      font-weight: 800;
+      margin-top: 18px;
+    }
+
+    .value {
+      margin-top: 5px;
+      font-size: 20px;
+      font-weight: 900;
+    }
+
+    .small {
+      font-size: 14px;
+      color: #334155;
+      line-height: 1.6;
+    }
+
+    .amount-pair {
+      display: flex;
+      gap: 12px;
+      align-items: baseline;
+      white-space: nowrap;
+    }
+
+    .estimate { color: #2563eb; }
+
+    .estimate.changed {
+      text-decoration-line: line-through;
+      text-decoration-thickness: .5px;
+      text-decoration-color: #475569;
+    }
+
+    .actual {
+      color: #111827;
+      font-weight: 950;
+    }
+
+    .diff {
+      color: #dc2626;
+      font-size: 13px;
+      font-weight: 900;
+    }
+
+    .badges {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 20px;
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      border: 1px solid;
+      border-radius: 8px;
+      padding: 4px 7px;
+      font-size: 10.5px;
+      font-weight: 900;
+    }
+
     .b-orange { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
     .b-blue { background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; }
     .b-purple { background:#faf5ff; color:#7e22ce; border-color:#d8b4fe; }
     .b-red { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
     .b-green { background:#f0fdf4; color:#15803d; border-color:#86efac; }
-    .ipad-bottom { display:grid; grid-template-columns:1fr 1fr; gap:16px; background:#f8fafc; padding:16px; }
-    .card { background:#fff; border:1px solid #d7dee8; border-radius:16px; padding:16px; box-shadow:0 3px 12px rgba(15,23,42,.06); }
-    .card h3 { margin:0 0 10px; color:#1d4ed8; font-size:15px; }
-    .mini-week { display:grid; grid-template-columns:repeat(7,1fr); gap:7px; }
-    .day { height:90px; border:1px solid #d7dee8; border-radius:10px; text-align:center; padding:7px; font-weight:800; }
-    .day.active { border-color:#2563eb; background:#eff6ff; }
-    .bar { height:7px; width:60%; margin:12px auto 0; border-radius:999px; background:#2563eb; }
-    .bar.greenbar { background:#22c55e; margin-top:8px; }
-    .bar.orangebar { background:#fb923c; margin-top:8px; }
-    .flow { max-width:1250px; margin:18px auto 0; display:grid; grid-template-columns:1fr 48px 1fr 48px 1fr; gap:10px; align-items:center; text-align:center; }
-    .flow-box { border:1px solid #cbd5e1; border-radius:16px; padding:15px; background:#fff; font-weight:900; }
-    .flow-blue { background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; }
-    .flow-green { background:#f0fdf4; color:#15803d; border-color:#86efac; }
-    .arrow { font-size:30px; color:#94a3b8; font-weight:900; }
 
-    .pc-wrap { display:grid; grid-template-columns:235px 1fr; min-height:100vh; margin:-26px; }
-    .sidebar { background:#14532d; color:#fff; padding:24px; }
-    .brand { font-size:16px; font-weight:950; margin-bottom:22px; }
-    .nav { padding:11px 12px; border-radius:10px; margin-bottom:6px; font-weight:900; color:#dcfce7; font-size:13px; }
-    .nav.active { background:#15803d; color:#fff; }
-    .settings-nav { display:block; text-decoration:none; }
-    .side-card { margin-top:42px; border:1px solid #22c55e; border-radius:16px; padding:16px; }
-    .side-row { display:flex; justify-content:space-between; font-size:12px; margin-top:10px; }
-    .pc-main { padding:30px; overflow:auto; }
-    .pc-header { display:flex; justify-content:space-between; align-items:center; margin-bottom:18px; }
-    .pc-header h1 { margin:0; color:#166534; font-size:24px; }
-    .pc-actions { display:flex; gap:10px; }
+    .ipad-bottom {
+      flex: 0 0 150px;
+      min-height: 150px;
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+      background: #f8fafc;
+      padding: 14px;
+      border-top: 1px solid #d7dee8;
+      overflow: hidden;
+    }
+
+    .card {
+      background: #fff;
+      border: 1px solid #d7dee8;
+      border-radius: 16px;
+      padding: 16px;
+      box-shadow: 0 3px 12px rgba(15,23,42,.06);
+      overflow: hidden;
+    }
+
+    .card h3 {
+      margin: 0 0 10px;
+      color: #1d4ed8;
+      font-size: 15px;
+    }
+
+    .mini-week {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 7px;
+    }
+
+    .day {
+      height: 90px;
+      border: 1px solid #d7dee8;
+      border-radius: 10px;
+      text-align: center;
+      padding: 7px;
+      font-weight: 800;
+    }
+
+    .day.active {
+      border-color: #2563eb;
+      background: #eff6ff;
+    }
+
+    .bar {
+      height: 7px;
+      width: 60%;
+      margin: 12px auto 0;
+      border-radius: 999px;
+      background: #2563eb;
+    }
+
+    .bar.greenbar { background: #22c55e; margin-top: 8px; }
+    .bar.orangebar { background: #fb923c; margin-top: 8px; }
+
+    .pc-wrap {
+      display: grid;
+      grid-template-columns: 235px 1fr;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    .sidebar {
+      background: #14532d;
+      color: #fff;
+      padding: 24px;
+      overflow: hidden;
+    }
+
+    .brand {
+      font-size: 16px;
+      font-weight: 950;
+      margin-bottom: 22px;
+    }
+
+    .nav {
+      padding: 11px 12px;
+      border-radius: 10px;
+      margin-bottom: 6px;
+      font-weight: 900;
+      color: #dcfce7;
+      font-size: 13px;
+    }
+
+    .nav.active {
+      background: #15803d;
+      color: #fff;
+    }
+
+    .settings-nav {
+      display: block;
+      text-decoration: none;
+    }
+
+    .side-card {
+      margin-top: 42px;
+      border: 1px solid #22c55e;
+      border-radius: 16px;
+      padding: 16px;
+    }
+
+    .side-row {
+      display: flex;
+      justify-content: space-between;
+      font-size: 12px;
+      margin-top: 10px;
+    }
+
+    .pc-main {
+      padding: 30px;
+      overflow: auto;
+      min-width: 0;
+    }
+
+    .pc-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 18px;
+    }
+
+    .pc-header h1 {
+      margin: 0;
+      color: #166534;
+      font-size: 24px;
+    }
+
+    .pc-actions {
+      display: flex;
+      gap: 10px;
+    }
+
     .pc-actions a,
-    .pc-actions button { text-decoration:none; border:1px solid #cbd5e1; border-radius:10px; background:white; padding:8px 12px; color:#166534; font-weight:900; font-size:12px; }
-    .pc-actions .primary { background:#15803d; color:#fff; border-color:#15803d; }
-    .filters { display:grid; grid-template-columns:repeat(6,1fr); gap:13px; background:#fff; border:1px solid #d7dee8; border-radius:16px; padding:16px; margin-bottom:18px; }
-    .filter-label { font-size:11px; color:#64748b; font-weight:900; margin-bottom:5px; }
-    .filter-box { border:1px solid #d7dee8; background:#f8fafc; border-radius:9px; padding:8px; font-size:12px; }
-    .table-box { border:1px solid #d7dee8; border-radius:18px; background:#fff; overflow:auto; box-shadow:0 3px 12px rgba(15,23,42,.06); }
-    table { border-collapse:collapse; min-width:1420px; width:100%; font-size:11.5px; }
-    th { background:#f1f5f9; padding:8px 6px; border:1px solid #d7dee8; font-size:10.5px; white-space:nowrap; }
-    td { padding:8px 6px; border:1px solid #d7dee8; white-space:nowrap; }
-    tbody tr:hover { background:#f0fdf4; }
-    .center { text-align:center; }
-    .bold { font-weight:900; }
-    .red { color:#dc2626; font-weight:900; }
-    .muted { color:#64748b; }
-    .summary { display:grid; grid-template-columns:repeat(4,1fr); gap:16px; margin-top:18px; }
-    .summary h3 { margin:0 0 10px; color:#166534; font-size:14px; }
+    .pc-actions button {
+      text-decoration: none;
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      background: white;
+      padding: 8px 12px;
+      color: #166534;
+      font-weight: 900;
+      font-size: 12px;
+    }
+
+    .pc-actions .primary {
+      background: #15803d;
+      color: #fff;
+      border-color: #15803d;
+    }
+
+    .filters {
+      display: grid;
+      grid-template-columns: repeat(6,1fr);
+      gap: 13px;
+      background: #fff;
+      border: 1px solid #d7dee8;
+      border-radius: 16px;
+      padding: 16px;
+      margin-bottom: 18px;
+    }
+
+    .filter-label {
+      font-size: 11px;
+      color: #64748b;
+      font-weight: 900;
+      margin-bottom: 5px;
+    }
+
+    .filter-box {
+      border: 1px solid #d7dee8;
+      background: #f8fafc;
+      border-radius: 9px;
+      padding: 8px;
+      font-size: 12px;
+    }
+
+    .table-box {
+      border: 1px solid #d7dee8;
+      border-radius: 18px;
+      background: #fff;
+      overflow: auto;
+      box-shadow: 0 3px 12px rgba(15,23,42,.06);
+    }
+
+    table {
+      border-collapse: collapse;
+      min-width: 1420px;
+      width: 100%;
+      font-size: 11.5px;
+    }
+
+    th {
+      background: #f1f5f9;
+      padding: 8px 6px;
+      border: 1px solid #d7dee8;
+      font-size: 10.5px;
+      white-space: nowrap;
+    }
+
+    td {
+      padding: 8px 6px;
+      border: 1px solid #d7dee8;
+      white-space: nowrap;
+    }
+
+    tbody tr:hover { background: #f0fdf4; }
+    .center { text-align: center; }
+    .bold { font-weight: 900; }
+    .red { color: #dc2626; font-weight: 900; }
+    .muted { color: #64748b; }
+
+    .summary {
+      display: grid;
+      grid-template-columns: repeat(4,1fr);
+      gap: 16px;
+      margin-top: 18px;
+    }
+
+    .summary h3 {
+      margin: 0 0 10px;
+      color: #166534;
+      font-size: 14px;
+    }
 
     @media (max-width: 980px) {
-      .ipad-main { grid-template-columns:1fr; }
-      .detail { border-left:0; border-top:1px solid #d7dee8; }
-      .ipad-bottom, .summary, .filters { grid-template-columns:1fr; }
-      .pc-wrap { grid-template-columns:1fr; }
-      .sidebar { display:none; }
-      .flow { grid-template-columns:1fr; }
-      .arrow { transform:rotate(90deg); }
-      .quick-booking{
-        width:96px;
-        height:96px;
-        right:22px;
-        bottom:22px;
+      .screen { padding: 4px; }
+
+      .ipad-shell {
+        border-width: 8px;
+        border-radius: 30px;
+      }
+
+      .ipad-main {
+        grid-template-columns: 1fr 260px;
+      }
+
+      .ipad-bottom {
+        flex-basis: 140px;
+        min-height: 140px;
+      }
+
+      .detail {
+        padding: 18px;
+      }
+
+      .pc-wrap {
+        grid-template-columns: 1fr;
+      }
+
+      .sidebar {
+        display: none;
+      }
+
+      .filters,
+      .summary {
+        grid-template-columns: 1fr;
       }
     }
   </style>
 </head>
+
 <body>
   <div class="drawer" id="drawer">
     <button onclick="showView('ipad')">iPad画面</button>
     <button onclick="showView('pc')">PC画面</button>
     <a class="settings" href="settings.html">設定</a>
   </div>
-
-  <a class="quick-booking" href="booking-input.html" aria-label="予約登録">
-    <span>＋</span>
-  </a>
 
   <section id="ipad" class="screen active">
     <div class="ipad-shell">
@@ -208,7 +594,7 @@
       </div>
 
       <div class="ipad-main">
-        <div>
+        <div class="timeline-panel">
           <div class="timeline-head">
             <div class="timeline-label">担当者 / 業者</div>
             <div class="hours">
@@ -228,11 +614,21 @@
 
             <div class="grid">
               <div class="now-line"></div>
-              <button class="appt green selected" style="top:22px; left:12%; width:12%;" onclick="selectAppt(0)"><div>08:30〜09:30</div><div>田中 様</div></button>
-              <button class="appt blue" style="top:100px; left:27%; width:10%;" onclick="selectAppt(1)"><div>10:00〜10:50</div><div>鈴木 様</div></button>
-              <button class="appt purple" style="top:334px; left:18%; width:11%;" onclick="selectAppt(2)"><div>09:00〜10:00</div><div>佐藤 様</div></button>
-              <button class="appt blue" style="top:178px; left:55%; width:13%;" onclick="selectAppt(3)"><div>13:30〜14:30</div><div>伊藤 様</div></button>
-              <button class="appt orange" style="top:334px; left:59%; width:12%;" onclick="selectAppt(4)"><div>14:00〜15:00</div><div>高橋 様</div></button>
+              <button class="appt green selected" style="top:22px; left:12%; width:12%;" onclick="selectAppt(0)">
+                <div>08:30〜09:30</div><div>田中 様</div>
+              </button>
+              <button class="appt blue" style="top:100px; left:27%; width:10%;" onclick="selectAppt(1)">
+                <div>10:00〜10:50</div><div>鈴木 様</div>
+              </button>
+              <button class="appt purple" style="top:334px; left:18%; width:11%;" onclick="selectAppt(2)">
+                <div>09:00〜10:00</div><div>佐藤 様</div>
+              </button>
+              <button class="appt blue" style="top:178px; left:55%; width:13%;" onclick="selectAppt(3)">
+                <div>13:30〜14:30</div><div>伊藤 様</div>
+              </button>
+              <button class="appt orange" style="top:334px; left:59%; width:12%;" onclick="selectAppt(4)">
+                <div>14:00〜15:00</div><div>高橋 様</div>
+              </button>
             </div>
           </div>
         </div>
@@ -274,14 +670,6 @@
           </div>
         </div>
       </div>
-    </div>
-
-    <div class="flow">
-      <div class="flow-box flow-blue">iPad<br>予約・実績入力</div>
-      <div class="arrow">→</div>
-      <div class="flow-box">同じデータ<br>案件台帳</div>
-      <div class="arrow">→</div>
-      <div class="flow-box flow-green">PC<br>締め・請求・支払</div>
     </div>
   </section>
 
@@ -363,14 +751,6 @@
             <h3>差額理由</h3>
             <div class="small">待機 1件<br>経由 1件<br>階段介助 1件</div>
           </div>
-        </div>
-
-        <div class="flow">
-          <div class="flow-box flow-blue">iPad入力</div>
-          <div class="arrow">→</div>
-          <div class="flow-box">同じ案件ID</div>
-          <div class="arrow">→</div>
-          <div class="flow-box flow-green">PCで締め処理</div>
         </div>
       </main>
     </div>
