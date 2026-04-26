@@ -1,129 +1,51 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>予約入力</title>
-
 <style>
-body {
-  margin: 0;
-  font-family: sans-serif;
-  background: #eef2f5;
-}
-
-.container {
-  padding: 20px;
-}
-
-.title {
-  font-size: 28px;
-  font-weight: bold;
-  margin-bottom: 20px;
-}
-
-/* 入力 */
-.input {
-  width: 100%;
-  height: 70px;
-  font-size: 24px;
-  margin-bottom: 15px;
-  border-radius: 15px;
-  border: 2px solid #ccc;
-  padding: 0 15px;
-}
-
-/* ボタン */
-.btn {
-  width: 100%;
-  height: 70px;
-  font-size: 22px;
-  border-radius: 20px;
-  border: none;
-  margin-bottom: 10px;
-  background: #ddd;
-}
-
-.btn.active {
-  background: #7fc84e;
-}
-
-/* 分ボタン */
-.minute {
-  width: 30%;
-  height: 60px;
-  margin: 5px;
-  font-size: 20px;
-}
-
-/* 登録 */
-.register {
-  background: #7fc84e;
-  font-size: 26px;
-  height: 80px;
-}
+body{margin:0;font-family:sans-serif;background:#eef2f5}
+.wrap{padding:20px}
+input{width:100%;height:60px;margin-bottom:10px;font-size:20px}
+button{height:60px;width:100%;font-size:20px;font-weight:900}
 </style>
-
 </head>
 <body>
 
-<div class="container">
+<div class="wrap">
+  <button onclick="back()">←戻る</button>
 
-<div class="title">予約入力</div>
+  <input id="name" placeholder="名前">
+  <input id="date" type="date">
+  <input id="time" type="time">
 
-<!-- 名前 -->
-<input id="name" class="input" placeholder="名前入力">
-
-<!-- 日付 -->
-<div>
-<button class="btn" onclick="setDate(0)">今日</button>
-<button class="btn" onclick="setDate(1)">明日</button>
-<button class="btn" onclick="setDate(2)">明後日</button>
-</div>
-
-<!-- 時間 -->
-<input id="time" type="time" class="input">
-
-<!-- 分（10分刻み） -->
-<div>
-<button class="minute" onclick="setMinute('00')">00</button>
-<button class="minute" onclick="setMinute('10')">10</button>
-<button class="minute" onclick="setMinute('20')">20</button>
-<button class="minute" onclick="setMinute('30')">30</button>
-<button class="minute" onclick="setMinute('40')">40</button>
-<button class="minute" onclick="setMinute('50')">50</button>
-</div>
-
-<!-- 行き先 -->
-<input id="dest" class="input" placeholder="行き先（候補後で）">
-
-<!-- 登録 -->
-<button class="register btn" onclick="register()">登録</button>
-
+  <button onclick="save()">保存</button>
 </div>
 
 <script>
-function setDate(offset) {
-  let d = new Date();
-  d.setDate(d.getDate() + offset);
-  let val = d.toISOString().split("T")[0];
-  alert("日付：" + val);
+function back(){
+  location.href="index.html"
 }
 
-function setMinute(min) {
-  let time = document.getElementById("time").value;
-  if (!time) return;
-  let h = time.split(":")[0];
-  document.getElementById("time").value = h + ":" + min;
-}
+function save(){
+  const now=new Date()
 
-function register() {
-  let name = document.getElementById("name").value;
-  let time = document.getElementById("time").value;
+  const booking={
+    id:Date.now(),
+    patientName:document.getElementById("name").value,
+    useDate:document.getElementById("date").value,
+    useTime:document.getElementById("time").value,
+    createdAt:now.toISOString(),
+    createdTime:now.getHours()+":"+String(now.getMinutes()).padStart(2,"0"),
+    status:"temporary"
+  }
 
-  alert("登録：" + name + " " + time);
+  const list=JSON.parse(localStorage.getItem("bookings")||"[]")
+  list.unshift(booking)
+  localStorage.setItem("bookings",JSON.stringify(list))
 
-  location.href = "index.html";
+  location.href="index.html"
 }
 </script>
 
