@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-<title>介護タクシー管理アプリ｜確認用モック</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>介護タクシー管理</title>
 
 <style>
 *{box-sizing:border-box}
@@ -13,296 +13,259 @@ html,body{
   width:100%;
   height:100%;
   overflow:hidden;
-  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  font-family:sans-serif;
   background:#eef2f6;
-  color:#172033;
 }
 
+/* ========= 共通 ========= */
 .screen{
-  width:100vw;
-  height:100vh;
-  display:flex;
-  flex-direction:column;
-  overflow:hidden;
-}
-
-/* ===== iPad ===== */
-
-.ipad-shell{
+  display:none;
   width:100%;
   height:100%;
-  border:10px solid #111827;
-  border-radius:36px;
-  overflow:hidden;
-  background:#fff;
+}
+.screen.active{display:block}
+
+/* ========= iPad ========= */
+.ipad{
   display:flex;
   flex-direction:column;
+  height:100%;
 }
 
 /* 上 */
-
-.ipad-top{
-  height:76px;
+.top{
+  height:70px;
   background:#1d4ed8;
   color:#fff;
   display:flex;
   align-items:center;
   justify-content:space-between;
-  padding:0 20px;
+  padding:0 16px;
   font-weight:900;
 }
 
-/* メイン */
+.top button{
+  height:44px;
+  border:0;
+  border-radius:10px;
+  padding:0 12px;
+}
 
-.ipad-main{
+/* 中央 */
+.main{
   flex:1;
-  display:flex;
+  display:grid;
+  grid-template-columns:120px 1fr 260px;
   overflow:hidden;
 }
 
-/* ===== タイムライン ===== */
-
-.timeline{
-  flex:1;
-  display:flex;
-  overflow:hidden;
-}
-
-/* 左固定 */
-
-.timeline-left{
-  width:130px;
-  display:flex;
-  flex-direction:column;
-  border-right:1px solid #ddd;
+/* 左（固定） */
+.names{
   background:#f8fafc;
 }
 
-.timeline-label{
-  height:60px;
+.name{
+  height:70px;
+  border-bottom:1px solid #ccc;
+  padding:10px;
+  font-weight:900;
+}
+
+/* 中央（横スクロール） */
+.timeline{
+  overflow-x:auto;
+  overflow-y:hidden;
+  background:#fff;
+}
+
+.timeline-inner{
+  min-width:1200px;
+  position:relative;
+}
+
+.row{
+  height:70px;
+  border-bottom:1px solid #ccc;
+  position:relative;
+}
+
+.slot{
+  position:absolute;
+  top:10px;
+  height:50px;
+  background:#2563eb;
+  color:#fff;
+  border-radius:8px;
+  padding:6px;
+  font-size:12px;
+}
+
+/* 右 */
+.detail{
+  border-left:1px solid #ccc;
+  padding:10px;
+}
+
+/* 下（格納） */
+.bottom{
+  background:#fff;
+  border-top:1px solid #ccc;
+  transition:.2s;
+}
+
+.bottom.closed{
+  height:40px;
+}
+
+.bottom.open{
+  height:160px;
+}
+
+.toggle{
+  height:40px;
   display:flex;
   align-items:center;
   justify-content:center;
   font-weight:900;
   border-bottom:1px solid #ddd;
+  background:#f1f5f9;
 }
 
-.row-name{
-  height:78px;
+.bottom-content{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:10px;
+  padding:10px;
+}
+
+/* ========= PC ========= */
+.pc{
   display:flex;
-  align-items:center;
-  justify-content:center;
-  border-bottom:1px solid #eee;
-  font-weight:900;
+  height:100%;
 }
 
-/* 右 */
+.sidebar{
+  width:220px;
+  background:#14532d;
+  color:#fff;
+  padding:20px;
+}
 
-.timeline-right{
+.main-pc{
   flex:1;
   display:flex;
   flex-direction:column;
   overflow:hidden;
 }
 
-/* 横スクロール */
+.header{
+  padding:10px;
+  background:#fff;
+  border-bottom:1px solid #ccc;
+}
 
-.timeline-x{
+.table{
+  flex:1;
   overflow-x:auto;
   overflow-y:hidden;
 }
 
-/* 時間 */
-
-.hours{
-  display:grid;
-  grid-template-columns:repeat(14,120px);
-  border-bottom:1px solid #ddd;
-  background:#fff;
-  position:sticky;
-  top:0;
-  z-index:10;
+table{
+  min-width:1200px;
+  border-collapse:collapse;
 }
 
-.hours div{
-  text-align:center;
-  padding:14px;
-  font-weight:900;
-  border-right:1px solid #eee;
-}
-
-/* 縦スクロール */
-
-.timeline-y{
-  height:100%;
-  overflow-y:auto;
-}
-
-/* グリッド */
-
-.grid{
-  position:relative;
-  display:grid;
-  grid-template-columns:repeat(14,120px);
-  grid-auto-rows:78px;
-}
-
-.cell{
-  border-right:1px solid #eee;
-  border-bottom:1px solid #eee;
-}
-
-/* 予約 */
-
-.appt{
-  position:absolute;
-  height:60px;
-  background:#2563eb;
-  color:#fff;
-  border-radius:10px;
+td,th{
+  border:1px solid #ccc;
   padding:6px;
-  font-size:12px;
-  font-weight:900;
-}
-
-/* ===== 詳細 ===== */
-
-.detail{
-  width:300px;
-  border-left:1px solid #ddd;
-  padding:20px;
-  background:#fff;
-}
-
-/* ===== 下カード ===== */
-
-.ipad-bottom{
-  height:40px;
-  background:#ddd;
-  text-align:center;
-  line-height:40px;
-  font-weight:900;
-  transition:.3s;
-  overflow:hidden;
-}
-
-.ipad-bottom.open{
-  height:160px;
-}
-
-.bottom-inner{
-  display:none;
-  height:120px;
-  background:#fff;
-}
-
-.ipad-bottom.open .bottom-inner{
-  display:flex;
-}
-
-.card{
-  flex:1;
-  padding:10px;
-  border-right:1px solid #eee;
-}
-
-/* ===== PC（そのまま） ===== */
-
-.pc{
-  display:none;
 }
 </style>
 </head>
 
 <body>
 
-<div class="screen">
+<!-- iPad -->
+<div id="ipad" class="screen active ipad">
 
-<div class="ipad-shell">
-
-  <div class="ipad-top">
+  <div class="top">
     <div>2026/04/21</div>
-    <div>＋予約</div>
+    <div>
+      <button onclick="location.href='booking-input.html'">＋予約</button>
+      <button onclick="location.href='settings.html'">設定</button>
+    </div>
   </div>
 
-  <div class="ipad-main">
+  <div class="main">
 
-    <!-- タイムライン -->
+    <div class="names">
+      <div class="name">佐藤</div>
+      <div class="name">鈴木</div>
+      <div class="name">山田</div>
+    </div>
+
     <div class="timeline">
+      <div class="timeline-inner">
 
-      <!-- 左 -->
-      <div class="timeline-left">
-        <div class="timeline-label">担当</div>
-        <div class="row-name">佐藤 太郎</div>
-        <div class="row-name">鈴木 花子</div>
-        <div class="row-name">山田 一郎</div>
-        <div class="row-name">協力業者A</div>
-        <div class="row-name">協力業者B</div>
-        <div class="row-name">協力業者C</div>
-      </div>
+        <div class="row">
+          <div class="slot" style="left:100px;width:120px">田中</div>
+        </div>
 
-      <!-- 右 -->
-      <div class="timeline-right">
+        <div class="row">
+          <div class="slot" style="left:300px;width:120px">鈴木</div>
+        </div>
 
-        <div class="timeline-x">
-
-          <div class="hours">
-            <div>7:00</div><div>8:00</div><div>9:00</div><div>10:00</div>
-            <div>11:00</div><div>12:00</div><div>13:00</div><div>14:00</div>
-            <div>15:00</div><div>16:00</div><div>17:00</div><div>18:00</div>
-            <div>19:00</div><div>20:00</div>
-          </div>
-
-          <div class="timeline-y">
-
-            <div class="grid">
-
-              <!-- 5行分 -->
-              <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-              <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-              <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
-              <div class="cell"></div><div class="cell"></div>
-
-              <div class="appt" style="top:20px; left:120px; width:120px;">
-                田中
-              </div>
-
-            </div>
-
-          </div>
-
+        <div class="row">
+          <div class="slot" style="left:500px;width:120px">佐藤</div>
         </div>
 
       </div>
-
     </div>
 
-    <!-- 詳細 -->
     <div class="detail">
       詳細
     </div>
 
   </div>
 
-  <!-- 下 -->
-  <div class="ipad-bottom" onclick="this.classList.toggle('open')">
-    ▲
-    <div class="bottom-inner">
-      <div class="card">2週間予定</div>
-      <div class="card">業者一覧</div>
+  <div id="bottom" class="bottom open">
+    <div class="toggle" onclick="toggleBottom()">予定・業者 ▲</div>
+    <div class="bottom-content">
+      <div>2週間予定</div>
+      <div>業者一覧</div>
     </div>
   </div>
 
 </div>
 
+<!-- PC -->
+<div id="pc" class="screen pc">
+
+  <div class="sidebar">
+    メニュー
+  </div>
+
+  <div class="main-pc">
+    <div class="header">
+      <button onclick="location.href='booking-input.html'">＋新規</button>
+      <button onclick="location.href='settings.html'">設定</button>
+    </div>
+
+    <div class="table">
+      <table>
+        <tr><th>日付</th><th>名前</th><th>金額</th></tr>
+        <tr><td>4/21</td><td>田中</td><td>4000</td></tr>
+      </table>
+    </div>
+  </div>
+
 </div>
 
 <script>
-document.addEventListener('touchmove', function(e){
-  if(!e.target.closest('.timeline-x') && !e.target.closest('.timeline-y')){
-    e.preventDefault();
-  }
-},{passive:false});
+function toggleBottom(){
+  const el=document.getElementById("bottom")
+  el.classList.toggle("open")
+  el.classList.toggle("closed")
+}
 </script>
 
 </body>
