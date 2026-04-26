@@ -1,917 +1,262 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
-  <title>介護タクシー管理アプリ｜確認用モック</title>
-  <style>
-    * { box-sizing: border-box; }
-
-    html, body {
-      margin: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      background: #eef2f6;
-      color: #172033;
-    }
-
-    button { font: inherit; cursor: pointer; }
-    a { color: inherit; }
-
-    .screen {
-      display: none;
-      width: 100vw;
-      height: 100vh;
-      height: 100dvh;
-      padding: 6px;
-      overflow: hidden;
-    }
-
-    .screen.active { display: block; }
-
-    .menu-btn {
-      border: 0;
-      background: rgba(255,255,255,.95);
-      color: #1d4ed8;
-      width: 54px;
-      height: 54px;
-      border-radius: 16px;
-      font-size: 30px;
-      font-weight: 950;
-      box-shadow: 0 6px 18px rgba(0,0,0,.16);
-      flex: 0 0 auto;
-    }
-
-    .drawer {
-      position: fixed;
-      left: 22px;
-      top: 92px;
-      z-index: 100;
-      width: 230px;
-      background: #fff;
-      border-radius: 22px;
-      box-shadow: 0 16px 40px rgba(0,0,0,.24);
-      padding: 12px;
-      display: none;
-    }
-
-    .drawer.open { display: block; }
-
-    .drawer button,
-    .drawer a {
-      width: 100%;
-      border: 0;
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      justify-content: flex-start;
-      height: 50px;
-      padding: 0 14px;
-      border-radius: 14px;
-      background: #f1f5f9;
-      margin-bottom: 8px;
-      font-weight: 900;
-      color: #334155;
-    }
-
-    .drawer a.settings {
-      background: #475569;
-      color: #fff;
-    }
-
-    .ipad-shell {
-      width: 100%;
-      height: 100%;
-      border: 10px solid #111827;
-      border-radius: 36px;
-      overflow: hidden;
-      background: #fff;
-      box-shadow: 0 20px 60px rgba(0,0,0,.22);
-      display: flex;
-      flex-direction: column;
-      min-height: 0;
-    }
-
-    .ipad-top {
-      flex: 0 0 76px;
-      height: 76px;
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      background: #1d4ed8;
-      color: #fff;
-      padding: 0 26px;
-      min-width: 0;
-    }
-
-    .ipad-top .left {
-      display: flex;
-      gap: 22px;
-      align-items: center;
-      font-weight: 900;
-      font-size: 24px;
-      min-width: 0;
-    }
-
-    .top-date {
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .top-btn {
-      background: #fff;
-      color: #1d4ed8;
-      border: 0;
-      padding: 12px 18px;
-      border-radius: 12px;
-      font-weight: 900;
-      text-decoration: none;
-      white-space: nowrap;
-    }
-
-    .top-booking {
-      font-size: 18px;
-      padding: 15px 22px;
-      flex: 0 0 auto;
-    }
-
-    .ipad-main {
-      flex: 1 1 auto;
-      min-height: 0;
-      display: grid;
-      grid-template-columns: 1fr 315px;
-      overflow: hidden;
-    }
-
-    .timeline-panel {
-      min-width: 0;
-      min-height: 0;
-      overflow: auto;
-      background: #fff;
-      overscroll-behavior: contain;
-    }
-
-    .timeline-head {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      border-bottom: 1px solid #d7dee8;
-      background: #fff;
-      min-width: 900px;
-    }
-
-    .timeline-label {
-      padding: 16px;
-      font-size: 13px;
-      font-weight: 900;
-      border-right: 1px solid #d7dee8;
-    }
-
-    .hours {
-      display: grid;
-      grid-template-columns: repeat(14, 1fr);
-      font-size: 13px;
-      text-align: center;
-    }
-
-    .hours div {
-      padding: 16px 4px;
-      border-right: 1px solid #d7dee8;
-      font-weight: 800;
-    }
-
-    .hours .now-hour { color: #dc2626; }
-
-    .timeline-body {
-      display: grid;
-      grid-template-columns: 130px 1fr;
-      min-width: 900px;
-    }
-
-    .rows { background: #f8fafc; }
-
-    .row-name {
-      height: 78px;
-      padding: 18px 12px;
-      border-right: 1px solid #d7dee8;
-      border-bottom: 1px solid #d7dee8;
-      font-weight: 900;
-    }
-
-    .grid {
-      position: relative;
-      height: 468px;
-      background-image:
-        linear-gradient(to right,#d7dee8 1px,transparent 1px),
-        linear-gradient(to bottom,#d7dee8 1px,transparent 1px);
-      background-size: 7.142% 78px;
-    }
-
-    .now-line {
-      position: absolute;
-      left: 43%;
-      top: 0;
-      bottom: 0;
-      width: 2px;
-      background: #ef4444;
-      z-index: 1;
-    }
-
-    .appt {
-      position: absolute;
-      z-index: 2;
-      color: white;
-      border: 0;
-      border-radius: 10px;
-      padding: 8px 10px;
-      box-shadow: 0 6px 16px rgba(0,0,0,.2);
-      font-weight: 900;
-      text-align: left;
-      font-size: 13px;
-      line-height: 1.35;
-    }
-
-    .appt.selected { outline: 5px solid rgba(147,197,253,.85); }
-    .green { background: #16a34a; }
-    .blue { background: #2563eb; }
-    .purple { background: #7c3aed; }
-    .orange { background: #f97316; }
-
-    .detail {
-      min-height: 0;
-      border-left: 1px solid #d7dee8;
-      padding: 24px;
-      background: #fff;
-      overflow: hidden;
-    }
-
-    .detail-title {
-      font-size: 19px;
-      font-weight: 900;
-      margin-bottom: 26px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-
-    .label {
-      color: #64748b;
-      font-size: 13px;
-      font-weight: 800;
-      margin-top: 18px;
-    }
-
-    .value {
-      margin-top: 5px;
-      font-size: 20px;
-      font-weight: 900;
-    }
-
-    .small {
-      font-size: 14px;
-      color: #334155;
-      line-height: 1.6;
-    }
-
-    .amount-pair {
-      display: flex;
-      gap: 12px;
-      align-items: baseline;
-      white-space: nowrap;
-    }
-
-    .estimate { color: #2563eb; }
-
-    .estimate.changed {
-      text-decoration-line: line-through;
-      text-decoration-thickness: .5px;
-      text-decoration-color: #475569;
-    }
-
-    .actual {
-      color: #111827;
-      font-weight: 950;
-    }
-
-    .diff {
-      color: #dc2626;
-      font-size: 13px;
-      font-weight: 900;
-    }
-
-    .badges {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 8px;
-      margin-top: 20px;
-    }
-
-    .badge {
-      display: inline-flex;
-      align-items: center;
-      border: 1px solid;
-      border-radius: 8px;
-      padding: 4px 7px;
-      font-size: 10.5px;
-      font-weight: 900;
-    }
-
-    .b-orange { background:#fff7ed; color:#c2410c; border-color:#fdba74; }
-    .b-blue { background:#eff6ff; color:#1d4ed8; border-color:#93c5fd; }
-    .b-purple { background:#faf5ff; color:#7e22ce; border-color:#d8b4fe; }
-    .b-red { background:#fef2f2; color:#b91c1c; border-color:#fca5a5; }
-    .b-green { background:#f0fdf4; color:#15803d; border-color:#86efac; }
-
-    .ipad-bottom {
-      flex: 0 0 150px;
-      min-height: 150px;
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 16px;
-      background: #f8fafc;
-      padding: 14px;
-      border-top: 1px solid #d7dee8;
-      overflow: hidden;
-    }
-
-    .card {
-      background: #fff;
-      border: 1px solid #d7dee8;
-      border-radius: 16px;
-      padding: 16px;
-      box-shadow: 0 3px 12px rgba(15,23,42,.06);
-      overflow: hidden;
-    }
-
-    .card h3 {
-      margin: 0 0 10px;
-      color: #1d4ed8;
-      font-size: 15px;
-    }
-
-    .mini-week {
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-      gap: 7px;
-    }
-
-    .day {
-      height: 90px;
-      border: 1px solid #d7dee8;
-      border-radius: 10px;
-      text-align: center;
-      padding: 7px;
-      font-weight: 800;
-    }
-
-    .day.active {
-      border-color: #2563eb;
-      background: #eff6ff;
-    }
-
-    .bar {
-      height: 7px;
-      width: 60%;
-      margin: 12px auto 0;
-      border-radius: 999px;
-      background: #2563eb;
-    }
-
-    .bar.greenbar { background: #22c55e; margin-top: 8px; }
-    .bar.orangebar { background: #fb923c; margin-top: 8px; }
-
-    .pc-wrap {
-      display: grid;
-      grid-template-columns: 235px 1fr;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-    }
-
-    .sidebar {
-      background: #14532d;
-      color: #fff;
-      padding: 24px;
-      overflow: hidden;
-      min-height: 0;
-    }
-
-    .brand {
-      font-size: 16px;
-      font-weight: 950;
-      margin-bottom: 22px;
-    }
-
-    .nav {
-      padding: 11px 12px;
-      border-radius: 10px;
-      margin-bottom: 6px;
-      font-weight: 900;
-      color: #dcfce7;
-      font-size: 13px;
-    }
-
-    .nav.active {
-      background: #15803d;
-      color: #fff;
-    }
-
-    .settings-nav {
-      display: block;
-      text-decoration: none;
-    }
-
-    .side-card {
-      margin-top: 42px;
-      border: 1px solid #22c55e;
-      border-radius: 16px;
-      padding: 16px;
-    }
-
-    .side-row {
-      display: flex;
-      justify-content: space-between;
-      font-size: 12px;
-      margin-top: 10px;
-    }
-
-    .pc-main {
-      padding: 24px 30px;
-      overflow: hidden;
-      min-width: 0;
-      min-height: 0;
-      height: 100%;
-      display: flex;
-      flex-direction: column;
-    }
-
-    .pc-header {
-      flex: 0 0 auto;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      margin-bottom: 14px;
-    }
-
-    .pc-header h1 {
-      margin: 0;
-      color: #166534;
-      font-size: 24px;
-    }
-
-    .pc-actions {
-      display: flex;
-      gap: 10px;
-    }
-
-    .pc-actions a,
-    .pc-actions button {
-      text-decoration: none;
-      border: 1px solid #cbd5e1;
-      border-radius: 10px;
-      background: white;
-      padding: 8px 12px;
-      color: #166534;
-      font-weight: 900;
-      font-size: 12px;
-    }
-
-    .pc-actions .primary {
-      background: #15803d;
-      color: #fff;
-      border-color: #15803d;
-    }
-
-    .filters {
-      flex: 0 0 auto;
-      display: grid;
-      grid-template-columns: repeat(6,1fr);
-      gap: 13px;
-      background: #fff;
-      border: 1px solid #d7dee8;
-      border-radius: 16px;
-      padding: 14px 16px;
-      margin-bottom: 14px;
-    }
-
-    .filter-label {
-      font-size: 11px;
-      color: #64748b;
-      font-weight: 900;
-      margin-bottom: 5px;
-    }
-
-    .filter-box {
-      border: 1px solid #d7dee8;
-      background: #f8fafc;
-      border-radius: 9px;
-      padding: 8px;
-      font-size: 12px;
-    }
-
-    .table-box {
-      flex: 1 1 auto;
-      min-height: 0;
-      border: 1px solid #d7dee8;
-      border-radius: 18px;
-      background: #fff;
-      overflow-x: auto;
-      overflow-y: hidden;
-      box-shadow: 0 3px 12px rgba(15,23,42,.06);
-      overscroll-behavior: contain;
-    }
-
-    table {
-      border-collapse: collapse;
-      min-width: 1420px;
-      width: 100%;
-      font-size: 11.5px;
-    }
-
-    th {
-      background: #f1f5f9;
-      padding: 8px 6px;
-      border: 1px solid #d7dee8;
-      font-size: 10.5px;
-      white-space: nowrap;
-    }
-
-    td {
-      padding: 8px 6px;
-      border: 1px solid #d7dee8;
-      white-space: nowrap;
-    }
-
-    tbody tr:hover { background: #f0fdf4; }
-    .center { text-align: center; }
-    .bold { font-weight: 900; }
-    .red { color: #dc2626; font-weight: 900; }
-    .muted { color: #64748b; }
-
-    .summary {
-      flex: 0 0 138px;
-      display: grid;
-      grid-template-columns: repeat(4,1fr);
-      gap: 16px;
-      margin-top: 14px;
-      overflow: hidden;
-    }
-
-    .summary .card {
-      height: 138px;
-      padding: 16px;
-    }
-
-    .summary h3 {
-      margin: 0 0 10px;
-      color: #166534;
-      font-size: 14px;
-    }
-
-    @media (max-width: 980px) {
-      .screen { padding: 4px; }
-
-      .ipad-shell {
-        border-width: 8px;
-        border-radius: 30px;
-      }
-
-      .ipad-top {
-        flex-basis: 68px;
-        height: 68px;
-        padding: 0 18px;
-      }
-
-      .ipad-top .left {
-        gap: 14px;
-        font-size: 20px;
-      }
-
-      .menu-btn {
-        width: 50px;
-        height: 50px;
-      }
-
-      .ipad-main {
-        grid-template-columns: 1fr 260px;
-      }
-
-      .ipad-bottom {
-        flex-basis: 140px;
-        min-height: 140px;
-      }
-
-      .detail {
-        padding: 18px;
-      }
-
-      .pc-wrap {
-        grid-template-columns: 1fr;
-      }
-
-      .sidebar {
-        display: none;
-      }
-
-      .pc-main {
-        padding: 18px;
-      }
-
-      .filters,
-      .summary {
-        grid-template-columns: 1fr;
-      }
-    }
-  </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>介護タクシー管理</title>
+
+<style>
+*{box-sizing:border-box}
+
+html,body{
+  margin:0;
+  height:100%;
+  overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
+  background:#eef2f6;
+}
+
+/* ===== 全体 ===== */
+
+.app{
+  height:100vh;
+  display:flex;
+  flex-direction:column;
+}
+
+/* ===== ヘッダー ===== */
+
+.header{
+  height:70px;
+  background:#1d4ed8;
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:0 20px;
+  font-weight:900;
+}
+
+.btn{
+  background:#fff;
+  color:#1d4ed8;
+  border-radius:10px;
+  padding:10px 14px;
+  font-size:14px;
+}
+
+/* ===== メイン ===== */
+
+.main{
+  flex:1;
+  display:flex;
+  overflow:hidden;
+}
+
+/* ===== タイムライン ===== */
+
+.timeline{
+  flex:1;
+  display:flex;
+  overflow:hidden;
+  background:#fff;
+}
+
+/* 左列（固定） */
+.names{
+  width:120px;
+  border-right:1px solid #ddd;
+  display:flex;
+  flex-direction:column;
+}
+
+.name{
+  height:80px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  border-bottom:1px solid #eee;
+  font-weight:900;
+}
+
+/* 右（スクロール） */
+.gridWrap{
+  flex:1;
+  overflow:auto;
+  position:relative;
+}
+
+/* 時間ヘッダー */
+.hours{
+  position:sticky;
+  top:0;
+  background:#fff;
+  display:grid;
+  grid-template-columns:repeat(14,120px);
+  border-bottom:1px solid #ddd;
+  z-index:5;
+}
+
+.hours div{
+  text-align:center;
+  padding:10px;
+  font-weight:900;
+  border-right:1px solid #eee;
+}
+
+/* グリッド */
+.grid{
+  display:grid;
+  grid-template-columns:repeat(14,120px);
+  grid-auto-rows:80px;
+}
+
+/* マス */
+.cell{
+  border-right:1px solid #eee;
+  border-bottom:1px solid #eee;
+}
+
+/* 予約 */
+.appt{
+  position:absolute;
+  height:60px;
+  background:#2563eb;
+  color:#fff;
+  border-radius:8px;
+  padding:6px;
+  font-size:12px;
+  font-weight:900;
+}
+
+/* ===== 右詳細 ===== */
+
+.detail{
+  width:260px;
+  border-left:1px solid #ddd;
+  padding:16px;
+  background:#fff;
+}
+
+/* ===== 下カード（格納） ===== */
+
+.bottom{
+  height:40px;
+  background:#ddd;
+  text-align:center;
+  line-height:40px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.bottom.open{
+  height:200px;
+}
+
+.bottomContent{
+  display:none;
+  background:#fff;
+  height:160px;
+}
+
+.bottom.open .bottomContent{
+  display:flex;
+}
+
+.card{
+  flex:1;
+  padding:10px;
+  border-right:1px solid #eee;
+}
+</style>
 </head>
 
 <body>
-  <div class="drawer" id="drawer">
-    <button onclick="showView('ipad')">iPad画面</button>
-    <button onclick="showView('pc')">PC画面</button>
-    <a class="settings" href="settings.html">設定</a>
+
+<div class="app">
+
+  <!-- ヘッダー -->
+  <div class="header">
+    <div>2026/04/21</div>
+    <div class="btn">＋予約</div>
   </div>
 
-  <section id="ipad" class="screen active">
-    <div class="ipad-shell">
-      <div class="ipad-top">
-        <div class="left">
-          <button class="menu-btn" onclick="toggleDrawer()">☰</button>
-          <span class="top-date">2026/04/21（火）</span>
-          <button class="top-btn">今日</button>
-        </div>
-        <a class="top-btn top-booking" href="booking-input.html">＋ 予約登録</a>
+  <!-- メイン -->
+  <div class="main">
+
+    <!-- タイムライン -->
+    <div class="timeline">
+
+      <!-- 左列 -->
+      <div class="names">
+        <div class="name">佐藤</div>
+        <div class="name">鈴木</div>
+        <div class="name">山田</div>
+        <div class="name">業者A</div>
+        <div class="name">業者B</div>
       </div>
 
-      <div class="ipad-main">
-        <div class="timeline-panel">
-          <div class="timeline-head">
-            <div class="timeline-label">担当者 / 業者</div>
-            <div class="hours">
-              <div>7:00</div><div>8:00</div><div>9:00</div><div>10:00</div><div>11:00</div><div class="now-hour">12:00</div><div>13:00</div><div>14:00</div><div>15:00</div><div>16:00</div><div>17:00</div><div>18:00</div><div>19:00</div><div>20:00</div>
-            </div>
-          </div>
+      <!-- 右 -->
+      <div class="gridWrap">
 
-          <div class="timeline-body">
-            <div class="rows">
-              <div class="row-name">佐藤 太郎</div>
-              <div class="row-name">鈴木 花子</div>
-              <div class="row-name">山田 一郎</div>
-              <div class="row-name">協力業者A</div>
-              <div class="row-name">協力業者B</div>
-              <div class="row-name">協力業者C</div>
-            </div>
-
-            <div class="grid">
-              <div class="now-line"></div>
-              <button class="appt green selected" style="top:22px; left:12%; width:12%;" onclick="selectAppt(0)">
-                <div>08:30〜09:30</div><div>田中 様</div>
-              </button>
-              <button class="appt blue" style="top:100px; left:27%; width:10%;" onclick="selectAppt(1)">
-                <div>10:00〜10:50</div><div>鈴木 様</div>
-              </button>
-              <button class="appt purple" style="top:334px; left:18%; width:11%;" onclick="selectAppt(2)">
-                <div>09:00〜10:00</div><div>佐藤 様</div>
-              </button>
-              <button class="appt blue" style="top:178px; left:55%; width:13%;" onclick="selectAppt(3)">
-                <div>13:30〜14:30</div><div>伊藤 様</div>
-              </button>
-              <button class="appt orange" style="top:334px; left:59%; width:12%;" onclick="selectAppt(4)">
-                <div>14:00〜15:00</div><div>高橋 様</div>
-              </button>
-            </div>
-          </div>
+        <!-- 時間 -->
+        <div class="hours">
+          <div>7</div><div>8</div><div>9</div><div>10</div>
+          <div>11</div><div>12</div><div>13</div><div>14</div>
+          <div>15</div><div>16</div><div>17</div><div>18</div>
+          <div>19</div><div>20</div>
         </div>
 
-        <aside class="detail">
-          <div id="detailTitle" class="detail-title">2026/04/21 08:30〜09:30</div>
-          <div class="label">患者名</div>
-          <div id="detailPatient" class="value">田中 様</div>
-          <div class="label">予約内容</div>
-          <div id="detailRoute" class="value small">自宅 → A病院</div>
-          <div id="detailNote" class="small">車椅子 / 付き添いあり</div>
-          <div class="label">金額</div>
-          <div id="detailAmount" class="value"></div>
-          <div id="detailBadges" class="badges"></div>
-        </aside>
+        <!-- グリッド -->
+        <div class="grid">
+          <!-- 5行分 -->
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div><div class="cell"></div><div class="cell"></div>
+          <div class="cell"></div><div class="cell"></div>
+
+          <!-- 同じの繰り返し（省略OK） -->
+        </div>
+
+        <!-- 予約 -->
+        <div class="appt" style="top:90px; left:120px; width:120px;">
+          8:30 田中
+        </div>
+
       </div>
 
-      <div class="ipad-bottom">
-        <div class="card">
-          <h3>2週間分の予定</h3>
-          <div class="mini-week">
-            <div class="day"><b>4/20</b><div class="bar"></div><div class="bar orangebar"></div></div>
-            <div class="day active"><b>4/21</b><div class="bar"></div><div class="bar greenbar"></div></div>
-            <div class="day"><b>4/22</b><div class="bar"></div></div>
-            <div class="day"><b>4/23</b><div class="bar greenbar"></div></div>
-            <div class="day"><b>4/24</b></div>
-            <div class="day"><b>4/25</b></div>
-            <div class="day"><b>4/26</b></div>
-          </div>
-        </div>
-
-        <div class="card">
-          <h3>協力業者さんの一覧</h3>
-          <div class="small" style="font-size:18px; line-height:2; font-weight:800;">
-            田中　待機中<br>
-            佐藤　対応中<br>
-            山本　空き<br>
-            他20件
-          </div>
-        </div>
-      </div>
     </div>
-  </section>
 
-  <section id="pc" class="screen">
-    <div class="pc-wrap">
-      <aside class="sidebar">
-        <div class="brand">🚕 介護タクシー管理</div>
-        <div class="nav">ダッシュボード</div>
-        <div class="nav active">案件台帳</div>
-        <div class="nav">締め・請求管理</div>
-        <div class="nav">入金管理</div>
-        <div class="nav">支払管理</div>
-        <div class="nav">再請求管理</div>
-        <div class="nav">マスター管理</div>
-        <div class="nav">帳票出力</div>
-        <a class="nav settings-nav" href="settings.html">設定</a>
-
-        <div class="side-card">
-          <b>本日のサマリー</b>
-          <div class="side-row"><span>未請求</span><b>1件</b></div>
-          <div class="side-row"><span>未入金</span><b>3件</b></div>
-          <div class="side-row"><span>未支払</span><b>4件</b></div>
-          <div class="side-row red"><span>差額</span><b>+1,600</b></div>
-        </div>
-      </aside>
-
-      <main class="pc-main">
-        <div class="pc-header">
-          <h1>案件台帳一覧</h1>
-          <div class="pc-actions">
-            <button>↓ CSV出力</button>
-            <a class="primary" href="booking-input.html">＋ 新規登録</a>
-          </div>
-        </div>
-
-        <div class="filters">
-          <div><div class="filter-label">利用日</div><div class="filter-box">2026/04/01〜04/30</div></div>
-          <div><div class="filter-label">請求状態</div><div class="filter-box">すべて</div></div>
-          <div><div class="filter-label">入金状態</div><div class="filter-box">すべて</div></div>
-          <div><div class="filter-label">支払状態</div><div class="filter-box">すべて</div></div>
-          <div><div class="filter-label">業者</div><div class="filter-box">すべて</div></div>
-          <div><div class="filter-label">詳細検索</div><div class="filter-box">検索</div></div>
-        </div>
-
-        <div class="table-box">
-          <table>
-            <thead>
-              <tr>
-                <th>利用日</th><th>患者名</th><th>請求先</th><th>業者</th><th>担当者</th>
-                <th>見積/実額</th><th>差額</th><th>差額理由</th><th>患者締め</th><th>請求〆切</th>
-                <th>業者締め</th><th>支払予定</th><th>請求</th><th>入金</th><th>支払</th><th>再請求</th><th>メモ</th>
-              </tr>
-            </thead>
-            <tbody id="pcRows"></tbody>
-          </table>
-        </div>
-
-        <div class="summary">
-          <div class="card">
-            <h3>金額サマリー</h3>
-            <div class="side-row"><span>見積合計</span><b>27,000</b></div>
-            <div class="side-row"><span>実額合計</span><b>28,600</b></div>
-            <div class="side-row red"><span>差額合計</span><b>+1,600</b></div>
-          </div>
-          <div class="card">
-            <h3>締め・期限情報</h3>
-            <div class="small">患者側締め 12件<br>業者側締め 10件<br>期限切れ 2件</div>
-          </div>
-          <div class="card">
-            <h3>状態サマリー</h3>
-            <div class="badges">
-              <span class="badge b-orange">未請求</span>
-              <span class="badge b-red">未入金</span>
-              <span class="badge b-red">未支払</span>
-              <span class="badge b-purple">再請求中</span>
-            </div>
-          </div>
-          <div class="card">
-            <h3>差額理由</h3>
-            <div class="small">待機 1件<br>経由 1件<br>階段介助 1件</div>
-          </div>
-        </div>
-      </main>
+    <!-- 右 -->
+    <div class="detail">
+      詳細
     </div>
-  </section>
+
+  </div>
+
+  <!-- 下 -->
+  <div class="bottom" onclick="toggleBottom()">
+    ▲
+    <div class="bottomContent">
+      <div class="card">2週間予定</div>
+      <div class="card">業者一覧</div>
+    </div>
+  </div>
+
+</div>
 
 <script>
-const data=[
- {date:'2026/04/21',start:'08:30',end:'09:30',patient:'田中 様',billingTo:'A病院',contractor:'協力業者A',staff:'佐藤 太郎',route:'自宅 → A病院',estimate:4000,actual:4800,reason:'診察待ち時間30分',patientPeriod:'4/21〜4/30',deadline:'05/05',contractorPeriod:'05/01〜5/10',payDate:'05/15',invoice:'未請求',payment:'未入金',payout:'未支払',re:0,note:'車椅子 / 付き添いあり'},
- {date:'2026/04/21',start:'10:00',end:'10:50',patient:'鈴木 様',billingTo:'本人',contractor:'協力業者B',staff:'鈴木 花子',route:'B病院 → 自宅',estimate:5500,actual:5500,reason:'-',patientPeriod:'4/21〜4/30',deadline:'05/05',contractorPeriod:'05/01〜5/10',payDate:'05/15',invoice:'請求済',payment:'未入金',payout:'未支払',re:0,note:''},
- {date:'2026/04/20',start:'09:00',end:'10:00',patient:'佐藤 様',billingTo:'Cクリニック',contractor:'協力業者A',staff:'山田 一郎',route:'薬局 → 施設',estimate:3500,actual:3800,reason:'経由あり',patientPeriod:'4/11〜4/20',deadline:'04/25',contractorPeriod:'4/21〜4/30',payDate:'05/05',invoice:'請求済',payment:'入金済',payout:'未支払',re:0,note:'経由先追加'},
- {date:'2026/04/19',start:'13:30',end:'14:30',patient:'伊藤 様',billingTo:'A病院',contractor:'協力業者C',staff:'佐藤 太郎',route:'自宅 → A病院',estimate:8000,actual:8000,reason:'-',patientPeriod:'4/01〜4/10',deadline:'04/15',contractorPeriod:'4/11〜4/20',payDate:'04/25',invoice:'請求済',payment:'入金済',payout:'支払済',re:0,note:''},
- {date:'2026/04/18',start:'14:00',end:'15:00',patient:'高橋 様',billingTo:'D病院',contractor:'協力業者B',staff:'鈴木 花子',route:'自宅 → D病院',estimate:6000,actual:6500,reason:'階段介助',patientPeriod:'4/11〜4/20',deadline:'04/25',contractorPeriod:'4/21〜4/30',payDate:'05/05',invoice:'再請求中',payment:'未入金',payout:'未支払',re:1,note:'再請求 4/28'}
-];
-
-const yen=n=>n.toLocaleString('ja-JP');
-
-function toggleDrawer(){
-  document.getElementById('drawer').classList.toggle('open');
+function toggleBottom(){
+  document.querySelector('.bottom').classList.toggle('open')
 }
 
-function closeDrawer(){
-  document.getElementById('drawer').classList.remove('open');
-}
-
-function badgeClass(v){
-  if(v==='未請求')return'b-orange';
-  if(v==='請求済')return'b-blue';
-  if(v==='再請求中')return'b-purple';
-  if(v==='未入金'||v==='未支払')return'b-red';
-  if(v==='入金済'||v==='支払済')return'b-green';
-  return'';
-}
-
-function amountHTML(a, detail=false){
-  const ch=a.estimate!==a.actual;
-  return `<span class="amount-pair"><span class="estimate ${ch?'changed':''}">${yen(a.estimate)}</span><span class="actual">${yen(a.actual)}</span>${detail&&ch?`<span class="diff">+${yen(a.actual-a.estimate)}</span>`:''}</span>`;
-}
-
-function statusHTML(v){
-  return `<span class="badge ${badgeClass(v)}">${v}</span>`;
-}
-
-let manualViewSelected = false;
-
-function detectDefaultView(){
-  const width = window.innerWidth || document.documentElement.clientWidth || 0;
-  const ua = navigator.userAgent || "";
-  const isIpad =
-    /iPad/.test(ua) ||
-    (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
-
-  if (isIpad) return "ipad";
-  if (width >= 1100) return "pc";
-  return "ipad";
-}
-
-function showView(v, manual=true){
-  if (manual) manualViewSelected = true;
-  document.getElementById('ipad').classList.toggle('active',v==='ipad');
-  document.getElementById('pc').classList.toggle('active',v==='pc');
-  closeDrawer();
-}
-
-function applyAutoView(){
-  if (!manualViewSelected) {
-    showView(detectDefaultView(), false);
+/* iPadスクロール完全禁止 */
+document.addEventListener('touchmove', function(e){
+  if(!e.target.closest('.gridWrap')){
+    e.preventDefault()
   }
-}
-
-window.addEventListener('load', applyAutoView);
-window.addEventListener('resize', applyAutoView);
-
-function selectAppt(i){
-  document.querySelectorAll('.appt').forEach((b,idx)=>b.classList.toggle('selected',idx===i));
-  const a=data[i];
-  document.getElementById('detailTitle').textContent=`${a.date} ${a.start}〜${a.end}`;
-  document.getElementById('detailPatient').textContent=a.patient;
-  document.getElementById('detailRoute').textContent=a.route;
-  document.getElementById('detailNote').textContent=a.note||'メモなし';
-  document.getElementById('detailAmount').innerHTML=amountHTML(a,true);
-  document.getElementById('detailBadges').innerHTML=statusHTML(a.invoice)+statusHTML(a.payment)+statusHTML(a.payout);
-}
-
-function renderPc(){
-  document.getElementById('pcRows').innerHTML=data.map(a=>`
-    <tr>
-      <td class="center">${a.date.slice(5)}</td>
-      <td class="bold">${a.patient}</td>
-      <td>${a.billingTo}</td>
-      <td>${a.contractor}</td>
-      <td>${a.staff.split(' ')[0]}</td>
-      <td>${amountHTML(a)}</td>
-      <td class="center ${a.actual!==a.estimate?'red':'muted'}">${a.actual-a.estimate===0?'0':'+'+yen(a.actual-a.estimate)}</td>
-      <td>${a.reason}</td>
-      <td class="center">${a.patientPeriod}</td>
-      <td class="center">${a.deadline}</td>
-      <td class="center">${a.contractorPeriod}</td>
-      <td class="center">${a.payDate}</td>
-      <td class="center">${statusHTML(a.invoice)}</td>
-      <td class="center">${statusHTML(a.payment)}</td>
-      <td class="center">${statusHTML(a.payout)}</td>
-      <td class="center">${a.re}</td>
-      <td>${a.note||'-'}</td>
-    </tr>
-  `).join('');
-}
-
-selectAppt(0);
-renderPc();
+},{passive:false})
 </script>
+
 </body>
 </html>
