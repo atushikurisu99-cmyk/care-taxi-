@@ -1,11 +1,18 @@
+# index.html
+
+```html
 <!doctype html>
 <html lang="ja">
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
 <title>介護タクシー管理アプリ</title>
+
 <style>
-*{box-sizing:border-box}
+*{
+  box-sizing:border-box;
+}
+
 html,body{
   margin:0;
   width:100%;
@@ -15,18 +22,18 @@ html,body{
   background:#eef2f6;
   color:#172033;
 }
-button,input,textarea{
-  font:inherit;
-}
+
 body{
   position:fixed;
   inset:0;
 }
+
 .screen{
   width:100vw;
   height:100vh;
   padding:8px;
 }
+
 .shell{
   width:100%;
   height:100%;
@@ -38,6 +45,7 @@ body{
   flex-direction:column;
   box-shadow:0 20px 60px rgba(0,0,0,.22);
 }
+
 .top{
   height:78px;
   background:#2f58a7;
@@ -45,4 +53,478 @@ body{
   display:flex;
   align-items:center;
   justify-content:space-between;
+  padding:0 20px;
+  flex:0 0 auto;
+}
+
+.top-left{
+  display:flex;
+  align-items:center;
+  gap:18px;
+  font-size:28px;
+  font-weight:950;
+}
+
+.menu{
+  width:56px;
+  height:56px;
+  border-radius:16px;
+  border:0;
+  background:white;
+  color:#2f58a7;
+  font-size:30px;
+  font-weight:950;
+}
+
+.top-right{
+  display:flex;
+  align-items:center;
+  gap:12px;
+}
+
+.top-btn{
+  border:0;
+  background:white;
+  color:#2f58a7;
+  border-radius:14px;
+  padding:14px 18px;
+  font-size:22px;
+  font-weight:950;
+  text-decoration:none;
+}
+
+.main{
+  flex:1 1 auto;
+  min-height:0;
+  display:grid;
+  grid-template-columns:120px 1fr 280px;
+}
+
+.names{
+  border-right:1px solid #d7dee8;
+  background:#fafcff;
+}
+
+.name-head{
+  height:58px;
+  border-bottom:1px solid #d7dee8;
+  display:flex;
+  align-items:center;
+  padding:0 12px;
+  font-size:15px;
+  font-weight:900;
+  color:#18a14b;
+}
+
+.name-row{
+  height:74px;
+  border-bottom:1px solid #d7dee8;
+  display:flex;
+  align-items:center;
+  padding:0 10px;
+  font-weight:900;
+  font-size:15px;
+}
+
+.timeline-wrap{
+  overflow-x:auto;
+  overflow-y:hidden;
+  background:white;
+}
+
+.timeline{
+  width:1100px;
+  min-width:1100px;
+  height:100%;
+  position:relative;
+}
+
+.hours{
+  height:58px;
+  display:grid;
+  grid-template-columns:repeat(14,1fr);
+  border-bottom:1px solid #d7dee8;
+}
+
+.hours div{
+  border-right:1px solid #d7dee8;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:14px;
+  font-weight:900;
+}
+
+.grid{
+  position:relative;
+  height:calc(100% - 58px);
+  background-image:
+    linear-gradient(to right,#d7dee8 1px,transparent 1px),
+    linear-gradient(to bottom,#d7dee8 1px,transparent 1px);
+  background-size:calc(100% / 14) 74px;
+}
+
+.now-line{
+  position:absolute;
+  top:0;
+  bottom:0;
+  left:52%;
+  width:2px;
+  background:#ef4444;
+}
+
+.now-label{
+  position:absolute;
+  top:6px;
+  left:calc(52% - 18px);
+  background:#ef4444;
+  color:white;
+  font-size:11px;
+  font-weight:900;
+  padding:2px 6px;
+  border-radius:999px;
+}
+
+.appt{
+  position:absolute;
+  border:0;
+  border-radius:12px;
+  padding:8px 10px;
+  color:white;
+  font-size:13px;
+  font-weight:900;
+  text-align:left;
+  box-shadow:0 6px 16px rgba(0,0,0,.18);
+}
+
+.green{
+  background:#8bc8bb;
+}
+
+.detail{
+  border-left:1px solid #d7dee8;
+  padding:18px;
+  overflow:hidden;
+}
+
+.detail-title{
+  color:#18a14b;
+  font-size:24px;
+  font-weight:950;
+  margin-bottom:22px;
+}
+
+.label{
+  margin-top:16px;
+  color:#444;
+  font-size:14px;
+  font-weight:900;
+}
+
+.value{
+  margin-top:6px;
+  font-size:22px;
+  font-weight:950;
+}
+
+.bottom-wrap{
+  height:190px;
+  border-top:1px solid #d7dee8;
+  background:#f8fafc;
+  display:grid;
+  grid-template-columns:1fr 280px;
+  gap:12px;
+  padding:12px;
+}
+
+.days{
+  background:white;
+  border-radius:18px;
+  border:1px solid #d7dee8;
+  padding:12px;
+}
+
+.days-title,
+.status-title{
+  color:#18a14b;
+  font-size:16px;
+  font-weight:950;
+  margin-bottom:10px;
+}
+
+.days-grid{
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+  gap:8px;
+}
+
+.day{
+  border:1px solid #d7dee8;
+  border-radius:10px;
+  padding:10px;
+  font-size:13px;
+  font-weight:900;
+  min-height:96px;
+}
+
+.day.active{
+  background:#d9ebf7;
+}
+
+.status{
+  background:white;
+  border-radius:18px;
+  border:1px solid #d7dee8;
+  padding:12px;
+}
+
+.status-list{
+  font-size:18px;
+  line-height:1.9;
+  font-weight:900;
+}
+
+.drawer{
+  position:fixed;
+  left:22px;
+  top:90px;
+  width:240px;
+  background:white;
+  border-radius:20px;
+  box-shadow:0 16px 40px rgba(0,0,0,.24);
+  padding:12px;
+  display:none;
+  z-index:50;
+}
+
+.drawer.open{
+  display:block;
+}
+
+.drawer a{
+  display:flex;
+  align-items:center;
+  height:52px;
+  border-radius:14px;
+  background:#f1f5f9;
+  padding:0 14px;
+  margin-bottom:8px;
+  text-decoration:none;
+  color:#334155;
+  font-weight:900;
+}
+</style>
+</head>
+
+<body>
+
+<div id="drawer" class="drawer">
+  <a href="booking-input.html">＋予約登録</a>
+  <a href="settings.html">設定</a>
+</div>
+
+<div class="screen">
+
+  <div class="shell">
+
+    <div class="top">
+
+      <div class="top-left">
+        <button class="menu" onclick="toggleDrawer()">☰</button>
+        <div id="nowText"></div>
+      </div>
+
+      <div class="top-right">
+        <a class="top-btn" href="booking-input.html">＋予約登録</a>
+      </div>
+
+    </div>
+
+    <div class="main">
+
+      <div class="names">
+        <div class="name-head">LOCATION</div>
+
+        <div class="name-row">協力業者A</div>
+        <div class="name-row">協力業者B</div>
+        <div class="name-row">協力業者C</div>
+        <div class="name-row">協力業者D</div>
+        <div class="name-row">協力業者E</div>
+        <div class="name-row">協力業者F</div>
+      </div>
+
+      <div class="timeline-wrap">
+
+        <div class="timeline">
+
+          <div class="hours">
+            <div>7:00</div>
+            <div>8:00</div>
+            <div>9:00</div>
+            <div>10:00</div>
+            <div>11:00</div>
+            <div>12:00</div>
+            <div>13:00</div>
+            <div>14:00</div>
+            <div>15:00</div>
+            <div>16:00</div>
+            <div>17:00</div>
+            <div>18:00</div>
+            <div>19:00</div>
+            <div>20:00</div>
+          </div>
+
+          <div class="grid">
+
+            <div class="now-line"></div>
+            <div class="now-label">現在</div>
+
+            <button class="appt green"
+              style="
+                top:20px;
+                left:4%;
+                width:14%;
+                height:62px;
+              ">
+              田中様<br>
+              協力業者A
+            </button>
+
+            <button class="appt green"
+              style="
+                top:94px;
+                left:4%;
+                width:14%;
+                height:62px;
+              ">
+              佐藤様<br>
+              協力業者B
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="detail">
+
+        <div class="detail-title">DETAIL</div>
+
+        <div class="label">時間</div>
+        <div class="value">10:30</div>
+
+        <div class="label">患者名</div>
+        <div class="value">田中様</div>
+
+        <div class="label">出発 → 到着</div>
+        <div class="value">広島駅 → 県病院</div>
+
+        <div class="label">担当</div>
+        <div class="value">協力業者A</div>
+
+        <div class="label">状態</div>
+        <div class="value">搬送中</div>
+
+        <div class="label">特記</div>
+        <div class="value">ーーー</div>
+
+      </div>
+
+    </div>
+
+    <div class="bottom-wrap">
+
+      <div class="days">
+
+        <div class="days-title">DAYS</div>
+
+        <div class="days-grid">
+
+          <div class="day active">
+            4/29<br><br>
+            案件数8件<br>
+            調整数8件
+          </div>
+
+          <div class="day">
+            4/30<br><br>
+            案件数8件<br>
+            調整数7件
+          </div>
+
+          <div class="day">
+            5/1<br><br>
+            案件数8件
+          </div>
+
+          <div class="day">
+            5/2<br><br>
+            案件数8件
+          </div>
+
+          <div class="day">
+            5/3<br><br>
+            案件数8件
+          </div>
+
+          <div class="day">
+            5/4<br><br>
+            案件数8件
+          </div>
+
+          <div class="day">
+            5/5<br><br>
+            案件数8件
+          </div>
+
+        </div>
+
+      </div>
+
+      <div class="status">
+
+        <div class="status-title">STATUS</div>
+
+        <div class="status-list">
+          協力業者A　待機<br>
+          協力業者B　向かい中<br>
+          協力業者C　搬送中<br>
+          協力業者D　終了
+        </div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+function toggleDrawer(){
+  document.getElementById("drawer").classList.toggle("open");
+}
+
+function updateTime(){
+
+  const now=new Date();
+
+  const week=["日","月","火","水","木","金","土"];
+
+  const text=
+    `${now.getMonth()+1}/${now.getDate()}（${week[now.getDay()]}） `+
+    `${String(now.getHours()).padStart(2,"0")}:`+
+    `${String(now.getMinutes()).padStart(2,"0")}`;
+
+  document.getElementById("nowText").textContent=text;
+}
+
+updateTime();
+
+setInterval(updateTime,1000);
+</script>
+
+</body>
 </html>
+```
