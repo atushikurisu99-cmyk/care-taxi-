@@ -2,9 +2,18 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+  />
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="black-translucent"
+  />
+
   <title>介護タクシー管理UI</title>
 
   <style>
@@ -13,25 +22,35 @@
       -webkit-tap-highlight-color: transparent;
     }
 
-    html,
-    body {
-      margin: 0;
+    html {
       width: 100%;
       height: 100%;
+      margin: 0;
+      padding: 0;
       overflow: hidden;
       background: #111;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
     }
 
     body {
-      position: fixed;
-      inset: 0;
+      width: 100%;
+      height: 100%;
+      margin: 0;
+      padding: 0;
+      overflow: hidden;
+      position: relative;
+      background: #111;
+      font-family:
+        -apple-system,
+        BlinkMacSystemFont,
+        "Helvetica Neue",
+        sans-serif;
     }
 
     .app {
       position: relative;
       width: 100vw;
-      height: 100dvh;
+      height: 100vh;
+      min-height: -webkit-fill-available;
       background: #ffffff;
       overflow: hidden;
       border: 2px solid #111;
@@ -39,268 +58,319 @@
 
     .safe {
       position: absolute;
-      inset: 18px 22px 18px 22px;
+
+      top: 18px;
+      left: 22px;
+      right: 22px;
+      bottom: 18px;
+
       overflow: hidden;
     }
 
     .top-bar {
       position: absolute;
+
       left: 0;
       top: 0;
+
       width: 100%;
-      height: 64px;
-      background: #2f76ff;
-      border-radius: 2px;
+      height: 72px;
+
+      background: #3567c7;
+
+      border-radius: 26px 26px 0 0;
     }
 
     .menu {
       position: absolute;
-      left: 18px;
-      top: 14px;
-      width: 36px;
-      height: 36px;
+
+      left: 28px;
+      top: 18px;
+
+      width: 38px;
+      height: 38px;
     }
 
     .menu span {
       display: block;
+
+      width: 100%;
       height: 4px;
-      margin: 7px 0;
-      background: #111;
-      border-radius: 4px;
+
+      margin-bottom: 7px;
+
+      background: #ffffff;
+
+      border-radius: 999px;
     }
 
     .reserve-btn {
       position: absolute;
-      right: 18px;
-      top: 10px;
-      width: 118px;
-      height: 44px;
-      background: #ffffff;
-      border: 2px solid #111;
+
+      right: 26px;
+      top: 16px;
+
+      width: 102px;
+      height: 40px;
+
       border-radius: 10px;
+
+      background: #ffffff;
+
+      border: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .main {
       position: absolute;
+
+      top: 108px;
       left: 0;
       right: 0;
-      top: 84px;
       bottom: 168px;
     }
 
     .timeline {
       position: absolute;
+
       left: 0;
       top: 0;
-      right: 280px;
       bottom: 0;
-      border: 2px solid #111;
-      background: #fff;
+      right: 238px;
+
+      background: #f7f7f7;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
+
       overflow: hidden;
     }
 
-    .vendor-col {
+    .timeline-grid {
       position: absolute;
-      left: 0;
-      top: 0;
-      width: 120px;
-      height: 100%;
-      border-right: 2px solid #111;
-      background: #f8f8f8;
-    }
 
-    .vendor-row {
-      height: calc(100% / 7);
-      border-bottom: 1px solid #999;
-    }
+      inset: 0;
 
-    .grid {
-      position: absolute;
-      left: 120px;
-      top: 0;
-      right: 0;
-      bottom: 0;
       background-image:
-        linear-gradient(to right, rgba(0,0,0,.22) 1px, transparent 1px),
-        linear-gradient(to bottom, rgba(0,0,0,.22) 1px, transparent 1px);
-      background-size: 72px calc(100% / 7);
-    }
+        linear-gradient(
+          to right,
+          rgba(0, 0, 0, 0.08) 1px,
+          transparent 1px
+        ),
+        linear-gradient(
+          to bottom,
+          rgba(0, 0, 0, 0.08) 1px,
+          transparent 1px
+        );
 
-    .job {
-      position: absolute;
-      height: 34px;
-      border: 2px solid #111;
-      border-radius: 4px;
-      background: #e8efff;
-    }
-
-    .job.a {
-      left: 170px;
-      top: 68px;
-      width: 150px;
-    }
-
-    .job.b {
-      left: 300px;
-      top: 160px;
-      width: 180px;
-      background: #edf6e6;
-    }
-
-    .job.c {
-      left: 430px;
-      top: 252px;
-      width: 160px;
-      background: #fff2d8;
+      background-size: 72px 64px;
     }
 
     .detail {
       position: absolute;
-      right: 0;
-      top: 0;
-      width: 260px;
-      height: 100%;
-      border: 2px solid #111;
-      background: #ffffff;
-    }
 
-    .detail-title {
-      height: 46px;
-      border-bottom: 2px solid #111;
-      background: #f1f1f1;
+      top: 0;
+      right: 0;
+
+      width: 210px;
+      height: 100%;
+
+      background: #f7f7f7;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .detail-line {
-      height: 44px;
-      border-bottom: 1px solid #aaa;
-      margin: 0 14px;
+      width: calc(100% - 28px);
+      height: 1px;
+
+      margin-left: 14px;
+
+      background: rgba(0, 0, 0, 0.18);
     }
 
-    .detail-large {
-      height: 76px;
+    .detail-line.a {
+      margin-top: 88px;
+    }
+
+    .detail-line.b {
+      margin-top: 42px;
+    }
+
+    .detail-line.c {
+      margin-top: 42px;
+    }
+
+    .detail-line.d {
+      margin-top: 42px;
+    }
+
+    .detail-line.e {
+      margin-top: 78px;
+    }
+
+    .detail-line.f {
+      margin-top: 78px;
     }
 
     .bottom {
       position: absolute;
+
       left: 0;
       right: 0;
       bottom: 0;
-      height: 148px;
-      display: grid;
-      grid-template-columns: 1fr 280px;
-      gap: 18px;
+
+      height: 136px;
     }
 
     .days {
-      border: 2px solid #111;
-      background: #ffffff;
-      border-radius: 2px;
+      position: absolute;
+
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: 238px;
+
+      background: #f7f7f7;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
+
       overflow: hidden;
     }
 
     .days-head {
+      width: 100%;
       height: 34px;
-      border-bottom: 2px solid #111;
-      background: #f1f1f1;
+
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .days-grid {
-      height: calc(100% - 34px);
       display: grid;
+
       grid-template-columns: repeat(7, 1fr);
+
+      height: calc(100% - 34px);
     }
 
     .day {
-      border-right: 1px solid #aaa;
       position: relative;
+
+      border-right: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .day:last-child {
+      border-right: none;
     }
 
     .day::before {
       content: "";
+
       position: absolute;
-      left: 12px;
-      right: 12px;
+
+      left: 14px;
+      right: 14px;
       top: 18px;
+
       height: 18px;
-      background: #e8efff;
-      border: 1px solid #111;
-      border-radius: 3px;
+
+      background: #dce6ff;
+
+      border-radius: 4px;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .day::after {
       content: "";
+
       position: absolute;
-      left: 12px;
+
+      left: 14px;
       right: 28px;
       top: 52px;
+
       height: 18px;
-      background: #edf6e6;
-      border: 1px solid #111;
-      border-radius: 3px;
+
+      background: #e8f1df;
+
+      border-radius: 4px;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .status {
-      border: 2px solid #111;
-      background: #ffffff;
-      border-radius: 2px;
+      position: absolute;
+
+      top: 0;
+      right: 0;
+      bottom: 0;
+
+      width: 210px;
+
+      background: #f7f7f7;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
+
       overflow: hidden;
     }
 
     .status-head {
+      width: 100%;
       height: 34px;
-      border-bottom: 2px solid #111;
-      background: #f1f1f1;
+
+      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .status-row {
-      height: calc((100% - 34px) / 3);
-      border-bottom: 1px solid #aaa;
       position: relative;
+
+      width: 100%;
+      height: calc((100% - 34px) / 3);
+
+      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+    }
+
+    .status-row:last-child {
+      border-bottom: none;
     }
 
     .status-row::before {
       content: "";
+
       position: absolute;
+
       left: 14px;
       top: 50%;
-      width: 86px;
+
+      width: 88px;
       height: 18px;
+
       transform: translateY(-50%);
-      background: #e8efff;
-      border: 1px solid #111;
-      border-radius: 3px;
+
+      background: #dce6ff;
+
+      border-radius: 4px;
+
+      border: 1px solid rgba(0, 0, 0, 0.45);
     }
 
     .status-row::after {
       content: "";
+
       position: absolute;
+
       right: 14px;
       top: 50%;
+
       width: 74px;
       height: 18px;
+
       transform: translateY(-50%);
-      background: #edf6e6;
-      border: 1px solid #111;
-      border-radius: 3px;
-    }
 
-    @media (max-width: 900px) {
-      .safe {
-        inset: 14px 16px 14px 16px;
-      }
+      background: #e8f1df;
 
-      .timeline {
-        right: 248px;
-      }
+      border-radius: 4px;
 
-      .detail {
-        width: 232px;
-      }
-
-      .bottom {
-        grid-template-columns: 1fr 248px;
-        gap: 14px;
-      }
+      border: 1px solid rgba(0, 0, 0, 0.45);
     }
   </style>
 </head>
@@ -308,48 +378,39 @@
 <body>
   <div class="app">
     <div class="safe">
+
       <div class="top-bar">
         <div class="menu">
           <span></span>
           <span></span>
           <span></span>
         </div>
+
         <div class="reserve-btn"></div>
       </div>
 
-      <main class="main">
-        <section class="timeline">
-          <div class="vendor-col">
-            <div class="vendor-row"></div>
-            <div class="vendor-row"></div>
-            <div class="vendor-row"></div>
-            <div class="vendor-row"></div>
-            <div class="vendor-row"></div>
-            <div class="vendor-row"></div>
-            <div class="vendor-row"></div>
-          </div>
+      <div class="main">
 
-          <div class="grid"></div>
+        <div class="timeline">
+          <div class="timeline-grid"></div>
+        </div>
 
-          <div class="job a"></div>
-          <div class="job b"></div>
-          <div class="job c"></div>
-        </section>
+        <div class="detail">
+          <div class="detail-line a"></div>
+          <div class="detail-line b"></div>
+          <div class="detail-line c"></div>
+          <div class="detail-line d"></div>
+          <div class="detail-line e"></div>
+          <div class="detail-line f"></div>
+        </div>
 
-        <aside class="detail">
-          <div class="detail-title"></div>
-          <div class="detail-line"></div>
-          <div class="detail-line"></div>
-          <div class="detail-line"></div>
-          <div class="detail-line"></div>
-          <div class="detail-line detail-large"></div>
-          <div class="detail-line detail-large"></div>
-        </aside>
-      </main>
+      </div>
 
-      <section class="bottom">
+      <div class="bottom">
+
         <div class="days">
           <div class="days-head"></div>
+
           <div class="days-grid">
             <div class="day"></div>
             <div class="day"></div>
@@ -363,11 +424,14 @@
 
         <div class="status">
           <div class="status-head"></div>
+
           <div class="status-row"></div>
           <div class="status-row"></div>
           <div class="status-row"></div>
         </div>
-      </section>
+
+      </div>
+
     </div>
   </div>
 </body>
