@@ -11,7 +11,7 @@
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Care Taxi UI" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#ffffff" />
+  <meta name="theme-color" content="#3568c8" />
 
   <title>介護タクシー管理UI</title>
 
@@ -19,7 +19,7 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
-      touch-action: manipulation;
+      touch-action: none;
     }
 
     html,
@@ -29,28 +29,28 @@
       margin: 0;
       padding: 0;
       overflow: hidden;
-      background: #111;
-      overscroll-behavior: none;
       position: fixed;
       inset: 0;
-      font-family:
-        -apple-system,
-        BlinkMacSystemFont,
-        "Helvetica Neue",
-        sans-serif;
-    }
-
-    body {
+      background: #111;
+      overscroll-behavior: none;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       -webkit-user-select: none;
       user-select: none;
     }
 
-    .app {
+    .viewport {
       position: fixed;
       inset: 0;
+      overflow: hidden;
+      background: #111;
+    }
+
+    .app {
+      position: absolute;
+      left: 0;
+      top: 0;
       width: 100vw;
-      height: 100vh;
-      height: 100svh;
+      height: calc(var(--vh, 1vh) * 100);
       overflow: hidden;
       background: #ffffff;
       border: 2px solid #111;
@@ -60,8 +60,8 @@
       position: absolute;
       left: 30px;
       right: 30px;
-      top: 26px;
-      bottom: 26px;
+      top: 0;
+      bottom: 24px;
       overflow: hidden;
     }
 
@@ -70,16 +70,27 @@
       left: 0;
       top: 0;
       width: 100%;
-      height: 96px;
-      background: #3769c8;
-      border-radius: 32px 32px 0 0;
+      height: 116px;
+      background: #3568c8;
+      border-radius: 0;
+      overflow: hidden;
+    }
+
+    .status-cover {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 24px;
+      background: #24406b;
+      opacity: 0.34;
     }
 
     .menu {
       position: absolute;
-      left: 38px;
-      top: 28px;
-      width: 52px;
+      left: 28px;
+      top: 50px;
+      width: 50px;
       height: 42px;
     }
 
@@ -92,23 +103,54 @@
       border-radius: 999px;
     }
 
+    .date-text {
+      position: absolute;
+      left: 96px;
+      top: 36px;
+      height: 70px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      font-size: 36px;
+      font-weight: 400;
+      letter-spacing: 1px;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
     .reserve-btn {
       position: absolute;
-      right: 36px;
-      top: 24px;
-      width: 138px;
-      height: 52px;
+      right: 28px;
+      top: 42px;
+      width: 100px;
+      height: 44px;
       background: #ffffff;
       border: 1px solid rgba(0, 0, 0, 0.28);
-      border-radius: 12px;
+      border-radius: 9px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #2d5fb8;
+      font-size: 17px;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+
+    .content {
+      position: absolute;
+      left: 28px;
+      right: 28px;
+      top: 150px;
+      bottom: 18px;
+      overflow: hidden;
     }
 
     .main {
       position: absolute;
       left: 0;
       right: 0;
-      top: 146px;
-      bottom: 196px;
+      top: 0;
+      bottom: 172px;
       overflow: hidden;
     }
 
@@ -141,27 +183,19 @@
       background: rgba(0, 0, 0, 0.18);
     }
 
-    .detail-line.a {
-      margin-top: 120px;
-    }
-
+    .detail-line.a { margin-top: 110px; }
     .detail-line.b,
     .detail-line.c,
-    .detail-line.d {
-      margin-top: 58px;
-    }
-
+    .detail-line.d { margin-top: 54px; }
     .detail-line.e,
-    .detail-line.f {
-      margin-top: 104px;
-    }
+    .detail-line.f { margin-top: 88px; }
 
     .bottom {
       position: absolute;
       left: 0;
       right: 0;
       bottom: 0;
-      height: 164px;
+      height: 142px;
       overflow: hidden;
     }
 
@@ -178,14 +212,14 @@
 
     .days-head {
       width: 100%;
-      height: 48px;
+      height: 40px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .days-grid {
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      height: calc(100% - 48px);
+      height: calc(100% - 40px);
     }
 
     .day {
@@ -202,8 +236,8 @@
       position: absolute;
       left: 20px;
       right: 20px;
-      top: 26px;
-      height: 28px;
+      top: 20px;
+      height: 24px;
       background: #dce6ff;
       border: 1px solid rgba(0, 0, 0, 0.45);
       border-radius: 5px;
@@ -214,8 +248,8 @@
       position: absolute;
       left: 20px;
       right: 40px;
-      top: 72px;
-      height: 28px;
+      top: 58px;
+      height: 24px;
       background: #e8f1df;
       border: 1px solid rgba(0, 0, 0, 0.45);
       border-radius: 5px;
@@ -234,14 +268,14 @@
 
     .status-head {
       width: 100%;
-      height: 48px;
+      height: 40px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .status-row {
       position: relative;
       width: 100%;
-      height: calc((100% - 48px) / 3);
+      height: calc((100% - 40px) / 3);
       border-bottom: 1px solid rgba(0, 0, 0, 0.13);
     }
 
@@ -255,7 +289,7 @@
       left: 22px;
       top: 50%;
       width: 122px;
-      height: 28px;
+      height: 24px;
       transform: translateY(-50%);
       background: #dce6ff;
       border: 1px solid rgba(0, 0, 0, 0.45);
@@ -268,76 +302,104 @@
       right: 20px;
       top: 50%;
       width: 104px;
-      height: 28px;
+      height: 24px;
       transform: translateY(-50%);
       background: #e8f1df;
       border: 1px solid rgba(0, 0, 0, 0.45);
       border-radius: 5px;
     }
-
-    @supports (-webkit-touch-callout: none) {
-      html,
-      body {
-        height: -webkit-fill-available;
-      }
-
-      .app {
-        height: -webkit-fill-available;
-      }
-    }
   </style>
 </head>
 
 <body>
-  <div class="app">
-    <div class="safe">
-      <div class="top-bar">
-        <div class="menu">
-          <span></span>
-          <span></span>
-          <span></span>
+  <div class="viewport">
+    <div class="app">
+      <div class="safe">
+
+        <div class="top-bar">
+          <div class="status-cover"></div>
+
+          <div class="menu">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
+
+          <div class="date-text">4/29（火）14:26</div>
+
+          <div class="reserve-btn">＋予約登録</div>
         </div>
 
-        <div class="reserve-btn"></div>
-      </div>
+        <div class="content">
+          <div class="main">
+            <div class="timeline"></div>
 
-      <div class="main">
-        <div class="timeline"></div>
+            <div class="detail">
+              <div class="detail-line a"></div>
+              <div class="detail-line b"></div>
+              <div class="detail-line c"></div>
+              <div class="detail-line d"></div>
+              <div class="detail-line e"></div>
+              <div class="detail-line f"></div>
+            </div>
+          </div>
 
-        <div class="detail">
-          <div class="detail-line a"></div>
-          <div class="detail-line b"></div>
-          <div class="detail-line c"></div>
-          <div class="detail-line d"></div>
-          <div class="detail-line e"></div>
-          <div class="detail-line f"></div>
-        </div>
-      </div>
+          <div class="bottom">
+            <div class="days">
+              <div class="days-head"></div>
 
-      <div class="bottom">
-        <div class="days">
-          <div class="days-head"></div>
+              <div class="days-grid">
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+                <div class="day"></div>
+              </div>
+            </div>
 
-          <div class="days-grid">
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
+            <div class="status">
+              <div class="status-head"></div>
+              <div class="status-row"></div>
+              <div class="status-row"></div>
+              <div class="status-row"></div>
+            </div>
           </div>
         </div>
 
-        <div class="status">
-          <div class="status-head"></div>
-
-          <div class="status-row"></div>
-          <div class="status-row"></div>
-          <div class="status-row"></div>
-        </div>
       </div>
     </div>
   </div>
+
+  <script>
+    function setViewportHeight() {
+      document.documentElement.style.setProperty(
+        "--vh",
+        window.innerHeight * 0.01 + "px"
+      );
+    }
+
+    setViewportHeight();
+
+    window.addEventListener("resize", setViewportHeight);
+    window.addEventListener("orientationchange", setViewportHeight);
+
+    document.addEventListener(
+      "touchmove",
+      function (event) {
+        event.preventDefault();
+      },
+      { passive: false }
+    );
+
+    document.addEventListener(
+      "gesturestart",
+      function (event) {
+        event.preventDefault();
+      },
+      { passive: false }
+    );
+  </script>
 </body>
 </html>
