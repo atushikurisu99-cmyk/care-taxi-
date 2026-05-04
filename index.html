@@ -2,17 +2,11 @@
 <html lang="ja">
 <head>
   <meta charset="UTF-8" />
-
-  <meta
-    name="viewport"
-    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
-  />
-
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Care Taxi UI" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#3568c8" />
-
   <title>介護タクシー管理UI</title>
 
   <style>
@@ -24,72 +18,65 @@
 
     html,
     body {
-      width: 100%;
-      height: 100%;
       margin: 0;
       padding: 0;
+      width: 100%;
+      height: 100%;
       overflow: hidden;
       position: fixed;
       inset: 0;
       background: #111;
-      overscroll-behavior: none;
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      -webkit-user-select: none;
       user-select: none;
+      -webkit-user-select: none;
     }
 
-    .viewport {
-      position: fixed;
-      inset: 0;
-      overflow: hidden;
-      background: #111;
+    :root {
+      --status-h: 24px;
+      --outer-x: 30px;
+      --outer-bottom: 18px;
+      --header-h: 112px;
+      --blue: #3568c8;
+      --right-w: 288px;
+      --right-gap: 38px;
+      --bottom-h: 142px;
+      --bottom-gap: 32px;
     }
 
     .app {
-      position: absolute;
-      left: 0;
-      top: 0;
+      position: fixed;
+      inset: 0;
       width: 100vw;
-      height: calc(var(--vh, 1vh) * 100);
+      height: var(--app-h, 100vh);
       overflow: hidden;
-      background: #ffffff;
+      background: #fff;
       border: 2px solid #111;
     }
 
-    .safe {
+    .shell {
       position: absolute;
-      left: 30px;
-      right: 30px;
+      left: var(--outer-x);
+      right: var(--outer-x);
       top: 0;
-      bottom: 24px;
+      bottom: var(--outer-bottom);
       overflow: hidden;
+      background: #fff;
     }
 
-    .top-bar {
+    .header {
       position: absolute;
       left: 0;
+      right: 0;
       top: 0;
-      width: 100%;
-      height: 116px;
-      background: #3568c8;
-      border-radius: 0;
+      height: var(--header-h);
+      background: var(--blue);
       overflow: hidden;
-    }
-
-    .status-cover {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 100%;
-      height: 24px;
-      background: #24406b;
-      opacity: 0.34;
     }
 
     .menu {
       position: absolute;
       left: 28px;
-      top: 50px;
+      top: calc(var(--status-h) + 22px);
       width: 50px;
       height: 42px;
     }
@@ -99,49 +86,47 @@
       width: 100%;
       height: 5px;
       margin-bottom: 10px;
-      background: #ffffff;
       border-radius: 999px;
+      background: #fff;
     }
 
-    .date-text {
+    .date {
       position: absolute;
       left: 96px;
-      top: 36px;
+      top: calc(var(--status-h) + 12px);
       height: 70px;
       display: flex;
       align-items: center;
-      color: #ffffff;
+      color: #fff;
       font-size: 36px;
-      font-weight: 400;
-      letter-spacing: 1px;
       line-height: 1;
       white-space: nowrap;
     }
 
-    .reserve-btn {
+    .reserve {
       position: absolute;
       right: 28px;
-      top: 42px;
-      width: 100px;
+      top: calc(var(--status-h) + 18px);
+      width: 104px;
       height: 44px;
-      background: #ffffff;
-      border: 1px solid rgba(0, 0, 0, 0.28);
       border-radius: 9px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
+      background: #fff;
       color: #2d5fb8;
       font-size: 17px;
       font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
       white-space: nowrap;
+      border: 1px solid rgba(0,0,0,.25);
     }
 
     .content {
       position: absolute;
       left: 28px;
       right: 28px;
-      top: 150px;
-      bottom: 18px;
+      top: 152px;
+      bottom: 0;
       overflow: hidden;
     }
 
@@ -150,7 +135,7 @@
       left: 0;
       right: 0;
       top: 0;
-      bottom: 172px;
+      bottom: calc(var(--bottom-h) + var(--bottom-gap));
       overflow: hidden;
     }
 
@@ -159,20 +144,19 @@
       left: 0;
       top: 0;
       bottom: 0;
-      right: 326px;
+      right: calc(var(--right-w) + var(--right-gap));
       background: #f8f8f8;
-      border: 1px solid rgba(0, 0, 0, 0.5);
-      overflow: hidden;
+      border: 1px solid rgba(0,0,0,.5);
     }
 
     .detail {
       position: absolute;
       top: 0;
       right: 0;
-      width: 288px;
+      width: var(--right-w);
       height: 100%;
       background: #f8f8f8;
-      border: 1px solid rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0,0,0,.5);
       overflow: hidden;
     }
 
@@ -180,7 +164,7 @@
       width: calc(100% - 42px);
       height: 1px;
       margin-left: 21px;
-      background: rgba(0, 0, 0, 0.18);
+      background: rgba(0,0,0,.18);
     }
 
     .detail-line.a { margin-top: 110px; }
@@ -195,7 +179,7 @@
       left: 0;
       right: 0;
       bottom: 0;
-      height: 142px;
+      height: var(--bottom-h);
       overflow: hidden;
     }
 
@@ -204,27 +188,37 @@
       left: 0;
       top: 0;
       bottom: 0;
-      right: 326px;
+      right: calc(var(--right-w) + var(--right-gap));
       background: #f8f8f8;
-      border: 1px solid rgba(0, 0, 0, 0.5);
+      border: 1px solid rgba(0,0,0,.5);
       overflow: hidden;
     }
 
-    .days-head {
-      width: 100%;
+    .status {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--right-w);
+      background: #f8f8f8;
+      border: 1px solid rgba(0,0,0,.5);
+      overflow: hidden;
+    }
+
+    .head {
       height: 40px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
+      border-bottom: 1px solid rgba(0,0,0,.25);
     }
 
     .days-grid {
+      height: calc(100% - 40px);
       display: grid;
       grid-template-columns: repeat(7, 1fr);
-      height: calc(100% - 40px);
     }
 
     .day {
       position: relative;
-      border-right: 1px solid rgba(0, 0, 0, 0.13);
+      border-right: 1px solid rgba(0,0,0,.13);
     }
 
     .day:last-child {
@@ -239,7 +233,7 @@
       top: 20px;
       height: 24px;
       background: #dce6ff;
-      border: 1px solid rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0,0,0,.45);
       border-radius: 5px;
     }
 
@@ -251,32 +245,14 @@
       top: 58px;
       height: 24px;
       background: #e8f1df;
-      border: 1px solid rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0,0,0,.45);
       border-radius: 5px;
-    }
-
-    .status {
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: 288px;
-      background: #f8f8f8;
-      border: 1px solid rgba(0, 0, 0, 0.5);
-      overflow: hidden;
-    }
-
-    .status-head {
-      width: 100%;
-      height: 40px;
-      border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .status-row {
       position: relative;
-      width: 100%;
       height: calc((100% - 40px) / 3);
-      border-bottom: 1px solid rgba(0, 0, 0, 0.13);
+      border-bottom: 1px solid rgba(0,0,0,.13);
     }
 
     .status-row:last-child {
@@ -292,7 +268,7 @@
       height: 24px;
       transform: translateY(-50%);
       background: #dce6ff;
-      border: 1px solid rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0,0,0,.45);
       border-radius: 5px;
     }
 
@@ -305,101 +281,84 @@
       height: 24px;
       transform: translateY(-50%);
       background: #e8f1df;
-      border: 1px solid rgba(0, 0, 0, 0.45);
+      border: 1px solid rgba(0,0,0,.45);
       border-radius: 5px;
     }
   </style>
 </head>
 
 <body>
-  <div class="viewport">
-    <div class="app">
-      <div class="safe">
-
-        <div class="top-bar">
-          <div class="status-cover"></div>
-
-          <div class="menu">
-            <span></span>
-            <span></span>
-            <span></span>
-          </div>
-
-          <div class="date-text">4/29（火）14:26</div>
-
-          <div class="reserve-btn">＋予約登録</div>
+  <div class="app">
+    <div class="shell">
+      <div class="header">
+        <div class="menu">
+          <span></span>
+          <span></span>
+          <span></span>
         </div>
 
-        <div class="content">
-          <div class="main">
-            <div class="timeline"></div>
+        <div class="date">4/29（火）14:26</div>
+        <div class="reserve">＋予約登録</div>
+      </div>
 
-            <div class="detail">
-              <div class="detail-line a"></div>
-              <div class="detail-line b"></div>
-              <div class="detail-line c"></div>
-              <div class="detail-line d"></div>
-              <div class="detail-line e"></div>
-              <div class="detail-line f"></div>
-            </div>
-          </div>
+      <div class="content">
+        <div class="main">
+          <div class="timeline"></div>
 
-          <div class="bottom">
-            <div class="days">
-              <div class="days-head"></div>
-
-              <div class="days-grid">
-                <div class="day"></div>
-                <div class="day"></div>
-                <div class="day"></div>
-                <div class="day"></div>
-                <div class="day"></div>
-                <div class="day"></div>
-                <div class="day"></div>
-              </div>
-            </div>
-
-            <div class="status">
-              <div class="status-head"></div>
-              <div class="status-row"></div>
-              <div class="status-row"></div>
-              <div class="status-row"></div>
-            </div>
+          <div class="detail">
+            <div class="detail-line a"></div>
+            <div class="detail-line b"></div>
+            <div class="detail-line c"></div>
+            <div class="detail-line d"></div>
+            <div class="detail-line e"></div>
+            <div class="detail-line f"></div>
           </div>
         </div>
 
+        <div class="bottom">
+          <div class="days">
+            <div class="head"></div>
+            <div class="days-grid">
+              <div class="day"></div>
+              <div class="day"></div>
+              <div class="day"></div>
+              <div class="day"></div>
+              <div class="day"></div>
+              <div class="day"></div>
+              <div class="day"></div>
+            </div>
+          </div>
+
+          <div class="status">
+            <div class="head"></div>
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+          </div>
+        </div>
       </div>
     </div>
   </div>
 
   <script>
-    function setViewportHeight() {
-      document.documentElement.style.setProperty(
-        "--vh",
-        window.innerHeight * 0.01 + "px"
-      );
+    function lockSize() {
+      const h = window.innerHeight;
+      document.documentElement.style.setProperty("--app-h", h + "px");
+      window.scrollTo(0, 0);
     }
 
-    setViewportHeight();
+    lockSize();
 
-    window.addEventListener("resize", setViewportHeight);
-    window.addEventListener("orientationchange", setViewportHeight);
+    window.addEventListener("resize", lockSize);
+    window.addEventListener("orientationchange", lockSize);
 
-    document.addEventListener(
-      "touchmove",
-      function (event) {
-        event.preventDefault();
-      },
-      { passive: false }
-    );
+    document.addEventListener("touchmove", function (e) {
+      e.preventDefault();
+    }, { passive: false });
 
-    document.addEventListener(
-      "gesturestart",
-      function (event) {
-        event.preventDefault();
-      },
-      { passive: false }
-    );
+    document.addEventListener("gesturestart", function (e) {
+      e.preventDefault();
+    }, { passive: false });
   </script>
 </body>
 </html>
