@@ -6,9 +6,7 @@
 <title>介護タクシー管理アプリ</title>
 
 <style>
-*{
-  box-sizing:border-box;
-}
+*{box-sizing:border-box}
 
 html,body{
   margin:0;
@@ -17,7 +15,7 @@ html,body{
   overflow:hidden;
   font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;
   background:#eef2f6;
-  color:#172033;
+  color:#111827;
 }
 
 body{
@@ -26,8 +24,8 @@ body{
 }
 
 a{
-  color:inherit;
   text-decoration:none;
+  color:inherit;
 }
 
 button{
@@ -35,15 +33,13 @@ button{
   cursor:pointer;
 }
 
-/* =========================
-   iPad基準
-========================= */
+/* ===== PWA / iPad基準 ===== */
 
 .app{
   width:100vw;
   height:100vh;
   height:100dvh;
-  padding:8px;
+  padding:10px;
   overflow:hidden;
 }
 
@@ -51,58 +47,53 @@ button{
   width:100%;
   height:100%;
   border:10px solid #111827;
-  border-radius:36px;
+  border-radius:34px;
   overflow:hidden;
   background:#fff;
   display:grid;
   grid-template-rows:78px 1fr 180px;
-  box-shadow:0 20px 60px rgba(0,0,0,.22);
 }
 
-/* =========================
-   Header
-========================= */
+/* ===== HEADER ===== */
 
 .header{
   background:#2f58a7;
-  color:#fff;
-  display:flex;
+  display:grid;
+  grid-template-columns:1fr auto;
   align-items:center;
-  justify-content:space-between;
-  padding:0 22px;
+  padding:0 24px;
 }
 
 .header-left{
   display:flex;
   align-items:center;
-  gap:22px;
-  min-width:0;
+  gap:24px;
 }
 
 .menu-btn{
   width:56px;
   height:56px;
   border:0;
-  border-radius:16px;
+  border-radius:14px;
   background:#fff;
   color:#2f58a7;
-  font-size:31px;
+  font-size:32px;
   font-weight:950;
   display:flex;
   align-items:center;
   justify-content:center;
 }
 
-.now-text{
+.now{
+  color:#fff;
   font-size:34px;
   font-weight:950;
   white-space:nowrap;
-  letter-spacing:.02em;
 }
 
-.header-action{
+.reserve-btn{
   height:56px;
-  padding:0 22px;
+  padding:0 24px;
   border-radius:15px;
   background:#fff;
   color:#2f58a7;
@@ -113,115 +104,108 @@ button{
   justify-content:center;
 }
 
-/* =========================
-   共通見出し
-========================= */
+/* ===== 上段 ===== */
 
-.section-title{
-  height:32px;
-  display:flex;
-  align-items:center;
-  color:#00983a;
-  font-size:18px;
-  font-weight:950;
-  letter-spacing:.02em;
-}
-
-/* =========================
-   Main
-========================= */
-
-.main{
+.upper{
   min-height:0;
   display:grid;
-  grid-template-columns:130px 1fr 300px;
+  grid-template-columns:120px 1fr 300px;
   overflow:hidden;
+  background:#fff;
 }
 
-/* LOCATION */
+/* ===== LOCATION ===== */
 
 .location{
-  border-right:1px solid #d4dce8;
-  background:#fbfdff;
+  border-right:1px solid #cfd7e3;
   display:grid;
-  grid-template-rows:58px 1fr;
+  grid-template-rows:50px 1fr;
   min-height:0;
 }
 
-.location-head{
-  border-bottom:1px solid #d4dce8;
-  padding:0 14px;
+.area-title{
+  color:#00983a;
+  font-size:16px;
+  font-weight:950;
+  line-height:1;
+}
+
+.location-title{
   display:flex;
   align-items:center;
+  padding-left:12px;
+  border-bottom:1px solid #cfd7e3;
 }
 
-.location-list{
-  min-height:0;
+.location-body{
   overflow:hidden;
 }
 
 .lane-name{
-  height:74px;
-  border-bottom:1px solid #d4dce8;
+  height:68px;
+  border-bottom:1px solid #cfd7e3;
   display:flex;
   align-items:center;
-  padding:0 12px;
-  font-size:16px;
-  font-weight:950;
-  white-space:nowrap;
+  padding-left:12px;
+  font-size:15px;
+  font-weight:900;
 }
 
-/* TIMELINE */
+/* ===== TIMELINE ===== */
 
-.timeline-wrap{
+.timeline-area{
+  position:relative;
   min-width:0;
   min-height:0;
-  overflow-x:auto;
-  overflow-y:hidden;
+  overflow:hidden;
   background:#fff;
 }
 
-.timeline{
+/* 横スクロールする中身 */
+.timeline-scroll{
+  width:100%;
+  height:100%;
+  overflow-x:auto;
+  overflow-y:hidden;
+}
+
+.timeline-canvas{
+  position:relative;
   width:1120px;
   min-width:1120px;
   height:100%;
   display:grid;
-  grid-template-rows:58px 1fr;
-  position:relative;
+  grid-template-rows:50px 1fr;
 }
 
-.hours{
-  height:58px;
+.time-head{
   display:grid;
   grid-template-columns:repeat(14,80px);
-  border-bottom:1px solid #d4dce8;
-  background:#fff;
+  border-bottom:1px solid #cfd7e3;
 }
 
-.hour{
-  border-right:1px solid #d4dce8;
+.time-cell{
+  border-right:1px solid #cfd7e3;
   display:flex;
   align-items:center;
   justify-content:center;
-  font-size:15px;
+  font-size:14px;
   font-weight:950;
 }
 
 .timeline-body{
   position:relative;
-  height:100%;
   min-height:0;
-  overflow:hidden;
+  height:100%;
 }
 
-/* 時間縦線を実体化 */
-
+/* 実体線 */
 .vline{
   position:absolute;
   top:0;
   bottom:0;
   width:1px;
-  background:#d4dce8;
+  background:#cfd7e3;
   z-index:1;
 }
 
@@ -230,12 +214,11 @@ button{
   left:0;
   right:0;
   height:1px;
-  background:#d4dce8;
+  background:#cfd7e3;
   z-index:1;
 }
 
-/* 現在時刻線はタイムライン内だけ */
-
+/* 現在時刻線：タイムライン内だけ */
 .now-line{
   position:absolute;
   top:0;
@@ -245,189 +228,195 @@ button{
   z-index:5;
 }
 
-.now-badge{
-  position:absolute;
-  top:8px;
-  transform:translateX(-50%);
-  background:#ef4444;
-  color:#fff;
-  padding:3px 7px;
-  border-radius:999px;
-  font-size:11px;
-  font-weight:950;
-  z-index:6;
-}
-
+/* 予約ブロック */
 .appt{
   position:absolute;
   z-index:10;
   border:0;
-  border-radius:12px;
-  background:#8bc8bb;
-  color:#fff;
-  padding:9px 12px;
+  border-radius:0;
+  background:#b7ddd4;
+  color:#111827;
+  padding:8px 10px;
   text-align:left;
-  box-shadow:0 8px 18px rgba(15,23,42,.18);
-  font-size:15px;
-  font-weight:950;
+  font-size:14px;
+  font-weight:900;
   line-height:1.45;
 }
 
-/* DETAIL */
+/* 固定領域との境界線 */
+.scroll-boundary{
+  position:absolute;
+  right:0;
+  top:0;
+  bottom:0;
+  width:1px;
+  background:#cfd7e3;
+  z-index:20;
+  pointer-events:none;
+}
+
+/* ===== DETAIL ===== */
 
 .detail{
-  border-left:1px solid #d4dce8;
-  padding:26px 20px 18px;
-  overflow:hidden;
+  border-left:1px solid #cfd7e3;
   display:grid;
-  grid-template-rows:32px 1fr;
+  grid-template-rows:50px 1fr;
+  min-height:0;
+}
+
+.detail-title{
+  display:flex;
+  align-items:center;
+  padding-left:12px;
+  border-bottom:1px solid transparent;
 }
 
 .detail-body{
-  padding-top:8px;
+  padding:18px 12px 0;
   display:grid;
-  grid-template-rows:repeat(6,auto);
+  grid-template-rows:
+    26px
+    26px
+    26px
+    26px
+    26px
+    26px
+    26px
+    26px
+    1fr;
+  row-gap:8px;
   align-content:start;
-  gap:14px;
 }
 
-.info-block{
-  min-height:42px;
-}
-
-.info-label{
-  font-size:14px;
+.detail-row{
+  font-size:15px;
   font-weight:900;
-  color:#444;
-  margin-bottom:5px;
+  line-height:1;
 }
 
-.info-value{
-  font-size:22px;
-  line-height:1.25;
-  font-weight:950;
-  color:#111827;
-}
+/* ===== 下段 ===== */
 
-.info-value.small{
-  font-size:19px;
-}
-
-/* =========================
-   Bottom
-========================= */
-
-.bottom{
-  border-top:1px solid #d4dce8;
-  background:#f8fafc;
+.lower{
+  min-height:0;
+  border-top:1px solid #cfd7e3;
   display:grid;
   grid-template-columns:1fr 300px;
-  gap:12px;
-  padding:12px 14px 14px;
-  min-height:0;
+  gap:10px;
+  padding:10px 12px 12px;
+  background:#fff;
 }
 
 .panel{
-  background:#fff;
-  border:1px solid #d4dce8;
-  border-radius:18px;
-  padding:12px;
+  border:1px solid #cfd7e3;
+  border-radius:14px;
   overflow:hidden;
   display:grid;
   grid-template-rows:32px 1fr;
+  background:#fff;
 }
 
-/* DAYS */
+.panel-title{
+  display:flex;
+  align-items:center;
+  padding-left:12px;
+}
 
-.days-grid{
+/* ===== DAYS ===== */
+
+.days-body{
+  padding:0 12px 10px;
   display:grid;
   grid-template-columns:repeat(7,1fr);
-  gap:10px;
-  min-height:0;
+  gap:8px;
+  align-items:start;
 }
 
 .day-card{
-  height:110px;
-  border:1px solid #d4dce8;
-  border-radius:12px;
-  background:#fff;
-  padding:10px;
+  height:122px;
+  border:1px solid #cfd7e3;
   display:grid;
-  grid-template-rows:24px 24px 24px 1fr;
-  align-items:center;
-  font-size:14px;
-  font-weight:950;
+  grid-template-rows:
+    18px
+    14px
+    18px
+    18px
+    18px
+    18px
+    18px;
+  padding:6px 8px;
+  font-size:13px;
+  font-weight:900;
   line-height:1;
+  overflow:hidden;
 }
 
 .day-card.active{
   background:#d9ebf7;
 }
 
-.day-date{
-  font-size:15px;
-}
-
 .day-line{
-  font-size:14px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;
 }
 
 .day-status{
   display:flex;
   align-items:center;
-  gap:5px;
-  flex-wrap:wrap;
-}
-
-.mini-tag{
-  display:inline-flex;
-  align-items:center;
   justify-content:center;
-  min-height:20px;
-  padding:0 8px;
-  border-radius:6px;
+  border-radius:5px;
   background:#fff4a3;
-  font-size:12px;
-  font-weight:950;
+  font-size:11px;
+  white-space:nowrap;
+  overflow:hidden;
 }
 
-/* STATUS */
+/* ===== STATUS ===== */
 
-.status-list{
+.status-body{
+  padding:0 12px 10px;
   display:grid;
-  grid-auto-rows:24px;
+  grid-template-rows:
+    18px
+    18px
+    18px
+    18px
+    18px
+    18px
+    18px;
+  row-gap:0;
   align-content:start;
-  font-size:16px;
-  font-weight:950;
-  line-height:1;
 }
 
 .status-row{
   display:grid;
-  grid-template-columns:1fr 86px;
+  grid-template-columns:1fr 74px;
   align-items:center;
-  border-bottom:1px solid transparent;
+  font-size:13px;
+  font-weight:900;
+  line-height:1;
+  white-space:nowrap;
 }
 
 .status-name{
-  white-space:nowrap;
+  overflow:hidden;
 }
 
 .status-value{
-  white-space:nowrap;
+  text-align:left;
 }
 
-/* Drawer */
+/* ===== Drawer ===== */
 
 .drawer{
   position:fixed;
-  left:26px;
+  left:28px;
   top:96px;
-  z-index:100;
   width:240px;
+  z-index:100;
   display:none;
-  background:#fff;
-  border-radius:20px;
+  background:white;
+  border-radius:18px;
   box-shadow:0 16px 40px rgba(0,0,0,.24);
   padding:12px;
 }
@@ -438,53 +427,18 @@ button{
 
 .drawer a{
   height:52px;
-  border-radius:14px;
+  border-radius:12px;
   background:#f1f5f9;
-  margin-bottom:8px;
-  padding:0 14px;
   display:flex;
   align-items:center;
+  padding:0 14px;
   font-size:18px;
-  font-weight:950;
+  font-weight:900;
+  margin-bottom:8px;
 }
 
 .drawer a:last-child{
   margin-bottom:0;
-}
-
-/* iPad Safari対策 */
-
-@media (max-height:720px){
-  .ipad{
-    grid-template-rows:72px 1fr 168px;
-  }
-
-  .header-action{
-    height:52px;
-  }
-
-  .menu-btn{
-    width:52px;
-    height:52px;
-  }
-
-  .now-text{
-    font-size:30px;
-  }
-
-  .bottom{
-    padding:10px 12px 12px;
-  }
-
-  .day-card{
-    height:100px;
-    grid-template-rows:22px 22px 22px 1fr;
-  }
-
-  .status-list{
-    grid-auto-rows:22px;
-    font-size:15px;
-  }
 }
 </style>
 </head>
@@ -504,138 +458,150 @@ button{
     <header class="header">
       <div class="header-left">
         <button class="menu-btn" onclick="toggleDrawer()">☰</button>
-        <div id="nowText" class="now-text">4/29（火）14:26</div>
+        <div id="nowText" class="now">4/29（火）14:26</div>
       </div>
 
-      <a class="header-action" href="booking-input.html">＋予約登録</a>
+      <a class="reserve-btn" href="booking-input.html">＋予約登録</a>
     </header>
 
-    <main class="main">
+    <section class="upper">
 
-      <section class="location">
-        <div class="location-head">
-          <div class="section-title">LOCATION</div>
+      <aside class="location">
+        <div class="location-title">
+          <div class="area-title">LOCATION</div>
         </div>
 
-        <div class="location-list" id="laneNames"></div>
-      </section>
-
-      <section class="timeline-wrap">
-        <div class="timeline">
-
-          <div class="hours" id="hours"></div>
-
-          <div class="timeline-body" id="timelineBody">
-            <div id="nowLine" class="now-line"></div>
-            <div id="nowBadge" class="now-badge">現在</div>
-          </div>
-
-        </div>
-      </section>
-
-      <aside class="detail">
-        <div class="section-title">DETAIL</div>
-
-        <div class="detail-body">
-          <div class="info-block">
-            <div class="info-label">時間</div>
-            <div id="detailTime" class="info-value">10:30</div>
-          </div>
-
-          <div class="info-block">
-            <div class="info-label">患者名</div>
-            <div id="detailPatient" class="info-value">田中様</div>
-          </div>
-
-          <div class="info-block">
-            <div class="info-label">出発 → 到着</div>
-            <div id="detailRoute" class="info-value small">広島駅 → 県病院</div>
-          </div>
-
-          <div class="info-block">
-            <div class="info-label">担当</div>
-            <div id="detailVendor" class="info-value small">協力業者A</div>
-          </div>
-
-          <div class="info-block">
-            <div class="info-label">状態</div>
-            <div id="detailStatus" class="info-value small">搬送中</div>
-          </div>
-
-          <div class="info-block">
-            <div class="info-label">特記</div>
-            <div id="detailMemo" class="info-value small">ーーー</div>
-          </div>
+        <div class="location-body">
+          <div class="lane-name">担当者</div>
+          <div class="lane-name">協力業者A</div>
+          <div class="lane-name">協力業者B</div>
+          <div class="lane-name">協力業者C</div>
+          <div class="lane-name">協力業者D</div>
+          <div class="lane-name">協力業者E</div>
+          <div class="lane-name">協力業者F</div>
+          <div class="lane-name">協力業者G</div>
         </div>
       </aside>
 
-    </main>
+      <main class="timeline-area">
+        <div class="timeline-scroll">
+          <div class="timeline-canvas">
 
-    <footer class="bottom">
+            <div id="timeHead" class="time-head"></div>
+
+            <div id="timelineBody" class="timeline-body"></div>
+
+          </div>
+        </div>
+
+        <div class="scroll-boundary"></div>
+      </main>
+
+      <aside class="detail">
+        <div class="detail-title">
+          <div class="area-title">DETAIL</div>
+        </div>
+
+        <div class="detail-body">
+          <div class="detail-row">時間</div>
+          <div class="detail-row">患者名</div>
+          <div class="detail-row">出発 → 到着</div>
+          <div class="detail-row">担当</div>
+          <div class="detail-row">状態</div>
+          <div class="detail-row">特記</div>
+          <div class="detail-row">ーーー（タップで料金）</div>
+          <div class="detail-row"></div>
+        </div>
+      </aside>
+
+    </section>
+
+    <section class="lower">
 
       <section class="panel">
-        <div class="section-title">DAYS</div>
+        <div class="panel-title">
+          <div class="area-title">DAYS</div>
+        </div>
 
-        <div class="days-grid">
+        <div class="days-body">
           <div class="day-card active">
-            <div class="day-date">4/29</div>
+            <div class="day-line">4/29</div>
+            <div></div>
             <div class="day-line">案件数8件</div>
             <div class="day-line">調整数8件</div>
-            <div class="day-status"></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
 
           <div class="day-card">
-            <div class="day-date">4/30</div>
+            <div class="day-line">4/30</div>
+            <div></div>
             <div class="day-line">案件数8件</div>
             <div class="day-line">調整数7件</div>
-            <div class="day-status"></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
 
           <div class="day-card">
-            <div class="day-date">5/1</div>
+            <div class="day-line">5/1</div>
+            <div></div>
             <div class="day-line">案件数8件</div>
             <div class="day-line">調整数8件</div>
-            <div class="day-status"></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
 
           <div class="day-card">
-            <div class="day-date">5/2</div>
+            <div class="day-line">5/2</div>
+            <div></div>
             <div class="day-line">案件数8件</div>
             <div class="day-line">調整数7件</div>
-            <div class="day-status"></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
 
           <div class="day-card">
-            <div class="day-date">5/3</div>
+            <div class="day-line">5/3</div>
+            <div></div>
             <div class="day-line">案件数8件</div>
             <div class="day-line">調整数8件</div>
-            <div class="day-status">
-              <span class="mini-tag">請求書発行</span>
-            </div>
+            <div class="day-status">請求書発行</div>
+            <div></div>
+            <div></div>
           </div>
 
           <div class="day-card">
-            <div class="day-date">5/4</div>
+            <div class="day-line">5/4</div>
+            <div></div>
             <div class="day-line">案件数8件</div>
             <div class="day-line">調整数7件</div>
-            <div class="day-status">
-              <span class="mini-tag">支払い</span>
-            </div>
+            <div class="day-status">支払い</div>
+            <div></div>
+            <div></div>
           </div>
 
           <div class="day-card">
-            <div class="day-date">5/5</div>
+            <div class="day-line">5/5</div>
+            <div></div>
             <div class="day-line">案件数8件</div>
             <div class="day-line">調整数8件</div>
-            <div class="day-status"></div>
+            <div></div>
+            <div></div>
+            <div></div>
           </div>
         </div>
       </section>
 
       <section class="panel">
-        <div class="section-title">STATUS</div>
+        <div class="panel-title">
+          <div class="area-title">STATUS</div>
+        </div>
 
-        <div class="status-list">
+        <div class="status-body">
           <div class="status-row">
             <div class="status-name">協力業者A</div>
             <div class="status-value">待機</div>
@@ -673,7 +639,7 @@ button{
         </div>
       </section>
 
-    </footer>
+    </section>
 
   </div>
 </div>
@@ -682,59 +648,13 @@ button{
 const START_HOUR = 7;
 const END_HOUR = 21;
 const HOUR_WIDTH = 80;
-const ROW_HEIGHT = 74;
-
-const defaultVendors = [
-  "協力業者A",
-  "協力業者B",
-  "協力業者C",
-  "協力業者D",
-  "協力業者E",
-  "協力業者F",
-  "協力業者G"
-];
-
-const sampleBookings = [
-  {
-    time:"08:30",
-    patient:"田中様",
-    vendor:"協力業者A",
-    route:"広島駅 → 県病院",
-    status:"搬送中",
-    memo:"ーーー",
-    lane:0,
-    leftHour:8.3,
-    widthHour:1.1
-  },
-  {
-    time:"08:30",
-    patient:"佐藤様",
-    vendor:"協力業者B",
-    route:"自宅 → 市民病院",
-    status:"向かい中",
-    memo:"ーーー",
-    lane:1,
-    leftHour:8.3,
-    widthHour:1.1
-  },
-  {
-    time:"09:00",
-    patient:"山田様",
-    vendor:"協力業者C",
-    route:"施設 → 日赤",
-    status:"待機",
-    memo:"ーーー",
-    lane:2,
-    leftHour:9,
-    widthHour:1
-  }
-];
+const LANE_HEIGHT = 68;
 
 function toggleDrawer(){
   document.getElementById("drawer").classList.toggle("open");
 }
 
-function updateHeaderTime(){
+function updateTime(){
   const now = new Date();
   const week = ["日","月","火","水","木","金","土"];
 
@@ -744,102 +664,64 @@ function updateHeaderTime(){
     `${String(now.getMinutes()).padStart(2,"0")}`;
 }
 
-function buildHours(){
-  const hours = document.getElementById("hours");
-  hours.innerHTML = "";
+function buildTimeline(){
+  const head = document.getElementById("timeHead");
+  const body = document.getElementById("timelineBody");
 
   for(let h = START_HOUR; h < END_HOUR; h++){
-    const div = document.createElement("div");
-    div.className = "hour";
-    div.textContent = `${h}:00`;
-    hours.appendChild(div);
+    const cell = document.createElement("div");
+    cell.className = "time-cell";
+    cell.textContent = `${h}:00`;
+    head.appendChild(cell);
   }
-}
-
-function buildLanes(){
-  const wrap = document.getElementById("laneNames");
-  wrap.innerHTML = defaultVendors.map(name => {
-    return `<div class="lane-name">${name}</div>`;
-  }).join("");
-}
-
-function buildGridLines(){
-  const body = document.getElementById("timelineBody");
 
   for(let i = 0; i <= END_HOUR - START_HOUR; i++){
-    const line = document.createElement("div");
-    line.className = "vline";
-    line.style.left = `${i * HOUR_WIDTH}px`;
-    body.appendChild(line);
+    const v = document.createElement("div");
+    v.className = "vline";
+    v.style.left = `${i * HOUR_WIDTH}px`;
+    body.appendChild(v);
   }
 
-  for(let i = 0; i <= defaultVendors.length; i++){
-    const line = document.createElement("div");
-    line.className = "hline";
-    line.style.top = `${i * ROW_HEIGHT}px`;
-    body.appendChild(line);
+  for(let i = 0; i <= 8; i++){
+    const h = document.createElement("div");
+    h.className = "hline";
+    h.style.top = `${i * LANE_HEIGHT}px`;
+    body.appendChild(h);
   }
-}
 
-function timeToLeft(hourValue){
-  return (hourValue - START_HOUR) * HOUR_WIDTH;
-}
-
-function updateNowLine(){
   const now = new Date();
-  const hourValue = now.getHours() + now.getMinutes() / 60;
-  const left = timeToLeft(hourValue);
+  const nowHour = now.getHours() + now.getMinutes() / 60;
 
-  const nowLine = document.getElementById("nowLine");
-  const nowBadge = document.getElementById("nowBadge");
-
-  if(hourValue < START_HOUR || hourValue > END_HOUR){
-    nowLine.style.display = "none";
-    nowBadge.style.display = "none";
-    return;
+  if(nowHour >= START_HOUR && nowHour <= END_HOUR){
+    const line = document.createElement("div");
+    line.className = "now-line";
+    line.style.left = `${(nowHour - START_HOUR) * HOUR_WIDTH}px`;
+    body.appendChild(line);
   }
 
-  nowLine.style.display = "block";
-  nowBadge.style.display = "block";
-  nowLine.style.left = `${left}px`;
-  nowBadge.style.left = `${left}px`;
+  addAppointment("田中様<br>協力業者A", 8.5, 1, 0);
+  addAppointment("佐藤様<br>協力業者B", 8.5, 1, 1);
+  addAppointment("山田様<br>協力業者C", 9.0, 1, 2);
 }
 
-function renderBookings(){
+function addAppointment(text, startHour, widthHour, lane){
   const body = document.getElementById("timelineBody");
 
-  sampleBookings.forEach(b => {
-    const btn = document.createElement("button");
-    btn.className = "appt";
-    btn.style.left = `${timeToLeft(b.leftHour)}px`;
-    btn.style.top = `${b.lane * ROW_HEIGHT + 12}px`;
-    btn.style.width = `${b.widthHour * HOUR_WIDTH}px`;
-    btn.style.height = "62px";
+  const btn = document.createElement("button");
+  btn.className = "appt";
+  btn.innerHTML = text;
 
-    btn.innerHTML = `${b.patient}<br>${b.vendor}`;
+  btn.style.left = `${(startHour - START_HOUR) * HOUR_WIDTH}px`;
+  btn.style.top = `${lane * LANE_HEIGHT + 10}px`;
+  btn.style.width = `${widthHour * HOUR_WIDTH}px`;
+  btn.style.height = "58px";
 
-    btn.onclick = () => {
-      document.getElementById("detailTime").textContent = b.time;
-      document.getElementById("detailPatient").textContent = b.patient;
-      document.getElementById("detailRoute").textContent = b.route;
-      document.getElementById("detailVendor").textContent = b.vendor;
-      document.getElementById("detailStatus").textContent = b.status;
-      document.getElementById("detailMemo").textContent = b.memo;
-    };
-
-    body.appendChild(btn);
-  });
+  body.appendChild(btn);
 }
 
-buildHours();
-buildLanes();
-buildGridLines();
-renderBookings();
-updateHeaderTime();
-updateNowLine();
-
-setInterval(updateHeaderTime, 1000);
-setInterval(updateNowLine, 60000);
+buildTimeline();
+updateTime();
+setInterval(updateTime,1000);
 </script>
 
 </body>
