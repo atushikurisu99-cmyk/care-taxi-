@@ -5,14 +5,13 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1.0, viewport-fit=cover"
+    content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
   />
 
   <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta
-    name="apple-mobile-web-app-status-bar-style"
-    content="black-translucent"
-  />
+  <meta name="apple-mobile-web-app-title" content="Care Taxi UI" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#ffffff" />
 
   <title>介護タクシー管理UI</title>
 
@@ -20,25 +19,20 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      touch-action: manipulation;
     }
 
-    html {
-      width: 100%;
-      height: 100%;
-      margin: 0;
-      padding: 0;
-      overflow: hidden;
-      background: #111;
-    }
-
+    html,
     body {
       width: 100%;
       height: 100%;
       margin: 0;
       padding: 0;
       overflow: hidden;
-      position: relative;
       background: #111;
+      overscroll-behavior: none;
+      position: fixed;
+      inset: 0;
       font-family:
         -apple-system,
         BlinkMacSystemFont,
@@ -46,215 +40,157 @@
         sans-serif;
     }
 
+    body {
+      -webkit-user-select: none;
+      user-select: none;
+    }
+
     .app {
-      position: relative;
+      position: fixed;
+      inset: 0;
       width: 100vw;
       height: 100vh;
-      min-height: -webkit-fill-available;
-      background: #ffffff;
+      height: 100svh;
       overflow: hidden;
+      background: #ffffff;
       border: 2px solid #111;
     }
 
     .safe {
       position: absolute;
-
-      top: 18px;
-      left: 22px;
-      right: 22px;
-      bottom: 18px;
-
+      left: 30px;
+      right: 30px;
+      top: 26px;
+      bottom: 26px;
       overflow: hidden;
     }
 
     .top-bar {
       position: absolute;
-
       left: 0;
       top: 0;
-
       width: 100%;
-      height: 72px;
-
-      background: #3567c7;
-
-      border-radius: 26px 26px 0 0;
+      height: 96px;
+      background: #3769c8;
+      border-radius: 32px 32px 0 0;
     }
 
     .menu {
       position: absolute;
-
-      left: 28px;
-      top: 18px;
-
-      width: 38px;
-      height: 38px;
+      left: 38px;
+      top: 28px;
+      width: 52px;
+      height: 42px;
     }
 
     .menu span {
       display: block;
-
       width: 100%;
-      height: 4px;
-
-      margin-bottom: 7px;
-
+      height: 5px;
+      margin-bottom: 10px;
       background: #ffffff;
-
       border-radius: 999px;
     }
 
     .reserve-btn {
       position: absolute;
-
-      right: 26px;
-      top: 16px;
-
-      width: 102px;
-      height: 40px;
-
-      border-radius: 10px;
-
+      right: 36px;
+      top: 24px;
+      width: 138px;
+      height: 52px;
       background: #ffffff;
-
-      border: 1px solid rgba(0, 0, 0, 0.25);
+      border: 1px solid rgba(0, 0, 0, 0.28);
+      border-radius: 12px;
     }
 
     .main {
       position: absolute;
-
-      top: 108px;
       left: 0;
       right: 0;
-      bottom: 168px;
+      top: 146px;
+      bottom: 196px;
+      overflow: hidden;
     }
 
     .timeline {
       position: absolute;
-
       left: 0;
       top: 0;
       bottom: 0;
-      right: 238px;
-
-      background: #f7f7f7;
-
-      border: 1px solid rgba(0, 0, 0, 0.45);
-
+      right: 326px;
+      background: #f8f8f8;
+      border: 1px solid rgba(0, 0, 0, 0.5);
       overflow: hidden;
-    }
-
-    .timeline-grid {
-      position: absolute;
-
-      inset: 0;
-
-      background-image:
-        linear-gradient(
-          to right,
-          rgba(0, 0, 0, 0.08) 1px,
-          transparent 1px
-        ),
-        linear-gradient(
-          to bottom,
-          rgba(0, 0, 0, 0.08) 1px,
-          transparent 1px
-        );
-
-      background-size: 72px 64px;
     }
 
     .detail {
       position: absolute;
-
       top: 0;
       right: 0;
-
-      width: 210px;
+      width: 288px;
       height: 100%;
-
-      background: #f7f7f7;
-
-      border: 1px solid rgba(0, 0, 0, 0.45);
+      background: #f8f8f8;
+      border: 1px solid rgba(0, 0, 0, 0.5);
+      overflow: hidden;
     }
 
     .detail-line {
-      width: calc(100% - 28px);
+      width: calc(100% - 42px);
       height: 1px;
-
-      margin-left: 14px;
-
+      margin-left: 21px;
       background: rgba(0, 0, 0, 0.18);
     }
 
     .detail-line.a {
-      margin-top: 88px;
+      margin-top: 120px;
     }
 
-    .detail-line.b {
-      margin-top: 42px;
-    }
-
-    .detail-line.c {
-      margin-top: 42px;
-    }
-
+    .detail-line.b,
+    .detail-line.c,
     .detail-line.d {
-      margin-top: 42px;
+      margin-top: 58px;
     }
 
-    .detail-line.e {
-      margin-top: 78px;
-    }
-
+    .detail-line.e,
     .detail-line.f {
-      margin-top: 78px;
+      margin-top: 104px;
     }
 
     .bottom {
       position: absolute;
-
       left: 0;
       right: 0;
       bottom: 0;
-
-      height: 136px;
+      height: 164px;
+      overflow: hidden;
     }
 
     .days {
       position: absolute;
-
       left: 0;
       top: 0;
       bottom: 0;
-      right: 238px;
-
-      background: #f7f7f7;
-
-      border: 1px solid rgba(0, 0, 0, 0.45);
-
+      right: 326px;
+      background: #f8f8f8;
+      border: 1px solid rgba(0, 0, 0, 0.5);
       overflow: hidden;
     }
 
     .days-head {
       width: 100%;
-      height: 34px;
-
+      height: 48px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .days-grid {
       display: grid;
-
       grid-template-columns: repeat(7, 1fr);
-
-      height: calc(100% - 34px);
+      height: calc(100% - 48px);
     }
 
     .day {
       position: relative;
-
-      border-right: 1px solid rgba(0, 0, 0, 0.12);
+      border-right: 1px solid rgba(0, 0, 0, 0.13);
     }
 
     .day:last-child {
@@ -263,70 +199,50 @@
 
     .day::before {
       content: "";
-
       position: absolute;
-
-      left: 14px;
-      right: 14px;
-      top: 18px;
-
-      height: 18px;
-
+      left: 20px;
+      right: 20px;
+      top: 26px;
+      height: 28px;
       background: #dce6ff;
-
-      border-radius: 4px;
-
       border: 1px solid rgba(0, 0, 0, 0.45);
+      border-radius: 5px;
     }
 
     .day::after {
       content: "";
-
       position: absolute;
-
-      left: 14px;
-      right: 28px;
-      top: 52px;
-
-      height: 18px;
-
+      left: 20px;
+      right: 40px;
+      top: 72px;
+      height: 28px;
       background: #e8f1df;
-
-      border-radius: 4px;
-
       border: 1px solid rgba(0, 0, 0, 0.45);
+      border-radius: 5px;
     }
 
     .status {
       position: absolute;
-
-      top: 0;
       right: 0;
+      top: 0;
       bottom: 0;
-
-      width: 210px;
-
-      background: #f7f7f7;
-
-      border: 1px solid rgba(0, 0, 0, 0.45);
-
+      width: 288px;
+      background: #f8f8f8;
+      border: 1px solid rgba(0, 0, 0, 0.5);
       overflow: hidden;
     }
 
     .status-head {
       width: 100%;
-      height: 34px;
-
+      height: 48px;
       border-bottom: 1px solid rgba(0, 0, 0, 0.25);
     }
 
     .status-row {
       position: relative;
-
       width: 100%;
-      height: calc((100% - 34px) / 3);
-
-      border-bottom: 1px solid rgba(0, 0, 0, 0.12);
+      height: calc((100% - 48px) / 3);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.13);
     }
 
     .status-row:last-child {
@@ -335,42 +251,39 @@
 
     .status-row::before {
       content: "";
-
       position: absolute;
-
-      left: 14px;
+      left: 22px;
       top: 50%;
-
-      width: 88px;
-      height: 18px;
-
+      width: 122px;
+      height: 28px;
       transform: translateY(-50%);
-
       background: #dce6ff;
-
-      border-radius: 4px;
-
       border: 1px solid rgba(0, 0, 0, 0.45);
+      border-radius: 5px;
     }
 
     .status-row::after {
       content: "";
-
       position: absolute;
-
-      right: 14px;
+      right: 20px;
       top: 50%;
-
-      width: 74px;
-      height: 18px;
-
+      width: 104px;
+      height: 28px;
       transform: translateY(-50%);
-
       background: #e8f1df;
-
-      border-radius: 4px;
-
       border: 1px solid rgba(0, 0, 0, 0.45);
+      border-radius: 5px;
+    }
+
+    @supports (-webkit-touch-callout: none) {
+      html,
+      body {
+        height: -webkit-fill-available;
+      }
+
+      .app {
+        height: -webkit-fill-available;
+      }
     }
   </style>
 </head>
@@ -378,7 +291,6 @@
 <body>
   <div class="app">
     <div class="safe">
-
       <div class="top-bar">
         <div class="menu">
           <span></span>
@@ -390,10 +302,7 @@
       </div>
 
       <div class="main">
-
-        <div class="timeline">
-          <div class="timeline-grid"></div>
-        </div>
+        <div class="timeline"></div>
 
         <div class="detail">
           <div class="detail-line a"></div>
@@ -403,11 +312,9 @@
           <div class="detail-line e"></div>
           <div class="detail-line f"></div>
         </div>
-
       </div>
 
       <div class="bottom">
-
         <div class="days">
           <div class="days-head"></div>
 
@@ -429,9 +336,7 @@
           <div class="status-row"></div>
           <div class="status-row"></div>
         </div>
-
       </div>
-
     </div>
   </div>
 </body>
