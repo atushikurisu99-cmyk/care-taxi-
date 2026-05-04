@@ -13,6 +13,7 @@
     * {
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
       touch-action: none;
     }
 
@@ -26,6 +27,7 @@
       position: fixed;
       inset: 0;
       background: #111;
+      overscroll-behavior: none;
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       user-select: none;
       -webkit-user-select: none;
@@ -45,12 +47,14 @@
 
     .app {
       position: fixed;
-      inset: 0;
+      left: 0;
+      top: 0;
       width: 100vw;
       height: var(--app-h, 100vh);
       overflow: hidden;
       background: #fff;
       border: 2px solid #111;
+      transform: translate3d(0, 0, 0);
     }
 
     .shell {
@@ -147,6 +151,7 @@
       right: calc(var(--right-w) + var(--right-gap));
       background: #f8f8f8;
       border: 1px solid rgba(0,0,0,.5);
+      overflow: hidden;
     }
 
     .detail {
@@ -288,7 +293,7 @@
 </head>
 
 <body>
-  <div class="app">
+  <div class="app" id="app">
     <div class="shell">
       <div class="header">
         <div class="menu">
@@ -345,20 +350,32 @@
       const h = window.innerHeight;
       document.documentElement.style.setProperty("--app-h", h + "px");
       window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
+
+    function stopEvent(event) {
+      event.preventDefault();
+      event.stopPropagation();
+      return false;
     }
 
     lockSize();
 
-    window.addEventListener("resize", lockSize);
-    window.addEventListener("orientationchange", lockSize);
+    window.addEventListener("resize", lockSize, { passive: false });
+    window.addEventListener("orientationchange", lockSize, { passive: false });
+    window.addEventListener("scroll", lockSize, { passive: false });
 
-    document.addEventListener("touchmove", function (e) {
-      e.preventDefault();
-    }, { passive: false });
+    document.addEventListener("touchstart", stopEvent, { passive: false });
+    document.addEventListener("touchmove", stopEvent, { passive: false });
+    document.addEventListener("touchend", stopEvent, { passive: false });
+    document.addEventListener("gesturestart", stopEvent, { passive: false });
+    document.addEventListener("gesturechange", stopEvent, { passive: false });
+    document.addEventListener("gestureend", stopEvent, { passive: false });
+    document.addEventListener("dragstart", stopEvent, { passive: false });
+    document.addEventListener("pointermove", stopEvent, { passive: false });
 
-    document.addEventListener("gesturestart", function (e) {
-      e.preventDefault();
-    }, { passive: false });
+    setInterval(lockSize, 300);
   </script>
 </body>
 </html>
