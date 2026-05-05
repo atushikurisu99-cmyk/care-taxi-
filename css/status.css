@@ -1,0 +1,25 @@
+.status-panel {
+  position: absolute;
+  inset: 0;
+  padding: 24px 6px 5px 18px;
+  color: #111111;
+  background: #ffffff;
+}
+
+.status-row {
+  display: grid;
+  grid-template-columns: 72px 1fr;
+  column-gap: 8px;
+  align-items: center;
+  height: 17px;
+  font-size: 13px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.status-driver,
+.status-text {
+  overflow: hidden;
+  text-overflow: ellipsis;
+}

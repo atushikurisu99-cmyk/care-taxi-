@@ -1,0 +1,50 @@
+.detail-panel {
+  position: absolute;
+  inset: 0;
+  padding: 47px 8px 8px 20px;
+  color: #111111;
+  background: #ffffff;
+}
+
+.detail-row {
+  margin-bottom: 18px;
+  min-height: 16px;
+  font-size: 14px;
+  line-height: 1.2;
+  font-weight: 600;
+}
+
+.detail-row.small {
+  margin-top: 24px;
+  font-size: 8px;
+  font-weight: 600;
+  line-height: 1.4;
+}
+
+.detail-price {
+  margin-top: 6px;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.detail-scroll-mark {
+  position: absolute;
+  right: 10px;
+  bottom: 13px;
+  width: 18px;
+  height: 70px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  color: #202020;
+  font-size: 28px;
+  line-height: 1;
+}
+
+.detail-scroll-mark .line {
+  width: 1px;
+  flex: 1;
+  background: #222222;
+  margin: 0 0;
+}

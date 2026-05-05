@@ -1,0 +1,237 @@
+.timeline {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  background: #ffffff;
+  border: 1px solid rgba(0, 0, 0, 0.18);
+}
+
+.timeline-head-left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 102px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  padding-left: 12px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #2b2b2b;
+  border-right: 1px solid var(--thin-line);
+  border-bottom: 1px solid var(--thin-line);
+  background: #ffffff;
+  z-index: 14;
+}
+
+.timeline-driver-col {
+  position: absolute;
+  left: 0;
+  top: 32px;
+  width: 102px;
+  bottom: 0;
+  background: #ffffff;
+  z-index: 12;
+  border-right: 1px solid var(--thin-line);
+}
+
+.timeline-driver-name {
+  position: absolute;
+  left: 0;
+  width: 100%;
+  padding-left: 10px;
+  display: flex;
+  align-items: center;
+  font-size: 13px;
+  font-weight: 700;
+  color: #333333;
+  border-bottom: 1px solid var(--thin-line);
+  white-space: nowrap;
+}
+
+.timeline-window {
+  position: absolute;
+  left: 102px;
+  right: 0;
+  top: 0;
+  bottom: 18px;
+  overflow: hidden;
+  cursor: grab;
+}
+
+.timeline-window.is-dragging {
+  cursor: grabbing;
+}
+
+.timeline-track {
+  position: absolute;
+  top: 0;
+  height: 100%;
+  will-change: transform;
+}
+
+.timeline-hours {
+  position: absolute;
+  left: 0;
+  top: 0;
+  right: 0;
+  height: 32px;
+  border-bottom: 1px solid var(--thin-line);
+}
+
+.timeline-hour-label {
+  position: absolute;
+  top: 8px;
+  transform: translateX(-50%);
+  font-size: 13px;
+  font-weight: 800;
+  color: #1e1e1e;
+  white-space: nowrap;
+}
+
+.timeline-grid {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 32px;
+  bottom: 0;
+}
+
+.timeline-vline {
+  position: absolute;
+  top: -32px;
+  bottom: 0;
+  width: 1px;
+  background: rgba(0, 0, 0, 0.18);
+}
+
+.timeline-vline.hour {
+  background: rgba(0, 0, 0, 0.26);
+}
+
+.timeline-row-line {
+  position: absolute;
+  left: -102px;
+  right: 0;
+  height: 1px;
+  background: var(--thin-line);
+}
+
+.timeline-now-line {
+  position: absolute;
+  top: 32px;
+  bottom: 18px;
+  width: 2px;
+  background: rgba(220, 35, 35, 0.82);
+  z-index: 22;
+  pointer-events: none;
+}
+
+.timeline-now-line::before {
+  content: "";
+  position: absolute;
+  left: -4px;
+  top: -4px;
+  width: 10px;
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(220, 35, 35, 0.82);
+}
+
+.timeline-job {
+  position: absolute;
+  min-width: 46px;
+  height: 42px;
+  border-radius: 0;
+  background: #bce6dc;
+  border: 1px solid rgba(0, 0, 0, 0.12);
+  overflow: hidden;
+  padding: 4px 5px;
+  z-index: 10;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.timeline-job.is-active {
+  outline: 2px solid rgba(53, 104, 200, 0.55);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
+  z-index: 11;
+}
+
+.timeline-job.is-provisional {
+  background: rgba(188, 230, 220, 0.48);
+  border-style: dashed;
+}
+
+.timeline-job.is-alert {
+  background: #fff17a;
+}
+
+.timeline-job.is-complete {
+  background: #d6dee6;
+}
+
+.job-patient {
+  width: 100%;
+  font-size: 12px;
+  line-height: 1.05;
+  font-weight: 800;
+  color: #232323;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: left;
+}
+
+.job-status {
+  width: 100%;
+  font-size: 11px;
+  line-height: 1.05;
+  font-weight: 700;
+  color: #2e2e2e;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  text-align: right;
+}
+
+.timeline-scrollbar {
+  position: absolute;
+  left: 102px;
+  right: 0;
+  bottom: 0;
+  height: 18px;
+  background: #e3e3e3;
+  border-top: 1px solid rgba(0, 0, 0, 0.18);
+  overflow: hidden;
+}
+
+.timeline-scrollbar-thumb {
+  position: absolute;
+  top: 3px;
+  height: 12px;
+  background: #a9a9a9;
+  border: 1px solid #8d8d8d;
+}
+
+.timeline-edge-arrow {
+  position: absolute;
+  top: 0;
+  width: 16px;
+  height: 18px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #666666;
+  font-size: 12px;
+  z-index: 2;
+}
+
+.timeline-edge-arrow.left {
+  left: 0;
+}
+
+.timeline-edge-arrow.right {
+  right: 0;
+}
