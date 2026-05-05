@@ -1,365 +1,418 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
-  <meta name="apple-mobile-web-app-capable" content="yes" />
-  <meta name="apple-mobile-web-app-title" content="Care Taxi UI" />
-  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <meta name="theme-color" content="#3568c8" />
-  <title>介護タクシー管理UI</title>
+<meta charset="UTF-8" />
+<meta name="viewport"
+content="width=device-width,
+initial-scale=1.0,
+maximum-scale=1.0,
+user-scalable=no,
+viewport-fit=cover" />
 
-  <style>
-    * {
-      box-sizing: border-box;
-      -webkit-tap-highlight-color: transparent;
-      -webkit-touch-callout: none;
-      touch-action: none;
-    }
+<meta name="apple-mobile-web-app-capable" content="yes" />
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+<meta name="theme-color" content="#3568c8" />
 
-    html,
-    body {
-      margin: 0;
-      padding: 0;
-      width: 100%;
-      height: 100%;
-      overflow: hidden;
-      position: fixed;
-      inset: 0;
-      background: #ffffff;
-      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
-      user-select: none;
-      -webkit-user-select: none;
-    }
+<title>Care Taxi UI</title>
 
-    :root {
-      --app-h: 100vh;
-      --blue: #3568c8;
+<style>
 
-      --status-h: 24px;
-      --header-h: 112px;
+*{
+  box-sizing:border-box;
+  margin:0;
+  padding:0;
+  -webkit-tap-highlight-color:transparent;
+  touch-action:none;
+}
 
-      --content-x: 58px;
-      --content-top: 152px;
-      --content-bottom: 18px;
+html,
+body{
+  width:100%;
+  height:100%;
+  overflow:hidden;
+  position:fixed;
+  inset:0;
+  background:#ffffff;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
+}
 
-      --right-w: 288px;
-      --right-gap: 38px;
+body{
+  overscroll-behavior:none;
+}
 
-      --bottom-h: 142px;
-      --bottom-gap: 32px;
-    }
+:root{
 
-    .app {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 100vw;
-      height: var(--app-h);
-      overflow: hidden;
-      background: #ffffff;
-    }
+  --blue:#3568c8;
 
-    .header {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      height: var(--header-h);
-      background: var(--blue);
-      overflow: hidden;
-    }
+  --safe-top:24px;
 
-    .menu {
-      position: absolute;
-      left: 58px;
-      top: calc(var(--status-h) + 22px);
-      width: 50px;
-      height: 42px;
-    }
+  --header-h:112px;
 
-    .menu span {
-      display: block;
-      width: 100%;
-      height: 5px;
-      margin-bottom: 10px;
-      border-radius: 999px;
-      background: #ffffff;
-    }
+  --outer-left:44px;
+  --outer-right:44px;
 
-    .date {
-      position: absolute;
-      left: 126px;
-      top: calc(var(--status-h) + 12px);
-      height: 70px;
-      display: flex;
-      align-items: center;
-      color: #ffffff;
-      font-size: 36px;
-      line-height: 1;
-      white-space: nowrap;
-    }
+  --content-top:148px;
+  --content-bottom:32px;
 
-    .reserve {
-      position: absolute;
-      right: 58px;
-      top: calc(var(--status-h) + 18px);
-      width: 112px;
-      height: 44px;
-      border-radius: 9px;
-      background: #ffffff;
-      color: #2d5fb8;
-      font-size: 17px;
-      font-weight: 700;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      white-space: nowrap;
-      border: 1px solid rgba(0,0,0,.25);
-    }
+  --right-col:222px;
 
-    .content-shell {
-      position: absolute;
-      left: var(--content-x);
-      right: var(--content-x);
-      top: var(--content-top);
-      bottom: var(--content-bottom);
-      overflow: hidden;
-      background: #ffffff;
-    }
+  --main-gap:56px;
 
-    .main {
-      position: absolute;
-      left: 0;
-      right: 0;
-      top: 0;
-      bottom: calc(var(--bottom-h) + var(--bottom-gap));
-      overflow: hidden;
-    }
+  --bottom-h:184px;
 
-    .timeline {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      right: calc(var(--right-w) + var(--right-gap));
-      background: #f8f8f8;
-      border: 1px solid rgba(0,0,0,.5);
-      overflow: hidden;
-    }
+}
 
-    .detail {
-      position: absolute;
-      top: 0;
-      right: 0;
-      width: var(--right-w);
-      height: 100%;
-      background: #f8f8f8;
-      border: 1px solid rgba(0,0,0,.5);
-      overflow: hidden;
-    }
+/* ========================================= */
 
-    .detail-line {
-      width: calc(100% - 42px);
-      height: 1px;
-      margin-left: 21px;
-      background: rgba(0,0,0,.18);
-    }
+.app{
+  position:fixed;
+  inset:0;
+  overflow:hidden;
+  background:#f8f8f8;
+}
 
-    .detail-line.a { margin-top: 110px; }
-    .detail-line.b,
-    .detail-line.c,
-    .detail-line.d { margin-top: 54px; }
-    .detail-line.e,
-    .detail-line.f { margin-top: 88px; }
+/* ========================================= */
+/* HEADER */
+/* ========================================= */
 
-    .bottom {
-      position: absolute;
-      left: 0;
-      right: 0;
-      bottom: 0;
-      height: var(--bottom-h);
-      overflow: hidden;
-    }
+.header{
+  position:absolute;
+  left:0;
+  right:0;
+  top:0;
+  height:var(--header-h);
+  background:var(--blue);
+}
 
-    .days {
-      position: absolute;
-      left: 0;
-      top: 0;
-      bottom: 0;
-      right: calc(var(--right-w) + var(--right-gap));
-      background: #f8f8f8;
-      border: 1px solid rgba(0,0,0,.5);
-      overflow: hidden;
-    }
+.menu{
+  position:absolute;
+  left:44px;
+  top:calc(var(--safe-top) + 18px);
+  width:58px;
+  height:48px;
+}
 
-    .status {
-      position: absolute;
-      right: 0;
-      top: 0;
-      bottom: 0;
-      width: var(--right-w);
-      background: #f8f8f8;
-      border: 1px solid rgba(0,0,0,.5);
-      overflow: hidden;
-    }
+.menu span{
+  display:block;
+  width:100%;
+  height:6px;
+  margin-bottom:12px;
+  border-radius:999px;
+  background:#ffffff;
+}
 
-    .head {
-      height: 40px;
-      border-bottom: 1px solid rgba(0,0,0,.25);
-    }
+.date{
+  position:absolute;
+  left:138px;
+  top:calc(var(--safe-top) + 8px);
 
-    .days-grid {
-      height: calc(100% - 40px);
-      display: grid;
-      grid-template-columns: repeat(7, 1fr);
-    }
+  color:#ffffff;
+  font-size:38px;
+  font-weight:600;
+  letter-spacing:0.02em;
+}
 
-    .day {
-      position: relative;
-      border-right: 1px solid rgba(0,0,0,.13);
-    }
+.reserve{
+  position:absolute;
 
-    .day:last-child {
-      border-right: none;
-    }
+  right:42px;
+  top:calc(var(--safe-top) + 14px);
 
-    .day::before {
-      content: "";
-      position: absolute;
-      left: 20px;
-      right: 20px;
-      top: 20px;
-      height: 24px;
-      background: #dce6ff;
-      border: 1px solid rgba(0,0,0,.45);
-      border-radius: 5px;
-    }
+  width:122px;
+  height:52px;
 
-    .day::after {
-      content: "";
-      position: absolute;
-      left: 20px;
-      right: 40px;
-      top: 58px;
-      height: 24px;
-      background: #e8f1df;
-      border: 1px solid rgba(0,0,0,.45);
-      border-radius: 5px;
-    }
+  border-radius:12px;
 
-    .status-row {
-      position: relative;
-      height: calc((100% - 40px) / 3);
-      border-bottom: 1px solid rgba(0,0,0,.13);
-    }
+  background:#ffffff;
 
-    .status-row:last-child {
-      border-bottom: none;
-    }
+  color:#2d5fb8;
 
-    .status-row::before {
-      content: "";
-      position: absolute;
-      left: 22px;
-      top: 50%;
-      width: 122px;
-      height: 24px;
-      transform: translateY(-50%);
-      background: #dce6ff;
-      border: 1px solid rgba(0,0,0,.45);
-      border-radius: 5px;
-    }
+  display:flex;
+  align-items:center;
+  justify-content:center;
 
-    .status-row::after {
-      content: "";
-      position: absolute;
-      right: 20px;
-      top: 50%;
-      width: 104px;
-      height: 24px;
-      transform: translateY(-50%);
-      background: #e8f1df;
-      border: 1px solid rgba(0,0,0,.45);
-      border-radius: 5px;
-    }
-  </style>
+  font-size:17px;
+  font-weight:700;
+
+  border:1px solid rgba(0,0,0,.18);
+}
+
+/* ========================================= */
+/* MAIN LAYOUT */
+/* ========================================= */
+
+.content{
+  position:absolute;
+
+  left:var(--outer-left);
+  right:var(--outer-right);
+
+  top:var(--content-top);
+  bottom:var(--content-bottom);
+
+  overflow:hidden;
+}
+
+/* ========================================= */
+/* LOCATION */
+/* ========================================= */
+
+.location{
+  position:absolute;
+
+  left:0;
+  top:0;
+
+  right:calc(var(--right-col) + var(--main-gap));
+  bottom:calc(var(--bottom-h) + 34px);
+
+  border-top:1px solid rgba(0,0,0,.28);
+  border-left:1px solid rgba(0,0,0,.28);
+}
+
+/* ========================================= */
+/* DETAIL */
+/* ========================================= */
+
+.detail{
+  position:absolute;
+
+  top:0;
+  right:0;
+
+  width:var(--right-col);
+  bottom:calc(var(--bottom-h) + 34px);
+
+  border-left:1px solid rgba(0,0,0,.28);
+  border-bottom:1px solid rgba(0,0,0,.28);
+}
+
+/* ========================================= */
+/* DAYS */
+/* ========================================= */
+
+.days{
+  position:absolute;
+
+  left:0;
+  right:calc(var(--right-col) + var(--main-gap));
+
+  bottom:0;
+
+  height:var(--bottom-h);
+
+  border-top:1px solid rgba(0,0,0,.28);
+}
+
+.days-grid{
+
+  position:absolute;
+
+  left:0;
+  right:0;
+  bottom:0;
+
+  height:150px;
+
+  display:grid;
+  grid-template-columns:repeat(7,1fr);
+
+  column-gap:6px;
+}
+
+.day{
+
+  position:relative;
+
+  border:1px solid rgba(0,0,0,.20);
+  border-radius:16px 16px 12px 12px;
+
+  background:#fafafa;
+}
+
+/* ========================================= */
+/* STATUS */
+/* ========================================= */
+
+.status{
+
+  position:absolute;
+
+  right:0;
+  bottom:0;
+
+  width:var(--right-col);
+  height:var(--bottom-h);
+
+  border-top:1px solid rgba(0,0,0,.28);
+}
+
+.status-lines{
+
+  position:absolute;
+
+  left:0;
+  right:0;
+  top:44px;
+  bottom:0;
+
+  display:flex;
+  flex-direction:column;
+}
+
+.status-row{
+
+  flex:1;
+
+  border-bottom:1px solid rgba(0,0,0,.18);
+}
+
+.status-row:last-child{
+  border-bottom:none;
+}
+
+/* ========================================= */
+/* GREEN LABEL */
+/* ========================================= */
+
+.label{
+
+  position:absolute;
+
+  color:#24a15a;
+
+  font-size:14px;
+  font-weight:700;
+}
+
+.label-location{
+  left:0;
+  top:8px;
+}
+
+.label-detail{
+  right:146px;
+  top:8px;
+}
+
+.label-days{
+  left:0;
+  bottom:188px;
+}
+
+.label-status{
+  right:142px;
+  bottom:188px;
+}
+
+/* ========================================= */
+
+</style>
 </head>
 
 <body>
-  <div class="app">
-    <div class="header">
-      <div class="menu">
-        <span></span>
-        <span></span>
-        <span></span>
-      </div>
 
-      <div class="date">4/29（火）14:26</div>
-      <div class="reserve">＋予約登録</div>
+<div class="app">
+
+  <!-- HEADER -->
+
+  <div class="header">
+
+    <div class="menu">
+      <span></span>
+      <span></span>
+      <span></span>
     </div>
 
-    <div class="content-shell">
-      <div class="main">
-        <div class="timeline"></div>
-
-        <div class="detail">
-          <div class="detail-line a"></div>
-          <div class="detail-line b"></div>
-          <div class="detail-line c"></div>
-          <div class="detail-line d"></div>
-          <div class="detail-line e"></div>
-          <div class="detail-line f"></div>
-        </div>
-      </div>
-
-      <div class="bottom">
-        <div class="days">
-          <div class="head"></div>
-          <div class="days-grid">
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-            <div class="day"></div>
-          </div>
-        </div>
-
-        <div class="status">
-          <div class="head"></div>
-          <div class="status-row"></div>
-          <div class="status-row"></div>
-          <div class="status-row"></div>
-        </div>
-      </div>
+    <div class="date">
+      4/29（火）14:26
     </div>
+
+    <div class="reserve">
+      ＋予約登録
+    </div>
+
   </div>
 
-  <script>
-    function lockSize() {
-      document.documentElement.style.setProperty("--app-h", window.innerHeight + "px");
-      window.scrollTo(0, 0);
-    }
+  <!-- CONTENT -->
 
-    function stopEvent(event) {
-      event.preventDefault();
-      event.stopPropagation();
-      return false;
-    }
+  <div class="content">
 
-    lockSize();
+    <div class="label label-location">
+      LOCATION
+    </div>
 
-    window.addEventListener("resize", lockSize, { passive: false });
-    window.addEventListener("orientationchange", lockSize, { passive: false });
-    window.addEventListener("scroll", lockSize, { passive: false });
+    <div class="label label-detail">
+      DETAIL
+    </div>
 
-    document.addEventListener("touchmove", stopEvent, { passive: false });
-    document.addEventListener("gesturestart", stopEvent, { passive: false });
-    document.addEventListener("gesturechange", stopEvent, { passive: false });
-    document.addEventListener("gestureend", stopEvent, { passive: false });
-    document.addEventListener("dragstart", stopEvent, { passive: false });
-  </script>
+    <div class="label label-days">
+      DAYS
+    </div>
+
+    <div class="label label-status">
+      STATUS
+    </div>
+
+    <div class="location"></div>
+
+    <div class="detail"></div>
+
+    <div class="days">
+
+      <div class="days-grid">
+
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+        <div class="day"></div>
+
+      </div>
+
+    </div>
+
+    <div class="status">
+
+      <div class="status-lines">
+
+        <div class="status-row"></div>
+        <div class="status-row"></div>
+        <div class="status-row"></div>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</div>
+
+<script>
+
+function lockApp(){
+
+  document.documentElement.style.height =
+    window.innerHeight + "px";
+
+  document.body.style.height =
+    window.innerHeight + "px";
+
+  window.scrollTo(0,0);
+
+}
+
+lockApp();
+
+window.addEventListener("resize",lockApp);
+
+document.addEventListener("touchmove",function(e){
+  e.preventDefault();
+},{passive:false});
+
+</script>
+
 </body>
 </html>
