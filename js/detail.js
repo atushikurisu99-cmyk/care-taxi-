@@ -1,37 +1,15 @@
 window.AppDetail = (() => {
-  function getSelectedJob() {
-    return window.AppData.jobs.find((job) => job.id === window.AppState.selectedJobId) || window.AppData.jobs[0];
+  function render(root, job) {
+    const L = window.AppTexts.labels;
+    root.innerHTML = `<div class="detail-panel">${L.detailRows.map(row => `<div class="detail-row">${row}</div>`).join("")}<div class="detail-fee">${L.fee}<span>⌃</span></div><div class="detail-arrow"><span class="up"></span><span class="down"></span></div><div class="detail-note">${L.detailNote}</div></div>`;
+    if (job) fill(root, job);
   }
-
-  function render(root) {
-    const labels = window.AppTexts.labels;
-    const messages = window.AppTexts.messages;
-    const job = getSelectedJob();
-    const driver = window.AppData.drivers.find((item) => item.id === job.driverId);
-
-    root.innerHTML = `
-      <div class="detail-panel">
-        <div class="detail-row">時間</div>
-        <div class="detail-row">患者名</div>
-        <div class="detail-row">出発→到着</div>
-        <div class="detail-row">担当</div>
-        <div class="detail-row">状態</div>
-        <div class="detail-row">特記</div>
-        <div class="detail-price">${labels.priceHint}</div>
-        <div class="detail-row small">${messages.detailSpaceNote}</div>
-        <div class="detail-scroll-mark"><div>⌃</div><div class="line"></div><div>⌄</div></div>
-      </div>
-    `;
-
-    root.dataset.selectedJob = JSON.stringify({
-      time: `${job.start}〜${job.end}`,
-      patient: job.patient,
-      route: job.route,
-      driver: driver ? driver.name : "",
-      status: job.status,
-      note: job.note
-    });
+  function fill(root, job) {
+    const rows = root.querySelectorAll(".detail-row");
+    const statusMap = window.AppTexts.statuses;
+    const driver = window.AppData.drivers.find(d => d.id === job.driverId);
+    const values = [`${job.start}〜${job.end}`, job.patient, `${job.from || "未入力"}→${job.to || "未入力"}`, driver ? driver.name : "", statusMap[job.status] || job.status, job.note || "—"];
+    rows.forEach((row, i) => row.textContent = values[i]);
   }
-
-  return { render };
+  return { render, fill };
 })();
