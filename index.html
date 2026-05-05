@@ -26,21 +26,26 @@
       overflow: hidden;
       position: fixed;
       inset: 0;
-      background: #111;
-      overscroll-behavior: none;
+      background: #ffffff;
       font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
       user-select: none;
       -webkit-user-select: none;
     }
 
     :root {
-      --status-h: 24px;
-      --outer-x: 30px;
-      --outer-bottom: 18px;
-      --header-h: 112px;
+      --app-h: 100vh;
       --blue: #3568c8;
+
+      --status-h: 24px;
+      --header-h: 112px;
+
+      --content-x: 58px;
+      --content-top: 152px;
+      --content-bottom: 18px;
+
       --right-w: 288px;
       --right-gap: 38px;
+
       --bottom-h: 142px;
       --bottom-gap: 32px;
     }
@@ -50,21 +55,9 @@
       left: 0;
       top: 0;
       width: 100vw;
-      height: var(--app-h, 100vh);
+      height: var(--app-h);
       overflow: hidden;
-      background: #fff;
-      border: 2px solid #111;
-      transform: translate3d(0, 0, 0);
-    }
-
-    .shell {
-      position: absolute;
-      left: var(--outer-x);
-      right: var(--outer-x);
-      top: 0;
-      bottom: var(--outer-bottom);
-      overflow: hidden;
-      background: #fff;
+      background: #ffffff;
     }
 
     .header {
@@ -79,7 +72,7 @@
 
     .menu {
       position: absolute;
-      left: 28px;
+      left: 58px;
       top: calc(var(--status-h) + 22px);
       width: 50px;
       height: 42px;
@@ -91,17 +84,17 @@
       height: 5px;
       margin-bottom: 10px;
       border-radius: 999px;
-      background: #fff;
+      background: #ffffff;
     }
 
     .date {
       position: absolute;
-      left: 96px;
+      left: 126px;
       top: calc(var(--status-h) + 12px);
       height: 70px;
       display: flex;
       align-items: center;
-      color: #fff;
+      color: #ffffff;
       font-size: 36px;
       line-height: 1;
       white-space: nowrap;
@@ -109,12 +102,12 @@
 
     .reserve {
       position: absolute;
-      right: 28px;
+      right: 58px;
       top: calc(var(--status-h) + 18px);
-      width: 104px;
+      width: 112px;
       height: 44px;
       border-radius: 9px;
-      background: #fff;
+      background: #ffffff;
       color: #2d5fb8;
       font-size: 17px;
       font-weight: 700;
@@ -125,13 +118,14 @@
       border: 1px solid rgba(0,0,0,.25);
     }
 
-    .content {
+    .content-shell {
       position: absolute;
-      left: 28px;
-      right: 28px;
-      top: 152px;
-      bottom: 0;
+      left: var(--content-x);
+      right: var(--content-x);
+      top: var(--content-top);
+      bottom: var(--content-bottom);
       overflow: hidden;
+      background: #ffffff;
     }
 
     .main {
@@ -293,53 +287,51 @@
 </head>
 
 <body>
-  <div class="app" id="app">
-    <div class="shell">
-      <div class="header">
-        <div class="menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-
-        <div class="date">4/29（火）14:26</div>
-        <div class="reserve">＋予約登録</div>
+  <div class="app">
+    <div class="header">
+      <div class="menu">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
 
-      <div class="content">
-        <div class="main">
-          <div class="timeline"></div>
+      <div class="date">4/29（火）14:26</div>
+      <div class="reserve">＋予約登録</div>
+    </div>
 
-          <div class="detail">
-            <div class="detail-line a"></div>
-            <div class="detail-line b"></div>
-            <div class="detail-line c"></div>
-            <div class="detail-line d"></div>
-            <div class="detail-line e"></div>
-            <div class="detail-line f"></div>
+    <div class="content-shell">
+      <div class="main">
+        <div class="timeline"></div>
+
+        <div class="detail">
+          <div class="detail-line a"></div>
+          <div class="detail-line b"></div>
+          <div class="detail-line c"></div>
+          <div class="detail-line d"></div>
+          <div class="detail-line e"></div>
+          <div class="detail-line f"></div>
+        </div>
+      </div>
+
+      <div class="bottom">
+        <div class="days">
+          <div class="head"></div>
+          <div class="days-grid">
+            <div class="day"></div>
+            <div class="day"></div>
+            <div class="day"></div>
+            <div class="day"></div>
+            <div class="day"></div>
+            <div class="day"></div>
+            <div class="day"></div>
           </div>
         </div>
 
-        <div class="bottom">
-          <div class="days">
-            <div class="head"></div>
-            <div class="days-grid">
-              <div class="day"></div>
-              <div class="day"></div>
-              <div class="day"></div>
-              <div class="day"></div>
-              <div class="day"></div>
-              <div class="day"></div>
-              <div class="day"></div>
-            </div>
-          </div>
-
-          <div class="status">
-            <div class="head"></div>
-            <div class="status-row"></div>
-            <div class="status-row"></div>
-            <div class="status-row"></div>
-          </div>
+        <div class="status">
+          <div class="head"></div>
+          <div class="status-row"></div>
+          <div class="status-row"></div>
+          <div class="status-row"></div>
         </div>
       </div>
     </div>
@@ -347,11 +339,8 @@
 
   <script>
     function lockSize() {
-      const h = window.innerHeight;
-      document.documentElement.style.setProperty("--app-h", h + "px");
+      document.documentElement.style.setProperty("--app-h", window.innerHeight + "px");
       window.scrollTo(0, 0);
-      document.body.scrollTop = 0;
-      document.documentElement.scrollTop = 0;
     }
 
     function stopEvent(event) {
@@ -366,16 +355,11 @@
     window.addEventListener("orientationchange", lockSize, { passive: false });
     window.addEventListener("scroll", lockSize, { passive: false });
 
-    document.addEventListener("touchstart", stopEvent, { passive: false });
     document.addEventListener("touchmove", stopEvent, { passive: false });
-    document.addEventListener("touchend", stopEvent, { passive: false });
     document.addEventListener("gesturestart", stopEvent, { passive: false });
     document.addEventListener("gesturechange", stopEvent, { passive: false });
     document.addEventListener("gestureend", stopEvent, { passive: false });
     document.addEventListener("dragstart", stopEvent, { passive: false });
-    document.addEventListener("pointermove", stopEvent, { passive: false });
-
-    setInterval(lockSize, 300);
   </script>
 </body>
 </html>
