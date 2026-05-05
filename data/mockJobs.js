@@ -7,6 +7,7 @@ window.AppData.jobs = [
   { id: "job-005", driverId: "a", patient: "村上様", status: "waiting", start: "15:10", end: "16:05", from: "病院", to: "自宅", note: "" },
   { id: "job-006", driverId: "b", patient: "高橋様", status: "alert", start: "16:20", end: "17:15", from: "施設", to: "病院", note: "要確認" }
 ];
+
 window.AppData.days = [
   { date: "4/29", jobs: 8, adjustments: 8, statuses: [] },
   { date: "4/30", jobs: 8, adjustments: 8, statuses: [] },

@@ -1,9 +1,65 @@
-.detail-panel { position: absolute; inset: 0; border-left: 1px solid var(--line-color); border-bottom: 1px solid var(--line-color); padding: 58px 0 0 24px; font-size: 14px; font-weight: 800; color: #111; }
-.detail-row { margin-bottom: 22px; line-height: 1; }
-.detail-fee { margin-top: 8px; font-size: 15px; font-weight: 900; display: flex; align-items: center; gap: 12px; }
-.detail-arrow { position: absolute; right: 42px; top: 208px; width: 16px; height: 74px; }
-.detail-arrow::before { content: ""; position: absolute; left: 7px; width: 1px; height: 58px; top: 8px; background: #111; }
-.detail-arrow .up, .detail-arrow .down { position: absolute; left: 0; width: 14px; height: 14px; border-left: 2px solid #111; border-top: 2px solid #111; }
+.detail-panel {
+  position: absolute;
+  inset: 0;
+  border-left: 1px solid var(--line-color);
+  border-bottom: 1px solid var(--line-color);
+  padding: 58px 0 0 24px;
+  font-size: 14px;
+  font-weight: 800;
+  color: #111;
+}
+
+.detail-row {
+  margin-bottom: 22px;
+  line-height: 1;
+}
+
+.detail-fee {
+  margin-top: 8px;
+  font-size: 15px;
+  font-weight: 900;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+
+.detail-arrow {
+  position: absolute;
+  right: 42px;
+  top: 208px;
+  width: 16px;
+  height: 74px;
+}
+
+.detail-arrow::before {
+  content: "";
+  position: absolute;
+  left: 7px;
+  width: 1px;
+  height: 58px;
+  top: 8px;
+  background: #111;
+}
+
+.detail-arrow .up,
+.detail-arrow .down {
+  position: absolute;
+  left: 0;
+  width: 14px;
+  height: 14px;
+  border-left: 2px solid #111;
+  border-top: 2px solid #111;
+}
+
 .detail-arrow .up { top: 0; transform: rotate(45deg); }
 .detail-arrow .down { bottom: 0; transform: rotate(225deg); }
-.detail-note { position: absolute; left: 24px; right: 14px; top: 276px; font-size: 7px; line-height: 1.45; font-weight: 800; }
+
+.detail-note {
+  position: absolute;
+  left: 24px;
+  right: 14px;
+  top: 276px;
+  font-size: 7px;
+  line-height: 1.45;
+  font-weight: 800;
+}
