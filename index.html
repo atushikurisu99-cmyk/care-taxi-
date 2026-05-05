@@ -3,10 +3,12 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-title" content="Care Taxi UI" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
   <meta name="theme-color" content="#3568c8" />
+
   <title>Care Taxi UI</title>
 
   <style>
@@ -36,17 +38,11 @@
       --app-h: 100vh;
       --blue: #3568c8;
 
-      --frame-left: 42px;
-      --frame-right: 42px;
-      --frame-bottom: 28px;
-
       --header-h: 112px;
-      --status-h: 24px;
 
-      --content-left: 74px;
-      --content-right: 74px;
+      --side-x: 76px;
       --content-top: 150px;
-      --content-bottom: 38px;
+      --content-bottom: 34px;
 
       --detail-w: 224px;
       --detail-gap: 54px;
@@ -56,23 +52,9 @@
 
     .app {
       position: fixed;
-      left: 0;
-      top: 0;
+      inset: 0;
       width: 100vw;
       height: var(--app-h);
-      overflow: hidden;
-      background: #ffffff;
-    }
-
-    .outer-frame {
-      position: absolute;
-      left: var(--frame-left);
-      right: var(--frame-right);
-      top: 0;
-      bottom: var(--frame-bottom);
-      border-left: 9px solid #1f1f1f;
-      border-right: 9px solid #1f1f1f;
-      border-bottom: 9px solid #1f1f1f;
       overflow: hidden;
       background: #ffffff;
     }
@@ -87,53 +69,30 @@
       overflow: hidden;
     }
 
-    .small-status {
-      position: absolute;
-      left: 14px;
-      top: 7px;
-      color: rgba(255,255,255,0.82);
-      font-size: 13px;
-      font-weight: 600;
-      letter-spacing: 0.02em;
-      white-space: nowrap;
-    }
-
-    .mock-status-right {
-      position: absolute;
-      right: 12px;
-      top: 7px;
-      height: 14px;
-      color: rgba(255,255,255,0.78);
-      font-size: 12px;
-      font-weight: 600;
-      letter-spacing: 1px;
-      white-space: nowrap;
-    }
-
     .menu {
       position: absolute;
-      left: 56px;
+      left: 76px;
       top: 46px;
-      width: 48px;
-      height: 40px;
+      width: 58px;
+      height: 46px;
     }
 
     .menu span {
       display: block;
       width: 100%;
-      height: 5px;
-      margin-bottom: 10px;
+      height: 6px;
+      margin-bottom: 11px;
       background: #ffffff;
       border-radius: 999px;
     }
 
     .date {
       position: absolute;
-      left: 126px;
+      left: 154px;
       top: 42px;
-      height: 54px;
+      height: 58px;
       color: #ffffff;
-      font-size: 36px;
+      font-size: 38px;
       font-weight: 500;
       line-height: 1;
       white-space: nowrap;
@@ -141,26 +100,26 @@
 
     .reserve {
       position: absolute;
-      right: 52px;
+      right: 76px;
       top: 40px;
-      width: 102px;
-      height: 42px;
-      border-radius: 9px;
+      width: 116px;
+      height: 48px;
+      border-radius: 10px;
       background: #ffffff;
       color: #2d5fb8;
-      font-size: 16px;
+      font-size: 17px;
       font-weight: 700;
       display: flex;
       align-items: center;
       justify-content: center;
       white-space: nowrap;
-      border: 1px solid rgba(0,0,0,0.18);
+      border: 1px solid rgba(0, 0, 0, 0.22);
     }
 
     .content {
       position: absolute;
-      left: var(--content-left);
-      right: var(--content-right);
+      left: var(--side-x);
+      right: var(--side-x);
       top: var(--content-top);
       bottom: var(--content-bottom);
       overflow: hidden;
@@ -212,7 +171,7 @@
       top: 0;
       bottom: 0;
       width: 1px;
-      background: rgba(0,0,0,0.35);
+      background: rgba(0, 0, 0, 0.35);
     }
 
     .detail-l::after {
@@ -222,7 +181,7 @@
       bottom: 0;
       width: 100%;
       height: 1px;
-      background: rgba(0,0,0,0.35);
+      background: rgba(0, 0, 0, 0.35);
     }
 
     .days-area {
@@ -237,10 +196,9 @@
     }
 
     .day-card {
-      position: relative;
       width: 100%;
       height: 100%;
-      border: 1px solid rgba(0,0,0,0.28);
+      border: 1px solid rgba(0, 0, 0, 0.28);
       border-radius: 11px;
       background: #ffffff;
     }
@@ -257,41 +215,36 @@
 
 <body>
   <div class="app">
-    <div class="outer-frame">
-      <div class="header">
-        <div class="small-status">15:06　5月5日(火)</div>
-        <div class="mock-status-right">••••  Wi-Fi  ◎  40% ▭</div>
-
-        <div class="menu">
-          <span></span>
-          <span></span>
-          <span></span>
-        </div>
-
-        <div class="date">4/29（火）14:26</div>
-        <div class="reserve">＋予約登録</div>
+    <div class="header">
+      <div class="menu">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
 
-      <div class="content">
-        <div class="label label-location">LOCATION</div>
-        <div class="label label-detail">DETAIL</div>
-        <div class="label label-days">DAYS</div>
-        <div class="label label-status">STATUS</div>
+      <div class="date">4/29（火）14:26</div>
+      <div class="reserve">＋予約登録</div>
+    </div>
 
-        <div class="detail-l"></div>
+    <div class="content">
+      <div class="label label-location">LOCATION</div>
+      <div class="label label-detail">DETAIL</div>
+      <div class="label label-days">DAYS</div>
+      <div class="label label-status">STATUS</div>
 
-        <div class="days-area">
-          <div class="day-card"></div>
-          <div class="day-card"></div>
-          <div class="day-card"></div>
-          <div class="day-card"></div>
-          <div class="day-card"></div>
-          <div class="day-card"></div>
-          <div class="day-card"></div>
-        </div>
+      <div class="detail-l"></div>
 
-        <div class="status-area"></div>
+      <div class="days-area">
+        <div class="day-card"></div>
+        <div class="day-card"></div>
+        <div class="day-card"></div>
+        <div class="day-card"></div>
+        <div class="day-card"></div>
+        <div class="day-card"></div>
+        <div class="day-card"></div>
       </div>
+
+      <div class="status-area"></div>
     </div>
   </div>
 
@@ -304,6 +257,7 @@
     }
 
     lockSize();
+
     window.addEventListener("resize", lockSize);
     window.addEventListener("orientationchange", lockSize);
 
