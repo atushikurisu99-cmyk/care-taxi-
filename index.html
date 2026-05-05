@@ -1,418 +1,359 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport"
-content="width=device-width,
-initial-scale=1.0,
-maximum-scale=1.0,
-user-scalable=no,
-viewport-fit=cover" />
-
-<meta name="apple-mobile-web-app-capable" content="yes" />
-<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-<meta name="theme-color" content="#3568c8" />
-
-<title>Care Taxi UI</title>
-
-<style>
-
-*{
-  box-sizing:border-box;
-  margin:0;
-  padding:0;
-  -webkit-tap-highlight-color:transparent;
-  touch-action:none;
-}
-
-html,
-body{
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  position:fixed;
-  inset:0;
-  background:#ffffff;
-  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue",sans-serif;
-}
-
-body{
-  overscroll-behavior:none;
-}
-
-:root{
-
-  --blue:#3568c8;
-
-  --safe-top:24px;
-
-  --header-h:112px;
-
-  --outer-left:44px;
-  --outer-right:44px;
-
-  --content-top:148px;
-  --content-bottom:32px;
-
-  --right-col:222px;
-
-  --main-gap:56px;
-
-  --bottom-h:184px;
-
-}
-
-/* ========================================= */
-
-.app{
-  position:fixed;
-  inset:0;
-  overflow:hidden;
-  background:#f8f8f8;
-}
-
-/* ========================================= */
-/* HEADER */
-/* ========================================= */
-
-.header{
-  position:absolute;
-  left:0;
-  right:0;
-  top:0;
-  height:var(--header-h);
-  background:var(--blue);
-}
-
-.menu{
-  position:absolute;
-  left:44px;
-  top:calc(var(--safe-top) + 18px);
-  width:58px;
-  height:48px;
-}
-
-.menu span{
-  display:block;
-  width:100%;
-  height:6px;
-  margin-bottom:12px;
-  border-radius:999px;
-  background:#ffffff;
-}
-
-.date{
-  position:absolute;
-  left:138px;
-  top:calc(var(--safe-top) + 8px);
-
-  color:#ffffff;
-  font-size:38px;
-  font-weight:600;
-  letter-spacing:0.02em;
-}
-
-.reserve{
-  position:absolute;
-
-  right:42px;
-  top:calc(var(--safe-top) + 14px);
-
-  width:122px;
-  height:52px;
-
-  border-radius:12px;
-
-  background:#ffffff;
-
-  color:#2d5fb8;
-
-  display:flex;
-  align-items:center;
-  justify-content:center;
-
-  font-size:17px;
-  font-weight:700;
-
-  border:1px solid rgba(0,0,0,.18);
-}
-
-/* ========================================= */
-/* MAIN LAYOUT */
-/* ========================================= */
-
-.content{
-  position:absolute;
-
-  left:var(--outer-left);
-  right:var(--outer-right);
-
-  top:var(--content-top);
-  bottom:var(--content-bottom);
-
-  overflow:hidden;
-}
-
-/* ========================================= */
-/* LOCATION */
-/* ========================================= */
-
-.location{
-  position:absolute;
-
-  left:0;
-  top:0;
-
-  right:calc(var(--right-col) + var(--main-gap));
-  bottom:calc(var(--bottom-h) + 34px);
-
-  border-top:1px solid rgba(0,0,0,.28);
-  border-left:1px solid rgba(0,0,0,.28);
-}
-
-/* ========================================= */
-/* DETAIL */
-/* ========================================= */
-
-.detail{
-  position:absolute;
-
-  top:0;
-  right:0;
-
-  width:var(--right-col);
-  bottom:calc(var(--bottom-h) + 34px);
-
-  border-left:1px solid rgba(0,0,0,.28);
-  border-bottom:1px solid rgba(0,0,0,.28);
-}
-
-/* ========================================= */
-/* DAYS */
-/* ========================================= */
-
-.days{
-  position:absolute;
-
-  left:0;
-  right:calc(var(--right-col) + var(--main-gap));
-
-  bottom:0;
-
-  height:var(--bottom-h);
-
-  border-top:1px solid rgba(0,0,0,.28);
-}
-
-.days-grid{
-
-  position:absolute;
-
-  left:0;
-  right:0;
-  bottom:0;
-
-  height:150px;
-
-  display:grid;
-  grid-template-columns:repeat(7,1fr);
-
-  column-gap:6px;
-}
-
-.day{
-
-  position:relative;
-
-  border:1px solid rgba(0,0,0,.20);
-  border-radius:16px 16px 12px 12px;
-
-  background:#fafafa;
-}
-
-/* ========================================= */
-/* STATUS */
-/* ========================================= */
-
-.status{
-
-  position:absolute;
-
-  right:0;
-  bottom:0;
-
-  width:var(--right-col);
-  height:var(--bottom-h);
-
-  border-top:1px solid rgba(0,0,0,.28);
-}
-
-.status-lines{
-
-  position:absolute;
-
-  left:0;
-  right:0;
-  top:44px;
-  bottom:0;
-
-  display:flex;
-  flex-direction:column;
-}
-
-.status-row{
-
-  flex:1;
-
-  border-bottom:1px solid rgba(0,0,0,.18);
-}
-
-.status-row:last-child{
-  border-bottom:none;
-}
-
-/* ========================================= */
-/* GREEN LABEL */
-/* ========================================= */
-
-.label{
-
-  position:absolute;
-
-  color:#24a15a;
-
-  font-size:14px;
-  font-weight:700;
-}
-
-.label-location{
-  left:0;
-  top:8px;
-}
-
-.label-detail{
-  right:146px;
-  top:8px;
-}
-
-.label-days{
-  left:0;
-  bottom:188px;
-}
-
-.label-status{
-  right:142px;
-  bottom:188px;
-}
-
-/* ========================================= */
-
-</style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Care Taxi UI" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <meta name="theme-color" content="#3568c8" />
+  <title>Care Taxi UI</title>
+
+  <style>
+    * {
+      box-sizing: border-box;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-touch-callout: none;
+      touch-action: none;
+    }
+
+    html,
+    body {
+      margin: 0;
+      padding: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+      position: fixed;
+      inset: 0;
+      background: #ffffff;
+      font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", sans-serif;
+      user-select: none;
+      -webkit-user-select: none;
+    }
+
+    :root {
+      --app-h: 100vh;
+      --blue: #3568c8;
+
+      --header-h: 112px;
+      --status-h: 24px;
+
+      --content-left: 74px;
+      --content-right: 74px;
+      --content-top: 152px;
+      --content-bottom: 36px;
+
+      --detail-w: 224px;
+      --gap: 54px;
+
+      --bottom-h: 174px;
+      --main-bottom-gap: 30px;
+    }
+
+    .app {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 100vw;
+      height: var(--app-h);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .header {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 0;
+      height: var(--header-h);
+      background: var(--blue);
+      overflow: hidden;
+    }
+
+    .menu {
+      position: absolute;
+      left: 76px;
+      top: calc(var(--status-h) + 22px);
+      width: 58px;
+      height: 46px;
+    }
+
+    .menu span {
+      display: block;
+      width: 100%;
+      height: 6px;
+      margin-bottom: 11px;
+      border-radius: 999px;
+      background: #ffffff;
+    }
+
+    .date {
+      position: absolute;
+      left: 154px;
+      top: calc(var(--status-h) + 8px);
+      height: 72px;
+      display: flex;
+      align-items: center;
+      color: #ffffff;
+      font-size: 38px;
+      font-weight: 500;
+      line-height: 1;
+      white-space: nowrap;
+    }
+
+    .reserve {
+      position: absolute;
+      right: 76px;
+      top: calc(var(--status-h) + 16px);
+      width: 116px;
+      height: 48px;
+      border-radius: 10px;
+      background: #ffffff;
+      color: #2d5fb8;
+      font-size: 17px;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      white-space: nowrap;
+      border: 1px solid rgba(0, 0, 0, 0.25);
+    }
+
+    .content {
+      position: absolute;
+      left: var(--content-left);
+      right: var(--content-right);
+      top: var(--content-top);
+      bottom: var(--content-bottom);
+      overflow: hidden;
+      background: #ffffff;
+    }
+
+    .location-label,
+    .detail-label,
+    .days-label,
+    .status-label {
+      position: absolute;
+      color: #20a55b;
+      font-size: 14px;
+      font-weight: 700;
+      line-height: 1;
+      z-index: 5;
+    }
+
+    .location-label {
+      left: 0;
+      top: 0;
+    }
+
+    .detail-label {
+      right: calc(var(--detail-w) - 56px);
+      top: 0;
+    }
+
+    .days-label {
+      left: 0;
+      bottom: calc(var(--bottom-h) - 2px);
+    }
+
+    .status-label {
+      right: calc(var(--detail-w) - 62px);
+      bottom: calc(var(--bottom-h) - 2px);
+    }
+
+    .main-area {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 26px;
+      bottom: calc(var(--bottom-h) + var(--main-bottom-gap));
+      overflow: hidden;
+    }
+
+    .location-box {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: calc(var(--detail-w) + var(--gap));
+      background: #fafafa;
+      border: 1px solid rgba(0, 0, 0, 0.42);
+    }
+
+    .detail-box {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--detail-w);
+      background: #fafafa;
+      border-left: 1px solid rgba(0, 0, 0, 0.42);
+      border-bottom: 1px solid rgba(0, 0, 0, 0.42);
+      overflow: hidden;
+    }
+
+    .detail-line {
+      position: absolute;
+      left: 20px;
+      right: 20px;
+      height: 1px;
+      background: rgba(0, 0, 0, 0.16);
+    }
+
+    .detail-line.l1 { top: 112px; }
+    .detail-line.l2 { top: 168px; }
+    .detail-line.l3 { top: 224px; }
+    .detail-line.l4 { top: 280px; }
+    .detail-line.l5 { bottom: 90px; }
+
+    .bottom-area {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: var(--bottom-h);
+      overflow: hidden;
+    }
+
+    .days-box {
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      right: calc(var(--detail-w) + var(--gap));
+      border-top: 1px solid rgba(0, 0, 0, 0.42);
+      overflow: hidden;
+    }
+
+    .days-grid {
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: 0;
+      height: calc(100% - 26px);
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .day-card {
+      position: relative;
+      height: 100%;
+      border: 1px solid rgba(0, 0, 0, 0.28);
+      border-radius: 12px;
+      background: #fafafa;
+    }
+
+    .status-box {
+      position: absolute;
+      right: 0;
+      top: 0;
+      bottom: 0;
+      width: var(--detail-w);
+      border-top: 1px solid rgba(0, 0, 0, 0.42);
+      overflow: hidden;
+    }
+
+    .status-rows {
+      position: absolute;
+      left: 0;
+      right: 0;
+      top: 26px;
+      bottom: 0;
+      display: grid;
+      grid-template-rows: repeat(7, 1fr);
+    }
+
+    .status-row {
+      border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+    }
+
+    .status-row:last-child {
+      border-bottom: none;
+    }
+  </style>
 </head>
 
 <body>
-
-<div class="app">
-
-  <!-- HEADER -->
-
-  <div class="header">
-
-    <div class="menu">
-      <span></span>
-      <span></span>
-      <span></span>
-    </div>
-
-    <div class="date">
-      4/29（火）14:26
-    </div>
-
-    <div class="reserve">
-      ＋予約登録
-    </div>
-
-  </div>
-
-  <!-- CONTENT -->
-
-  <div class="content">
-
-    <div class="label label-location">
-      LOCATION
-    </div>
-
-    <div class="label label-detail">
-      DETAIL
-    </div>
-
-    <div class="label label-days">
-      DAYS
-    </div>
-
-    <div class="label label-status">
-      STATUS
-    </div>
-
-    <div class="location"></div>
-
-    <div class="detail"></div>
-
-    <div class="days">
-
-      <div class="days-grid">
-
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-        <div class="day"></div>
-
+  <div class="app">
+    <div class="header">
+      <div class="menu">
+        <span></span>
+        <span></span>
+        <span></span>
       </div>
 
+      <div class="date">4/29（火）14:26</div>
+      <div class="reserve">＋予約登録</div>
     </div>
 
-    <div class="status">
+    <div class="content">
+      <div class="location-label">LOCATION</div>
+      <div class="detail-label">DETAIL</div>
+      <div class="days-label">DAYS</div>
+      <div class="status-label">STATUS</div>
 
-      <div class="status-lines">
+      <div class="main-area">
+        <div class="location-box"></div>
 
-        <div class="status-row"></div>
-        <div class="status-row"></div>
-        <div class="status-row"></div>
-
+        <div class="detail-box">
+          <div class="detail-line l1"></div>
+          <div class="detail-line l2"></div>
+          <div class="detail-line l3"></div>
+          <div class="detail-line l4"></div>
+          <div class="detail-line l5"></div>
+        </div>
       </div>
 
-    </div>
+      <div class="bottom-area">
+        <div class="days-box">
+          <div class="days-grid">
+            <div class="day-card"></div>
+            <div class="day-card"></div>
+            <div class="day-card"></div>
+            <div class="day-card"></div>
+            <div class="day-card"></div>
+            <div class="day-card"></div>
+            <div class="day-card"></div>
+          </div>
+        </div>
 
+        <div class="status-box">
+          <div class="status-rows">
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+            <div class="status-row"></div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 
-</div>
+  <script>
+    function lockSize() {
+      document.documentElement.style.setProperty("--app-h", window.innerHeight + "px");
+      window.scrollTo(0, 0);
+      document.body.scrollTop = 0;
+      document.documentElement.scrollTop = 0;
+    }
 
-<script>
+    lockSize();
 
-function lockApp(){
+    window.addEventListener("resize", lockSize);
+    window.addEventListener("orientationchange", lockSize);
 
-  document.documentElement.style.height =
-    window.innerHeight + "px";
+    document.addEventListener("touchmove", function(e) {
+      e.preventDefault();
+    }, { passive: false });
 
-  document.body.style.height =
-    window.innerHeight + "px";
-
-  window.scrollTo(0,0);
-
-}
-
-lockApp();
-
-window.addEventListener("resize",lockApp);
-
-document.addEventListener("touchmove",function(e){
-  e.preventDefault();
-},{passive:false});
-
-</script>
-
+    document.addEventListener("gesturestart", function(e) {
+      e.preventDefault();
+    }, { passive: false });
+  </script>
 </body>
 </html>
