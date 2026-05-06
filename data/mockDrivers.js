@@ -1,10 +1,1 @@
-window.AppData = window.AppData || {};
-window.AppData.drivers = [
-  { id: "a", name: "協力業者 A" },
-  { id: "b", name: "協力業者 B" },
-  { id: "c", name: "協力業者 C" },
-  { id: "d", name: "協力業者 D" },
-  { id: "e", name: "協力業者 E" },
-  { id: "f", name: "協力業者 F" },
-  { id: "g", name: "協力業者 G" }
-];
+window.AppData=window.AppData||{};window.AppData.drivers=[{id:"a",name:"協力業者 A"},{id:"b",name:"協力業者 B"},{id:"c",name:"協力業者 C"},{id:"d",name:"協力業者 D"},{id:"e",name:"協力業者 E"},{id:"f",name:"協力業者 F"},{id:"g",name:"協力業者 G"}];
