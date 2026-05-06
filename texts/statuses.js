@@ -1,1 +1,0 @@
-window.AppTexts=window.AppTexts||{};window.AppTexts.statuses={go:"向かい中",arrived:"到着",departing:"搬送中",done:"完了",waiting:"待機",temp:"仮登録",alert:"要確認"};
