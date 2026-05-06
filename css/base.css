@@ -1,0 +1,46 @@
+* {
+  box-sizing: border-box;
+  -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  position: fixed;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  overflow: hidden;
+  overscroll-behavior: none;
+  touch-action: none;
+  background: #eeeeee;
+  color: #111111;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", YuGothic, Meiryo, sans-serif;
+}
+
+button {
+  font-family: inherit;
+}
+
+#viewport {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100dvh;
+  overflow: hidden;
+  background: #eeeeee;
+}
+
+#canvas {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 1366px;
+  height: 1024px;
+  transform-origin: center center;
+  transform: translate(-50%, -50%) scale(var(--app-scale, 1));
+  overflow: hidden;
+  background: #f4f4f4;
+}
