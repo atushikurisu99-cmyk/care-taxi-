@@ -1,0 +1,1 @@
+window.AppTexts=window.AppTexts||{};window.AppTexts.labels={location:"LOCATION",detail:"DETAIL",days:"DAYS",status:"STATUS",reserve:"＋予約登録",driver:"担当者",detailRows:["時間","患者名","出発→到着","担当","状態","特記"],fee:"ーーー（タップで料金）"};
