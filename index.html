@@ -1,371 +1,72 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
-<title>介護タクシー管理アプリ</title>
-<style>
-html,body{
-  margin:0;
-  width:100%;
-  height:100%;
-  overflow:hidden;
-  background:#dcdcdc;
-  font-family:Arial,"Yu Gothic",sans-serif;
-}
-
-#stage{
-  width:100vw;
-  height:100vh;
-  display:flex;
-  justify-content:center;
-  align-items:center;
-  overflow:hidden;
-}
-
-#canvas{
-  width:1280px;
-  height:720px;
-  background:#f4f4f4;
-  position:relative;
-  overflow:hidden;
-  transform-origin:top left;
-}
-
-#topbar{
-  position:absolute;
-  left:0;
-  top:0;
-  width:100%;
-  height:118px;
-  background:#2f6fae;
-}
-
-#datetime{
-  position:absolute;
-  left:165px;
-  top:26px;
-  color:#fff;
-  font-size:56px;
-  font-weight:900;
-}
-
-#menu{
-  position:absolute;
-  left:42px;
-  top:28px;
-  color:#fff;
-  font-size:68px;
-  line-height:1;
-}
-
-#reserve{
-  position:absolute;
-  right:36px;
-  top:24px;
-  width:168px;
-  height:58px;
-  border-radius:14px;
-  border:2px solid #d6d6d6;
-  background:#fff;
-  color:#075bad;
-  font-size:18px;
-  font-weight:900;
-}
-
-.section-title{
-  position:absolute;
-  color:#17a05d;
-  font-size:18px;
-  font-weight:900;
-}
-
-#location-title{left:22px;top:142px;}
-#detail-title{right:238px;top:142px;}
-#days-title{left:22px;bottom:128px;}
-#status-title{right:222px;bottom:128px;}
-
-#location{
-  position:absolute;
-  left:22px;
-  top:182px;
-  width:860px;
-  height:392px;
-}
-
-#detail{
-  position:absolute;
-  right:24px;
-  top:182px;
-  width:240px;
-  height:470px;
-  border-left:1px solid #bdbdbd;
-  border-bottom:1px solid #bdbdbd;
-}
-
-#days{
-  position:absolute;
-  left:22px;
-  bottom:18px;
-  width:860px;
-  height:104px;
-  border-top:1px solid #bdbdbd;
-}
-
-#status{
-  position:absolute;
-  right:24px;
-  bottom:18px;
-  width:240px;
-  height:104px;
-}
-
-#vendors{
-  position:absolute;
-  left:0;
-  top:46px;
-  width:134px;
-}
-
-.vendor{
-  height:52px;
-  line-height:52px;
-  border-bottom:1px solid #bdbdbd;
-  font-size:18px;
-  font-weight:900;
-}
-
-#timeline-view{
-  position:absolute;
-  left:134px;
-  top:0;
-  width:726px;
-  height:392px;
-  overflow-x:auto;
-  overflow-y:hidden;
-}
-
-#timeline-inner{
-  width:1100px;
-  height:392px;
-  position:relative;
-}
-
-.hour-label{
-  position:absolute;
-  top:0;
-  transform:translateX(-50%);
-  font-size:14px;
-  font-weight:900;
-}
-
-.grid{
-  position:absolute;
-  left:0;
-  top:34px;
-  width:1100px;
-  height:364px;
-  border-top:1px solid #bdbdbd;
-  border-bottom:1px solid #bdbdbd;
-}
-
-.vline{
-  position:absolute;
-  top:0;
-  width:1px;
-  height:100%;
-}
-
-.vline.hour{background:#bdbdbd;}
-.vline.half{background:#e1e1e1;}
-
-.hline{
-  position:absolute;
-  left:0;
-  width:100%;
-  height:1px;
-  background:#bdbdbd;
-}
-
-#now{
-  position:absolute;
-  top:0;
-  width:2px;
-  height:100%;
-  background:red;
-}
-
-.job{
-  position:absolute;
-  left:140px;
-  top:0;
-  width:110px;
-  height:156px;
-  background:rgba(160,220,202,.75);
-  padding:8px;
-  box-sizing:border-box;
-  font-size:12px;
-  font-weight:900;
-}
-
-.day-row{
-  position:absolute;
-  left:0;
-  top:46px;
-  display:flex;
-  gap:8px;
-}
-
-.day{
-  width:114px;
-  height:92px;
-  border:1px solid #bdbdbd;
-  border-radius:12px;
-  background:#fff;
-  text-align:center;
-  font-weight:900;
-  padding-top:10px;
-}
-
-.today{
-  background:#eef6ff;
-  border-color:#2d78ff;
-  color:#065fd5;
-}
-
-#detail-content{
-  position:absolute;
-  left:40px;
-  top:70px;
-  display:flex;
-  flex-direction:column;
-  gap:28px;
-  font-size:22px;
-  font-weight:900;
-}
-
-#status-list{
-  position:absolute;
-  left:0;
-  top:46px;
-  font-size:14px;
-  font-weight:900;
-  line-height:1.7;
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>介護タクシー管理アプリ</title>
+  <link rel="stylesheet" href="css/styles.css" />
 </head>
 <body>
-<div id="stage">
-<div id="canvas">
+  <div id="fitStage">
+    <div id="appCanvas">
+      <header class="topbar">
+        <button class="hamburger" type="button" aria-label="メニュー">
+          <span></span><span></span><span></span>
+        </button>
+        <div id="headerDateTime" class="header-datetime">--/--（--） --:--</div>
+        <a class="booking-button" href="booking-input.html">＋予約登録</a>
+      </header>
 
-<div id="topbar"></div>
-<div id="menu">≡</div>
-<div id="datetime">5/8（金） 04:14</div>
-<button id="reserve">＋予約登録</button>
+      <main class="main">
+        <section class="location-area">
+          <h1 class="section-title">LOCATION</h1>
 
-<div id="location-title" class="section-title">LOCATION</div>
-<div id="detail-title" class="section-title">DETAIL</div>
-<div id="days-title" class="section-title">DAYS</div>
-<div id="status-title" class="section-title">STATUS</div>
+          <div class="timeline-shell">
+            <div id="vendorColumn" class="vendor-column"></div>
 
-<div id="location">
+            <div id="timelineViewport" class="timeline-viewport">
+              <div id="timelineInner" class="timeline-inner">
+                <div id="timeAxis" class="time-axis"></div>
+                <div id="timelineGrid" class="timeline-grid"></div>
+              </div>
+            </div>
 
-<div id="vendors">
-<div class="vendor">担当者</div>
-<div class="vendor">協力業者 A</div>
-<div class="vendor">協力業者 B</div>
-<div class="vendor">協力業者 C</div>
-<div class="vendor">協力業者 D</div>
-<div class="vendor">協力業者 E</div>
-<div class="vendor">協力業者 F</div>
-<div class="vendor">協力業者 G</div>
-</div>
+            <div class="timeline-scrollbar">
+              <span class="scrollbar-arrow left"></span>
+              <span class="scrollbar-track"><span id="scrollbarThumb" class="scrollbar-thumb"></span></span>
+              <span class="scrollbar-arrow right"></span>
+            </div>
+          </div>
+        </section>
 
-<div id="timeline-view">
-<div id="timeline-inner">
+        <aside class="detail-area">
+          <h2 class="section-title">DETAIL</h2>
+          <div class="detail-content">
+            <div>時間</div>
+            <div>患者名</div>
+            <div>出発 ➜ 到着</div>
+            <div>担当</div>
+            <div>状態</div>
+            <div>特記</div>
+            <div>ーーー</div>
+          </div>
+        </aside>
 
-<div class="hour-label" style="left:40px">7:00</div>
-<div class="hour-label" style="left:120px">8:00</div>
-<div class="hour-label" style="left:200px">9:00</div>
-<div class="hour-label" style="left:280px">10:00</div>
-<div class="hour-label" style="left:360px">11:00</div>
-<div class="hour-label" style="left:440px">12:00</div>
-<div class="hour-label" style="left:520px">13:00</div>
-<div class="hour-label" style="left:600px">14:00</div>
-<div class="hour-label" style="left:680px">15:00</div>
-<div class="hour-label" style="left:760px">16:00</div>
-<div class="hour-label" style="left:840px">17:00</div>
-<div class="hour-label" style="left:920px">18:00</div>
-<div class="hour-label" style="left:1000px">19:00</div>
+        <section class="days-area">
+          <h2 class="section-title">DAYS</h2>
+          <div id="daysList" class="days-list"></div>
+        </section>
 
-<div class="grid">
-<div id="now" style="left:650px"></div>
+        <aside class="status-area">
+          <h2 class="section-title">STATUS</h2>
+          <div id="statusList" class="status-list"></div>
+        </aside>
+      </main>
+    </div>
+  </div>
 
-<script>
-for(var i=0;i<=26;i++){
-  document.write('<div class="vline '+(i%2===0?'hour':'half')+'" style="left:'+(i*40)+'px"></div>');
-}
-for(var j=0;j<=7;j++){
-  document.write('<div class="hline" style="top:'+(j*52)+'px"></div>');
-}
-</script>
-
-<div class="job">
-<div>田中様　　　状態</div><br>
-<div>佐藤様　　　状態</div><br>
-<div>山田様　　　状態</div>
-</div>
-
-</div>
-</div>
-</div>
-</div>
-
-<div id="detail">
-<div id="detail-content">
-<div>時間</div>
-<div>患者名</div>
-<div>出発 ➜ 到着</div>
-<div>担当</div>
-<div>状態</div>
-<div>特記</div>
-<div>ーーー</div>
-</div>
-</div>
-
-<div id="days">
-<div class="day-row">
-<div class="day today">5/8<br><br>本日</div>
-<div class="day">5/9</div>
-<div class="day">5/10</div>
-<div class="day">5/11</div>
-<div class="day">5/12</div>
-<div class="day">5/13</div>
-<div class="day">5/14</div>
-</div>
-</div>
-
-<div id="status">
-<div id="status-list">
-協力業者 A　　　待機<br>
-協力業者 B　　　向かい中<br>
-協力業者 C　　　搬送中<br>
-協力業者 D　　　終了
-</div>
-</div>
-
-</div>
-</div>
-
-<script>
-function fit(){
-  var baseW=1280;
-  var baseH=720;
-  var scale=Math.min(window.innerWidth/baseW,window.innerHeight/baseH);
-  document.getElementById('canvas').style.transform='scale('+scale+')';
-}
-window.addEventListener('resize',fit);
-fit();
-</script>
+  <script src="js/timeline.js"></script>
+  <script src="js/days.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>
