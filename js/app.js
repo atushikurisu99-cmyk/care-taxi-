@@ -14,6 +14,9 @@
   }
 
   function fitCanvas() {
+    window.scrollTo(0, 0);
+    document.body.scrollTop = 0;
+    document.documentElement.scrollTop = 0;
     var scale = Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H);
     var left = Math.floor((window.innerWidth - BASE_W * scale) / 2);
     var top = Math.floor((window.innerHeight - BASE_H * scale) / 2);

@@ -31,6 +31,7 @@ body {
   height: 100%;
   margin: 0;
   overflow: hidden;
+  position: fixed;
   background: #fff;
   color: var(--text);
   font-family: Arial, "Yu Gothic", "Hiragino Kaku Gothic ProN", Meiryo, sans-serif;
@@ -57,16 +58,16 @@ body {
 
 .topbar {
   position: absolute;
-  left: 0;
+  left: calc((var(--canvas-w) - 100vw) / 2);
   top: 0;
-  width: var(--canvas-w);
+  width: 100vw;
   height: var(--header-h);
   background: var(--blue);
 }
 
 .hamburger {
   position: absolute;
-  left: 74px;
+  left: calc((100vw - var(--canvas-w)) / 2 + 74px);
   top: 39px;
   width: 58px;
   height: 44px;
@@ -86,7 +87,7 @@ body {
 
 .header-datetime {
   position: absolute;
-  left: 141px;
+  left: calc((100vw - var(--canvas-w)) / 2 + 141px);
   top: 43px;
   color: #fff;
   font-size: 38px;
@@ -98,7 +99,7 @@ body {
 
 .booking-button {
   position: absolute;
-  right: 71px;
+  right: calc((100vw - var(--canvas-w)) / 2 + 71px);
   top: 39px;
   width: 108px;
   height: 45px;
@@ -429,7 +430,7 @@ body {
 
 .day-body {
   margin-top: 30px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.55;
 }
 
@@ -452,13 +453,17 @@ body {
   left: 0;
   top: 27px;
   width: 185px;
+  height: 112px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  -webkit-overflow-scrolling: touch;
 }
 
 .status-row {
   display: grid;
   grid-template-columns: 82px 1fr;
   column-gap: 8px;
-  font-size: 11px;
+  font-size: 12px;
   line-height: 1.55;
   font-weight: 900;
 }
@@ -481,4 +486,14 @@ body {
 .badge.yellow {
   color: #111;
   background: #fff35c;
+}
+
+
+.status-list::-webkit-scrollbar {
+  width: 4px;
+}
+
+.status-list::-webkit-scrollbar-thumb {
+  background: #c9c9c9;
+  border-radius: 999px;
 }
