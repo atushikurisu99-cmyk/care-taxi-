@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>介護タクシー管理アプリ</title>
+  <link rel="stylesheet" href="css/styles.css" />
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="hamburger" type="button" aria-label="メニュー">
+          <span></span><span></span><span></span>
+        </button>
+        <div id="headerDateTime" class="header-datetime">--/--（--） --:--</div>
+        <a class="booking-button" href="booking-input.html">＋予約登録</a>
+      </div>
+    </header>
+
+    <main class="main-shell">
+      <section class="main-board">
+        <section class="upper-area">
+          <section class="location-area">
+            <h1 class="section-title">LOCATION</h1>
+            <div class="timeline-wrap">
+              <div id="vendorColumn" class="vendor-column"></div>
+              <div class="timeline-column">
+                <div id="timelineScroller" class="timeline-scroller">
+                  <div id="timelineContent" class="timeline-content">
+                    <div id="timeAxis" class="time-axis"></div>
+                    <div id="timelineGrid" class="timeline-grid"></div>
+                  </div>
+                </div>
+                <div id="timelineScrollbar" class="timeline-scrollbar">
+                  <button id="scrollLeftBtn" class="scrollbar-arrow left" type="button" aria-label="左へスクロール"></button>
+                  <div id="scrollbarTrack" class="scrollbar-track"><span id="scrollbarThumb" class="scrollbar-thumb"></span></div>
+                  <button id="scrollRightBtn" class="scrollbar-arrow right" type="button" aria-label="右へスクロール"></button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <aside class="detail-area">
+            <h2 class="section-title">DETAIL</h2>
+            <div class="detail-content">
+              <div>時間</div>
+              <div>患者名</div>
+              <div>出発 → 到着</div>
+              <div>担当</div>
+              <div>状態</div>
+              <div>特記</div>
+              <div>ーーー</div>
+            </div>
+          </aside>
+        </section>
+
+        <section class="lower-area">
+          <section class="days-area">
+            <h2 class="section-title">DAYS</h2>
+            <div id="daysList" class="days-list"></div>
+          </section>
+          <aside class="status-area">
+            <h2 class="section-title">STATUS</h2>
+            <div id="statusList" class="status-list"></div>
+          </aside>
+        </section>
+      </section>
+    </main>
+  </div>
+
+  <script src="js/timeline.js"></script>
+  <script src="js/days.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
