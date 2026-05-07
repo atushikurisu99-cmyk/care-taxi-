@@ -15,7 +15,7 @@
     var i;
 
     for (i = 0; i < DAYS.length; i++) {
-      html += '<div class="day-card" style="left:' + (i * 92) + 'px;">';
+      html += '<div class="day-card" style="left:' + (i * 91) + 'px;">';
       html += '<div class="day-date">' + DAYS[i].date + '</div>';
       html += '<div class="day-body">' + DAYS[i].body + '</div>';
       html += '</div>';

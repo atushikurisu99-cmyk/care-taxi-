@@ -11,7 +11,7 @@
   --header-h: 106px;
 
   --timeline-left: 71px;
-  --timeline-top: 83px;
+  --timeline-top: 66px;
   --vendor-w: 112px;
   --timeline-view-w: 528px;
   --timeline-total-w: 756px;
@@ -149,7 +149,7 @@ body {
 .timeline-shell {
   position: absolute;
   left: 0;
-  top: 44px;
+  top: 24px;
   width: 640px;
   height: 314px;
 }
@@ -172,7 +172,7 @@ body {
 .vendor-row {
   height: var(--timeline-row-h);
   padding-left: 10px;
-  font-size: 16px;
+  font-size: 15px;
   line-height: var(--timeline-row-h);
   font-weight: 900;
   border-bottom: 1px solid var(--line);
@@ -356,9 +356,9 @@ body {
   content: "";
   position: absolute;
   left: 0;
-  top: 41px;
+  top: 20px;
   width: 1px;
-  height: 324px;
+  height: 345px;
   background: var(--line);
 }
 
@@ -375,14 +375,14 @@ body {
 .detail-content {
   position: absolute;
   left: 15px;
-  top: 95px;
+  top: 70px;
 }
 
 .detail-content div {
-  font-size: 18px;
+  font-size: 17px;
   line-height: 1;
   font-weight: 900;
-  margin-bottom: 24px;
+  margin-bottom: 22px;
   white-space: nowrap;
 }
 
@@ -411,7 +411,7 @@ body {
 .day-card {
   position: absolute;
   top: 0;
-  width: 86px;
+  width: 84px;
   height: 145px;
   border: 1px solid var(--line);
   border-radius: 9px;
@@ -423,13 +423,13 @@ body {
 
 .day-date {
   margin-top: 7px;
-  font-size: 15px;
+  font-size: 14px;
   line-height: 1.1;
 }
 
 .day-body {
   margin-top: 30px;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.55;
 }
 
@@ -458,7 +458,7 @@ body {
   display: grid;
   grid-template-columns: 82px 1fr;
   column-gap: 8px;
-  font-size: 12px;
+  font-size: 11px;
   line-height: 1.55;
   font-weight: 900;
 }
