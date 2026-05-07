@@ -25,8 +25,11 @@
     canvas.style.left = left + "px";
     canvas.style.top = top + "px";
     canvas.style.transform = "scale(" + scale + ")";
-    canvas.style.setProperty("--topbar-left", (-left / scale) + "px");
-    canvas.style.setProperty("--topbar-width", (window.innerWidth / scale) + "px");
+
+    var band = document.getElementById("topBand");
+    if (band) {
+      band.style.height = Math.ceil(106 * scale) + "px";
+    }
   }
 
   function renderStatus() {

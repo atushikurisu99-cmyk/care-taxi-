@@ -45,6 +45,17 @@ body {
   background: #fff;
 }
 
+
+#topBand {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: var(--topband-h, 106px);
+  background: var(--blue);
+  z-index: 0;
+}
+
 #appCanvas {
   position: absolute;
   left: 0;
@@ -58,11 +69,12 @@ body {
 
 .topbar {
   position: absolute;
-  left: var(--topbar-left, 0px);
+  left: 0;
   top: 0;
-  width: var(--topbar-width, var(--canvas-w));
+  width: var(--canvas-w);
   height: var(--header-h);
-  background: var(--blue);
+  background: transparent;
+  z-index: 2;
 }
 
 .hamburger {
