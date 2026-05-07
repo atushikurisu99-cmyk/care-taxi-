@@ -58,16 +58,16 @@ body {
 
 .topbar {
   position: absolute;
-  left: calc((var(--canvas-w) - 100vw) / 2);
+  left: var(--topbar-left, 0px);
   top: 0;
-  width: 100vw;
+  width: var(--topbar-width, var(--canvas-w));
   height: var(--header-h);
   background: var(--blue);
 }
 
 .hamburger {
   position: absolute;
-  left: calc((100vw - var(--canvas-w)) / 2 + 74px);
+  left: 74px;
   top: 39px;
   width: 58px;
   height: 44px;
@@ -87,7 +87,7 @@ body {
 
 .header-datetime {
   position: absolute;
-  left: calc((100vw - var(--canvas-w)) / 2 + 141px);
+  left: 141px;
   top: 43px;
   color: #fff;
   font-size: 38px;
@@ -99,7 +99,7 @@ body {
 
 .booking-button {
   position: absolute;
-  right: calc((100vw - var(--canvas-w)) / 2 + 71px);
+  right: 71px;
   top: 39px;
   width: 108px;
   height: 45px;
@@ -423,15 +423,21 @@ body {
 }
 
 .day-date {
-  margin-top: 7px;
+  position: absolute;
+  left: 0;
+  top: 9px;
+  width: 100%;
   font-size: 14px;
-  line-height: 1.1;
+  line-height: 16px;
 }
 
 .day-body {
-  margin-top: 30px;
+  position: absolute;
+  left: 0;
+  top: 62px;
+  width: 100%;
   font-size: 12px;
-  line-height: 1.55;
+  line-height: 16px;
 }
 
 .status-area {
@@ -451,7 +457,7 @@ body {
 .status-list {
   position: absolute;
   left: 0;
-  top: 27px;
+  top: 34px;
   width: 185px;
   height: 112px;
   overflow-y: auto;
@@ -463,16 +469,17 @@ body {
   display: grid;
   grid-template-columns: 82px 1fr;
   column-gap: 8px;
+  height: 16px;
   font-size: 12px;
-  line-height: 1.55;
+  line-height: 16px;
   font-weight: 900;
 }
 
 .badge {
   display: inline-block;
   min-width: 54px;
-  height: 16px;
-  line-height: 16px;
+  height: 15px;
+  line-height: 15px;
   border-radius: 3px;
   font-size: 10px;
 }
