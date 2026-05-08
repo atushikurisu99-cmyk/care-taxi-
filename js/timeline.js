@@ -79,16 +79,68 @@
     return '<div class="current-line" style="left:' + minuteToX(nowMin) + 'px;"></div>';
   }
 
-  function renderSampleJob() {
-    var left = minuteToX(8 * 60);
-    var width = minuteToX(10 * 60) - minuteToX(8 * 60);
+  function jobBlock(job) {
+    var left = minuteToX(job.start);
+    var width = minuteToX(job.end) - minuteToX(job.start);
+    var top = (job.vendorIndex - 1) * ROW_H + 4;
+
+    var style = ""
+      + "left:" + left + "px;"
+      + "top:" + top + "px;"
+      + "width:" + width + "px;"
+      + "background:" + (job.blockColor || "var(--job)") + ";"
+      + "--job-patient-color:" + (job.patientTextColor || "#111") + ";"
+      + "--job-state-color:" + (job.stateTextColor || "#555") + ";";
 
     return ''
-      + '<div class="job-block" style="left:' + left + 'px;width:' + width + 'px;">'
-      + '<div class="job-row"><span>田中様</span><span class="job-status">状態</span></div>'
-      + '<div class="job-row"><span>佐藤様</span><span class="job-status">状態</span></div>'
-      + '<div class="job-row"><span>山田様</span><span class="job-status">状態</span></div>'
+      + '<div class="job-block" style="' + style + '">'
+      + '<div class="job-patient">' + job.patient + '</div>'
+      + '<div class="job-state">' + job.state + '</div>'
       + '</div>';
+  }
+
+  function renderSampleJob() {
+    var jobs = [
+      {
+        vendorIndex: 1,
+        start: 8 * 60,
+        end: 10 * 60,
+        patient: "田中様",
+        state: "向かい中",
+        blockColor: "rgba(158, 220, 202, 0.84)",
+        patientTextColor: "#111",
+        stateTextColor: "#555"
+      },
+      {
+        vendorIndex: 2,
+        start: 8 * 60,
+        end: 10 * 60,
+        patient: "佐藤様",
+        state: "搬送中",
+        blockColor: "rgba(158, 220, 202, 0.84)",
+        patientTextColor: "#111",
+        stateTextColor: "#555"
+      },
+      {
+        vendorIndex: 3,
+        start: 8 * 60,
+        end: 10 * 60,
+        patient: "山田様",
+        state: "終了",
+        blockColor: "rgba(158, 220, 202, 0.84)",
+        patientTextColor: "#111",
+        stateTextColor: "#555"
+      }
+    ];
+
+    var html = "";
+    var i;
+
+    for (i = 0; i < jobs.length; i++) {
+      html += jobBlock(jobs[i]);
+    }
+
+    return html;
   }
 
 
