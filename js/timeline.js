@@ -82,7 +82,7 @@
   function jobBlock(job) {
     var left = minuteToX(job.start);
     var width = minuteToX(job.end) - minuteToX(job.start);
-    var top = (job.vendorIndex - 1) * ROW_H + 4;
+    var top = (job.vendorIndex - 1) * ROW_H + 1;
 
     var style = ""
       + "left:" + left + "px;"
