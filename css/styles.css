@@ -51,7 +51,7 @@ body {
   left: 0;
   top: 0;
   width: 100vw;
-  height: 106px;
+  height: var(--band-h, 106px);
   background: var(--blue);
   z-index: 0;
   pointer-events: none;
@@ -75,7 +75,7 @@ body {
   top: 0;
   width: var(--canvas-w);
   height: var(--header-h);
-  background: transparent;
+  background: transparent !important;
   z-index: 2;
 }
 
@@ -169,11 +169,31 @@ body {
   height: 314px;
 }
 
+.location-row-lines {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 640px;
+  height: 323px;
+  z-index: 4;
+  pointer-events: none;
+}
+
+.location-row-line {
+  position: absolute;
+  left: 0;
+  width: 640px;
+  height: 1px;
+  background: var(--line);
+  pointer-events: none;
+}
+
 .vendor-column {
   position: absolute;
   left: 0;
   top: 13px;
   width: var(--vendor-w);
+  z-index: 5;
 }
 
 .vendor-header {
@@ -181,7 +201,7 @@ body {
   padding-left: 20px;
   font-size: 12px;
   line-height: 18px;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 0;
 }
 
 .vendor-row {
@@ -190,7 +210,7 @@ body {
   font-size: 15px;
   line-height: var(--timeline-row-h);
   font-weight: 900;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 0;
   white-space: nowrap;
 }
 
@@ -200,6 +220,7 @@ body {
   top: 0;
   width: var(--timeline-view-w);
   height: 323px;
+  z-index: 2;
   overflow-x: auto;
   overflow-y: hidden;
   scrollbar-width: none;
@@ -225,6 +246,7 @@ body {
 
 .time-label {
   position: absolute;
+  z-index: 6;
   top: 0;
   transform: translateX(-50%);
   font-size: 11px;
@@ -239,7 +261,7 @@ body {
   width: var(--timeline-total-w);
   height: 280px;
   border-top: 0;
-  border-bottom: 1px solid var(--line);
+  border-bottom: 0;
   overflow: hidden;
 }
 

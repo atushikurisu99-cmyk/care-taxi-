@@ -21,8 +21,10 @@
     var scale = Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H);
     var scaledW = BASE_W * scale;
     var scaledH = BASE_H * scale;
+
     var left = (window.innerWidth - scaledW) / 2;
     var top = (window.innerHeight - scaledH) / 2;
+
     var canvas = document.getElementById("appCanvas");
 
     canvas.style.left = left + "px";

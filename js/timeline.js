@@ -62,10 +62,6 @@
       html += '<div class="grid-line ' + (m % 60 === 0 ? "hour" : "half") + '" style="left:' + x + 'px;"></div>';
     }
 
-    for (i = 0; i <= 7; i++) {
-      html += '<div class="row-line" style="top:' + (i * ROW_H) + 'px;"></div>';
-    }
-
     html += renderCurrentLine();
     html += renderSampleJob();
 
@@ -95,6 +91,32 @@
       + '</div>';
   }
 
+
+  function renderLocationRowLines() {
+    var shell = document.querySelector(".timeline-shell");
+    var old = document.getElementById("locationRowLines");
+    var html = "";
+    var i;
+
+    if (!shell) {
+      return;
+    }
+
+    if (old) {
+      old.parentNode.removeChild(old);
+    }
+
+    for (i = 0; i < 8; i++) {
+      html += '<div class="location-row-line" style="top:' + (43 + i * ROW_H) + 'px;"></div>';
+    }
+
+    var layer = document.createElement("div");
+    layer.id = "locationRowLines";
+    layer.className = "location-row-lines";
+    layer.innerHTML = html;
+    shell.appendChild(layer);
+  }
+
   function syncFakeScrollbar() {
     var view = document.getElementById("timelineViewport");
     var thumb = document.getElementById("scrollbarThumb");
@@ -118,6 +140,7 @@
     renderVendorColumn();
     renderTimeAxis();
     renderGrid();
+    renderLocationRowLines();
     initScroll();
   }
 
