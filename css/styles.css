@@ -42,22 +42,29 @@ body {
   height: 100vh;
   overflow: hidden;
   position: relative;
-  background: linear-gradient(
-    to bottom,
-    var(--blue) 0,
-    var(--blue) var(--band-h, 106px),
-    #fff var(--band-h, 106px),
-    #fff 100%
-  );
+  background: #fff;
+}
+
+
+#topBand {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: var(--band-h, 106px);
+  background: var(--blue);
+  z-index: 0;
+  pointer-events: none;
 }
 
 #appCanvas {
+  z-index: 1;
   position: absolute;
   left: 0;
   top: 0;
   width: var(--canvas-w);
   height: var(--canvas-h);
-  background: #fff;
+  background: transparent;
   overflow: hidden;
   transform-origin: 0 0;
 }
@@ -68,7 +75,8 @@ body {
   top: 0;
   width: var(--canvas-w);
   height: var(--header-h);
-  background: var(--blue);
+  background: transparent !important;
+  z-index: 2;
 }
 
 .hamburger {
@@ -88,7 +96,7 @@ body {
   height: 6px;
   margin: 0 0 10px 0;
   border-radius: 999px;
-  background: #fff;
+  background: transparent;
 }
 
 .header-datetime {

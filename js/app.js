@@ -25,10 +25,9 @@
     canvas.style.left = left + "px";
     canvas.style.top = top + "px";
     canvas.style.transform = "scale(" + scale + ")";
-
-    var stage = document.getElementById("fitStage");
-    if (stage) {
-      stage.style.setProperty("--band-h", Math.ceil(106 * scale) + "px");
+    var band = document.getElementById("topBand");
+    if (band) {
+      band.style.setProperty("--band-h", Math.ceil(BASE_H ? 106 * scale : 106) + "px");
     }
   }
 
