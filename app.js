@@ -1,1 +1,1 @@
-window.addEventListener("DOMContentLoaded",()=>{window.AppTimeline.render();window.AppDays.render();window.AppDetail.render();window.AppStatus.render();});
+window.addEventListener("DOMContentLoaded",function(){window.AppTimeline.render();window.AppDays.render();window.AppDetail.render();window.AppStatus.render();});

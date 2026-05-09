@@ -1,14 +1,1 @@
-(function(){
-function render(){
-const root=document.getElementById("daysRoot"),data=window.CARE_TAXI_DATA.days;root.innerHTML="";
-const row=document.createElement("div");row.className="daysRow";
-data.forEach(day=>{
-const card=document.createElement("div");card.className="dayCard";
-card.innerHTML=`<div class="dayDate ${day.danger?"danger":""}">${day.date}</div><div class="dayInfo ${day.danger?"danger":""}"><div>案件数 ${day.cases}件</div><div>調整数 ${day.adjust}件</div></div>`;
-if((day.actions||[]).length){const actions=document.createElement("div");actions.className="dayActions";day.actions.forEach(a=>{const b=document.createElement("div");b.className=`dayAction ${a.type}`;b.textContent=a.label;actions.appendChild(b)});card.appendChild(actions)}
-row.appendChild(card)
-});
-root.appendChild(row)
-}
-window.AppDays={render};
-})();
+(function(){function render(){const root=document.getElementById("daysRoot"),data=window.CARE_TAXI_DATA.days;root.innerHTML="";const row=document.createElement("div");row.className="daysRow";data.forEach(day=>{const card=document.createElement("div");card.className="dayCard";card.innerHTML='<div class="dayDate '+(day.danger?'danger':'')+'">'+day.date+'</div><div class="dayInfo '+(day.danger?'danger':'')+'"><div>案件数 '+day.cases+'件</div><div>調整数 '+day.adjust+'件</div></div>';if((day.actions||[]).length){const actions=document.createElement("div");actions.className="dayActions";day.actions.forEach(a=>{const b=document.createElement("div");b.className='dayAction '+a.type;b.textContent=a.label;actions.appendChild(b)});card.appendChild(actions)}row.appendChild(card)});root.appendChild(row)}window.AppDays={render};})();
