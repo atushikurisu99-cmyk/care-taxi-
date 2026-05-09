@@ -1,1 +1,1 @@
-console.log("CARE TAXI TRACE READY");
+window.addEventListener("DOMContentLoaded",()=>{window.AppTimeline.render();window.AppDays.render();window.AppDetail.render();window.AppStatus.render();});

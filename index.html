@@ -1,77 +1,45 @@
-
 <!DOCTYPE html>
 <html lang="ja">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CARE TAXI</title>
-
+<title>CARE TAXI TRACE</title>
 <link rel="stylesheet" href="style.css">
-
+<script defer src="data.js"></script>
 <script defer src="timeline.js"></script>
 <script defer src="days.js"></script>
 <script defer src="detail.js"></script>
 <script defer src="status.js"></script>
 <script defer src="app.js"></script>
 </head>
-
 <body>
-
 <div id="app">
+  <div class="screen">
+    <header class="topbar">
+      <button class="hamburger" aria-label="menu"><span></span><span></span><span></span></button>
+      <div class="clock">5/10（日） 05:14</div>
+      <button class="reserveButton">＋予約登録</button>
+      <button class="mapButton">MAP</button>
+    </header>
 
-  <div class="main">
+    <main class="mainGrid">
+      <section class="leftPanel">
+        <div class="sectionLabel locationLabel">LOCATION</div>
+        <div id="timelineRoot" class="timelineFrame"></div>
 
-    <div class="top-bar">
+        <div class="sectionLabel daysLabel">DAYS</div>
+        <div id="daysRoot" class="daysFrame"></div>
+      </section>
 
-      <div class="top-date">
-        5/10（日） 05:14
-      </div>
+      <aside class="rightPanel">
+        <div class="sectionLabel detailLabel">DETAIL</div>
+        <div id="detailRoot" class="detailFrame"></div>
 
-      <div class="reserve-btn">
-        ＋予約登録
-      </div>
-
-    </div>
-
-    <div class="content">
-
-      <div class="left">
-
-        <div class="section-title">LOCATION</div>
-
-        <div id="timeline-root" class="location"></div>
-
-        <div class="days">
-
-          <div class="section-title">DAYS</div>
-
-          <div id="days-root" class="days-row"></div>
-
-        </div>
-
-      </div>
-
-      <div class="right">
-
-        <div class="section-title">DETAIL</div>
-
-        <div id="detail-root" class="detail"></div>
-
-        <div class="status">
-
-          <div class="section-title">STATUS</div>
-
-          <div id="status-root"></div>
-
-        </div>
-
-      </div>
-
-    </div>
-
+        <div class="sectionLabel statusLabel">STATUS</div>
+        <div id="statusRoot" class="statusFrame"></div>
+      </aside>
+    </main>
   </div>
-
 </div>
-
 </body>
 </html>
