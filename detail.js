@@ -1,0 +1,1 @@
+window.addEventListener("DOMContentLoaded",()=>{document.getElementById("detail-root").innerHTML=`<div class="detail-line">時間</div><div class="detail-line">患者名</div><div class="detail-line">出発 → 到着</div><div class="detail-line">担当</div><div class="detail-line">状態</div><div class="detail-line">特記</div>`;});

@@ -2,156 +2,66 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
-<title>CARE TAXI UI</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>CARE TAXI</title>
+
 <link rel="stylesheet" href="style.css">
+
+<script defer src="timeline.js"></script>
+<script defer src="days.js"></script>
+<script defer src="detail.js"></script>
+<script defer src="status.js"></script>
+<script defer src="app.js"></script>
 </head>
+
 <body>
 
 <div id="app">
 
-  <div class="main-shell">
+  <div class="main">
 
     <div class="top-bar">
-      <div class="top-date">5/10（日） 05:14</div>
-      <div class="reserve-btn">＋予約登録</div>
+
+      <div class="top-date">
+        5/10（日） 05:14
+      </div>
+
+      <div class="reserve-btn">
+        ＋予約登録
+      </div>
+
     </div>
 
     <div class="content">
 
-      <div class="left-area">
+      <div class="left">
 
-        <div class="location-title">LOCATION</div>
+        <div class="section-title">LOCATION</div>
 
-        <div class="timeline-wrap">
-          <div class="timeline-scroll">
+        <div id="timeline-root" class="location"></div>
 
-            <div class="timeline">
+        <div class="days">
 
-              <div class="grid"></div>
+          <div class="section-title">DAYS</div>
 
-              <div class="job" style="left:170px;top:36px;width:80px;">
-                <div>田中様</div>
-                <div class="job-small">向かい中</div>
-              </div>
-
-              <div class="job" style="left:170px;top:76px;width:80px;">
-                <div>佐藤様</div>
-                <div class="job-small">搬送中</div>
-              </div>
-
-              <div class="job" style="left:170px;top:116px;width:80px;">
-                <div>山田様</div>
-                <div class="job-small">終了</div>
-              </div>
-
-              <div class="now-line"></div>
-
-            </div>
-
-          </div>
-        </div>
-
-        <div class="days-area">
-
-          <div class="days-title">DAYS</div>
-
-          <div class="days-row">
-
-            <div class="day-card">
-              <div class="day-date">4/29</div>
-              <div class="day-info">
-                <div>案件数 8件</div>
-                <div>調整数 8件</div>
-              </div>
-            </div>
-
-            <div class="day-card">
-              <div class="day-date">4/30</div>
-              <div class="day-info">
-                <div>案件数 8件</div>
-                <div>調整数 7件</div>
-              </div>
-            </div>
-
-            <div class="day-card">
-              <div class="day-date">5/1</div>
-              <div class="day-info">
-                <div>案件数 8件</div>
-                <div>調整数 8件</div>
-              </div>
-            </div>
-
-            <div class="day-card">
-              <div class="day-date">5/2</div>
-              <div class="day-info">
-                <div>案件数 8件</div>
-                <div>調整数 7件</div>
-              </div>
-            </div>
-
-            <div class="day-card">
-              <div class="day-date">5/3</div>
-              <div class="day-info">
-                <div>案件数 8件</div>
-                <div>調整数 8件</div>
-              </div>
-
-              <div class="day-actions">
-                <div class="action-blue">請求書発行</div>
-                <div class="action-yellow">支払い</div>
-                <div class="action-yellow">支払い</div>
-              </div>
-            </div>
-
-            <div class="day-card">
-              <div class="day-date red">5/4</div>
-              <div class="day-info red">
-                <div>案件数 7件</div>
-                <div>調整数 7件</div>
-              </div>
-
-              <div class="day-actions">
-                <div class="action-yellow">支払い</div>
-              </div>
-            </div>
-
-            <div class="day-card">
-              <div class="day-date">5/5</div>
-              <div class="day-info">
-                <div>案件数 8件</div>
-                <div>調整数 8件</div>
-              </div>
-            </div>
-
-          </div>
+          <div id="days-root" class="days-row"></div>
 
         </div>
 
       </div>
 
-      <div class="right-area">
+      <div class="right">
 
-        <div class="detail-title">DETAIL</div>
+        <div class="section-title">DETAIL</div>
 
-        <div class="detail-box">
-          <div class="detail-line">時間</div>
-          <div class="detail-line">患者名</div>
-          <div class="detail-line">出発 → 到着</div>
-          <div class="detail-line">担当</div>
-          <div class="detail-line">状態</div>
-          <div class="detail-line">特記</div>
-        </div>
+        <div id="detail-root" class="detail"></div>
 
-        <div class="status-area">
+        <div class="status">
 
-          <div class="status-title">STATUS</div>
+          <div class="section-title">STATUS</div>
 
-          <div class="status-row"><span>協力業者 A</span><span>待機</span></div>
-          <div class="status-row"><span>協力業者 B</span><span>向かい中</span></div>
-          <div class="status-row"><span>協力業者 C</span><span>搬送中</span></div>
-          <div class="status-row"><span>協力業者 D</span><span>終了</span></div>
+          <div id="status-root"></div>
 
         </div>
 
@@ -163,6 +73,5 @@
 
 </div>
 
-<script src="script.js"></script>
 </body>
 </html>
