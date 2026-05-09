@@ -3,43 +3,168 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CARE TAXI TRACE</title>
+<title>CARE TAXI PDF TRACE</title>
 <link rel="stylesheet" href="style.css">
-<script defer src="data.js"></script>
-<script defer src="timeline.js"></script>
-<script defer src="days.js"></script>
-<script defer src="detail.js"></script>
-<script defer src="status.js"></script>
-<script defer src="app.js"></script>
 </head>
 <body>
-<div id="app">
-  <div class="screen">
-    <header class="topbar">
-      <button class="hamburger" aria-label="menu"><span></span><span></span><span></span></button>
+<div id="stage">
+  <div id="canvas">
+
+    <div class="topbar">
+      <div class="hamburger"><span></span><span></span><span></span></div>
       <div class="clock">5/10（日） 05:14</div>
-      <button class="reserveButton">＋予約登録</button>
-      <button class="mapButton">MAP</button>
-    </header>
+      <div class="reserve">＋予約登録</div>
+    </div>
 
-    <main class="mainGrid">
-      <section class="leftPanel">
-        <div class="sectionLabel locationLabel">LOCATION</div>
-        <div id="timelineRoot" class="timelineFrame"></div>
+    <div class="section-title location-title">LOCATION</div>
+    <div class="section-title detail-title">DETAIL</div>
 
-        <div class="sectionLabel daysLabel">DAYS</div>
-        <div id="daysRoot" class="daysFrame"></div>
-      </section>
+    <div class="timeline-box">
+      <div class="timeline-scroll">
+        <div class="timeline-inner">
 
-      <aside class="rightPanel">
-        <div class="sectionLabel detailLabel">DETAIL</div>
-        <div id="detailRoot" class="detailFrame"></div>
+          <div class="name-head">担当者</div>
 
-        <div class="sectionLabel statusLabel">STATUS</div>
-        <div id="statusRoot" class="statusFrame"></div>
-      </aside>
-    </main>
+          <div class="time-label" style="left:100px;">7:00</div>
+          <div class="time-label" style="left:160px;">8:00</div>
+          <div class="time-label" style="left:220px;">9:00</div>
+          <div class="time-label" style="left:280px;">10:00</div>
+          <div class="time-label" style="left:340px;">11:00</div>
+          <div class="time-label" style="left:400px;">12:00</div>
+          <div class="time-label" style="left:460px;">13:00</div>
+          <div class="time-label" style="left:520px;">14:00</div>
+          <div class="time-label" style="left:580px;">15:00</div>
+          <div class="time-label" style="left:640px;">16:00</div>
+          <div class="time-label" style="left:700px;">17:00</div>
+          <div class="time-label" style="left:760px;">18:00</div>
+          <div class="time-label" style="left:820px;">19:00</div>
+
+          <div class="vendor" style="top:39px;">協力業者 A</div>
+          <div class="vendor" style="top:79px;">協力業者 B</div>
+          <div class="vendor" style="top:119px;">協力業者 C</div>
+          <div class="vendor" style="top:159px;">協力業者 D</div>
+          <div class="vendor" style="top:199px;">協力業者 E</div>
+          <div class="vendor" style="top:239px;">協力業者 F</div>
+          <div class="vendor" style="top:279px;">協力業者 G</div>
+
+          <div class="grid">
+            <div class="hline" style="top:0px;"></div>
+            <div class="hline" style="top:40px;"></div>
+            <div class="hline" style="top:80px;"></div>
+            <div class="hline" style="top:120px;"></div>
+            <div class="hline" style="top:160px;"></div>
+            <div class="hline" style="top:200px;"></div>
+            <div class="hline" style="top:240px;"></div>
+            <div class="hline" style="top:280px;"></div>
+
+            <div class="vline major" style="left:0px;"></div>
+            <div class="vline half" style="left:30px;"></div>
+            <div class="vline major" style="left:60px;"></div>
+            <div class="vline half" style="left:90px;"></div>
+            <div class="vline major" style="left:120px;"></div>
+            <div class="vline half" style="left:150px;"></div>
+            <div class="vline major" style="left:180px;"></div>
+            <div class="vline half" style="left:210px;"></div>
+            <div class="vline major" style="left:240px;"></div>
+            <div class="vline half" style="left:270px;"></div>
+            <div class="vline major" style="left:300px;"></div>
+            <div class="vline half" style="left:330px;"></div>
+            <div class="vline major" style="left:360px;"></div>
+            <div class="vline half" style="left:390px;"></div>
+            <div class="vline major" style="left:420px;"></div>
+            <div class="vline half" style="left:450px;"></div>
+            <div class="vline major" style="left:480px;"></div>
+            <div class="vline half" style="left:510px;"></div>
+            <div class="vline major" style="left:540px;"></div>
+            <div class="vline half" style="left:570px;"></div>
+            <div class="vline major" style="left:600px;"></div>
+            <div class="vline half" style="left:630px;"></div>
+            <div class="vline major" style="left:660px;"></div>
+            <div class="vline half" style="left:690px;"></div>
+            <div class="vline major" style="left:720px;"></div>
+            <div class="vline half" style="left:750px;"></div>
+            <div class="vline major" style="left:780px;"></div>
+          </div>
+
+          <div class="job" style="left:190px;top:40px;width:95px;">
+            <div class="job-name">田中様</div>
+            <div class="job-sub">向かい中</div>
+          </div>
+          <div class="job" style="left:190px;top:80px;width:95px;">
+            <div class="job-name">佐藤様</div>
+            <div class="job-sub">搬送中</div>
+          </div>
+          <div class="job" style="left:190px;top:120px;width:95px;">
+            <div class="job-name">山田様</div>
+            <div class="job-sub">終了</div>
+          </div>
+
+          <div class="now-line" style="left:420px;"></div>
+
+        </div>
+      </div>
+    </div>
+
+    <div class="detail-lines">
+      <div>時間</div>
+      <div>患者名</div>
+      <div>出発 → 到着</div>
+      <div>担当</div>
+      <div>状態</div>
+      <div>特記</div>
+      <div>ーーー</div>
+    </div>
+
+    <div class="section-title days-title">DAYS</div>
+    <div class="days-row">
+      <div class="day-card">
+        <div class="day-date">4/29</div>
+        <div class="day-info">案件数 8件<br>調整数 8件</div>
+      </div>
+      <div class="day-card">
+        <div class="day-date">4/30</div>
+        <div class="day-info">案件数 8件<br>調整数 7件</div>
+      </div>
+      <div class="day-card">
+        <div class="day-date">5/1</div>
+        <div class="day-info">案件数 8件<br>調整数 8件</div>
+      </div>
+      <div class="day-card">
+        <div class="day-date">5/2</div>
+        <div class="day-info">案件数 8件<br>調整数 7件</div>
+      </div>
+      <div class="day-card">
+        <div class="day-date">5/3</div>
+        <div class="day-info">案件数 8件<br>調整数 8件</div>
+        <div class="action blue">請求書発行</div>
+        <div class="action yellow">支払い</div>
+        <div class="action yellow">支払い</div>
+      </div>
+      <div class="day-card">
+        <div class="day-date red">5/4</div>
+        <div class="day-info red">案件数 7件<br>調整数 7件</div>
+        <div class="action yellow">支払い</div>
+      </div>
+      <div class="day-card">
+        <div class="day-date">5/5</div>
+        <div class="day-info">案件数 8件<br>調整数 8件</div>
+      </div>
+    </div>
+
+    <div class="section-title status-title">STATUS</div>
+    <div class="status-list">
+      <div><span>協力業者 A</span><span>待機</span></div>
+      <div><span>協力業者 B</span><span>向かい中</span></div>
+      <div><span>協力業者 C</span><span>搬送中</span></div>
+      <div><span>協力業者 D</span><span>終了</span></div>
+      <div><span>協力業者 E</span><span>終了</span></div>
+      <div><span>協力業者 F</span><span>終了</span></div>
+      <div><span>協力業者 G</span><span>終了</span></div>
+    </div>
+
   </div>
 </div>
+
+<script src="scale.js"></script>
 </body>
 </html>
