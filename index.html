@@ -1,54 +1,76 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="ja">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
-<title>CARE TAXI TRACE V5</title>
-<link rel="stylesheet" href="style.css">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<title>CARE TAXI TRACE V7</title>
+<link rel="stylesheet" href="./css/app.css" />
 </head>
 <body>
-<div id="app">
-  <div class="topbar">
-    <button class="hamburger"><span></span><span></span><span></span></button>
-    <div class="clock">5/10（日） 05:14</div>
-    <button class="reserve">＋予約登録</button>
-  </div>
+<div id="viewport">
+  <main id="app" aria-label="介護タクシー管理アプリ トレースUI">
+    <div class="abs header"></div>
+    <div class="abs hamburger" aria-hidden="true"><i></i><i></i><i></i></div>
+    <div class="abs date-time">5/10（日） 05:14</div>
+    <button class="abs reserve">＋予約登録</button>
 
-  <main class="body">
-    <section class="left">
-      <div class="label locationLabel">LOCATION</div>
-      <div class="timeline">
-        <div class="nameHead">担当者</div>
-        <div class="time t7">7:00</div><div class="time t8">8:00</div><div class="time t9">9:00</div><div class="time t10">10:00</div><div class="time t11">11:00</div><div class="time t12">12:00</div><div class="time t13">13:00</div><div class="time t14">14:00</div><div class="time t15">15:00</div><div class="time t16">16:00</div>
-        <div class="grid">
-          <div class="rowName r0">協力業者 A</div><div class="rowName r1">協力業者 B</div><div class="rowName r2">協力業者 C</div><div class="rowName r3">協力業者 D</div><div class="rowName r4">協力業者 E</div><div class="rowName r5">協力業者 F</div><div class="rowName r6">協力業者 G</div>
-          <div class="job"><div class="jname j1">田中様</div><div class="jstat s1">向かい中</div><div class="jname j2">佐藤様</div><div class="jstat s2">搬送中</div><div class="jname j3">山田様</div><div class="jstat s3">終了</div></div>
-          <div class="now"></div>
-        </div>
+    <div class="abs label location-label">LOCATION</div>
+    <div class="abs label detail-label">DETAIL</div>
+    <div class="abs label days-label">DAYS</div>
+    <div class="abs label status-label">STATUS</div>
+
+    <section class="abs timeline-wrap">
+      <div class="timeline-head">
+        <span class="staff">担当者</span>
+        <span class="time-label" style="left:22.8%">7:00</span>
+        <span class="time-label" style="left:32.4%">8:00</span>
+        <span class="time-label" style="left:42.0%">9:00</span>
+        <span class="time-label" style="left:51.6%">10:00</span>
+        <span class="time-label" style="left:61.2%">11:00</span>
+        <span class="time-label" style="left:70.8%">12:00</span>
+        <span class="time-label" style="left:80.4%">13:00</span>
+        <span class="time-label" style="left:90.0%">14:00</span>
+        <span class="time-label" style="left:99.5%">15:00</span>
       </div>
-      <div class="locationLine"></div>
-      <div class="label daysLabel">DAYS</div>
-      <div class="days">
-        <div class="card"><div class="date">4/29</div><div class="info">案件数 8件<br>調整数 8件</div></div>
-        <div class="card"><div class="date">4/30</div><div class="info">案件数 8件<br>調整数 7件</div></div>
-        <div class="card"><div class="date">5/1</div><div class="info">案件数 8件<br>調整数 8件</div></div>
-        <div class="card"><div class="date">5/2</div><div class="info">案件数 8件<br>調整数 7件</div></div>
-        <div class="card"><div class="date">5/3</div><div class="info">案件数 8件<br>調整数 8件</div><div class="acts"><div class="act blue">請求書発行</div><div class="act yellow">支払い</div><div class="act yellow">支払い</div></div></div>
-        <div class="card"><div class="date red">5/4</div><div class="info red">案件数 7件<br>調整数 7件</div><div class="acts"><div class="act yellow">支払い</div></div></div>
-        <div class="card"><div class="date">5/5</div><div class="info">案件数 8件<br>調整数 8件</div></div>
+      <div class="grid">
+        <span class="vline" style="left:9.6%"></span><span class="vline" style="left:19.2%"></span><span class="vline" style="left:28.8%"></span><span class="vline" style="left:38.4%"></span><span class="vline" style="left:48.0%"></span><span class="vline" style="left:57.6%"></span><span class="vline" style="left:67.2%"></span><span class="vline" style="left:76.8%"></span><span class="vline" style="left:86.4%"></span><span class="vline" style="left:96.0%"></span>
+        <span class="hline" style="top:12.1%"></span><span class="hline" style="top:24.2%"></span><span class="hline" style="top:36.3%"></span><span class="hline" style="top:48.4%"></span><span class="hline" style="top:60.5%"></span><span class="hline" style="top:72.6%"></span><span class="hline" style="top:84.7%"></span><span class="hline" style="top:96.8%"></span>
+        <span class="now"></span>
       </div>
+      <div class="staff-name r0">協力業者 A</div><div class="staff-name r1">協力業者 B</div><div class="staff-name r2">協力業者 C</div><div class="staff-name r3">協力業者 D</div><div class="staff-name r4">協力業者 E</div><div class="staff-name r5">協力業者 F</div><div class="staff-name r6">協力業者 G</div>
+      <div class="job" style="left:35.0%; top:8.9%;">田中様<span class="small">向かい中</span></div>
+      <div class="job" style="left:35.0%; top:21.0%;">佐藤様<span class="small">搬送中</span></div>
+      <div class="job" style="left:35.0%; top:33.1%;">山田様<span class="small">終了</span></div>
+      <div class="scrollbar"><span class="scroll-arrow left">◀</span><span class="scroll-thumb"></span><span class="scroll-arrow right">▶</span></div>
     </section>
 
-    <aside class="right">
-      <div class="label detailLabel">DETAIL</div>
-      <div class="detail"><div>時間</div><div>患者名</div><div>出発 → 到着</div><div>担当</div><div>状態</div><div>特記</div><div>ーーー</div></div>
-      <div class="rightLine"></div>
-      <div class="label statusLabel">STATUS</div>
-      <div class="status">
-        <div><span>協力業者 A</span><span>待機</span></div><div><span>協力業者 B</span><span>向かい中</span></div><div><span>協力業者 C</span><span>向かい中</span></div><div><span>協力業者 D</span><span>搬送中</span></div><div><span>協力業者 E</span><span>終了</span></div><div><span>協力業者 F</span><span>終了</span></div><div><span>協力業者 G</span><span>終了</span></div>
-      </div>
-    </aside>
+    <section class="abs detail-panel">
+      <div>時間</div><div>患者名</div><div>出発 → 到着</div><div>担当</div><div>状態</div><div>特記</div><div class="line">ーーー</div>
+    </section>
+
+    <div class="abs upper-bottom-line"></div>
+
+    <section class="abs days">
+      <div class="day-card"><div class="date">4/29</div><div>案件数 8件</div><div>調整数 8件</div></div>
+      <div class="day-card"><div class="date">4/30</div><div>案件数 8件</div><div>調整数 7件</div></div>
+      <div class="day-card"><div class="date">5/1</div><div>案件数 8件</div><div>調整数 8件</div></div>
+      <div class="day-card"><div class="date">5/2</div><div>案件数 8件</div><div>調整数 7件</div></div>
+      <div class="day-card"><div class="date">5/3</div><div>案件数 8件</div><div>調整数 8件</div><span class="tag">請求書発行</span><span class="tag blank">.</span></div>
+      <div class="day-card"><div class="date">5/4</div><div>案件数 7件</div><div class="tag red">調整数 7件</div><span class="tag yellow">支払い</span></div>
+      <div class="day-card"><div class="date">5/5</div><div>案件数 8件</div><div>調整数 8件</div></div>
+    </section>
+
+    <section class="abs status">
+      <div>協力業者 A</div><div>待機</div>
+      <div>協力業者 B</div><div>向かい中</div>
+      <div>協力業者 C</div><div>向かい中</div>
+      <div>協力業者 D</div><div>搬送中</div>
+      <div>協力業者 E</div><div>終了</div>
+      <div>協力業者 F</div><div>終了</div>
+      <div>協力業者 G</div><div>終了</div>
+    </section>
   </main>
 </div>
+<script src="./js/app.js"></script>
 </body>
 </html>
