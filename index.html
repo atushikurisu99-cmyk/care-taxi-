@@ -3,160 +3,163 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title>CARE TAXI PDF TRACE</title>
+<title>CARE TAXI TRACE V4</title>
 <link rel="stylesheet" href="style.css">
+<script defer src="scale.js"></script>
 </head>
 <body>
-<div id="stage">
-  <div id="canvas">
+<div id="stageWrap">
+  <div id="stage">
 
     <div class="topbar">
-      <div class="hamburger"><span></span><span></span><span></span></div>
+      <button class="hamburger" aria-label="menu"><span></span><span></span><span></span></button>
       <div class="clock">5/10（日） 05:14</div>
-      <div class="reserve">＋予約登録</div>
+      <button class="reserve">＋予約登録</button>
     </div>
 
-    <div class="section-title location-title">LOCATION</div>
-    <div class="section-title detail-title">DETAIL</div>
+    <div class="rightBorder"></div>
 
-    <div class="timeline-box">
-      <div class="timeline-scroll">
-        <div class="timeline-inner">
+    <div class="label locationLabel">LOCATION</div>
+    <div class="label detailLabel">DETAIL</div>
 
-          <div class="name-head">担当者</div>
+    <div class="timelineViewport">
+      <div class="timelineCanvas">
 
-          <div class="time-label" style="left:100px;">7:00</div>
-          <div class="time-label" style="left:160px;">8:00</div>
-          <div class="time-label" style="left:220px;">9:00</div>
-          <div class="time-label" style="left:280px;">10:00</div>
-          <div class="time-label" style="left:340px;">11:00</div>
-          <div class="time-label" style="left:400px;">12:00</div>
-          <div class="time-label" style="left:460px;">13:00</div>
-          <div class="time-label" style="left:520px;">14:00</div>
-          <div class="time-label" style="left:580px;">15:00</div>
-          <div class="time-label" style="left:640px;">16:00</div>
-          <div class="time-label" style="left:700px;">17:00</div>
-          <div class="time-label" style="left:760px;">18:00</div>
-          <div class="time-label" style="left:820px;">19:00</div>
+        <div class="timeHeader">
+          <div class="nameHead">担当者</div>
+          <div class="timeLabel" style="left:135px;">7:00</div>
+          <div class="timeLabel" style="left:217px;">8:00</div>
+          <div class="timeLabel" style="left:299px;">9:00</div>
+          <div class="timeLabel" style="left:381px;">10:00</div>
+          <div class="timeLabel" style="left:463px;">11:00</div>
+          <div class="timeLabel" style="left:545px;">12:00</div>
+          <div class="timeLabel" style="left:627px;">13:00</div>
+          <div class="timeLabel" style="left:709px;">14:00</div>
+          <div class="timeLabel" style="left:791px;">15:00</div>
+          <div class="timeLabel" style="left:873px;">16:00</div>
+          <div class="timeLabel" style="left:955px;">17:00</div>
+          <div class="timeLabel" style="left:1037px;">18:00</div>
+        </div>
 
-          <div class="vendor" style="top:39px;">協力業者 A</div>
-          <div class="vendor" style="top:79px;">協力業者 B</div>
-          <div class="vendor" style="top:119px;">協力業者 C</div>
-          <div class="vendor" style="top:159px;">協力業者 D</div>
-          <div class="vendor" style="top:199px;">協力業者 E</div>
-          <div class="vendor" style="top:239px;">協力業者 F</div>
-          <div class="vendor" style="top:279px;">協力業者 G</div>
+        <div class="grid">
+          <div class="rowName" style="top:0;">協力業者 A</div>
+          <div class="rowName" style="top:50px;">協力業者 B</div>
+          <div class="rowName" style="top:100px;">協力業者 C</div>
+          <div class="rowName" style="top:150px;">協力業者 D</div>
+          <div class="rowName" style="top:200px;">協力業者 E</div>
+          <div class="rowName" style="top:250px;">協力業者 F</div>
+          <div class="rowName" style="top:300px;">協力業者 G</div>
 
-          <div class="grid">
-            <div class="hline" style="top:0px;"></div>
-            <div class="hline" style="top:40px;"></div>
-            <div class="hline" style="top:80px;"></div>
-            <div class="hline" style="top:120px;"></div>
-            <div class="hline" style="top:160px;"></div>
-            <div class="hline" style="top:200px;"></div>
-            <div class="hline" style="top:240px;"></div>
-            <div class="hline" style="top:280px;"></div>
+          <div class="hLine" style="top:0;"></div>
+          <div class="hLine" style="top:50px;"></div>
+          <div class="hLine" style="top:100px;"></div>
+          <div class="hLine" style="top:150px;"></div>
+          <div class="hLine" style="top:200px;"></div>
+          <div class="hLine" style="top:250px;"></div>
+          <div class="hLine" style="top:300px;"></div>
+          <div class="hLine" style="top:350px;"></div>
 
-            <div class="vline major" style="left:0px;"></div>
-            <div class="vline half" style="left:30px;"></div>
-            <div class="vline major" style="left:60px;"></div>
-            <div class="vline half" style="left:90px;"></div>
-            <div class="vline major" style="left:120px;"></div>
-            <div class="vline half" style="left:150px;"></div>
-            <div class="vline major" style="left:180px;"></div>
-            <div class="vline half" style="left:210px;"></div>
-            <div class="vline major" style="left:240px;"></div>
-            <div class="vline half" style="left:270px;"></div>
-            <div class="vline major" style="left:300px;"></div>
-            <div class="vline half" style="left:330px;"></div>
-            <div class="vline major" style="left:360px;"></div>
-            <div class="vline half" style="left:390px;"></div>
-            <div class="vline major" style="left:420px;"></div>
-            <div class="vline half" style="left:450px;"></div>
-            <div class="vline major" style="left:480px;"></div>
-            <div class="vline half" style="left:510px;"></div>
-            <div class="vline major" style="left:540px;"></div>
-            <div class="vline half" style="left:570px;"></div>
-            <div class="vline major" style="left:600px;"></div>
-            <div class="vline half" style="left:630px;"></div>
-            <div class="vline major" style="left:660px;"></div>
-            <div class="vline half" style="left:690px;"></div>
-            <div class="vline major" style="left:720px;"></div>
-            <div class="vline half" style="left:750px;"></div>
-            <div class="vline major" style="left:780px;"></div>
+          <!-- full hour lines -->
+          <div class="vLine main" style="left:135px;"></div>
+          <div class="vLine main" style="left:217px;"></div>
+          <div class="vLine main" style="left:299px;"></div>
+          <div class="vLine main" style="left:381px;"></div>
+          <div class="vLine main" style="left:463px;"></div>
+          <div class="vLine main" style="left:545px;"></div>
+          <div class="vLine main" style="left:627px;"></div>
+          <div class="vLine main" style="left:709px;"></div>
+          <div class="vLine main" style="left:791px;"></div>
+          <div class="vLine main" style="left:873px;"></div>
+          <div class="vLine main" style="left:955px;"></div>
+          <div class="vLine main" style="left:1037px;"></div>
+
+          <!-- half hour lines -->
+          <div class="vLine half" style="left:176px;"></div>
+          <div class="vLine half" style="left:258px;"></div>
+          <div class="vLine half" style="left:340px;"></div>
+          <div class="vLine half" style="left:422px;"></div>
+          <div class="vLine half" style="left:504px;"></div>
+          <div class="vLine half" style="left:586px;"></div>
+          <div class="vLine half" style="left:668px;"></div>
+          <div class="vLine half" style="left:750px;"></div>
+          <div class="vLine half" style="left:832px;"></div>
+          <div class="vLine half" style="left:914px;"></div>
+          <div class="vLine half" style="left:996px;"></div>
+          <div class="vLine half" style="left:1078px;"></div>
+
+          <div class="jobBlock tall" style="left:299px;top:0;width:124px;height:150px;">
+            <div class="jobText" style="top:10px;left:10px;">田中様</div>
+            <div class="jobSub" style="top:54px;right:10px;">向かい中</div>
+            <div class="jobText" style="top:60px;left:10px;">佐藤様</div>
+            <div class="jobSub" style="top:104px;right:10px;">搬送中</div>
+            <div class="jobText" style="top:110px;left:10px;">山田様</div>
+            <div class="jobSub" style="top:134px;right:10px;">終了</div>
           </div>
 
-          <div class="job" style="left:190px;top:40px;width:95px;">
-            <div class="job-name">田中様</div>
-            <div class="job-sub">向かい中</div>
-          </div>
-          <div class="job" style="left:190px;top:80px;width:95px;">
-            <div class="job-name">佐藤様</div>
-            <div class="job-sub">搬送中</div>
-          </div>
-          <div class="job" style="left:190px;top:120px;width:95px;">
-            <div class="job-name">山田様</div>
-            <div class="job-sub">終了</div>
-          </div>
-
-          <div class="now-line" style="left:420px;"></div>
-
+          <div class="nowLine" style="left:586px;"></div>
         </div>
       </div>
     </div>
 
-    <div class="detail-lines">
+    <div class="locationBottomLine"></div>
+
+    <div class="detailText">
       <div>時間</div>
       <div>患者名</div>
       <div>出発 → 到着</div>
       <div>担当</div>
       <div>状態</div>
       <div>特記</div>
-      <div>ーーー</div>
+      <div class="dash">ーーー</div>
     </div>
 
-    <div class="section-title days-title">DAYS</div>
-    <div class="days-row">
-      <div class="day-card">
-        <div class="day-date">4/29</div>
-        <div class="day-info">案件数 8件<br>調整数 8件</div>
+    <div class="label daysLabel">DAYS</div>
+
+    <div class="daysArea">
+      <div class="dayCard">
+        <div class="dayDate">4/29</div>
+        <div class="dayInfo"><div>案件数 8件</div><div>調整数 8件</div></div>
       </div>
-      <div class="day-card">
-        <div class="day-date">4/30</div>
-        <div class="day-info">案件数 8件<br>調整数 7件</div>
+      <div class="dayCard">
+        <div class="dayDate">4/30</div>
+        <div class="dayInfo"><div>案件数 8件</div><div>調整数 7件</div></div>
       </div>
-      <div class="day-card">
-        <div class="day-date">5/1</div>
-        <div class="day-info">案件数 8件<br>調整数 8件</div>
+      <div class="dayCard">
+        <div class="dayDate">5/1</div>
+        <div class="dayInfo"><div>案件数 8件</div><div>調整数 8件</div></div>
       </div>
-      <div class="day-card">
-        <div class="day-date">5/2</div>
-        <div class="day-info">案件数 8件<br>調整数 7件</div>
+      <div class="dayCard">
+        <div class="dayDate">5/2</div>
+        <div class="dayInfo"><div>案件数 8件</div><div>調整数 7件</div></div>
       </div>
-      <div class="day-card">
-        <div class="day-date">5/3</div>
-        <div class="day-info">案件数 8件<br>調整数 8件</div>
-        <div class="action blue">請求書発行</div>
-        <div class="action yellow">支払い</div>
-        <div class="action yellow">支払い</div>
+      <div class="dayCard">
+        <div class="dayDate">5/3</div>
+        <div class="dayInfo"><div>案件数 8件</div><div>調整数 8件</div></div>
+        <div class="actions">
+          <div class="action invoice">請求書発行</div>
+          <div class="action pay">支払い</div>
+          <div class="action pay">支払い</div>
+        </div>
       </div>
-      <div class="day-card">
-        <div class="day-date red">5/4</div>
-        <div class="day-info red">案件数 7件<br>調整数 7件</div>
-        <div class="action yellow">支払い</div>
+      <div class="dayCard">
+        <div class="dayDate red">5/4</div>
+        <div class="dayInfo red"><div>案件数 8件</div><div>調整数 7件</div></div>
+        <div class="actions">
+          <div class="action pay">支払い</div>
+        </div>
       </div>
-      <div class="day-card">
-        <div class="day-date">5/5</div>
-        <div class="day-info">案件数 8件<br>調整数 8件</div>
+      <div class="dayCard">
+        <div class="dayDate">5/5</div>
+        <div class="dayInfo"><div>案件数 8件</div><div>調整数 8件</div></div>
       </div>
     </div>
 
-    <div class="section-title status-title">STATUS</div>
-    <div class="status-list">
+    <div class="label statusLabel">STATUS</div>
+    <div class="statusArea">
       <div><span>協力業者 A</span><span>待機</span></div>
       <div><span>協力業者 B</span><span>向かい中</span></div>
-      <div><span>協力業者 C</span><span>搬送中</span></div>
-      <div><span>協力業者 D</span><span>終了</span></div>
+      <div><span>協力業者 C</span><span>向かい中</span></div>
+      <div><span>協力業者 D</span><span>搬送中</span></div>
       <div><span>協力業者 E</span><span>終了</span></div>
       <div><span>協力業者 F</span><span>終了</span></div>
       <div><span>協力業者 G</span><span>終了</span></div>
@@ -164,7 +167,5 @@
 
   </div>
 </div>
-
-<script src="scale.js"></script>
 </body>
 </html>
