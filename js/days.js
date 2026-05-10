@@ -1,1 +1,1 @@
-window.AppDays={render:function(root){root.innerHTML='<div class="day-cards">'+window.AppData.days.map(function(d){return '<article class="day-card"><b>'+d.date+'</b><p>'+d.jobs+'</p><p class="'+(d.adjustClass||'')+'">'+d.adjust+'</p>'+d.tags.map(function(t){return '<div class="tag-line"><span class="tag '+t.type+'">'+(t.text||'&nbsp;')+'</span></div>';}).join('')+'</article>';}).join('')+'</div>';}};
+window.CareTaxiDays={};

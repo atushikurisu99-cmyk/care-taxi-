@@ -1,14 +1,4 @@
-CARE TAXI TRACE V11
-
-アップロード対象:
-- index.html
-- css/app.css
-- css/styles.css
-- js/data.js
-- js/timeline.js
-- js/days.js
-- js/app.js
-
-index.html は css/app.css と js フォルダ内の各JSを読み込みます。
-GitHub上で css/app.css と js/app.js が存在している状態なら動きます。
-古い表示が残る場合は Ctrl + F5 で更新してください。
+CARE TAXI TRACE V12
+PDF基準のトレース修正版。
+DAYSカード高さ、タグ段、DETAILのL字境界を反映。
+GitHub Pagesでは index.html / css/app.css / js/app.js 等を同じ構成でアップロードしてください。
