@@ -17,8 +17,15 @@
     const parts = String(t || '00:00').split(':').map(Number);
     return (parts[0] || 0) * 60 + (parts[1] || 0);
   }
-  function xFromTime(t){ return ((minutes(t) - START_MIN) / 60) * HOUR_W; }
-  function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
+
+  function xFromTime(t){
+    return ((minutes(t) - START_MIN) / 60) * HOUR_W;
+  }
+
+  function clamp(n,min,max){
+    return Math.max(min, Math.min(max, n));
+  }
+
   function safeText(value){
     return String(value == null ? '' : value)
       .replace(/&/g,'&amp;')
@@ -28,7 +35,7 @@
       .replace(/'/g,'&#039;');
   }
 
-  function lockPageBelowHeader(){
+  function lockPage(){
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overscrollBehavior = 'none';
@@ -37,24 +44,23 @@
     document.body.style.inset = '0';
     document.body.style.width = '100%';
     document.body.style.height = '100%';
-
-    if(!window.__careTaxiTouchLock){
-      window.__careTaxiTouchLock = true;
-      document.addEventListener('touchmove', function(e){
-        const inLocation = e.target && e.target.closest && e.target.closest('.location-grid-viewport');
-        if(!inLocation){ e.preventDefault(); }
-      }, {passive:false});
-    }
   }
 
   function render(root,data){
     if(!root) return;
+
     root.innerHTML = '';
-    lockPageBelowHeader();
+    lockPage();
 
     const contractors = data.contractors || [];
     const jobs = data.jobs || [];
     const totalH = Math.max(ROW_VIEW_H, contractors.length * LANE_H);
+
+    const maxLeft = Math.max(0, GRID_W - GRID_VIEW_W);
+    const maxTop = Math.max(0, totalH - ROW_VIEW_H);
+
+    let viewLeft = 0;
+    let viewTop = 0;
 
     const board = document.createElement('div');
     board.className = 'location-board';
@@ -65,6 +71,7 @@
 
     const timeHead = document.createElement('div');
     timeHead.className = 'location-time-head';
+
     const timeInner = document.createElement('div');
     timeInner.className = 'location-time-inner';
     timeInner.style.width = GRID_W + 'px';
@@ -76,27 +83,36 @@
       label.style.left = xFromTime(String(h).padStart(2,'0') + ':00') + 'px';
       timeInner.appendChild(label);
     }
+
     timeHead.appendChild(timeInner);
 
     const nameViewport = document.createElement('div');
     nameViewport.className = 'location-name-viewport';
+
     const nameInner = document.createElement('div');
     nameInner.className = 'location-name-inner';
     nameInner.style.height = totalH + 'px';
+
     contractors.forEach(c=>{
       const row = document.createElement('div');
       row.className = 'location-name-row';
       row.textContent = c.name;
       nameInner.appendChild(row);
     });
+
     nameViewport.appendChild(nameInner);
 
     const gridViewport = document.createElement('div');
     gridViewport.className = 'location-grid-viewport';
+    gridViewport.style.overflow = 'hidden';
+    gridViewport.style.touchAction = 'none';
+    gridViewport.style.overscrollBehavior = 'contain';
+
     const gridInner = document.createElement('div');
     gridInner.className = 'location-grid-inner';
     gridInner.style.width = GRID_W + 'px';
     gridInner.style.height = totalH + 'px';
+    gridInner.style.willChange = 'transform';
 
     const gridBg = document.createElement('div');
     gridBg.className = 'location-grid-bg';
@@ -113,29 +129,40 @@
     jobs.forEach(j=>{
       const rowIndex = contractors.findIndex(c => c.id === j.contractorId);
       if(rowIndex < 0) return;
+
       const left = clamp(xFromTime(j.start), 0, GRID_W);
       const endX = clamp(xFromTime(j.end), 0, GRID_W);
       const width = Math.max(54, endX - left);
+
       const job = document.createElement('div');
       job.className = 'location-job ' + (j.type || '');
       job.style.left = left + 'px';
       job.style.top = (rowIndex * LANE_H + 6) + 'px';
       job.style.width = width + 'px';
-      job.innerHTML = '<b>' + safeText(j.patient) + '</b><span>' + safeText(j.status) + '</span>';
+      job.innerHTML =
+        '<b>' + safeText(j.patient) + '</b>' +
+        '<span>' + safeText(j.status) + '</span>';
+
       gridInner.appendChild(job);
     });
+
     gridViewport.appendChild(gridInner);
 
     const lineViewport = document.createElement('div');
     lineViewport.className = 'location-row-lines-viewport';
+
     const lineInner = document.createElement('div');
     lineInner.className = 'location-row-lines-inner';
     lineInner.style.height = totalH + 'px';
+
     lineViewport.appendChild(lineInner);
 
     const bar = document.createElement('div');
     bar.className = 'location-scrollbar';
-    bar.innerHTML = '<div class="location-scroll-thumb"></div><div class="location-scroll-arrow">▶</div>';
+    bar.innerHTML =
+      '<div class="location-scroll-thumb"></div>' +
+      '<div class="location-scroll-arrow">▶</div>';
+
     const thumb = bar.querySelector('.location-scroll-thumb');
 
     board.appendChild(corner);
@@ -146,85 +173,129 @@
     board.appendChild(bar);
     root.appendChild(board);
 
-    let lockAxis = null;
     let pointerActive = false;
+    let lockAxis = null;
     let startX = 0;
     let startY = 0;
     let startLeft = 0;
     let startTop = 0;
-    let snapping = false;
+    let snapTimer = null;
 
-    function sync(){
-      timeInner.style.transform = 'translateX(' + (-gridViewport.scrollLeft) + 'px)';
-      nameInner.style.transform = 'translateY(' + (-gridViewport.scrollTop) + 'px)';
-      lineInner.style.transform = 'translateY(' + (-gridViewport.scrollTop) + 'px)';
+    function apply(){
+      gridInner.style.transform =
+        'translate(' + (-viewLeft) + 'px,' + (-viewTop) + 'px)';
 
-      const maxScroll = Math.max(1, GRID_W - GRID_VIEW_W);
-      const ratio = gridViewport.scrollLeft / maxScroll;
+      timeInner.style.transform =
+        'translateX(' + (-viewLeft) + 'px)';
+
+      nameInner.style.transform =
+        'translateY(' + (-viewTop) + 'px)';
+
+      lineInner.style.transform =
+        'translateY(' + (-viewTop) + 'px)';
+
+      const ratio = maxLeft <= 0 ? 0 : viewLeft / maxLeft;
       const thumbW = Math.max(60, (GRID_VIEW_W / GRID_W) * GRID_VIEW_W);
       const maxThumb = GRID_VIEW_W - thumbW - 2;
+
       thumb.style.width = thumbW + 'px';
       thumb.style.left = clamp(ratio * maxThumb, 0, maxThumb) + 'px';
     }
 
-    function snap(){
-      if(pointerActive || snapping) return;
-      snapping = true;
-      const targetTop = Math.round(gridViewport.scrollTop / LANE_H) * LANE_H;
-      const targetLeft = Math.round(gridViewport.scrollLeft / HALF_HOUR_W) * HALF_HOUR_W;
-      gridViewport.scrollTo({ left: targetLeft, top: targetTop, behavior: 'smooth' });
-      window.setTimeout(()=>{ snapping = false; sync(); }, 180);
+    function setView(left, top){
+      viewLeft = clamp(left, 0, maxLeft);
+      viewTop = clamp(top, 0, maxTop);
+      apply();
     }
 
-    gridViewport.addEventListener('scroll', sync, {passive:true});
+    function snap(axis){
+      let targetLeft = viewLeft;
+      let targetTop = viewTop;
+
+      if(axis === 'x'){
+        targetLeft = Math.round(viewLeft / HALF_HOUR_W) * HALF_HOUR_W;
+      }
+
+      if(axis === 'y'){
+        targetTop = Math.round(viewTop / LANE_H) * LANE_H;
+      }
+
+      setView(targetLeft, targetTop);
+    }
+
     gridViewport.addEventListener('pointerdown', e=>{
       pointerActive = true;
       lockAxis = null;
+
       startX = e.clientX;
       startY = e.clientY;
-      startLeft = gridViewport.scrollLeft;
-      startTop = gridViewport.scrollTop;
-      if(gridViewport.setPointerCapture) gridViewport.setPointerCapture(e.pointerId);
-    });
+      startLeft = viewLeft;
+      startTop = viewTop;
+
+      if(gridViewport.setPointerCapture){
+        gridViewport.setPointerCapture(e.pointerId);
+      }
+
+      e.preventDefault();
+    }, {passive:false});
+
     gridViewport.addEventListener('pointermove', e=>{
       if(!pointerActive) return;
+
       const dx = e.clientX - startX;
       const dy = e.clientY - startY;
+
       if(!lockAxis && Math.max(Math.abs(dx), Math.abs(dy)) > 8){
         lockAxis = Math.abs(dx) >= Math.abs(dy) ? 'x' : 'y';
       }
+
       if(lockAxis === 'x'){
-        e.preventDefault();
-        gridViewport.scrollLeft = startLeft - dx;
-        gridViewport.scrollTop = startTop;
-      }else if(lockAxis === 'y'){
-        e.preventDefault();
-        gridViewport.scrollTop = startTop - dy;
-        gridViewport.scrollLeft = startLeft;
+        setView(startLeft - dx, startTop);
       }
+
+      if(lockAxis === 'y'){
+        setView(startLeft, startTop - dy);
+      }
+
+      e.preventDefault();
     }, {passive:false});
+
     function endPointer(){
       if(!pointerActive) return;
+
+      const axis = lockAxis || 'y';
+
       pointerActive = false;
       lockAxis = null;
-      snap();
+
+      snap(axis);
     }
+
     gridViewport.addEventListener('pointerup', endPointer);
     gridViewport.addEventListener('pointercancel', endPointer);
     gridViewport.addEventListener('lostpointercapture', endPointer);
+
     gridViewport.addEventListener('wheel', e=>{
-      const horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey;
       e.preventDefault();
-      if(horizontal){ gridViewport.scrollLeft += e.deltaX || e.deltaY; }
-      else{ gridViewport.scrollTop += e.deltaY; }
-      window.clearTimeout(gridViewport._snapTimer);
-      gridViewport._snapTimer = window.setTimeout(snap, 140);
+
+      const horizontal =
+        Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey;
+
+      if(horizontal){
+        setView(viewLeft + (e.deltaX || e.deltaY), viewTop);
+      }else{
+        setView(viewLeft, viewTop + e.deltaY);
+      }
+
+      window.clearTimeout(snapTimer);
+      snapTimer = window.setTimeout(()=>{
+        snap(horizontal ? 'x' : 'y');
+      }, 140);
     }, {passive:false});
 
-    gridViewport.scrollLeft = 0;
-    gridViewport.scrollTop = 0;
-    sync();
+    setView(0,0);
   }
 
   window.CareTaxiLocation = { render };
+
 })();
