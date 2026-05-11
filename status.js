@@ -1,1 +1,0 @@
-(function(){function render(){const root=document.getElementById("statusRoot");root.innerHTML="";window.CARE_TAXI_DATA.status.forEach(([n,s])=>{const row=document.createElement("div");row.className="statusRow";row.innerHTML='<span class="statusName">'+n+'</span><span>'+s+'</span>';root.appendChild(row)})}window.AppStatus={render};})();
