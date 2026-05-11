@@ -1,3 +1,13 @@
+/* LOCATION PATCH v17.5
+   差し替え対象: js/location.js
+
+   - LOCATION内だけをJS制御でスクロール
+   - body固定はしない
+   - 縦横同時スクロールを禁止
+   - 6:30開始、数字は7:00から
+   - 業者名・時間・横線を本体スクロールに同期
+*/
+
 (function(){
   const START_MIN = 6 * 60 + 30;
   const END_MIN = 20 * 60;
@@ -35,22 +45,18 @@
       .replace(/'/g,'&#039;');
   }
 
-  function lockPage(){
+  function lockPageSoft(){
     document.documentElement.style.overflow = 'hidden';
     document.body.style.overflow = 'hidden';
     document.documentElement.style.overscrollBehavior = 'none';
     document.body.style.overscrollBehavior = 'none';
-    document.body.style.position = 'fixed';
-    document.body.style.inset = '0';
-    document.body.style.width = '100%';
-    document.body.style.height = '100%';
   }
 
   function render(root,data){
     if(!root) return;
 
     root.innerHTML = '';
-    lockPage();
+    lockPageSoft();
 
     const contractors = data.contractors || [];
     const jobs = data.jobs || [];
@@ -104,15 +110,11 @@
 
     const gridViewport = document.createElement('div');
     gridViewport.className = 'location-grid-viewport';
-    gridViewport.style.overflow = 'hidden';
-    gridViewport.style.touchAction = 'none';
-    gridViewport.style.overscrollBehavior = 'contain';
 
     const gridInner = document.createElement('div');
     gridInner.className = 'location-grid-inner';
     gridInner.style.width = GRID_W + 'px';
     gridInner.style.height = totalH + 'px';
-    gridInner.style.willChange = 'transform';
 
     const gridBg = document.createElement('div');
     gridBg.className = 'location-grid-bg';
@@ -183,16 +185,16 @@
 
     function apply(){
       gridInner.style.transform =
-        'translate(' + (-viewLeft) + 'px,' + (-viewTop) + 'px)';
+        'translate3d(' + (-viewLeft) + 'px,' + (-viewTop) + 'px,0)';
 
       timeInner.style.transform =
-        'translateX(' + (-viewLeft) + 'px)';
+        'translate3d(' + (-viewLeft) + 'px,0,0)';
 
       nameInner.style.transform =
-        'translateY(' + (-viewTop) + 'px)';
+        'translate3d(0,' + (-viewTop) + 'px,0)';
 
       lineInner.style.transform =
-        'translateY(' + (-viewTop) + 'px)';
+        'translate3d(0,' + (-viewTop) + 'px,0)';
 
       const ratio = maxLeft <= 0 ? 0 : viewLeft / maxLeft;
       const thumbW = Math.max(60, (GRID_VIEW_W / GRID_W) * GRID_VIEW_W);
@@ -223,6 +225,11 @@
       setView(targetLeft, targetTop);
     }
 
+    function stopNative(e){
+      e.preventDefault();
+      e.stopPropagation();
+    }
+
     gridViewport.addEventListener('pointerdown', e=>{
       pointerActive = true;
       lockAxis = null;
@@ -236,7 +243,7 @@
         gridViewport.setPointerCapture(e.pointerId);
       }
 
-      e.preventDefault();
+      stopNative(e);
     }, {passive:false});
 
     gridViewport.addEventListener('pointermove', e=>{
@@ -257,27 +264,29 @@
         setView(startLeft, startTop - dy);
       }
 
-      e.preventDefault();
+      stopNative(e);
     }, {passive:false});
 
-    function endPointer(){
+    function endPointer(e){
       if(!pointerActive) return;
 
-      const axis = lockAxis || 'y';
+      const axis = lockAxis || 'x';
 
       pointerActive = false;
       lockAxis = null;
 
       snap(axis);
+
+      if(e){
+        stopNative(e);
+      }
     }
 
-    gridViewport.addEventListener('pointerup', endPointer);
-    gridViewport.addEventListener('pointercancel', endPointer);
-    gridViewport.addEventListener('lostpointercapture', endPointer);
+    gridViewport.addEventListener('pointerup', endPointer, {passive:false});
+    gridViewport.addEventListener('pointercancel', endPointer, {passive:false});
+    gridViewport.addEventListener('lostpointercapture', endPointer, {passive:false});
 
     gridViewport.addEventListener('wheel', e=>{
-      e.preventDefault();
-
       const horizontal =
         Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey;
 
@@ -291,7 +300,12 @@
       snapTimer = window.setTimeout(()=>{
         snap(horizontal ? 'x' : 'y');
       }, 140);
+
+      stopNative(e);
     }, {passive:false});
+
+    gridViewport.addEventListener('touchstart', stopNative, {passive:false});
+    gridViewport.addEventListener('touchmove', stopNative, {passive:false});
 
     setView(0,0);
   }
