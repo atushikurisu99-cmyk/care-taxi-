@@ -304,9 +304,6 @@
       stopNative(e);
     }, {passive:false});
 
-    gridViewport.addEventListener('touchstart', stopNative, {passive:false});
-    gridViewport.addEventListener('touchmove', stopNative, {passive:false});
-
     setView(0,0);
   }
 
