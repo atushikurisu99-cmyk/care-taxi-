@@ -19,7 +19,6 @@
   }
   function xFromTime(t){ return ((minutes(t) - START_MIN) / 60) * HOUR_W; }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
-
   function safeText(value){
     return String(value == null ? '' : value)
       .replace(/&/g,'&amp;')
@@ -29,9 +28,29 @@
       .replace(/'/g,'&#039;');
   }
 
+  function lockPageBelowHeader(){
+    document.documentElement.style.overflow = 'hidden';
+    document.body.style.overflow = 'hidden';
+    document.documentElement.style.overscrollBehavior = 'none';
+    document.body.style.overscrollBehavior = 'none';
+    document.body.style.position = 'fixed';
+    document.body.style.inset = '0';
+    document.body.style.width = '100%';
+    document.body.style.height = '100%';
+
+    if(!window.__careTaxiTouchLock){
+      window.__careTaxiTouchLock = true;
+      document.addEventListener('touchmove', function(e){
+        const inLocation = e.target && e.target.closest && e.target.closest('.location-grid-viewport');
+        if(!inLocation){ e.preventDefault(); }
+      }, {passive:false});
+    }
+  }
+
   function render(root,data){
     if(!root) return;
     root.innerHTML = '';
+    lockPageBelowHeader();
 
     const contractors = data.contractors || [];
     const jobs = data.jobs || [];
@@ -107,6 +126,13 @@
     });
     gridViewport.appendChild(gridInner);
 
+    const lineViewport = document.createElement('div');
+    lineViewport.className = 'location-row-lines-viewport';
+    const lineInner = document.createElement('div');
+    lineInner.className = 'location-row-lines-inner';
+    lineInner.style.height = totalH + 'px';
+    lineViewport.appendChild(lineInner);
+
     const bar = document.createElement('div');
     bar.className = 'location-scrollbar';
     bar.innerHTML = '<div class="location-scroll-thumb"></div><div class="location-scroll-arrow">▶</div>';
@@ -116,6 +142,7 @@
     board.appendChild(timeHead);
     board.appendChild(nameViewport);
     board.appendChild(gridViewport);
+    board.appendChild(lineViewport);
     board.appendChild(bar);
     root.appendChild(board);
 
@@ -130,6 +157,8 @@
     function sync(){
       timeInner.style.transform = 'translateX(' + (-gridViewport.scrollLeft) + 'px)';
       nameInner.style.transform = 'translateY(' + (-gridViewport.scrollTop) + 'px)';
+      lineInner.style.transform = 'translateY(' + (-gridViewport.scrollTop) + 'px)';
+
       const maxScroll = Math.max(1, GRID_W - GRID_VIEW_W);
       const ratio = gridViewport.scrollLeft / maxScroll;
       const thumbW = Math.max(60, (GRID_VIEW_W / GRID_W) * GRID_VIEW_W);
@@ -191,6 +220,9 @@
       window.clearTimeout(gridViewport._snapTimer);
       gridViewport._snapTimer = window.setTimeout(snap, 140);
     }, {passive:false});
+
+    gridViewport.scrollLeft = 0;
+    gridViewport.scrollTop = 0;
     sync();
   }
 
