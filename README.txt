@@ -1,16 +1,24 @@
-CARE TAXI TRACE V15 LANE FIX
+CARE TAXI TRACE V16 MODULAR
 
-V14からの順次修正版です。
+方針:
+- 青帯、縮尺、見切れ防止、ピンチ拡大防止は共通管理。
+- 4エリアの座標は css/layout.css に固定。
+- グレー破線などの設計ガイドは実画面には描写しない。
+- LOCATION / DETAIL / DAYS / STATUS はそれぞれ独立ファイルで管理。
+- 今後は1エリアだけ修正しても他エリアを壊さない構成。
 
-修正点:
-- LOCATIONの案件ブロックを各業者レーン内に完全に収めるため、lane-rowをoverflow:hidden化し、案件高さ・上下位置をレーン基準で再調整。
-- 協力業者名列にも偶数行背景を付け、右側レーンと視覚的に同期。
-- iPadでのピンチ拡大・ダブルタップ拡大を抑制。
-- DAYSカードをflex左寄せから7列gridへ変更し、DAYSエリア内で均等配置。
-- DAYSカード高さを微調整し、タグ段の位置も固定。
-
-全体構造:
-- 青帯固定。
-- メインUI全体構造はV13/V14の固定思想を維持。
-- LOCATION高さは現状維持。
-- 10〜15業者はLOCATION内縦スクロールで表示。
+構成:
+index.html
+css/base.css      共通初期化・青帯
+css/layout.css    4エリア骨格・座標
+css/location.css  LOCATION内部
+css/detail.css    DETAIL内部
+css/days.css      DAYS内部
+css/status.css    STATUS内部
+js/data.js        表示データ
+js/scale.js       縮尺・見切れ・iPad拡大防止
+js/location.js    LOCATION描画
+js/detail.js      DETAIL描画
+js/days.js        DAYS描画
+js/status.js      STATUS描画
+js/app.js         起動処理
