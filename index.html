@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="mobile-web-app-capable" content="yes" />
+  <title>CARE TAXI TRACE V16 MODULAR</title>
+  <link rel="stylesheet" href="css/base.css" />
+  <link rel="stylesheet" href="css/layout.css" />
+  <link rel="stylesheet" href="css/location.css" />
+  <link rel="stylesheet" href="css/detail.css" />
+  <link rel="stylesheet" href="css/days.css" />
+  <link rel="stylesheet" href="css/status.css" />
+</head>
+<body>
+  <header class="app-header" aria-label="上部バー">
+    <div class="header-inner">
+      <button class="hamburger" aria-label="menu"><span></span><span></span><span></span></button>
+      <div class="datetime" id="datetime">5/10（日） 05:14</div>
+      <button class="reserve-btn" type="button">＋予約登録</button>
+    </div>
+  </header>
+
+  <main class="app-viewport" aria-label="介護タクシー管理アプリ">
+    <section class="stage-holder" id="stageHolder">
+      <section class="stage" id="stage">
+        <section class="area area-location" aria-label="LOCATION">
+          <h2 class="area-title">LOCATION</h2>
+          <div id="locationRoot" class="area-content location-content"></div>
+        </section>
+
+        <aside class="area area-detail" aria-label="DETAIL">
+          <h2 class="area-title">DETAIL</h2>
+          <div id="detailRoot" class="area-content detail-content"></div>
+        </aside>
+
+        <section class="area area-days" aria-label="DAYS">
+          <h2 class="area-title">DAYS</h2>
+          <div id="daysRoot" class="area-content days-content"></div>
+        </section>
+
+        <section class="area area-status" aria-label="STATUS">
+          <h2 class="area-title">STATUS</h2>
+          <div id="statusRoot" class="area-content status-content"></div>
+        </section>
+
+        <div class="detail-leg" aria-hidden="true"></div>
+        <div class="status-top-line" aria-hidden="true"></div>
+      </section>
+    </section>
+  </main>
+
+  <script src="js/data.js"></script>
+  <script src="js/scale.js"></script>
+  <script src="js/location.js"></script>
+  <script src="js/detail.js"></script>
+  <script src="js/days.js"></script>
+  <script src="js/status.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>
