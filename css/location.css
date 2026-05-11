@@ -1,27 +1,29 @@
-/* LOCATION PATCH v17.4
+/* LOCATION PATCH v17.5
    差し替え対象: css/location.css
+
    - LOCATION内だけを修正
    - 業者名列〜時間グリッドまで、横線を1本でつなぐ
    - 6:30開始線を維持。数字は7:00から
-   - 5業者表示・縦横ロック・画面全体固定を維持
+   - 5業者表示を維持
+   - 縦横スクロールはJS制御
+   - body固定を廃止して青帯下のガクガクを防止
 */
+
 .location-content{
   top:32px;
   bottom:auto;
   height:294px;
   overflow:hidden;
   background:#fff;
+  overscroll-behavior:none;
 }
-html,body{
+
+html,
+body{
   overscroll-behavior:none;
   -webkit-overflow-scrolling:auto;
 }
-body{
-  position:fixed;
-  inset:0;
-  width:100%;
-  height:100%;
-}
+
 .location-board{
   --name-w:132px;
   --head-h:27px;
@@ -32,6 +34,7 @@ body{
   --hour-w:72px;
   --half-hour-w:36px;
   --scrollbar-h:14px;
+
   position:relative;
   width:612px;
   height:294px;
@@ -41,7 +44,9 @@ body{
   user-select:none;
   -webkit-user-select:none;
   touch-action:none;
+  overscroll-behavior:none;
 }
+
 .location-corner{
   position:absolute;
   left:0;
@@ -56,7 +61,9 @@ body{
   font-size:11px;
   font-weight:900;
   border-bottom:1px solid var(--grid-strong,#bdbdbd);
+  pointer-events:none;
 }
+
 .location-time-head{
   position:absolute;
   left:var(--name-w);
@@ -67,12 +74,15 @@ body{
   background:#fff;
   z-index:28;
   border-bottom:1px solid var(--grid-strong,#bdbdbd);
+  pointer-events:none;
 }
+
 .location-time-inner{
   position:relative;
   height:var(--head-h);
   will-change:transform;
 }
+
 .location-time-label{
   position:absolute;
   top:0;
@@ -85,6 +95,7 @@ body{
   line-height:24px;
   white-space:nowrap;
 }
+
 .location-name-viewport{
   position:absolute;
   left:0;
@@ -94,12 +105,15 @@ body{
   overflow:hidden;
   background:#fff;
   z-index:22;
+  pointer-events:none;
 }
+
 .location-name-inner{
   position:relative;
   width:var(--name-w);
   will-change:transform;
 }
+
 .location-name-row{
   width:var(--name-w);
   height:var(--lane-h);
@@ -113,35 +127,43 @@ body{
   border-bottom:0;
   overflow:hidden;
 }
+
 .location-grid-viewport{
-  overscroll-behavior:contain;
   position:absolute;
   left:var(--name-w);
   top:var(--head-h);
   width:var(--grid-view-w);
   height:var(--row-view-h);
-  overflow:auto;
+  overflow:hidden;
   scrollbar-width:none;
-  -webkit-overflow-scrolling:touch;
+  -webkit-overflow-scrolling:auto;
   touch-action:none;
+  overscroll-behavior:none;
   background:#fff;
   z-index:10;
 }
-.location-grid-viewport::-webkit-scrollbar{display:none}
+
+.location-grid-viewport::-webkit-scrollbar{
+  display:none;
+}
+
 .location-grid-inner{
   position:relative;
   background:#fff;
   min-height:var(--row-view-h);
+  will-change:transform;
 }
+
 .location-grid-bg{
   position:absolute;
   left:0;
   top:0;
   pointer-events:none;
-  border-left:1px solid var(--grid-strong,#bdbdbd); /* 6:30線 */
+  border-left:1px solid var(--grid-strong,#bdbdbd);
   box-sizing:border-box;
   background:
-    repeating-linear-gradient(to right,
+    repeating-linear-gradient(
+      to right,
       transparent 0,
       transparent calc(var(--half-hour-w) - 1px),
       var(--grid,#cfcfcf) calc(var(--half-hour-w) - 1px),
@@ -152,6 +174,7 @@ body{
       var(--grid-strong,#bdbdbd) var(--hour-w)
     );
 }
+
 .location-row-lines-viewport{
   position:absolute;
   left:0;
@@ -162,20 +185,24 @@ body{
   z-index:24;
   pointer-events:none;
 }
+
 .location-row-lines-inner{
   position:absolute;
   left:0;
   top:0;
   width:100%;
   will-change:transform;
+  pointer-events:none;
   background:
-    repeating-linear-gradient(to bottom,
+    repeating-linear-gradient(
+      to bottom,
       transparent 0,
       transparent calc(var(--lane-h) - 1px),
       var(--grid-strong,#bdbdbd) calc(var(--lane-h) - 1px),
       var(--grid-strong,#bdbdbd) var(--lane-h)
     );
 }
+
 .location-job{
   position:absolute;
   height:36px;
@@ -190,6 +217,7 @@ body{
   flex-direction:column;
   justify-content:space-between;
 }
+
 .location-job b{
   font-size:14px;
   line-height:15px;
@@ -197,6 +225,7 @@ body{
   overflow:hidden;
   text-overflow:ellipsis;
 }
+
 .location-job span{
   font-size:11px;
   line-height:12px;
@@ -206,8 +235,15 @@ body{
   text-overflow:ellipsis;
   text-align:right;
 }
-.location-job.temp{background:#d7e9ff}
-.location-job.alert{background:#ffd6dd}
+
+.location-job.temp{
+  background:#d7e9ff;
+}
+
+.location-job.alert{
+  background:#ffd6dd;
+}
+
 .location-now-line{
   position:absolute;
   top:0;
@@ -216,6 +252,7 @@ body{
   z-index:6;
   pointer-events:none;
 }
+
 .location-scrollbar{
   position:absolute;
   left:var(--name-w);
@@ -226,7 +263,9 @@ body{
   border:1px solid #d0d0d0;
   z-index:18;
   overflow:hidden;
+  pointer-events:none;
 }
+
 .location-scroll-thumb{
   position:absolute;
   left:0;
@@ -235,6 +274,7 @@ body{
   width:280px;
   background:#bdbdbd;
 }
+
 .location-scroll-arrow{
   position:absolute;
   right:4px;
