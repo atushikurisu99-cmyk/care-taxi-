@@ -1,0 +1,1 @@
+window.CareTaxiDays = window.CareTaxiDays || {};
