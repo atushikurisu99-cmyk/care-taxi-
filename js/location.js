@@ -1,14 +1,14 @@
 (function(){
-  const START_MIN = 6 * 60 + 30;   // 実グリッド開始 6:30
-  const END_MIN = 20 * 60;         // 実グリッド終了 20:00
-  const LABEL_START = 7;           // 数字表示は7:00から
-  const LABEL_END = 19;            // 数字表示は19:00まで
+  const START_MIN = 6 * 60 + 30;
+  const END_MIN = 20 * 60;
+  const LABEL_START = 7;
+  const LABEL_END = 19;
+
   const NAME_W = 132;
   const HOUR_W = 72;
   const HALF_HOUR_W = 36;
-  const LANE_H = 49;
+  const LANE_H = 48;
   const VISIBLE_LANES = 5;
-  const HEAD_H = 31;
   const GRID_VIEW_W = 480;
   const ROW_VIEW_H = LANE_H * VISIBLE_LANES;
   const GRID_W = ((END_MIN - START_MIN) / 60) * HOUR_W;
@@ -17,14 +17,20 @@
     const parts = String(t || '00:00').split(':').map(Number);
     return (parts[0] || 0) * 60 + (parts[1] || 0);
   }
-
-  function xFromTime(t){
-    return ((minutes(t) - START_MIN) / 60) * HOUR_W;
-  }
-
+  function xFromTime(t){ return ((minutes(t) - START_MIN) / 60) * HOUR_W; }
   function clamp(n,min,max){ return Math.max(min, Math.min(max, n)); }
 
+  function safeText(value){
+    return String(value == null ? '' : value)
+      .replace(/&/g,'&amp;')
+      .replace(/</g,'&lt;')
+      .replace(/>/g,'&gt;')
+      .replace(/"/g,'&quot;')
+      .replace(/'/g,'&#039;');
+  }
+
   function render(root,data){
+    if(!root) return;
     root.innerHTML = '';
 
     const contractors = data.contractors || [];
@@ -58,7 +64,6 @@
     const nameInner = document.createElement('div');
     nameInner.className = 'location-name-inner';
     nameInner.style.height = totalH + 'px';
-
     contractors.forEach(c=>{
       const row = document.createElement('div');
       row.className = 'location-name-row';
@@ -89,17 +94,17 @@
     jobs.forEach(j=>{
       const rowIndex = contractors.findIndex(c => c.id === j.contractorId);
       if(rowIndex < 0) return;
-      const left = xFromTime(j.start);
-      const width = Math.max(54, xFromTime(j.end) - xFromTime(j.start));
+      const left = clamp(xFromTime(j.start), 0, GRID_W);
+      const endX = clamp(xFromTime(j.end), 0, GRID_W);
+      const width = Math.max(54, endX - left);
       const job = document.createElement('div');
       job.className = 'location-job ' + (j.type || '');
       job.style.left = left + 'px';
       job.style.top = (rowIndex * LANE_H + 6) + 'px';
       job.style.width = width + 'px';
-      job.innerHTML = '<b>' + (j.patient || '') + '</b><span>' + (j.status || '') + '</span>';
+      job.innerHTML = '<b>' + safeText(j.patient) + '</b><span>' + safeText(j.status) + '</span>';
       gridInner.appendChild(job);
     });
-
     gridViewport.appendChild(gridInner);
 
     const bar = document.createElement('div');
@@ -125,7 +130,6 @@
     function sync(){
       timeInner.style.transform = 'translateX(' + (-gridViewport.scrollLeft) + 'px)';
       nameInner.style.transform = 'translateY(' + (-gridViewport.scrollTop) + 'px)';
-
       const maxScroll = Math.max(1, GRID_W - GRID_VIEW_W);
       const ratio = gridViewport.scrollLeft / maxScroll;
       const thumbW = Math.max(60, (GRID_VIEW_W / GRID_W) * GRID_VIEW_W);
@@ -144,7 +148,6 @@
     }
 
     gridViewport.addEventListener('scroll', sync, {passive:true});
-
     gridViewport.addEventListener('pointerdown', e=>{
       pointerActive = true;
       lockAxis = null;
@@ -152,9 +155,8 @@
       startY = e.clientY;
       startLeft = gridViewport.scrollLeft;
       startTop = gridViewport.scrollTop;
-      gridViewport.setPointerCapture && gridViewport.setPointerCapture(e.pointerId);
+      if(gridViewport.setPointerCapture) gridViewport.setPointerCapture(e.pointerId);
     });
-
     gridViewport.addEventListener('pointermove', e=>{
       if(!pointerActive) return;
       const dx = e.clientX - startX;
@@ -172,7 +174,6 @@
         gridViewport.scrollLeft = startLeft;
       }
     }, {passive:false});
-
     function endPointer(){
       if(!pointerActive) return;
       pointerActive = false;
@@ -182,19 +183,14 @@
     gridViewport.addEventListener('pointerup', endPointer);
     gridViewport.addEventListener('pointercancel', endPointer);
     gridViewport.addEventListener('lostpointercapture', endPointer);
-
     gridViewport.addEventListener('wheel', e=>{
       const horizontal = Math.abs(e.deltaX) > Math.abs(e.deltaY) || e.shiftKey;
       e.preventDefault();
-      if(horizontal){
-        gridViewport.scrollLeft += e.deltaX || e.deltaY;
-      }else{
-        gridViewport.scrollTop += e.deltaY;
-      }
+      if(horizontal){ gridViewport.scrollLeft += e.deltaX || e.deltaY; }
+      else{ gridViewport.scrollTop += e.deltaY; }
       window.clearTimeout(gridViewport._snapTimer);
       gridViewport._snapTimer = window.setTimeout(snap, 140);
     }, {passive:false});
-
     sync();
   }
 

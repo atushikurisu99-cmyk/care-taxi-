@@ -1,24 +1,27 @@
-CARE TAXI TRACE V16 MODULAR
+LOCATION受け皿固定パッチ v17.2
 
-方針:
-- 青帯、縮尺、見切れ防止、ピンチ拡大防止は共通管理。
-- 4エリアの座標は css/layout.css に固定。
-- グレー破線などの設計ガイドは実画面には描写しない。
-- LOCATION / DETAIL / DAYS / STATUS はそれぞれ独立ファイルで管理。
-- 今後は1エリアだけ修正しても他エリアを壊さない構成。
+目的:
+- LOCATIONだけを安全にJS描画へ固定する
+- 他エリアのcss/jsは触らない
 
-構成:
-index.html
-css/base.css      共通初期化・青帯
-css/layout.css    4エリア骨格・座標
-css/location.css  LOCATION内部
-css/detail.css    DETAIL内部
-css/days.css      DAYS内部
-css/status.css    STATUS内部
-js/data.js        表示データ
-js/scale.js       縮尺・見切れ・iPad拡大防止
-js/location.js    LOCATION描画
-js/detail.js      DETAIL描画
-js/days.js        DAYS描画
-js/status.js      STATUS描画
-js/app.js         起動処理
+アップロードするファイル:
+1. index.html
+2. css/location.css
+3. js/location.js
+
+注意:
+- index.htmlはLOCATION用css/jsに ?v=17_2 を付け、GitHub Pagesの古いキャッシュを避けています。
+- layout.css / detail.css / days.css / status.css は変更しません。
+
+LOCATION仕様:
+- 5業者分だけ表示
+- 6件目以降はLOCATION内で縦スクロール
+- 実時間軸は6:30〜20:00
+- 数字表示は7:00〜19:00
+- 7:00左側に30分ぶんの目盛りあり
+- 左上「担当者」固定
+- 業者名列は縦スクロールのみ連動
+- 時間ヘッダーは横スクロールのみ連動
+- グリッド本体だけ縦横可動
+- 縦横同時スクロールを抑制
+- 縦は業者行単位、横は30分単位へ軽く吸着
