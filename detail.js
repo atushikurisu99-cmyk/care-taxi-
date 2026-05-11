@@ -1,1 +1,0 @@
-(function(){function render(){const root=document.getElementById("detailRoot");root.innerHTML="";window.CARE_TAXI_DATA.detail.forEach(t=>{const line=document.createElement("div");line.className="detailLine";line.textContent=t;root.appendChild(line)})}window.AppDetail={render};})();
