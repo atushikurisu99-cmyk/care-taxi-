@@ -1,13 +1,28 @@
-/* LOCATION PATCH v17.5
+/* LOCATION PATCH v17.9
    差し替え対象: css/location.css
-
-   - LOCATION内だけを修正
-   - 業者名列〜時間グリッドまで、横線を1本でつなぐ
-   - 6:30開始線を維持。数字は7:00から
-   - 5業者表示を維持
-   - 縦横スクロールはJS制御
-   - body固定を廃止して青帯下のガクガクを防止
+   青帯より下の上下ガクガク停止込み
 */
+
+html,
+body{
+  width:100%;
+  height:100%;
+  margin:0;
+  padding:0;
+  overflow:hidden !important;
+  position:fixed;
+  inset:0;
+  overscroll-behavior:none;
+  -webkit-overflow-scrolling:auto;
+}
+
+.app-viewport,
+.stage-holder,
+.stage{
+  overflow:hidden !important;
+  overscroll-behavior:none;
+  touch-action:none;
+}
 
 .location-content{
   top:32px;
@@ -16,12 +31,7 @@
   overflow:hidden;
   background:#fff;
   overscroll-behavior:none;
-}
-
-html,
-body{
-  overscroll-behavior:none;
-  -webkit-overflow-scrolling:auto;
+  touch-action:none;
 }
 
 .location-board{
@@ -45,6 +55,11 @@ body{
   -webkit-user-select:none;
   touch-action:none;
   overscroll-behavior:none;
+  cursor:grab;
+}
+
+.location-board.is-dragging{
+  cursor:grabbing;
 }
 
 .location-corner{
@@ -141,6 +156,7 @@ body{
   overscroll-behavior:none;
   background:#fff;
   z-index:10;
+  pointer-events:none;
 }
 
 .location-grid-viewport::-webkit-scrollbar{
@@ -216,6 +232,7 @@ body{
   display:flex;
   flex-direction:column;
   justify-content:space-between;
+  pointer-events:none;
 }
 
 .location-job b{
