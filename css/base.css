@@ -1,0 +1,32 @@
+:root{
+  --blue:#0070C0;
+  --page-bg:#ffffff;
+  --ink:#222222;
+  --muted:#6d7480;
+  --line:#d9dde5;
+  --soft-line:#edf0f5;
+  --header-h:58px;
+  --outer-x:24px;
+  --outer-y:14px;
+  --gap:12px;
+  --right-w:264px;
+  --bottom-h:154px;
+  --location-title-h:28px;
+  --time-header-h:34px;
+  --person-col-w:96px;
+  --timeline-row-h:60px;
+  --timeline-half-hour-w:56px;
+  --radius:14px;
+  --days-weekday-bg:#ffffff;
+  --days-weekday-border:#C9CAFF;
+  --days-today-bg:#CDE9EE;
+  --days-today-border:#45C5E3;
+  --days-holiday-bg:#F4DEEB;
+  --days-holiday-border:#FF75A3;
+}
+
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent;}
+html,body{width:100%;height:100%;margin:0;overflow:hidden;background:var(--page-bg);color:var(--ink);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;}
+button{font:inherit;border:0;background:none;color:inherit;cursor:pointer;}
+.app-root{position:fixed;inset:0;overflow:hidden;background:#fff;}
+.no-select{user-select:none;-webkit-user-select:none;}
