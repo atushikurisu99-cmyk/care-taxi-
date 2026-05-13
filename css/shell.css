@@ -1,0 +1,15 @@
+.app-shell{
+  position:absolute;
+  left:50%;top:50%;
+  width:var(--design-w);height:var(--design-h);
+  transform:translate(-50%,-50%) scale(var(--app-scale,1));
+  transform-origin:center center;
+  overflow:hidden;background:#fff;
+}
+.app-main{position:absolute;left:0;right:0;top:var(--header-h);bottom:0;overflow:hidden;background:#fff;}
+.panel{position:absolute;min-width:0;min-height:0;background:#fff;overflow:hidden;}
+.location-panel{left:var(--content-left);top:var(--location-top);width:465px;height:280px;}
+.detail-panel{left:var(--right-x);top:var(--location-top);width:133px;height:280px;border-left:2px solid #e0e0e0;}
+.days-panel{left:var(--content-left);top:var(--bottom-top);width:465px;height:119px;}
+.status-panel{left:var(--right-x);top:var(--bottom-top);width:133px;height:119px;}
+.section-title{height:var(--title-h);display:flex;align-items:flex-start;font-size:13px;line-height:16px;letter-spacing:.01em;font-weight:900;color:var(--green);}
