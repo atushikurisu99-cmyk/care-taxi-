@@ -1,9 +1,0 @@
-/* 青帯はPDF外接幅ではなくブラウザ横いっぱい。中身は中央のPDFバランス幅に固定して載せる。 */
-.top-band{position:absolute;left:0;right:0;top:0;height:var(--header-h);background:var(--blue);color:#fff;overflow:hidden;z-index:20;}
-.top-inner{position:absolute;left:50%;top:0;width:900px;height:100%;transform:translateX(-50%) scale(var(--board-scale));transform-origin:top center;-webkit-transform:translateX(-50%) scale(var(--board-scale));-webkit-transform-origin:top center;}
-.header-sub{position:absolute;left:4px;top:3px;font-size:10px;line-height:12px;font-weight:800;opacity:.95;white-space:nowrap;}
-.menu-icon{position:absolute;left:94px;top:26px;width:28px;height:22px;}
-.menu-icon span,.menu-icon:before,.menu-icon:after{content:"";position:absolute;left:0;width:28px;height:4px;border-radius:2px;background:#fff;}
-.menu-icon:before{top:0}.menu-icon span{top:9px}.menu-icon:after{bottom:0}
-.main-clock{position:absolute;left:160px;top:24px;font-size:29px;line-height:29px;font-weight:900;letter-spacing:.045em;white-space:nowrap;}
-.add-booking{position:absolute;right:70px;top:26px;width:88px;height:34px;border-radius:5px;background:#fff;color:#0f5c98;font-size:12px;font-weight:900;box-shadow:0 1px 2px rgba(0,0,0,.18);}
