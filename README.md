@@ -700,3 +700,44 @@ LOCATIONを触る時にDAYSやDETAILを壊さない構成を守ります。
 7. ズレがあれば、CSS変数を中心に調整する
 
 最初から予約登録や設定画面まで作り込まず、まず「崩れない土台」を確定させることが重要です。
+
+---
+
+# v2 trace correction note
+
+This package was corrected from the uploaded Illustrator/PDF trace source.
+The implementation intentionally treats the white mock area as the design artboard and does not trace the outer gray Illustrator workspace.
+
+## Fixed trace basis
+
+- Design artboard: 687 x 553 logical px.
+- Header: full artboard width, 79px height.
+- LOCATION starts at x=59, y=105.
+- DETAIL starts at x=524, y=105 and is separated by a thin vertical rule.
+- DAYS starts at x=59, y=405.
+- STATUS starts at x=524, y=405.
+- DAYS is fixed to 7 cards, not 14.
+- LOCATION vendor rows are designed around the mock's visible structure, with 5 usable visible rows before vertical movement reveals the lower rows.
+- Timeline range remains 06:30–20:00 while visible labels are hour labels. Half-hour lines are drawn but not labeled.
+- Current time line is a thin red solid line.
+- The app shell scales as a single traced artboard so PC/iPad size differences do not break the internal proportions.
+
+## Important design philosophy retained
+
+- Each area remains an independent file: header / location / detail / days / status.
+- The screen itself is the UI. Do not add an extra outer frame.
+- DETAIL is display-only. Editing forms and operation buttons are not packed into DETAIL.
+- DAYS is one week / 7 cards.
+- DAYS card content is limited; overflow details go to DETAIL after tap.
+- LOCATION remains the main wide area.
+- STATUS follows LOCATION vendor order.
+- Future settings can control labels, display order, colors, status names, and notification badges without changing the screen structure.
+
+## Do not regress
+
+- Do not stretch columns independently.
+- Do not make DAYS 14 cards.
+- Do not let the header contents spread across the PC browser width.
+- Do not add the gray Illustrator workspace as part of the app UI.
+- Do not replace this with a generic sample layout.
+- Do not collapse the files into one file; this project is expansion-first.
