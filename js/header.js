@@ -1,1 +1,0 @@
-window.CareTaxiHeader={render:function(root){root.innerHTML='<header class="app-header"><div class="header-sub">2:36　6月12日(火)</div><div class="header-left"><button class="header-menu" aria-label="メニュー"><span></span></button></div><div class="header-center">5/10（日） 05:14</div><div class="header-right"><button class="header-btn">＋予約登録</button></div></header>';}};
