@@ -1,0 +1,26 @@
+.location-wrap{position:absolute;inset:0;overflow:hidden;}
+.location-board{position:absolute;left:0;right:0;top:var(--title-h);bottom:0;overflow:hidden;}
+.location-corner{position:absolute;left:0;top:0;width:var(--person-col-w);height:var(--time-header-h);background:#fff;z-index:7;border-bottom:1px solid var(--line);}
+.location-corner-label{position:absolute;left:25px;top:9px;font-size:11px;font-weight:800;}
+.location-person-viewport{position:absolute;left:0;top:var(--time-header-h);bottom:14px;width:var(--person-col-w);overflow:hidden;z-index:6;background:#fff;border-right:1px solid var(--line);}
+.location-person-strip{position:absolute;left:0;top:0;width:100%;will-change:transform;}
+.person-row{height:var(--timeline-row-h);display:flex;align-items:center;justify-content:flex-start;padding:0 8px 0 9px;border-bottom:1px solid var(--line);font-size:18px;font-weight:900;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;background:#fff;}
+.location-time-viewport{position:absolute;left:var(--person-col-w);right:0;top:0;height:var(--time-header-h);overflow:hidden;z-index:5;background:#fff;border-bottom:1px solid var(--line);}
+.location-time-strip{position:absolute;left:0;top:0;height:100%;will-change:transform;}
+.time-cell{position:absolute;top:0;height:100%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:900;color:#111;border-left:1px solid #cfcfcf;}
+.time-cell.half{border-left:1px solid #ededed;color:transparent;}
+.location-grid-viewport{position:absolute;left:var(--person-col-w);right:0;top:var(--time-header-h);bottom:14px;overflow:hidden;z-index:3;touch-action:none;background:#fff;}
+.location-scroll-canvas{position:absolute;left:0;top:0;will-change:transform;}
+.location-grid-layer,.location-booking-layer,.location-now-layer{position:absolute;left:0;top:0;}
+.location-grid-layer{z-index:1;pointer-events:none;}
+.location-booking-layer{z-index:2;pointer-events:none;}
+.location-now-layer{z-index:3;pointer-events:none;}
+.grid-vline{position:absolute;top:0;bottom:0;width:1px;background:#ededed;}
+.grid-vline.hour{background:#cfcfcf;}
+.grid-hline{position:absolute;left:0;right:0;height:1px;background:#d9d9d9;}
+.booking-band{position:absolute;height:36px;border-radius:0;border:0;background:#a9ddd3;padding:0;overflow:hidden;pointer-events:auto;box-shadow:none;}
+.booking-patient{position:absolute;left:4px;top:4px;right:4px;font-size:12px;font-weight:900;line-height:14px;color:#111;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:left;}
+.booking-status{position:absolute;right:5px;bottom:4px;left:4px;font-size:9px;font-weight:800;line-height:11px;color:#217669;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:right;}
+.now-line{position:absolute;top:0;bottom:0;width:2px;background:#ff1d25;opacity:.95;}
+.location-scrollbar{position:absolute;left:var(--person-col-w);right:0;bottom:0;height:14px;background:#efefef;border-top:1px solid #d6d6d6;z-index:8;}
+.location-scrollbar-thumb{position:absolute;top:2px;height:10px;background:#aaa;border-radius:0;}
