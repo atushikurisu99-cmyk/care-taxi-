@@ -1,0 +1,18 @@
+/*
+  PDFの薄いグレー線で示された4エリアを固定する。
+  この境界は画面には出さないが、配置基準として絶対に動かさない。
+
+  左列: LOCATION + DAYS
+  右列: DETAIL + STATUS
+  LOCATION右端 = DETAIL左端
+  DAYS右端 = STATUS左端
+  LOCATION下端 = DAYS上端
+  DETAIL下端 = STATUS上端
+*/
+.board{position:absolute;left:50%;top:var(--header-h);width:var(--board-w);height:var(--board-h);background:#fff;overflow:hidden;transform:translateX(-50%) scale(var(--board-scale));transform-origin:top center;-webkit-transform:translateX(-50%) scale(var(--board-scale));-webkit-transform-origin:top center;}
+.area{position:absolute;background:#fff;overflow:hidden;}
+/* 外接矩形。ここから中身をはみ出させない。 */
+.area-location{left:90px;top:62px;width:584px;height:294px;}
+.area-detail{left:674px;top:62px;width:160px;height:294px;border-left:2px solid #e1e1e1;}
+.area-days{left:90px;top:382px;width:584px;height:139px;}
+.area-status{left:674px;top:382px;width:160px;height:139px;}
