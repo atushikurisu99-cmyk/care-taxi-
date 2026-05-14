@@ -1,0 +1,57 @@
+.top-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: var(--top-h, 96px);
+  background: #3d7faf;
+  color: #fff;
+  overflow: hidden;
+}
+.device-info {
+  position: absolute;
+  left: calc(50% - var(--stage-w, 900px) / 2 + 8px);
+  top: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  line-height: 1;
+  white-space: nowrap;
+}
+.menu-button {
+  position: absolute;
+  left: calc(50% - var(--stage-w, 900px) / 2 + 88px);
+  top: 31px;
+  width: 52px;
+  height: 44px;
+  border: 0;
+  background: transparent;
+  color: #fff;
+  font-size: 48px;
+  line-height: 40px;
+  font-weight: 900;
+  padding: 0;
+}
+.main-time {
+  position: absolute;
+  left: calc(50% - var(--stage-w, 900px) / 2 + 190px);
+  top: 32px;
+  font-size: 34px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: .04em;
+  white-space: nowrap;
+}
+.reserve-button {
+  position: absolute;
+  right: calc(50% - var(--stage-w, 900px) / 2 + 74px);
+  top: 32px;
+  width: 102px;
+  height: 36px;
+  border-radius: 6px;
+  border: 0;
+  background: #fff;
+  color: #075f9b;
+  font-size: 13px;
+  font-weight: 800;
+  box-shadow: 0 1px 2px rgba(0,0,0,.18);
+}
