@@ -8,6 +8,15 @@
   color: #fff;
   overflow: hidden;
 }
+.top-inner {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: 900px;
+  height: 100%;
+  margin-left: -450px;
+  overflow: hidden;
+}
 .device-info {
   position: absolute;
   left: 8px;
@@ -55,9 +64,18 @@
   font-weight: 800;
   box-shadow: 0 1px 2px rgba(0,0,0,.18);
 }
-/* PCだけJSでcompact化。iPadは幅が広くても通常サイズのまま。 */
+
+/* PCだけcompact。配置基準は画面左ではなく、白本体と同じ中央900px。 */
 .pc .top-bar { height: 62px; }
 .pc .device-info { left: 8px; top: 4px; font-size: 10px; }
 .pc .menu-button { left: 88px; top: 18px; width: 40px; height: 34px; font-size: 34px; line-height: 28px; }
 .pc .main-time { left: 150px; top: 20px; font-size: 30px; }
 .pc .reserve-button { right: 74px; top: 24px; height: 34px; }
+
+@media screen and (max-width: 900px) {
+  .top-inner {
+    left: 0;
+    width: 100%;
+    margin-left: 0;
+  }
+}

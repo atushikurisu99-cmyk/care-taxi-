@@ -8,9 +8,19 @@ html, body {
   background: #e5e5e5;
   font-family: -apple-system, BlinkMacSystemFont, "Hiragino Sans", "Yu Gothic", Meiryo, sans-serif;
   color: #111;
+  overscroll-behavior: none;
+  -ms-touch-action: none;
+  touch-action: none;
+}
+html {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
 }
 body {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   right: 0;
@@ -18,11 +28,14 @@ body {
 }
 button { font-family: inherit; }
 #app {
-  position: absolute;
+  position: fixed;
   left: 0;
   top: 0;
   right: 0;
   bottom: 0;
   overflow: hidden;
   background: #e5e5e5;
+  overscroll-behavior: none;
+  -ms-touch-action: none;
+  touch-action: none;
 }

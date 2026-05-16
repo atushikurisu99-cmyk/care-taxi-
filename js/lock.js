@@ -15,18 +15,24 @@
     }
 
     window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
   }
 
   function stopPageScroll(e) {
-    /* Shell版は全体スクロール禁止。内部スクロールは後続LOCATION実装で個別に許可する。 */
+    /* Shell骨格では全体スクロール・iPadの引っ張り下げを止める。 */
     if (e && e.preventDefault) e.preventDefault();
+    return false;
   }
 
   if (document.addEventListener) {
     window.addEventListener('load', boot, false);
     window.addEventListener('resize', boot, false);
     window.addEventListener('orientationchange', function () { setTimeout(boot, 150); }, false);
-    document.addEventListener('touchmove', stopPageScroll, false);
+
+    /* iPad Safari対策：passive:false を明示しないと preventDefault が効かない場合がある。 */
+    document.addEventListener('touchmove', stopPageScroll, { passive: false });
+    document.body.addEventListener('touchmove', stopPageScroll, { passive: false });
   } else {
     window.onload = boot;
   }
