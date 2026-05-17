@@ -10,12 +10,12 @@
 }
 .stage-wrap{
   position:absolute;
-  left:50%;
+  left:0;
   top:var(--header-h);
   width:var(--stage-w);
   height:var(--stage-h);
-  transform-origin:top center;
-  transform:translateX(-50%) scale(var(--stage-scale));
+  transform-origin:top left;
+  transform:scale(var(--stage-scale));
   background:transparent;
   overflow:visible;
 }

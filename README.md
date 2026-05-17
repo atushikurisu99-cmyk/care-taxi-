@@ -10,3 +10,10 @@
 - 中身は今後、各エリア内だけ個別実装する
 
 CSS参照は GitHub Pages 対応の相対パス `./css/...`。
+
+## v23 balance adjustment
+v22をベースに、構造は維持したまま以下のみ調整。
+- 固定ステージの中央計算をJSで明示
+- header内パーツを少し左へ
+- LOCATION/DETAIL/DAYS/STATUSラベル基準を微調整
+- 青帯はfluidのまま維持

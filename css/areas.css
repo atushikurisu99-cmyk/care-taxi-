@@ -1,3 +1,14 @@
-/* 固定ステージ内の座標。外枠は今後原則動かさず、中身だけ各エリアで育てる。 */
-.location-label{left:0px;top:62px}.detail-label{left:560px;top:62px}.days-label{left:0px;top:365px}.status-label{left:560px;top:365px}
-.area-location{left:0px;top:84px;width:540px;height:260px}.area-detail{left:560px;top:84px;width:200px;height:260px}.area-days{left:0px;top:390px;width:540px;height:120px}.area-status{left:560px;top:390px;width:200px;height:120px}
+/*
+  v23: v22をベースに、外側構造は維持。
+  触ったのはラベル/エリアの基準位置だけ。
+  今後も外枠座標を確定したら、中身だけ各エリアで育てる。
+*/
+.location-label{left:0px;top:56px}
+.detail-label{left:548px;top:56px}
+.days-label{left:0px;top:345px}
+.status-label{left:548px;top:345px}
+
+.area-location{left:0px;top:80px;width:528px;height:245px}
+.area-detail{left:548px;top:80px;width:212px;height:245px}
+.area-days{left:0px;top:370px;width:528px;height:120px}
+.area-status{left:548px;top:370px;width:212px;height:120px}
