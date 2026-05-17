@@ -19,10 +19,20 @@ CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 - DAYS・STATUSは下へ移動
 - LOCATION/DETAIL/青帯/ステージ構造は触らない
 
+## v31 px area range
+- v25/v27系の完成骨格を維持
+- 外側基準を px で固定
+  - 左端：ハンバーガー左端 x=34px
+  - 右端：予約登録ボタン右端 x=696px
+  - 下端：現状DAYSカード下部 y=535px
+- LOCATION / DETAIL / DAYS / STATUS のエリア範囲を明文化
+- DAYSカードはDAYSエリア内で7枚を広く使用
+- STATUSはSTATUSエリア内に2列固定で収納
+- 外枠座標は今後原則触らず、中身だけ調整する
 
-## v33 l-right-edge-fix
-- v32をベースに維持
-- L字境界線のみ調整
-- 縦線は LOCATION右端 / DETAIL左端
-- 横線は DETAIL/STATUSエリア右端まで
-- 外枠・青帯・各ラベル座標は変更なし
+
+## v34 L字境界修正
+- v31のDAYS/STATUS内容を保持。
+- DETAIL/STATUS右側エリアのL字境界線のみ追加。
+- 横線は右エリアの右端（予約登録ボタン右端基準のcontent-right）までで停止。
+- 外枠座標・DAYSカード・STATUS内容は変更しない。
