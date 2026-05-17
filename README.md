@@ -18,3 +18,11 @@ CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 - ハンバーガー・日付・時刻は左へ移動
 - DAYS・STATUSは下へ移動
 - LOCATION/DETAIL/青帯/ステージ構造は触らない
+
+
+## v33 l-right-edge-fix
+- v32をベースに維持
+- L字境界線のみ調整
+- 縦線は LOCATION右端 / DETAIL左端
+- 横線は DETAIL/STATUSエリア右端まで
+- 外枠・青帯・各ラベル座標は変更なし

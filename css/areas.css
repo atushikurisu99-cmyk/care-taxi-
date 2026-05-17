@@ -5,11 +5,17 @@
 
 /* DETAIL / STATUS 側の境界線。
    既存の外枠座標・各エリア座標は触らず、LOCATION右端と右側エリアの境界を示す細いL字だけ追加。 */
+/* L字境界線：
+   - 縦線は LOCATION右端 / DETAIL左端 の境界
+   - 横線は DETAIL/STATUSエリアの右端まで
+   - 本番表示の補助線なので細いグレー実線のみ
+*/
 .l-boundary{
+  --boundary-x:540px;
   position:absolute;
-  left:540px;
+  left:var(--boundary-x);
   top:62px;
-  width:220px;
+  width:calc(var(--stage-w) - var(--boundary-x));
   height:318px;
   border-left:1px solid rgba(90,90,90,.55);
   border-bottom:1px solid rgba(90,90,90,.55);
