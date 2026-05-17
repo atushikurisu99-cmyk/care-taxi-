@@ -1,6 +1,64 @@
-.header-layer{left:24px;top:42px;width:812px;height:52px;background:var(--blue);color:#fff;overflow:hidden;}
-.header-date{position:absolute;left:30px;top:13px;font-size:22px;line-height:26px;font-weight:800;white-space:nowrap;}
-.header-time{position:absolute;left:176px;top:13px;font-size:22px;line-height:26px;font-weight:800;white-space:nowrap;}
-.header-button{position:absolute;top:10px;height:32px;border:0;border-radius:16px;background:#fff;color:var(--blue);font-size:15px;font-weight:800;line-height:32px;padding:0 14px;white-space:nowrap;}
-.header-booking{right:92px;}
-.header-map{right:24px;min-width:54px;}
+.header-layer {
+  position: absolute;
+  left: 110px;
+  top: 84px;
+  width: 804px;
+  height: 72px;
+  background: #3f7eaa;
+  color: #ffffff;
+  overflow: hidden;
+}
+
+.header-menu {
+  position: absolute;
+  left: 74px;
+  top: 19px;
+  width: 32px;
+  height: 32px;
+}
+
+.header-menu span {
+  display: block;
+  width: 32px;
+  height: 5px;
+  margin: 0 0 8px 0;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.header-date {
+  position: absolute;
+  left: 150px;
+  top: 20px;
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.header-time {
+  position: absolute;
+  left: 342px;
+  top: 20px;
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 0.03em;
+}
+
+.header-booking {
+  position: absolute;
+  right: 66px;
+  top: 23px;
+  width: 76px;
+  height: 30px;
+  border: 0;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #2e6792;
+  font-size: 11px;
+  line-height: 30px;
+  font-weight: 800;
+  text-align: center;
+  padding: 0;
+}
