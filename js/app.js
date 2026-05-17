@@ -1,40 +1,59 @@
-(function(){
-  var BASE_W=1024;
-  var BASE_H=768;
-  var canvas=null;
-  var lastScale='';
+(function () {
+  var DESIGN_W = 1024;
+  var DESIGN_H = 768;
+  var canvas = null;
 
-  function size(){
-    var vv=window.visualViewport;
-    var w=vv && vv.width ? vv.width : (window.innerWidth||document.documentElement.clientWidth||BASE_W);
-    var h=vv && vv.height ? vv.height : (window.innerHeight||document.documentElement.clientHeight||BASE_H);
-    return {w:w,h:h};
+  function viewportWidth() {
+    return window.innerWidth || document.documentElement.clientWidth || DESIGN_W;
   }
 
-  function fit(){
-    if(!canvas){return;}
-    var s=size();
-    var scale=Math.min(s.w/BASE_W,s.h/BASE_H)*0.965;
-    if(scale<0.35){scale=0.35;}
-    var next=String(scale);
-    if(next!==lastScale){
-      document.documentElement.style.setProperty('--app-scale',next);
-      lastScale=next;
-    }
-    window.scrollTo(0,0);
+  function viewportHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || DESIGN_H;
   }
 
-  function boot(){
-    canvas=document.getElementById('app-canvas');
-    fit();
+  function fitCanvas() {
+    if (!canvas) return;
+
+    var vw = viewportWidth();
+    var vh = viewportHeight();
+    var scaleX = vw / DESIGN_W;
+    var scaleY = vh / DESIGN_H;
+    var scale = Math.min(scaleX, scaleY);
+
+    canvas.style.transform = 'translate(-50%, -50%) scale(' + scale + ')';
   }
 
-  if(document.readyState==='loading'){
-    document.addEventListener('DOMContentLoaded',boot);
-  }else{
+  function stopScroll() {
+    window.scrollTo(0, 0);
+    document.documentElement.scrollTop = 0;
+    document.body.scrollTop = 0;
+  }
+
+  function boot() {
+    canvas = document.getElementById('app-canvas');
+    fitCanvas();
+    stopScroll();
+
+    window.addEventListener('resize', function () {
+      fitCanvas();
+      stopScroll();
+    }, false);
+
+    window.addEventListener('orientationchange', function () {
+      setTimeout(function () {
+        fitCanvas();
+        stopScroll();
+      }, 250);
+    }, false);
+
+    document.addEventListener('touchmove', function (event) {
+      event.preventDefault();
+    }, { passive: false });
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', boot, false);
+  } else {
     boot();
   }
-  window.addEventListener('resize',fit);
-  window.addEventListener('orientationchange',function(){setTimeout(fit,250);});
-  document.addEventListener('touchmove',function(e){e.preventDefault();},{passive:false});
-})();
+}());

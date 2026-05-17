@@ -2,30 +2,37 @@
 <html lang="ja">
 <head>
   <meta charset="utf-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
-  <meta name="format-detection" content="telephone=no">
-  <title>介護タクシー管理アプリ Shell v13</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+  <title>介護タクシー管理アプリ</title>
   <link rel="stylesheet" href="css/base.css">
 </head>
 <body>
-  <div id="viewport">
-    <main id="app-canvas" aria-label="介護タクシー管理アプリ">
-      <section class="top-bar" aria-label="上部バー">
-        <div class="hamburger" aria-hidden="true"><span></span><span></span><span></span></div>
+  <div id="viewport" class="viewport">
+    <main id="app-canvas" class="app-canvas" aria-label="介護タクシー管理アプリ">
+      <header class="top-bar" aria-label="上部操作エリア">
+        <button class="menu-button" type="button" aria-label="メニュー">
+          <span></span><span></span><span></span>
+        </button>
         <div class="main-date">5/10（日）</div>
         <div class="main-time">05:14</div>
-        <button class="reserve-button" type="button">＋予約登録</button>
+        <button class="booking-button" type="button">＋予約登録</button>
+      </header>
+
+      <section class="area area-location" aria-label="LOCATION">
+        <h2>LOCATION</h2>
       </section>
 
-      <div class="area-label label-location">LOCATION</div>
-      <div class="area-label label-detail">DETAIL</div>
-      <div class="area-label label-days">DAYS</div>
-      <div class="area-label label-status">STATUS</div>
+      <section class="area area-detail" aria-label="DETAIL">
+        <h2>DETAIL</h2>
+      </section>
 
-      <section id="location-area" class="area location-area" aria-label="LOCATIONエリア"></section>
-      <section id="detail-area" class="area detail-area" aria-label="DETAILエリア"></section>
-      <section id="days-area" class="area days-area" aria-label="DAYSエリア"></section>
-      <section id="status-area" class="area status-area" aria-label="STATUSエリア"></section>
+      <section class="area area-days" aria-label="DAYS">
+        <h2>DAYS</h2>
+      </section>
+
+      <section class="area area-status" aria-label="STATUS">
+        <h2>STATUS</h2>
+      </section>
     </main>
   </div>
   <script src="js/app.js"></script>
