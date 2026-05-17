@@ -8,7 +8,6 @@
   <link rel="stylesheet" href="./css/layout.css">
   <link rel="stylesheet" href="./css/header.css">
   <link rel="stylesheet" href="./css/areas.css">
-  <link rel="stylesheet" href="./css/days-status.css">
 </head>
 <body>
   <div id="app">
@@ -30,81 +29,28 @@
 
         <div class="area area-location" aria-label="LOCATIONエリア"></div>
         <div class="area area-detail" aria-label="DETAILエリア"></div>
+
         <div class="area area-days" aria-label="DAYSエリア">
           <div class="days-grid" aria-label="7日カード">
-            <article class="day-card">
-              <div class="day-date">5/10</div>
-              <div class="day-gap"></div>
-              <div class="day-line">案件 8</div>
-              <div class="day-line">調整 1</div>
-              <div class="day-notice">未請求 2</div>
-              <div class="day-notice">未入金 1</div>
-              <div class="day-notice muted">—</div>
-            </article>
-            <article class="day-card">
-              <div class="day-date">5/11</div>
-              <div class="day-gap"></div>
-              <div class="day-line">案件 6</div>
-              <div class="day-line">調整 0</div>
-              <div class="day-notice">確認 1</div>
-              <div class="day-notice muted">—</div>
-              <div class="day-notice muted">—</div>
-            </article>
-            <article class="day-card">
-              <div class="day-date">5/12</div>
-              <div class="day-gap"></div>
-              <div class="day-line">案件 9</div>
-              <div class="day-line">調整 2</div>
-              <div class="day-notice">要調整</div>
-              <div class="day-notice">請求前</div>
-              <div class="day-notice muted">—</div>
-            </article>
-            <article class="day-card">
-              <div class="day-date">5/13</div>
-              <div class="day-gap"></div>
-              <div class="day-line">案件 5</div>
-              <div class="day-line">調整 0</div>
-              <div class="day-notice muted">—</div>
-              <div class="day-notice muted">—</div>
-              <div class="day-notice muted">—</div>
-            </article>
-            <article class="day-card">
-              <div class="day-date">5/14</div>
-              <div class="day-gap"></div>
-              <div class="day-line">案件 7</div>
-              <div class="day-line">調整 1</div>
-              <div class="day-notice">未支払</div>
-              <div class="day-notice muted">—</div>
-              <div class="day-notice muted">—</div>
-            </article>
-            <article class="day-card">
-              <div class="day-date">5/15</div>
-              <div class="day-gap"></div>
-              <div class="day-line">案件 4</div>
-              <div class="day-line">調整 0</div>
-              <div class="day-notice muted">—</div>
-              <div class="day-notice muted">—</div>
-              <div class="day-notice muted">—</div>
-            </article>
-            <article class="day-card">
-              <div class="day-date">5/16</div>
-              <div class="day-gap"></div>
-              <div class="day-line">案件 3</div>
-              <div class="day-line">調整 0</div>
-              <div class="day-notice">仮予約</div>
-              <div class="day-notice muted">—</div>
-              <div class="day-notice muted">—</div>
-            </article>
+            <article class="day-card"><div class="day-date">5/10</div><div class="day-spacer"></div><div>案件 8</div><div>調整 1</div><div>未請求 2</div><div>未入金 1</div><div class="day-muted">—</div></article>
+            <article class="day-card"><div class="day-date">5/11</div><div class="day-spacer"></div><div>案件 6</div><div>調整 0</div><div>確認 1</div><div class="day-muted">—</div><div class="day-muted">—</div></article>
+            <article class="day-card"><div class="day-date">5/12</div><div class="day-spacer"></div><div>案件 9</div><div>調整 2</div><div>要調整</div><div>請求前</div><div class="day-muted">—</div></article>
+            <article class="day-card"><div class="day-date">5/13</div><div class="day-spacer"></div><div>案件 5</div><div>調整 0</div><div class="day-muted">—</div><div class="day-muted">—</div><div class="day-muted">—</div></article>
+            <article class="day-card"><div class="day-date">5/14</div><div class="day-spacer"></div><div>案件 7</div><div>調整 1</div><div>未支払</div><div class="day-muted">—</div><div class="day-muted">—</div></article>
+            <article class="day-card"><div class="day-date">5/15</div><div class="day-spacer"></div><div>案件 4</div><div>調整 0</div><div class="day-muted">—</div><div class="day-muted">—</div><div class="day-muted">—</div></article>
+            <article class="day-card"><div class="day-date">5/16</div><div class="day-spacer"></div><div>案件 3</div><div>調整 0</div><div>仮予約</div><div class="day-muted">—</div><div class="day-muted">—</div></article>
           </div>
         </div>
+
         <div class="area area-status" aria-label="STATUSエリア">
-          <div class="status-list" aria-label="搬送対応ステータス">
-            <div class="status-row"><span class="status-name">広島ケア</span><span class="status-state">待機中</span></div>
-            <div class="status-row"><span class="status-name">あおば</span><span class="status-state">向かい中</span></div>
-            <div class="status-row"><span class="status-name">みらい</span><span class="status-state">搬送中</span></div>
-            <div class="status-row"><span class="status-name">さくら</span><span class="status-state">終了</span></div>
-            <div class="status-row"><span class="status-name">ひかり</span><span class="status-state">待機中</span></div>
-            <div class="status-row"><span class="status-name">中央</span><span class="status-state">確認中</span></div>
+          <div class="status-grid" aria-label="搬送対応状況">
+            <div>広島ケア</div><div>待機中</div>
+            <div>あおば</div><div>向かい中</div>
+            <div>みらい</div><div>搬送中</div>
+            <div>さくら</div><div>終了</div>
+            <div>ひかり</div><div>待機中</div>
+            <div>中央</div><div>確認中</div>
+            <div>西部</div><div>終了</div>
           </div>
         </div>
       </section>

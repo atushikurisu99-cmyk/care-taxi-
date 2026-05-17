@@ -1,3 +1,12 @@
 /* 固定ステージ内の座標。外枠は今後原則動かさず、中身だけ各エリアで育てる。 */
 .location-label{left:0px;top:62px}.detail-label{left:635px;top:62px}.days-label{left:0px;top:390px}.status-label{left:630px;top:390px}
 .area-location{left:0px;top:84px;width:540px;height:260px}.area-detail{left:560px;top:84px;width:200px;height:260px}.area-days{left:0px;top:415px;width:540px;height:120px}.area-status{left:560px;top:415px;width:200px;height:120px}
+
+/* DAYS: エリア内だけで7枚を綺麗に収める。スクロールなし。 */
+.days-grid{width:100%;height:100%;display:grid;grid-template-columns:repeat(7,1fr);gap:7px;align-items:start;justify-items:stretch;overflow:hidden;padding:0 0 0 0}
+.day-card{height:110px;border:1.4px solid rgba(0,128,56,.34);border-radius:8px;background:#fff;color:#123122;font-size:11.5px;font-weight:800;line-height:1.18;text-align:center;padding:7px 5px 6px 5px;display:grid;grid-template-rows:17px 6px repeat(5,13px);align-content:start;overflow:hidden;white-space:nowrap}
+.day-date{font-size:15px;font-weight:900;line-height:17px;color:#123122}.day-spacer{height:6px}.day-muted{color:#b9c8c0;font-weight:900}
+
+/* STATUS: STATUSエリアから左へはみ出させない。DAYSカードのテキスト積層高に合わせる。 */
+.status-grid{width:100%;height:110px;display:grid;grid-template-columns:minmax(0,1fr) 64px;column-gap:8px;row-gap:0;align-content:start;overflow:hidden;padding:20px 8px 0 8px;color:#123122;font-size:11.5px;font-weight:800;line-height:13px;white-space:nowrap}
+.status-grid div:nth-child(odd){text-align:left;overflow:hidden;text-overflow:ellipsis}.status-grid div:nth-child(even){text-align:right;color:var(--green);overflow:hidden;text-overflow:ellipsis}
