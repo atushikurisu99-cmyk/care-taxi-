@@ -1,67 +1,81 @@
 /*
-  care-taxi-shell-v8
-  PDFの「必要部分」だけをトレースするための骨格版。
+  care-taxi-shell-v9-area-lock
 
   目的:
-  - 青帯 / LOCATION / DETAIL / DAYS / STATUS の基準線を固定する。
-  - 赤ガイド線は描かない。?guide=1 の時だけ確認用に出せる。
-  - iPadのOS表示・Safari表示はコードで描かない。
-  - 画面全体スクロールは禁止。
-  - LOCATIONの中だけ横スクロール。縦横同時スクロールを起こさない。
+  - 添付PDF「レイヤー説明.pdf」の必要部分だけをトレースする。
+  - LOCATION / DETAIL / DAYS / STATUS の4エリアを先に固定する。
+  - この段階では各エリア内の情報・線・カード・スクロールは入れない。
+
+  基準:
+  - デザイン基準サイズ: 1024px × 768px
+  - PDF上の赤破線境界を座標として固定
+  - 端末差は canvas 全体の等倍スケールで吸収
+  - 画面全体スクロールは禁止
+
+  注意:
+  - iPadのOS時刻、日付、Wi-Fi、バッテリー等は描かない。
+  - 赤破線はエリア固定確認用。通常開発では表示したまま確認する。
+  - URL末尾に ?clean=1 を付けると赤破線だけ非表示にできる。
 */
 
-* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
 
-html, body {
+html,
+body {
   margin: 0;
   padding: 0;
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: #fff;
+  background: #ffffff;
   font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", Meiryo, sans-serif;
   -webkit-text-size-adjust: 100%;
   overscroll-behavior: none;
 }
 
-body { position: fixed; inset: 0; }
+body {
+  position: fixed;
+  inset: 0;
+}
 
 #app {
   position: fixed;
   inset: 0;
   overflow: hidden;
-  background: #fff;
-  color: #111;
-  --header-h: clamp(82px, 10.45svh, 98px);
-  --frame-w: clamp(720px, 72vw, 880px);
-  --green: #0a8d46;
-  --blue: #3f80af;
-  --grid: #d7d7d7;
+  background: #ffffff;
 }
 
-.topBar {
+.canvas {
   position: absolute;
   left: 0;
   top: 0;
-  width: 100%;
-  height: var(--header-h);
-  background: var(--blue);
+  width: 1024px;
+  height: 768px;
   overflow: hidden;
+  background: #ffffff;
+  transform-origin: 0 0;
 }
 
-.topInner {
-  position: relative;
-  width: var(--frame-w);
-  height: 100%;
-  margin: 0 auto;
+/* PDF基準の青帯。OS表示は描かない。 */
+.topBar {
+  position: absolute;
+  left: 32px;
+  top: 14px;
+  width: 936px;
+  height: 84px;
+  overflow: hidden;
+  background: #427fac;
 }
 
 .menuBtn {
   position: absolute;
-  left: 7.9%;
-  top: 33.5%;
-  width: 42px;
-  height: 34px;
+  left: 94px;
+  top: 28px;
+  width: 34px;
+  height: 30px;
   padding: 0;
   border: 0;
   background: transparent;
@@ -69,58 +83,50 @@ body { position: fixed; inset: 0; }
 
 .menuBtn span {
   display: block;
-  width: 34px;
+  width: 30px;
   height: 4px;
   margin: 0 auto 7px;
   border-radius: 4px;
-  background: #fff;
+  background: #ffffff;
 }
 
 .dateText,
 .timeText {
   position: absolute;
-  top: 34.4%;
-  color: #fff;
-  font-size: 30px;
+  top: 31px;
+  color: #ffffff;
+  font-size: 31px;
   line-height: 1;
   font-weight: 900;
   letter-spacing: 1px;
   white-space: nowrap;
 }
 
-.dateText { left: 16.2%; }
-.timeText { left: 39.2%; }
+.dateText { left: 176px; }
+.timeText { left: 361px; }
 
 .reserveBtn {
   position: absolute;
-  right: 5.8%;
-  top: 32.8%;
-  width: 104px;
+  left: 781px;
+  top: 31px;
+  width: 82px;
   height: 34px;
+  padding: 0;
   border: 0;
   border-radius: 6px;
-  background: #fff;
-  color: #0b5c99;
-  font-size: 12px;
+  background: #ffffff;
+  color: #0a5d96;
+  font-size: 11px;
+  line-height: 34px;
   font-weight: 900;
-  box-shadow: 0 1px 4px rgba(0,0,0,.18);
+  text-align: center;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.16);
 }
 
-.whiteStage {
+.layoutBase {
   position: absolute;
-  left: 0;
-  right: 0;
-  top: var(--header-h);
-  bottom: 0;
+  inset: 0;
   overflow: hidden;
-  background: #fff;
-}
-
-.layoutFrame {
-  position: relative;
-  width: var(--frame-w);
-  height: 100%;
-  margin: 0 auto;
 }
 
 .area {
@@ -128,246 +134,58 @@ body { position: fixed; inset: 0; }
   overflow: hidden;
 }
 
-.area h2 {
-  position: absolute;
-  left: 0;
-  top: 0;
-  margin: 0;
-  color: var(--green);
-  font-size: 13px;
-  line-height: 1;
-  font-weight: 900;
-}
-
-/* PDF赤破線の基準線だけをCSSに落とした位置 */
-.locationArea { left: 7.1%; top: 5.6%; width: 66.7%; height: 48.7%; }
-.detailArea   { left: 75.8%; top: 5.6%; width: 18.8%; height: 48.7%; }
-.daysArea     { left: 7.1%; top: 57.6%; width: 66.7%; height: 23.2%; }
-.statusArea   { left: 75.8%; top: 57.6%; width: 18.8%; height: 23.2%; }
-
-#location-root {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 30px;
-  bottom: 0;
-  overflow: hidden;
-}
-
-.timelineShell {
-  position: absolute;
-  inset: 0;
-  display: grid;
-  grid-template-columns: 112px 1fr;
-  grid-template-rows: 28px 1fr 18px;
-  overflow: hidden;
-}
-
-.timelineCorner {
-  grid-column: 1;
-  grid-row: 1;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 10px;
-  font-weight: 900;
-}
-
-.timeHeaderClip {
-  grid-column: 2;
-  grid-row: 1;
-  overflow: hidden;
-}
-
-.laneNames {
-  grid-column: 1;
-  grid-row: 2;
-  border-top: 1px solid var(--grid);
-  overflow: hidden;
-}
-
-.timelineViewport {
-  grid-column: 2;
-  grid-row: 2;
-  overflow-x: auto;
-  overflow-y: hidden;
-  scrollbar-width: thin;
-  overscroll-behavior: contain;
-  -webkit-overflow-scrolling: touch;
-  border-top: 1px solid var(--grid);
-}
-
-.timelineScrollSpacer {
-  grid-column: 1 / span 2;
-  grid-row: 3;
-  overflow: hidden;
-}
-
-.timeHeader,
-.gridBody {
-  width: 1134px; /* 6:30〜20:00を30分単位。42px × 27 */
-}
-
-.timeHeader {
-  position: relative;
-  height: 28px;
-}
-
-.hourLabel {
-  position: absolute;
-  top: 5px;
-  width: 40px;
-  transform: translateX(-50%);
-  text-align: center;
-  font-size: 9px;
-  line-height: 1;
-  font-weight: 900;
-}
-
-.nameRow,
-.gridRow {
-  height: 32px;
-  border-bottom: 1px solid var(--grid);
-}
-
-.nameRow {
-  display: flex;
-  align-items: center;
-  padding-left: 10px;
-  font-size: 13px;
-  line-height: 1;
-  font-weight: 900;
-  white-space: nowrap;
-}
-
-.gridBody {
-  position: relative;
-  height: 224px;
-  background-image:
-    linear-gradient(to right, var(--grid) 1px, transparent 1px),
-    linear-gradient(to bottom, var(--grid) 1px, transparent 1px);
-  background-size: 42px 32px, 100% 32px;
-}
-
-.nowLine {
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  width: 2px;
-  background: #ff5c64;
-  pointer-events: none;
-}
-
-.jobBlock {
-  position: absolute;
-  height: 32px;
-  background: #9edfd1;
-  border: 0;
-  padding: 4px 5px 3px;
-  font-size: 10px;
-  line-height: 1.05;
-  font-weight: 900;
-  overflow: hidden;
-}
-
-.jobBlock .state {
-  position: absolute;
-  right: 5px;
-  bottom: 4px;
-  font-size: 8px;
-  color: #555;
-}
-
-#days-root {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 28px;
-  bottom: 0;
-  display: grid;
-  grid-template-columns: repeat(7, 1fr);
-  gap: 7px;
-  overflow: hidden;
-}
-
-.dayCard {
-  min-width: 0;
-  height: 100%;
-  border: 1px solid #d2d2d2;
-  border-radius: 7px;
-  background: #fff;
-  padding: 8px 5px 4px;
-  text-align: center;
-  font-size: 10px;
-  line-height: 1.35;
-  font-weight: 900;
-  overflow: hidden;
-}
-
-.dayDate { font-size: 12px; margin-bottom: 14px; }
-.notice {
-  display: inline-block;
-  min-width: 44px;
-  height: 14px;
-  margin-top: 2px;
-  border-radius: 3px;
-  border: 1px solid #68c4ce;
-  background: #def3f5;
-  color: #2e929c;
-  font-size: 8px;
-  line-height: 12px;
-}
-.notice.yellow { border-color: #d9c84d; background: #ffef6a; color: #8b7600; }
-.notice.empty { color: transparent; }
-
-.detailBody {
-  position: absolute;
-  left: 10px;
-  top: 56px;
-  right: 0;
-  bottom: 0;
-  font-size: 14px;
-  line-height: 2.0;
-  font-weight: 900;
-  overflow: hidden;
-}
-
-#status-root {
-  position: absolute;
-  left: 8px;
-  right: 0;
-  top: 31px;
-  bottom: 0;
-  overflow: hidden;
-}
-
-.statusRow {
-  display: grid;
-  grid-template-columns: 62px 1fr;
-  column-gap: 8px;
-  height: 16px;
-  align-items: center;
-  font-size: 10px;
-  line-height: 1;
-  font-weight: 900;
-  white-space: nowrap;
-}
-
-.statusName { overflow: hidden; text-overflow: clip; }
-.statusValue { overflow: hidden; text-overflow: clip; }
-
-/* 確認用。通常は出さない */
-.guide .topInner::after,
-.guide .layoutFrame::after,
-.guide .area::after {
+.area::before {
   content: "";
   position: absolute;
   inset: 0;
-  border: 1px dashed #e65b75;
+  border: 1.5px dashed #e05f6b;
   pointer-events: none;
-  z-index: 999;
 }
 
-@media (max-width: 780px) {
-  #app { --frame-w: 720px; }
+.clean .area::before {
+  display: none;
+}
+
+.area h2 {
+  position: absolute;
+  left: 0;
+  top: -15px;
+  margin: 0;
+  color: #168f52;
+  font-size: 14px;
+  line-height: 1;
+  font-weight: 900;
+}
+
+/*
+  レイヤー説明.pdf の赤破線境界を固定。
+  LOCATION と DETAIL は上段で横接続。
+  DAYS と STATUS は下段で横接続。
+*/
+.locationArea {
+  left: 125px;
+  top: 183px;
+  width: 604px;
+  height: 318px;
+}
+
+.detailArea {
+  left: 729px;
+  top: 183px;
+  width: 166px;
+  height: 318px;
+}
+
+.daysArea {
+  left: 125px;
+  top: 538px;
+  width: 604px;
+  height: 152px;
+}
+
+.statusArea {
+  left: 729px;
+  top: 538px;
+  width: 166px;
+  height: 152px;
 }
