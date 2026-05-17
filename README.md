@@ -19,24 +19,13 @@ CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 - DAYS・STATUSは下へ移動
 - LOCATION/DETAIL/青帯/ステージ構造は触らない
 
-
-## v26 final targeted
-- v25をベースに維持
-- 修正対象はハンバーガー、日付、時刻、予約ボタン、DETAIL/STATUSラベルのみ
-- ハンバーガー・日付・時刻は左へ移動
-- 予約ボタンは右へ移動
-- DETAIL/STATUSラベルは右エリア内の中央寄せ
-- LOCATION/DAYS/エリア外枠/scale構造は触らない
-
-## v27 pc date gap fix
-- v26をベースに維持
-- iPadの配置は触らない方針
-- PC表示時のみ、日付と時刻の隙間を確保するため `.header-time` の left を調整
-- 対象は `css/header.css` のメディアクエリのみ
-
-## v29 changes
-- v27完成骨格をベースに、外枠座標は変更しない。
-- DAYSエリア内に7枚カードをスクロールなしで収める。
-- STATUSは完全2列固定で、STATUSエリアから左へはみ出さない。
-- DAYSカード内のテキスト積層エリアとSTATUS一覧の表示高を同期。
-- iPadの画面全体上下スクロール防止を強化。LOCATION/STATUS以外のtouchmoveを抑制。
+## v31 px area range
+- v25/v27系の完成骨格を維持
+- 外側基準を px で固定
+  - 左端：ハンバーガー左端 x=34px
+  - 右端：予約登録ボタン右端 x=696px
+  - 下端：現状DAYSカード下部 y=535px
+- LOCATION / DETAIL / DAYS / STATUS のエリア範囲を明文化
+- DAYSカードはDAYSエリア内で7枚を広く使用
+- STATUSはSTATUSエリア内に2列固定で収納
+- 外枠座標は今後原則触らず、中身だけ調整する

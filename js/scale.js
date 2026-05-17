@@ -1,14 +1,5 @@
 (function(){
-  function lockViewport(){
-    var h=window.innerHeight || document.documentElement.clientHeight;
-    var app=document.getElementById('app');
-    if(app){app.style.height=h+'px'}
-    document.documentElement.style.height=h+'px';
-    document.body.style.height=h+'px';
-    window.scrollTo(0,0);
-  }
   function setScale(){
-    lockViewport();
     var root=document.documentElement;
     var headerH=80;
     var stageW=760;
@@ -29,10 +20,5 @@
   }
   window.addEventListener('resize',setScale);
   window.addEventListener('orientationchange',function(){setTimeout(setScale,150)});
-  window.addEventListener('load',setScale);
-  document.addEventListener('touchmove',function(e){
-    var t=e.target;
-    if(!t || (!t.closest('.area-location') && !t.closest('.area-status'))){e.preventDefault();}
-  },{passive:false});
   if(document.readyState==='loading'){document.addEventListener('DOMContentLoaded',setScale)}else{setScale()}
 })();
