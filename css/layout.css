@@ -1,65 +1,53 @@
-html,
-body {
-  width: 100%;
-  height: 100%;
-  margin: 0;
-  padding: 0;
-  overflow: hidden;
-  background: #ffffff;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  -webkit-text-size-adjust: 100%;
-  user-select: none;
+:root {
+  /* 固定比率キャンバス。中身の距離・余白はここから変えない */
+  --stage-w: 1024px;
+  --stage-h: 768px;
+
+  /* 本文安全領域：実際には描画しない */
+  --safe-x: 234px;
+  --safe-y: 178px;
+  --safe-w: 694px;
+  --safe-h: 540px;
+
+  /* エリア固定座標：外枠はここで確定、中身だけ後から育てる */
+  --location-x: 248px;
+  --location-y: 238px;
+  --location-w: 500px;
+  --location-h: 282px;
+
+  --detail-x: 780px;
+  --detail-y: 238px;
+  --detail-w: 145px;
+  --detail-h: 282px;
+
+  --days-x: 248px;
+  --days-y: 542px;
+  --days-w: 500px;
+  --days-h: 145px;
+
+  --status-x: 780px;
+  --status-y: 542px;
+  --status-w: 145px;
+  --status-h: 145px;
+
+  --green: #078b3c;
+  --blue: #3f80ae;
 }
 
-* {
-  box-sizing: border-box;
-}
-
-#viewport {
+.app-shell {
   position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: var(--real-vh, 100vh);
+  inset: 0;
   overflow: hidden;
   background: #ffffff;
 }
 
-#appCanvas {
+.stage {
   position: absolute;
   left: 50%;
   top: 50%;
-  width: 1024px;
-  height: 768px;
+  width: var(--stage-w);
+  height: var(--stage-h);
   transform-origin: center center;
-  transform: translate(-50%, -50%) scale(var(--canvas-scale, 1));
   background: #ffffff;
   overflow: hidden;
 }
-
-.area-layer {
-  position: absolute;
-  overflow: hidden;
-  background: transparent;
-}
-
-.area-label {
-  position: absolute;
-  left: 0;
-  top: 0;
-  color: #178a3d;
-  font-size: 15px;
-  line-height: 1;
-  font-weight: 800;
-  letter-spacing: -0.02em;
-  white-space: nowrap;
-}
-
-/*
-  固定比率UIキャンバスの考え方
-  - 座標は1024×768内の固定座標。
-  - デバイス差は #appCanvas 全体の scale だけで吸収する。
-  - LOCATION / DETAIL / DAYS / STATUS の外枠座標は原則動かさない。
-  - 個別修正は各エリア内部だけで行う。
-  - 赤線・ガイド線・枠線は本番表示しない。
-*/
