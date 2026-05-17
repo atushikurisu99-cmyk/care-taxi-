@@ -12,12 +12,9 @@
 CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 
 
-## v24 targeted adjust
-
-既存v22をベースに、以下だけを修正。
-
-- ハンバーガーを左へ移動
-- 日付・時間を左へ移動
-- DAYS / STATUS のラベルと内部エリアを少し上へ移動
-
-LOCATION / DETAIL / 青帯構造 / scale処理 / ファイル構成は変更なし。
+## v25 targeted adjust
+- v22をベースに維持
+- 修正対象はハンバーガー、日付、時刻、DAYS、STATUSのみ
+- ハンバーガー・日付・時刻は左へ移動
+- DAYS・STATUSは下へ移動
+- LOCATION/DETAIL/青帯/ステージ構造は触らない
