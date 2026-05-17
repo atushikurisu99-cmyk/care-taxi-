@@ -18,3 +18,12 @@ CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 - ハンバーガー・日付・時刻は左へ移動
 - DAYS・STATUSは下へ移動
 - LOCATION/DETAIL/青帯/ステージ構造は触らない
+
+
+## v26 final targeted
+- v25をベースに維持
+- 修正対象はハンバーガー、日付、時刻、予約ボタン、DETAIL/STATUSラベルのみ
+- ハンバーガー・日付・時刻は左へ移動
+- 予約ボタンは右へ移動
+- DETAIL/STATUSラベルは右エリア内の中央寄せ
+- LOCATION/DAYS/エリア外枠/scale構造は触らない
