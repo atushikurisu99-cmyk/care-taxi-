@@ -11,9 +11,13 @@
 
 CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 
-## v23 balance adjustment
-v22をベースに、構造は維持したまま以下のみ調整。
-- 固定ステージの中央計算をJSで明示
-- header内パーツを少し左へ
-- LOCATION/DETAIL/DAYS/STATUSラベル基準を微調整
-- 青帯はfluidのまま維持
+
+## v24 targeted adjust
+
+既存v22をベースに、以下だけを修正。
+
+- ハンバーガーを左へ移動
+- 日付・時間を左へ移動
+- DAYS / STATUS のラベルと内部エリアを少し上へ移動
+
+LOCATION / DETAIL / 青帯構造 / scale処理 / ファイル構成は変更なし。
