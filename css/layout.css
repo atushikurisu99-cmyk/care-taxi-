@@ -1,4 +1,4 @@
-:root{--stage-w:1024px;--stage-h:768px;--scale:1;--green:#0b8a3b;--blue:#3e82b2;}
-#app{position:fixed;inset:0;background:#fff;overflow:hidden;}
-#stage{position:absolute;left:50%;top:50%;width:var(--stage-w);height:var(--stage-h);transform:translate(-50%,-50%) scale(var(--scale));transform-origin:center center;background:#fff;overflow:hidden;}
-/* 外枠・赤線・ガイド線は描画しない。ここは固定比率キャンバスだけ。 */
+:root{--stage-w:1024px;--stage-h:620px;--scale:1;--green:#07873a;--blue:#3f82b0;}
+#app{position:fixed;left:0;top:0;right:0;bottom:0;background:#fff;overflow:hidden;}
+#stage{position:absolute;left:50%;top:50%;width:var(--stage-w);height:var(--stage-h);transform:translate(-50%,-50%) scale(var(--scale));transform-origin:center center;background:#fff;overflow:visible;}
+/* 赤線・ガイド線・外枠は描画しない。固定比率キャンバス全体だけをscaleする。 */

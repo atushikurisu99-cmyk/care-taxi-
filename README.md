@@ -1,23 +1,14 @@
-# care-taxi-shell-v18-fixed-stage
+# care-taxi-shell-v20-scale-correct
 
-## 目的
-PDF/レイヤー説明を基準に、固定比率キャンバスを先に作る版。
+固定比率UIキャンバス版。
+
+- 画面全体は白背景
+- 1024×620 の固定ステージを作成
+- デバイス差はステージ全体の scale のみで吸収
+- LOCATION / DETAIL / DAYS / STATUS の関係距離は変えない
+- 青帯は固定ステージ内で長めに配置
+- 赤線・破線・枠線・iPadステータス文字は描画しない
 
 ## 重要
-- 赤線・破線・黒線は描画しない
-- iPadステータス文字も描画しない
-- MAPは入れない
-- デバイス差はキャンバス全体のscaleのみで吸収
-- 中の座標・余白・距離は変えない
-
-## 基準
-- stage: 1024 x 768 固定
-- header: left 33 / top 14 / width 936 / height 83
-- LOCATION: left 125 / top 170 / width 604 / height 330
-- DETAIL: left 732 / top 170 / width 164 / height 330
-- DAYS: left 125 / top 535 / width 604 / height 154
-- STATUS: left 732 / top 535 / width 164 / height 154
-
-## 個別修正
-外枠座標は layout/areas 側で固定。
-次段階から中身のみ、location/detail/days/status 内部で個別調整する。
+外側座標はこの段階で固定する前提。
+以後の個別修正は各エリアの中身のみ。
