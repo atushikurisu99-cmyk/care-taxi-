@@ -1,0 +1,29 @@
+:root{
+  --canvas-w:859;
+  --canvas-h:612;
+  --scale:1;
+  --green:#4b8f2f;
+  --blue:#143c8b;
+  --text:#111;
+}
+*{box-sizing:border-box;}
+html,body{width:100%;height:100%;margin:0;padding:0;overflow:hidden;background:#fff;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;color:var(--text);}
+button{font:inherit;}
+#viewport{position:fixed;left:0;top:0;width:100vw;height:100vh;overflow:hidden;background:#fff;}
+#app-canvas{position:absolute;left:50%;top:50%;width:859px;height:612px;transform:translate(-50%,-50%) scale(var(--scale));transform-origin:center center;background:#fff;overflow:hidden;}
+.layer{position:absolute;}
+.area-layer{overflow:hidden;}
+.area-label{position:absolute;left:0;top:0;margin:0;color:var(--green);font-size:20px;line-height:24px;font-weight:800;letter-spacing:.01em;white-space:nowrap;}
+.area-body{position:absolute;left:0;right:0;bottom:0;overflow:hidden;background:transparent;}
+/* PDFトレース後に動かすのは原則ここだけ。中身の個別調整では触らない。 */
+.location-layer{left:48px;top:108px;width:592px;height:334px;}
+.detail-layer{left:666px;top:108px;width:150px;height:334px;}
+.days-layer{left:48px;top:462px;width:592px;height:78px;}
+.status-layer{left:666px;top:462px;width:150px;height:78px;}
+.location-body{top:34px;height:300px;}
+.detail-body{top:34px;height:300px;}
+.days-body{top:34px;height:44px;}
+.status-body{top:34px;height:44px;}
+/* 内部確認が必要な時だけ body に .debug を付ける。通常は表示されない。 */
+body.debug .area-body{outline:1px dashed rgba(232,120,30,.75);}
+body.debug #app-canvas{outline:1px solid rgba(0,0,0,.4);}

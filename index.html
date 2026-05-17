@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="format-detection" content="telephone=no">
+  <title>Care Taxi Shell v15</title>
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/header.css">
+  <link rel="stylesheet" href="css/location.css">
+  <link rel="stylesheet" href="css/detail.css">
+  <link rel="stylesheet" href="css/days.css">
+  <link rel="stylesheet" href="css/status.css">
+</head>
+<body>
+  <div id="viewport">
+    <main id="app-canvas" aria-label="介護タクシー管理アプリ">
+      <section id="header-layer" class="layer header-layer" aria-label="上部情報">
+        <div class="header-date">5月12日(火)</div>
+        <div class="header-time">13:26</div>
+        <button class="header-button header-booking" type="button">＋予約登録</button>
+        <button class="header-button header-map" type="button">MAP</button>
+      </section>
+
+      <section id="location-layer" class="layer area-layer location-layer" aria-label="LOCATION">
+        <h2 class="area-label location-label">LOCATION</h2>
+        <div class="area-body location-body" id="location-root"></div>
+      </section>
+
+      <section id="detail-layer" class="layer area-layer detail-layer" aria-label="DETAIL">
+        <h2 class="area-label detail-label">DETAIL</h2>
+        <div class="area-body detail-body" id="detail-root"></div>
+      </section>
+
+      <section id="days-layer" class="layer area-layer days-layer" aria-label="DAYS">
+        <h2 class="area-label days-label">DAYS</h2>
+        <div class="area-body days-body" id="days-root"></div>
+      </section>
+
+      <section id="status-layer" class="layer area-layer status-layer" aria-label="STATUS">
+        <h2 class="area-label status-label">STATUS</h2>
+        <div class="area-body status-body" id="status-root"></div>
+      </section>
+    </main>
+  </div>
+  <script src="js/shell.js"></script>
+</body>
+</html>
