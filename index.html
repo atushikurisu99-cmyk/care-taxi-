@@ -1,29 +1,46 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
-  <title>介護タクシー管理アプリ Shell v9 Area Lock</title>
-  <link rel="stylesheet" href="./css/app.css" />
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <title>介護タクシー管理アプリ Shell v10</title>
+  <link rel="stylesheet" href="css/base.css">
 </head>
 <body>
-  <div id="app">
-    <div id="canvas" class="canvas">
-      <header class="topBar" aria-label="上部バー">
-        <button class="menuBtn" aria-label="メニュー"><span></span><span></span><span></span></button>
-        <div class="dateText">5/10（日）</div>
-        <div class="timeText">05:14</div>
-        <button class="reserveBtn">＋予約登録</button>
-      </header>
+  <div id="app" class="app">
+    <div id="stage" class="stage">
+      <div class="top-bar">
+        <div class="ipad-status">2:36　5月12日(火)</div>
+        <div class="hamburger" aria-label="menu"><span></span><span></span><span></span></div>
+        <div class="main-date">5/10（日）</div>
+        <div class="main-time">05:14</div>
+        <button class="reserve-button">＋予約登録</button>
+        <div class="ipad-icons">⋯  Wi‑Fi  ⟳  80% ▰</div>
+      </div>
 
-      <main class="layoutBase" aria-label="レイヤー固定確認">
-        <section class="area locationArea" aria-label="LOCATION"><h2>LOCATION</h2></section>
-        <section class="area detailArea" aria-label="DETAIL"><h2>DETAIL</h2></section>
-        <section class="area daysArea" aria-label="DAYS"><h2>DAYS</h2></section>
-        <section class="area statusArea" aria-label="STATUS"><h2>STATUS</h2></section>
+      <main class="content">
+        <section class="area area-location" aria-label="LOCATION">
+          <h2>LOCATION</h2>
+        </section>
+
+        <section class="area area-detail" aria-label="DETAIL">
+          <h2>DETAIL</h2>
+        </section>
+
+        <section class="area area-days" aria-label="DAYS">
+          <h2>DAYS</h2>
+        </section>
+
+        <section class="area area-status" aria-label="STATUS">
+          <h2>STATUS</h2>
+        </section>
       </main>
+
+      <div class="bottom-reserve" aria-hidden="true"></div>
     </div>
   </div>
-  <script src="./js/app.js"></script>
+  <script src="js/app.js"></script>
 </body>
 </html>

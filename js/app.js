@@ -1,49 +1,54 @@
-/*
-  Shell v9 Area Lock
-  - 1024×768のPDF基準座標を、画面に収まるよう等倍スケールする。
-  - 画面全体スクロールは禁止。
-  - この段階ではエリア内の中身は描画しない。
-*/
 (function () {
-  var DESIGN_W = 1024;
-  var DESIGN_H = 768;
+  "use strict";
 
-  function lockPage() {
-    window.scrollTo(0, 0);
-    document.documentElement.scrollTop = 0;
-    document.body.scrollTop = 0;
+  var BASE_W = 1024;
+  var BASE_H = 768;
+  var stage = null;
+
+  function viewportWidth() {
+    return window.innerWidth || document.documentElement.clientWidth || BASE_W;
   }
 
-  function fitCanvas() {
-    var canvas = document.getElementById("canvas");
-    if (!canvas) return;
+  function viewportHeight() {
+    return window.innerHeight || document.documentElement.clientHeight || BASE_H;
+  }
 
-    var ww = window.innerWidth || document.documentElement.clientWidth || DESIGN_W;
-    var wh = window.innerHeight || document.documentElement.clientHeight || DESIGN_H;
-    var scale = Math.min(ww / DESIGN_W, wh / DESIGN_H);
-    var left = Math.round((ww - DESIGN_W * scale) / 2);
-    var top = Math.round((wh - DESIGN_H * scale) / 2);
+  function fitStage() {
+    if (!stage) return;
 
-    canvas.style.transform = "translate(" + left + "px," + top + "px) scale(" + scale + ")";
-    lockPage();
+    var vw = viewportWidth();
+    var vh = viewportHeight();
+    var scale = Math.min(vw / BASE_W, vh / BASE_H);
+
+    /* PCでは巨大化し過ぎない。iPadでは画面内に確実に収める。 */
+    if (scale > 1.25) scale = 1.25;
+
+    var x = Math.round((vw - BASE_W * scale) / 2);
+    var y = Math.round((vh - BASE_H * scale) / 2);
+
+    stage.style.transform = "translate(" + x + "px," + y + "px) scale(" + scale + ")";
+  }
+
+  function preventPageMove(e) {
+    /* エリア固定段階なので画面全体のスクロールを止める */
+    e.preventDefault();
   }
 
   function boot() {
-    var params = new URLSearchParams(window.location.search);
-    if (params.get("clean") === "1") {
-      document.getElementById("app").classList.add("clean");
-    }
-    fitCanvas();
+    stage = document.getElementById("stage");
+    fitStage();
+
+    window.addEventListener("resize", fitStage, false);
+    window.addEventListener("orientationchange", function () {
+      window.setTimeout(fitStage, 250);
+    }, false);
+
+    document.addEventListener("touchmove", preventPageMove, { passive: false });
   }
 
-  document.addEventListener("touchmove", function (event) {
-    event.preventDefault();
-  }, { passive: false });
-
-  window.addEventListener("resize", fitCanvas);
-  window.addEventListener("orientationchange", function () {
-    setTimeout(fitCanvas, 120);
-  });
-  window.addEventListener("scroll", lockPage);
-  document.addEventListener("DOMContentLoaded", boot);
-})();
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", boot, false);
+  } else {
+    boot();
+  }
+}());
