@@ -1,53 +1,26 @@
-:root {
-  /* 固定比率キャンバス。中身の距離・余白はここから変えない */
-  --stage-w: 1024px;
-  --stage-h: 768px;
-
-  /* 本文安全領域：実際には描画しない */
-  --safe-x: 234px;
-  --safe-y: 178px;
-  --safe-w: 694px;
-  --safe-h: 540px;
-
-  /* エリア固定座標：外枠はここで確定、中身だけ後から育てる */
-  --location-x: 248px;
-  --location-y: 238px;
-  --location-w: 500px;
-  --location-h: 282px;
-
-  --detail-x: 780px;
-  --detail-y: 238px;
-  --detail-w: 145px;
-  --detail-h: 282px;
-
-  --days-x: 248px;
-  --days-y: 542px;
-  --days-w: 500px;
-  --days-h: 145px;
-
-  --status-x: 780px;
-  --status-y: 542px;
-  --status-w: 145px;
-  --status-h: 145px;
-
-  --green: #078b3c;
-  --blue: #3f80ae;
+:root{
+  --base-w:1024px;
+  --base-h:768px;
+  --blue:#3f7eae;
+  --green:#14843a;
 }
-
-.app-shell {
-  position: fixed;
-  inset: 0;
-  overflow: hidden;
-  background: #ffffff;
+*{box-sizing:border-box;}
+html,body{width:100%;height:100%;margin:0;padding:0;background:#fff;overflow:hidden;font-family:Arial,'Helvetica Neue',sans-serif;}
+.viewport{position:fixed;left:0;top:0;right:0;bottom:0;background:#fff;overflow:hidden;}
+.stage{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:var(--base-w);
+  height:var(--base-h);
+  background:#fff;
+  transform:translate(-50%,-50%) scale(1);
+  transform-origin:center center;
+  overflow:hidden;
 }
-
-.stage {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: var(--stage-w);
-  height: var(--stage-h);
-  transform-origin: center center;
-  background: #ffffff;
-  overflow: hidden;
-}
+/*
+  基準キャンバスは1024×768固定。
+  デバイス差は js/scale.js で stage 全体を等倍scaleするだけ。
+  中の座標・余白・エリア距離は変えない。
+  赤線・破線・黒線などのガイドは本番描画しない。
+*/

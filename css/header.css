@@ -1,65 +1,65 @@
-.top-band {
-  position: absolute;
-  left: 165px;
-  top: 107px;
-  width: 822px;
-  height: 73px;
-  background: var(--blue);
+.header-bar{
+  position:absolute;
+  left:33px;
+  top:14px;
+  width:936px;
+  height:83px;
+  background:var(--blue);
 }
-
-.hamburger {
-  position: absolute;
-  left: 72px;
-  top: 22px;
-  width: 32px;
-  height: 30px;
-  border: 0;
-  background: transparent;
-  padding: 0;
+.menu-button{
+  position:absolute;
+  left:96px;
+  top:25px;
+  width:31px;
+  height:28px;
+  padding:0;
+  border:0;
+  background:transparent;
 }
-
-.hamburger span {
-  display: block;
-  width: 29px;
-  height: 4px;
-  margin: 5px 0;
-  background: #ffffff;
-  border-radius: 4px;
+.menu-button span{
+  display:block;
+  width:31px;
+  height:5px;
+  margin:0 0 7px 0;
+  background:#fff;
+  border-radius:3px;
 }
-
-.date-text,
-.time-text {
-  position: absolute;
-  top: 21px;
-  color: #ffffff;
-  font-weight: 900;
-  line-height: 1;
-  letter-spacing: 0.02em;
-  white-space: nowrap;
+.header-date{
+  position:absolute;
+  left:175px;
+  top:27px;
+  font-size:31px;
+  line-height:36px;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:1px;
+  white-space:nowrap;
 }
-
-.date-text {
-  left: 143px;
-  font-size: 28px;
+.header-time{
+  position:absolute;
+  left:390px;
+  top:27px;
+  font-size:31px;
+  line-height:36px;
+  font-weight:800;
+  color:#fff;
+  letter-spacing:1px;
+  white-space:nowrap;
 }
-
-.time-text {
-  left: 306px;
-  font-size: 28px;
-}
-
-.booking-button {
-  position: absolute;
-  right: 66px;
-  top: 27px;
-  width: 74px;
-  height: 29px;
-  border: 0;
-  border-radius: 8px;
-  background: #ffffff;
-  color: #1b5f8e;
-  font-size: 10px;
-  font-weight: 900;
-  line-height: 29px;
-  padding: 0;
+.reserve-button{
+  position:absolute;
+  right:74px;
+  top:28px;
+  width:83px;
+  height:34px;
+  border:0;
+  border-radius:7px;
+  background:#fff;
+  color:#1e5f92;
+  font-weight:700;
+  font-size:12px;
+  line-height:34px;
+  padding:0;
+  text-align:center;
+  white-space:nowrap;
 }

@@ -1,25 +1,23 @@
-# care-taxi-shell-v17-fixed-canvas
+# care-taxi-shell-v18-fixed-stage
 
 ## 目的
-PDF/Illustratorで確認した「固定比率UIキャンバス」をHTML化した骨格版。
+PDF/レイヤー説明を基準に、固定比率キャンバスを先に作る版。
 
-## 重要ルール
-- LOCATION / DETAIL / DAYS / STATUS の外枠座標は固定。
-- デバイス差では中の距離を変えない。
-- 画面サイズに合わせて stage 全体だけを scale する。
-- 白キャンバス外にグレー余白は作らない。
-- 赤線、破線、ガイド線、iPadステータス文字は描画しない。
-- MAPは入れない。
-- ハンバーガー、日付、時刻、＋予約登録のみ表示。
+## 重要
+- 赤線・破線・黒線は描画しない
+- iPadステータス文字も描画しない
+- MAPは入れない
+- デバイス差はキャンバス全体のscaleのみで吸収
+- 中の座標・余白・距離は変えない
 
-## 調整する場所
-外枠座標は `css/layout.css` の CSS変数。
-ただし外枠確定後はここを原則動かさず、各エリア内だけを調整する。
+## 基準
+- stage: 1024 x 768 固定
+- header: left 33 / top 14 / width 936 / height 83
+- LOCATION: left 125 / top 170 / width 604 / height 330
+- DETAIL: left 732 / top 170 / width 164 / height 330
+- DAYS: left 125 / top 535 / width 604 / height 154
+- STATUS: left 732 / top 535 / width 164 / height 154
 
-## ファイル
-- index.html
-- css/reset.css
-- css/layout.css
-- css/header.css
-- css/areas.css
-- js/scale.js
+## 個別修正
+外枠座標は layout/areas 側で固定。
+次段階から中身のみ、location/detail/days/status 内部で個別調整する。
