@@ -1,19 +1,12 @@
-# care-taxi-shell-v21-fluid-header
+# care-taxi-shell-v22
 
-## 今回の目的
-青帯を固定キャンバスに閉じ込めず、画面横幅いっぱいに自然に伸びる流体レイヤーとして分離。
+目的：PDFトレース前提の固定比率UI骨格。
 
-## 重要仕様
-- 画面上部に隙間を作らない
-- 青帯は `#header-bg` で画面幅いっぱい
-- 中の文字・ボタンは `#stage` 内で固定比率配置
-- LOCATION / DETAIL / DAYS / STATUS は固定比率ステージ内に配置
-- 赤線・破線・枠線は描画しない
-- MAPボタンなし
-- iPadステータス文字なし
+- 青帯は画面横いっぱいに自然に伸びる fluid header
+- 青帯の中身は中央の固定基準に置く
+- 本文は固定比率 stage を全体 scale する
+- LOCATION / DETAIL / DAYS / STATUS の外枠は原則固定
+- 赤線・ガイド線・端末ステータス文字・MAPは描画しない
+- 中身は今後、各エリア内だけ個別実装する
 
-## 調整箇所
-- 青帯高さ: `css/layout.css` と `css/header.css` の 80px
-- ヘッダー内要素: `css/header.css`
-- エリアラベルと透明スロット: `css/areas.css`
-- 全体スケール: `js/app.js`
+CSS参照は GitHub Pages 対応の相対パス `./css/...`。

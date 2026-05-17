@@ -1,39 +1,30 @@
-:root {
-  --stage-w: 1024;
-  --stage-h: 768;
-  --scale: 1;
-  --header-h: 80px;
-  --blue: #3f82b0;
-  --green: #078033;
+:root{
+  --base-w:1024;
+  --base-h:650;
+  --header-h:80px;
+  --stage-w:760px;
+  --stage-h:560px;
+  --stage-scale:1;
+  --green:#008038;
+  --blue:#3d82b0;
 }
-
-#viewport {
-  position: fixed;
-  inset: 0;
-  width: 100vw;
-  height: 100vh;
-  overflow: hidden;
-  background: #ffffff;
+.stage-wrap{
+  position:absolute;
+  left:50%;
+  top:var(--header-h);
+  width:var(--stage-w);
+  height:var(--stage-h);
+  transform-origin:top center;
+  transform:translateX(-50%) scale(var(--stage-scale));
+  background:transparent;
+  overflow:visible;
 }
-
-#stage {
-  position: absolute;
-  left: 50%;
-  top: 0;
-  width: calc(var(--stage-w) * 1px);
-  height: calc(var(--stage-h) * 1px);
-  transform-origin: top center;
-  transform: translateX(-50%) scale(var(--scale));
-  background: transparent;
+.stage{
+  position:relative;
+  width:var(--stage-w);
+  height:var(--stage-h);
+  background:#fff;
+  overflow:hidden;
 }
-
-#header-bg {
-  position: fixed;
-  left: 0;
-  top: 0;
-  width: 100vw;
-  height: calc(80px * var(--scale));
-  background: var(--blue);
-  z-index: 0;
-  pointer-events: none;
-}
+.area{position:absolute;overflow:hidden;background:transparent;border:0;outline:0}
+.area-label{position:absolute;color:var(--green);font-size:13px;font-weight:900;line-height:1;letter-spacing:.01em;z-index:5;white-space:nowrap}

@@ -10,31 +10,30 @@
   <link rel="stylesheet" href="./css/areas.css">
 </head>
 <body>
-  <div id="header-bg" aria-hidden="true"></div>
-
-  <main id="viewport" aria-label="介護タクシー管理アプリ">
-    <section id="stage">
-      <header id="header-content" aria-label="上部情報">
-        <button class="hamburger" type="button" aria-label="メニュー">
-          <span></span><span></span><span></span>
-        </button>
+  <div id="app">
+    <header class="app-header" aria-label="上部情報帯">
+      <div class="header-inner">
+        <button class="menu-button" aria-label="メニュー"><span></span><span></span><span></span></button>
         <div class="header-date">5/10（日）</div>
         <div class="header-time">05:14</div>
-        <button class="booking-button" type="button">＋予約登録</button>
-      </header>
+        <button class="reserve-button">＋予約登録</button>
+      </div>
+    </header>
 
-      <section class="area-label area-location" aria-label="LOCATION">LOCATION</section>
-      <section class="area-label area-detail" aria-label="DETAIL">DETAIL</section>
-      <section class="area-label area-days" aria-label="DAYS">DAYS</section>
-      <section class="area-label area-status" aria-label="STATUS">STATUS</section>
+    <main class="stage-wrap" aria-label="固定比率UIキャンバス">
+      <section class="stage" id="stage">
+        <div class="area-label location-label">LOCATION</div>
+        <div class="area-label detail-label">DETAIL</div>
+        <div class="area-label days-label">DAYS</div>
+        <div class="area-label status-label">STATUS</div>
 
-      <section class="area-slot slot-location" aria-hidden="true"></section>
-      <section class="area-slot slot-detail" aria-hidden="true"></section>
-      <section class="area-slot slot-days" aria-hidden="true"></section>
-      <section class="area-slot slot-status" aria-hidden="true"></section>
-    </section>
-  </main>
-
-  <script src="./js/app.js"></script>
+        <div class="area area-location" aria-label="LOCATIONエリア"></div>
+        <div class="area area-detail" aria-label="DETAILエリア"></div>
+        <div class="area area-days" aria-label="DAYSエリア"></div>
+        <div class="area area-status" aria-label="STATUSエリア"></div>
+      </section>
+    </main>
+  </div>
+  <script src="./js/scale.js"></script>
 </body>
 </html>

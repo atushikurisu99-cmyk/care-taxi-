@@ -1,69 +1,21 @@
-#header-content {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1024px;
-  height: 80px;
-  color: #ffffff;
-  z-index: 2;
+.app-header{
+  position:absolute;
+  left:0;
+  top:0;
+  width:100vw;
+  height:var(--header-h);
+  background:var(--blue);
+  overflow:hidden;
+  z-index:10;
 }
-
-.hamburger {
-  position: absolute;
-  left: 148px;
-  top: 26px;
-  width: 44px;
-  height: 34px;
-  border: 0;
-  padding: 0;
-  background: transparent;
+.header-inner{
+  position:relative;
+  width:760px;
+  height:var(--header-h);
+  margin:0 auto;
 }
-
-.hamburger span {
-  display: block;
-  width: 34px;
-  height: 5px;
-  margin: 0 0 7px 0;
-  border-radius: 4px;
-  background: #ffffff;
-}
-
-.header-date {
-  position: absolute;
-  left: 240px;
-  top: 21px;
-  font-size: 34px;
-  line-height: 1;
-  font-weight: 800;
-  letter-spacing: 1px;
-  white-space: nowrap;
-}
-
-.header-time {
-  position: absolute;
-  left: 415px;
-  top: 21px;
-  font-size: 34px;
-  line-height: 1;
-  font-weight: 800;
-  letter-spacing: 1px;
-  white-space: nowrap;
-}
-
-.booking-button {
-  position: absolute;
-  right: 142px;
-  top: 23px;
-  width: 90px;
-  height: 34px;
-  border: 0;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #1f5f91;
-  font-size: 12px;
-  line-height: 34px;
-  font-weight: 800;
-  text-align: center;
-  padding: 0;
-  white-space: nowrap;
-}
+.menu-button{position:absolute;left:64px;top:25px;width:36px;height:30px;border:0;background:transparent;padding:0;display:block}
+.menu-button span{display:block;width:32px;height:5px;background:#fff;border-radius:999px;margin:0 0 7px 0}
+.header-date{position:absolute;left:138px;top:20px;color:#fff;font-size:34px;font-weight:900;line-height:1.1;letter-spacing:.02em}
+.header-time{position:absolute;left:325px;top:20px;color:#fff;font-size:34px;font-weight:900;line-height:1.1;letter-spacing:.02em}
+.reserve-button{position:absolute;right:64px;top:24px;height:32px;min-width:94px;padding:0 15px;border:0;border-radius:8px;background:#fff;color:#1f5f92;font-size:12px;font-weight:800;line-height:32px;white-space:nowrap}
