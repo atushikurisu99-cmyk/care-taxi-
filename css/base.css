@@ -1,223 +1,150 @@
-html,
-body {
-  margin: 0;
-  padding: 0;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  background: #e7e8ea;
-  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", Arial, sans-serif;
-  -webkit-text-size-adjust: 100%;
-  touch-action: none;
+*{
+  box-sizing:border-box;
+  -webkit-tap-highlight-color:transparent;
 }
-
-* {
-  box-sizing: border-box;
+html,body{
+  width:100%;
+  height:100%;
+  margin:0;
+  overflow:hidden;
+  background:#e6e7e9;
+  font-family:-apple-system,BlinkMacSystemFont,"Hiragino Kaku Gothic ProN","Yu Gothic",Meiryo,sans-serif;
+  color:#111;
 }
-
-button {
-  font-family: inherit;
+button{
+  font-family:inherit;
 }
-
-.app {
-  position: fixed;
-  left: 0;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  overflow: hidden;
-  background: #e7e8ea;
+#viewport{
+  position:fixed;
+  left:0;
+  top:0;
+  width:100vw;
+  height:100vh;
+  overflow:hidden;
+  background:#e6e7e9;
 }
-
-/*
-  PDFトレース用の白キャンバス。
-  1024×768のPDF基準で座標を固定し、JSで画面内に収まる倍率へ縮小/拡大する。
-  中身はHTMLなので、後から各エリアへ部品を追加できる。
-*/
-.stage {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 1024px;
-  height: 768px;
-  transform-origin: 0 0;
-  background: #ffffff;
-  overflow: hidden;
+#app-canvas{
+  position:absolute;
+  left:50%;
+  top:50%;
+  width:1024px;
+  height:768px;
+  transform:translate(-50%,-50%) scale(var(--app-scale,1));
+  transform-origin:center center;
+  background:#fff;
+  overflow:hidden;
 }
-
-.top-bar {
-  position: absolute;
-  left: 32px;
-  top: 14px;
-  width: 936px;
-  height: 84px;
-  background: #3f82b0;
-  color: #ffffff;
-  overflow: hidden;
+.top-bar{
+  position:absolute;
+  left:32px;
+  top:14px;
+  width:936px;
+  height:83px;
+  background:#3f82b2;
+  color:#fff;
+  overflow:hidden;
 }
-
-.ipad-status {
-  position: absolute;
-  left: 6px;
-  top: 4px;
-  font-size: 12px;
-  line-height: 12px;
-  font-weight: 700;
-  letter-spacing: .02em;
-  opacity: .95;
-  white-space: nowrap;
+.ipad-status{
+  position:absolute;
+  top:7px;
+  font-size:11px;
+  line-height:1;
+  font-weight:800;
+  letter-spacing:.01em;
+  opacity:.95;
+  white-space:nowrap;
 }
-
-.ipad-icons {
-  position: absolute;
-  right: 10px;
-  top: 6px;
-  font-size: 11px;
-  line-height: 11px;
-  font-weight: 700;
-  opacity: .78;
-  white-space: nowrap;
+.ipad-status.left{left:6px;}
+.ipad-status.right{right:8px;}
+.hamburger{
+  position:absolute;
+  left:96px;
+  top:27px;
+  width:31px;
+  height:28px;
 }
-
-.hamburger {
-  position: absolute;
-  left: 96px;
-  top: 27px;
-  width: 31px;
-  height: 28px;
+.hamburger span{
+  display:block;
+  width:31px;
+  height:5px;
+  margin-bottom:6px;
+  border-radius:4px;
+  background:#fff;
 }
-
-.hamburger span {
-  display: block;
-  width: 31px;
-  height: 5px;
-  margin-bottom: 7px;
-  border-radius: 4px;
-  background: #ffffff;
+.main-date{
+  position:absolute;
+  left:175px;
+  top:31px;
+  font-size:30px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.03em;
+  white-space:nowrap;
 }
-
-.main-date {
-  position: absolute;
-  left: 176px;
-  top: 29px;
-  width: 160px;
-  font-size: 30px;
-  line-height: 30px;
-  font-weight: 800;
-  letter-spacing: .04em;
-  white-space: nowrap;
+.main-time{
+  position:absolute;
+  left:390px;
+  top:31px;
+  font-size:30px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:.03em;
+  white-space:nowrap;
 }
-
-.main-time {
-  position: absolute;
-  left: 504px;
-  top: 29px;
-  width: 110px;
-  font-size: 30px;
-  line-height: 30px;
-  font-weight: 800;
-  letter-spacing: .04em;
-  white-space: nowrap;
+.reserve-button{
+  position:absolute;
+  right:73px;
+  top:30px;
+  width:83px;
+  height:34px;
+  border:0;
+  border-radius:6px;
+  background:#fff;
+  color:#1e5f95;
+  font-size:11px;
+  font-weight:800;
+  line-height:34px;
+  padding:0;
+  text-align:center;
+  box-shadow:none;
 }
-
-.reserve-button {
-  position: absolute;
-  right: 74px;
-  top: 31px;
-  width: 84px;
-  height: 34px;
-  border: 0;
-  border-radius: 7px;
-  background: #ffffff;
-  color: #1e5d91;
-  font-size: 11px;
-  font-weight: 800;
-  line-height: 34px;
-  padding: 0;
-  text-align: center;
-  box-shadow: none;
+.area{
+  position:absolute;
+  overflow:hidden;
+  background:transparent;
 }
-
-.content {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 1024px;
-  height: 768px;
+.area h2{
+  position:absolute;
+  left:0;
+  top:-16px;
+  margin:0;
+  color:#139554;
+  font-size:13px;
+  line-height:1;
+  font-weight:900;
+  letter-spacing:-.02em;
 }
-
-.area {
-  position: absolute;
-  border: 1.5px dashed #e56b78;
-  background: transparent;
-  overflow: hidden;
+.location-area{
+  left:125px;
+  top:183px;
+  width:604px;
+  height:318px;
 }
-
-.area h2 {
-  position: absolute;
-  left: -1px;
-  top: -18px;
-  margin: 0;
-  padding: 0;
-  color: #149565;
-  font-size: 14px;
-  line-height: 14px;
-  font-weight: 900;
-  letter-spacing: -.03em;
+.detail-area{
+  left:729px;
+  top:183px;
+  width:166px;
+  height:318px;
 }
-
-/* レイヤー説明.pdf の赤破線エリアを基準にした固定枠 */
-.area-location {
-  left: 125px;
-  top: 182px;
-  width: 605px;
-  height: 318px;
+.days-area{
+  left:125px;
+  top:537px;
+  width:604px;
+  height:153px;
 }
-
-.area-detail {
-  left: 729px;
-  top: 182px;
-  width: 166px;
-  height: 318px;
-}
-
-.area-days {
-  left: 125px;
-  top: 538px;
-  width: 605px;
-  height: 152px;
-}
-
-.area-status {
-  left: 729px;
-  top: 538px;
-  width: 166px;
-  height: 152px;
-}
-
-.bottom-reserve {
-  position: absolute;
-  left: 32px;
-  right: 55px;
-  bottom: 0;
-  height: 56px;
-  background: #d9dadc;
-  opacity: .0;
-}
-
-@media (max-width: 767px) {
-  body::before {
-    content: "この画面はタブレット表示を基準にしています";
-    position: fixed;
-    left: 12px;
-    right: 12px;
-    top: 12px;
-    z-index: 9999;
-    padding: 10px 12px;
-    border-radius: 8px;
-    background: rgba(255,255,255,.92);
-    color: #333;
-    font-size: 13px;
-    text-align: center;
-  }
+.status-area{
+  left:729px;
+  top:537px;
+  width:166px;
+  height:153px;
 }
