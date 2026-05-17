@@ -1,18 +1,8 @@
-.area{position:absolute;overflow:hidden;background:transparent;}
-.area h2{
-  position:absolute;
-  left:0;
-  top:0;
-  margin:0;
-  padding:0;
-  color:var(--green);
-  font-size:14px;
-  line-height:18px;
-  font-weight:800;
-  letter-spacing:-0.2px;
-}
-/* レイヤー説明.pdf基準：赤ガイドの位置だけを透明エリアとして保持 */
-.area-location{left:125px;top:170px;width:604px;height:330px;}
-.area-detail{left:732px;top:170px;width:164px;height:330px;}
-.area-days{left:125px;top:535px;width:604px;height:154px;}
-.area-status{left:732px;top:535px;width:164px;height:154px;}
+.area{position:absolute;background:transparent;overflow:hidden;}
+.area h2{position:absolute;left:0;top:0;margin:0;color:var(--green);font-size:15px;line-height:18px;font-weight:800;letter-spacing:.01em;}
+.area-inner{position:absolute;left:0;right:0;top:24px;bottom:0;overflow:hidden;}
+/* PDF/Illustratorを元にした固定配置。線・枠は非表示。 */
+.area-location{left:176px;top:218px;width:580px;height:282px;}
+.area-detail{left:760px;top:218px;width:150px;height:282px;}
+.area-days{left:176px;top:532px;width:580px;height:118px;}
+.area-status{left:760px;top:532px;width:150px;height:118px;}

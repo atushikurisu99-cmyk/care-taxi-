@@ -4,37 +4,42 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
   <title>介護タクシー管理アプリ</title>
-  <link rel="stylesheet" href="css/layout.css">
-  <link rel="stylesheet" href="css/header.css">
-  <link rel="stylesheet" href="css/areas.css">
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/header.css">
+  <link rel="stylesheet" href="./css/areas.css">
 </head>
 <body>
-  <div id="viewport" class="viewport">
-    <main id="stage" class="stage" aria-label="介護タクシー管理アプリ UI固定キャンバス">
-      <header class="header-bar" aria-label="上部情報帯">
-        <button class="menu-button" aria-label="メニュー" type="button"><span></span><span></span><span></span></button>
-        <div class="header-date">5/10（日）</div>
-        <div class="header-time">05:14</div>
-        <button class="reserve-button" type="button">＋予約登録</button>
+  <main id="app" aria-label="介護タクシー管理アプリ">
+    <section id="stage" aria-label="固定比率UIキャンバス">
+      <header class="top-band" aria-label="上部情報帯">
+        <div class="hamburger" aria-hidden="true"><span></span><span></span><span></span></div>
+        <div class="today">5/10（日）</div>
+        <div class="clock">05:14</div>
+        <button class="reserve-btn" type="button">＋予約登録</button>
       </header>
 
       <section class="area area-location" aria-label="LOCATION">
         <h2>LOCATION</h2>
+        <div class="area-inner"></div>
       </section>
 
       <section class="area area-detail" aria-label="DETAIL">
         <h2>DETAIL</h2>
+        <div class="area-inner"></div>
       </section>
 
       <section class="area area-days" aria-label="DAYS">
         <h2>DAYS</h2>
+        <div class="area-inner"></div>
       </section>
 
       <section class="area area-status" aria-label="STATUS">
         <h2>STATUS</h2>
+        <div class="area-inner"></div>
       </section>
-    </main>
-  </div>
-  <script src="js/scale.js"></script>
+    </section>
+  </main>
+  <script src="./js/scale.js"></script>
 </body>
 </html>

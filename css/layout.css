@@ -1,26 +1,4 @@
-:root{
-  --base-w:1024px;
-  --base-h:768px;
-  --blue:#3f7eae;
-  --green:#14843a;
-}
-*{box-sizing:border-box;}
-html,body{width:100%;height:100%;margin:0;padding:0;background:#fff;overflow:hidden;font-family:Arial,'Helvetica Neue',sans-serif;}
-.viewport{position:fixed;left:0;top:0;right:0;bottom:0;background:#fff;overflow:hidden;}
-.stage{
-  position:absolute;
-  left:50%;
-  top:50%;
-  width:var(--base-w);
-  height:var(--base-h);
-  background:#fff;
-  transform:translate(-50%,-50%) scale(1);
-  transform-origin:center center;
-  overflow:hidden;
-}
-/*
-  基準キャンバスは1024×768固定。
-  デバイス差は js/scale.js で stage 全体を等倍scaleするだけ。
-  中の座標・余白・エリア距離は変えない。
-  赤線・破線・黒線などのガイドは本番描画しない。
-*/
+:root{--stage-w:1024px;--stage-h:768px;--scale:1;--green:#0b8a3b;--blue:#3e82b2;}
+#app{position:fixed;inset:0;background:#fff;overflow:hidden;}
+#stage{position:absolute;left:50%;top:50%;width:var(--stage-w);height:var(--stage-h);transform:translate(-50%,-50%) scale(var(--scale));transform-origin:center center;background:#fff;overflow:hidden;}
+/* 外枠・赤線・ガイド線は描画しない。ここは固定比率キャンバスだけ。 */
