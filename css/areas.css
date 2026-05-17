@@ -1,8 +1,29 @@
-.area{position:absolute;background:transparent;overflow:hidden;}
-.area h2{position:absolute;left:0;top:0;margin:0;color:var(--green);font-size:15px;line-height:18px;font-weight:800;letter-spacing:.01em;}
-.area-inner{position:absolute;left:0;right:0;top:24px;bottom:0;overflow:hidden;}
-/* PDF/レイヤー説明を元にした固定配置。外枠は非表示。 */
-.area-location{left:126px;top:160px;width:604px;height:286px;}
-.area-detail{left:736px;top:160px;width:160px;height:286px;}
-.area-days{left:126px;top:472px;width:604px;height:118px;}
-.area-status{left:736px;top:472px;width:160px;height:118px;}
+.area-label {
+  position: absolute;
+  z-index: 1;
+  color: var(--green);
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: .2px;
+  white-space: nowrap;
+}
+
+/* ラベル位置。各エリアの外枠は描画しない */
+.area-location { left: 148px; top: 150px; }
+.area-detail   { left: 690px; top: 150px; }
+.area-days     { left: 148px; top: 455px; }
+.area-status   { left: 690px; top: 455px; }
+
+/* 後から中身を入れる透明スロット。表示はしない */
+.area-slot {
+  position: absolute;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: none;
+}
+
+.slot-location { left: 148px; top: 176px; width: 542px; height: 270px; }
+.slot-detail   { left: 690px; top: 176px; width: 184px; height: 270px; }
+.slot-days     { left: 148px; top: 480px; width: 542px; height: 145px; }
+.slot-status   { left: 690px; top: 480px; width: 184px; height: 145px; }

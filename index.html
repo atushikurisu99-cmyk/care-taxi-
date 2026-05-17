@@ -10,36 +10,31 @@
   <link rel="stylesheet" href="./css/areas.css">
 </head>
 <body>
-  <main id="app" aria-label="介護タクシー管理アプリ">
-    <section id="stage" aria-label="固定比率UIキャンバス">
-      <header class="top-band" aria-label="上部情報帯">
-        <div class="hamburger" aria-hidden="true"><span></span><span></span><span></span></div>
-        <div class="today">5/10（日）</div>
-        <div class="clock">05:14</div>
-        <button class="reserve-btn" type="button">＋予約登録</button>
+  <div id="header-bg" aria-hidden="true"></div>
+
+  <main id="viewport" aria-label="介護タクシー管理アプリ">
+    <section id="stage">
+      <header id="header-content" aria-label="上部情報">
+        <button class="hamburger" type="button" aria-label="メニュー">
+          <span></span><span></span><span></span>
+        </button>
+        <div class="header-date">5/10（日）</div>
+        <div class="header-time">05:14</div>
+        <button class="booking-button" type="button">＋予約登録</button>
       </header>
 
-      <section class="area area-location" aria-label="LOCATION">
-        <h2>LOCATION</h2>
-        <div class="area-inner"></div>
-      </section>
+      <section class="area-label area-location" aria-label="LOCATION">LOCATION</section>
+      <section class="area-label area-detail" aria-label="DETAIL">DETAIL</section>
+      <section class="area-label area-days" aria-label="DAYS">DAYS</section>
+      <section class="area-label area-status" aria-label="STATUS">STATUS</section>
 
-      <section class="area area-detail" aria-label="DETAIL">
-        <h2>DETAIL</h2>
-        <div class="area-inner"></div>
-      </section>
-
-      <section class="area area-days" aria-label="DAYS">
-        <h2>DAYS</h2>
-        <div class="area-inner"></div>
-      </section>
-
-      <section class="area area-status" aria-label="STATUS">
-        <h2>STATUS</h2>
-        <div class="area-inner"></div>
-      </section>
+      <section class="area-slot slot-location" aria-hidden="true"></section>
+      <section class="area-slot slot-detail" aria-hidden="true"></section>
+      <section class="area-slot slot-days" aria-hidden="true"></section>
+      <section class="area-slot slot-status" aria-hidden="true"></section>
     </section>
   </main>
-  <script src="./js/scale.js"></script>
+
+  <script src="./js/app.js"></script>
 </body>
 </html>

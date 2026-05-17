@@ -1,4 +1,39 @@
-:root{--stage-w:1024px;--stage-h:620px;--scale:1;--green:#07873a;--blue:#3f82b0;}
-#app{position:fixed;left:0;top:0;right:0;bottom:0;background:#fff;overflow:hidden;}
-#stage{position:absolute;left:50%;top:50%;width:var(--stage-w);height:var(--stage-h);transform:translate(-50%,-50%) scale(var(--scale));transform-origin:center center;background:#fff;overflow:visible;}
-/* 赤線・ガイド線・外枠は描画しない。固定比率キャンバス全体だけをscaleする。 */
+:root {
+  --stage-w: 1024;
+  --stage-h: 768;
+  --scale: 1;
+  --header-h: 80px;
+  --blue: #3f82b0;
+  --green: #078033;
+}
+
+#viewport {
+  position: fixed;
+  inset: 0;
+  width: 100vw;
+  height: 100vh;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+#stage {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  width: calc(var(--stage-w) * 1px);
+  height: calc(var(--stage-h) * 1px);
+  transform-origin: top center;
+  transform: translateX(-50%) scale(var(--scale));
+  background: transparent;
+}
+
+#header-bg {
+  position: fixed;
+  left: 0;
+  top: 0;
+  width: 100vw;
+  height: calc(80px * var(--scale));
+  background: var(--blue);
+  z-index: 0;
+  pointer-events: none;
+}
