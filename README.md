@@ -27,3 +27,9 @@ CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 - 予約ボタンは右へ移動
 - DETAIL/STATUSラベルは右エリア内の中央寄せ
 - LOCATION/DAYS/エリア外枠/scale構造は触らない
+
+## v27 pc date gap fix
+- v26をベースに維持
+- iPadの配置は触らない方針
+- PC表示時のみ、日付と時刻の隙間を確保するため `.header-time` の left を調整
+- 対象は `css/header.css` のメディアクエリのみ
