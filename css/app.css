@@ -1,0 +1,279 @@
+/*
+  care-taxi-shell-v6
+  - 青帯は画面横いっぱい
+  - 青帯内のUIは header-canvas 基準で定位置
+  - 背景は常に白、左右にグレー背景を出さない
+  - UI本体は中央配置
+  - デバイス差で変わるのは外側の白い余白だけ
+  - LOCATION / DETAIL / DAYS / STATUS は ui-canvas 内の固定比率
+  - 赤いガイド線・補助線・タイムライン等は描画しない
+*/
+
+* {
+  box-sizing: border-box;
+  -webkit-tap-highlight-color: transparent;
+}
+
+html,
+body {
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: #ffffff;
+  font-family: -apple-system, BlinkMacSystemFont, "Helvetica Neue", "Yu Gothic", Meiryo, sans-serif;
+  overscroll-behavior: none;
+  -webkit-text-size-adjust: 100%;
+}
+
+body {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+}
+
+#app {
+  position: fixed;
+  left: 0;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.header-canvas,
+.ui-canvas {
+  position: relative;
+  width: 86vw;
+  max-width: 980px;
+  min-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+.top-bar {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 100%;
+  height: 96px;
+  background: #3f82b1;
+  overflow: hidden;
+}
+
+.header-canvas {
+  height: 96px;
+}
+
+.sub-info {
+  position: absolute;
+  left: 0;
+  top: 8px;
+  font-size: 11px;
+  line-height: 1;
+  font-weight: 800;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.menu-button {
+  position: absolute;
+  left: 72px;
+  top: 30px;
+  width: 46px;
+  height: 38px;
+  border: 0;
+  padding: 0;
+  background: transparent;
+}
+
+.menu-button span {
+  display: block;
+  width: 40px;
+  height: 5px;
+  margin: 0 auto 8px auto;
+  border-radius: 4px;
+  background: #ffffff;
+}
+
+.main-date {
+  position: absolute;
+  left: 190px;
+  top: 30px;
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.main-time {
+  position: absolute;
+  left: 420px;
+  top: 30px;
+  font-size: 32px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: 1px;
+  color: #ffffff;
+  white-space: nowrap;
+}
+
+.reserve-button {
+  position: absolute;
+  right: 70px;
+  top: 28px;
+  width: 118px;
+  height: 40px;
+  border: 0;
+  border-radius: 7px;
+  background: #ffffff;
+  color: #0d5b99;
+  font-size: 14px;
+  font-weight: 800;
+  box-shadow: 0 1px 4px rgba(0,0,0,.18);
+}
+
+.main-stage {
+  position: absolute;
+  left: 0;
+  top: 96px;
+  right: 0;
+  bottom: 0;
+  overflow: hidden;
+  background: #ffffff;
+}
+
+.ui-canvas {
+  height: 100%;
+  min-height: 0;
+}
+
+.area {
+  position: absolute;
+  overflow: hidden;
+}
+
+.area h2 {
+  position: absolute;
+  left: 0;
+  top: 0;
+  margin: 0;
+  color: #088b43;
+  font-size: 16px;
+  line-height: 1;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+
+.area-location {
+  left: 9%;
+  top: 14%;
+  width: 66%;
+  height: 43%;
+}
+
+.area-detail {
+  left: 76%;
+  top: 14%;
+  width: 18%;
+  height: 43%;
+}
+
+.area-days {
+  left: 9%;
+  top: 63%;
+  width: 66%;
+  height: 20%;
+}
+
+.area-status {
+  left: 76%;
+  top: 63%;
+  width: 18%;
+  height: 20%;
+}
+
+@media (min-width: 1000px) and (max-width: 1200px) {
+  .header-canvas,
+  .ui-canvas {
+    width: 88vw;
+    max-width: none;
+    min-width: 0;
+  }
+
+  .top-bar,
+  .header-canvas {
+    height: 106px;
+  }
+
+  .main-stage {
+    top: 106px;
+  }
+
+  .sub-info {
+    left: 0;
+    top: 10px;
+    font-size: 14px;
+  }
+
+  .menu-button {
+    left: 46px;
+    top: 36px;
+    width: 58px;
+    height: 48px;
+  }
+
+  .menu-button span {
+    width: 52px;
+    height: 6px;
+    margin-bottom: 10px;
+  }
+
+  .main-date {
+    left: 150px;
+    top: 36px;
+    font-size: 38px;
+  }
+
+  .main-time {
+    left: 410px;
+    top: 36px;
+    font-size: 38px;
+  }
+
+  .reserve-button {
+    right: 38px;
+    top: 34px;
+    width: 130px;
+    height: 48px;
+    font-size: 16px;
+  }
+
+  .area h2 {
+    font-size: 20px;
+  }
+
+  .area-location,
+  .area-detail {
+    top: 13%;
+  }
+
+  .area-days,
+  .area-status {
+    top: 64%;
+  }
+}
+
+@media (max-width: 860px) {
+  .header-canvas,
+  .ui-canvas {
+    width: 760px;
+    min-width: 760px;
+  }
+}

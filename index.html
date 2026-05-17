@@ -1,54 +1,32 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
-<title>care taxi shell v5</title>
-<style>
-html,body{
-margin:0;
-padding:0;
-width:100%;
-height:100%;
-overflow:hidden;
-background:#ffffff;
-font-family:sans-serif;
-}
-#topbar{
-position:fixed;
-left:0;
-top:0;
-width:100%;
-height:132px;
-background:#4d86b7;
-}
-#shell{
-position:fixed;
-left:0;
-top:132px;
-right:0;
-bottom:0;
-background:#ffffff;
-}
-.label{
-position:absolute;
-font-weight:700;
-color:#0c9447;
-font-size:18px;
-}
-#loc{left:17%;top:12%;}
-#det{right:20%;top:12%;}
-#days{left:17%;bottom:18%;}
-#status{right:20%;bottom:18%;}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no" />
+  <title>介護タクシー管理アプリ Shell v6</title>
+  <link rel="stylesheet" href="./css/app.css" />
 </head>
 <body>
-<div id="topbar"></div>
-<div id="shell">
-<div id="loc" class="label">LOCATION</div>
-<div id="det" class="label">DETAIL</div>
-<div id="days" class="label">DAYS</div>
-<div id="status" class="label">STATUS</div>
-</div>
+  <div id="app">
+    <header class="top-bar" aria-label="ヘッダー">
+      <div class="header-canvas">
+        <div class="sub-info">2:36　6月12日(火)</div>
+        <button class="menu-button" aria-label="メニュー"><span></span><span></span><span></span></button>
+        <div class="main-date">5/10（日）</div>
+        <div class="main-time">05:14</div>
+        <button class="reserve-button">＋予約登録</button>
+      </div>
+    </header>
+
+    <main class="main-stage" aria-label="管理画面">
+      <div class="ui-canvas">
+        <section class="area area-location" aria-label="LOCATION"><h2>LOCATION</h2></section>
+        <section class="area area-detail" aria-label="DETAIL"><h2>DETAIL</h2></section>
+        <section class="area area-days" aria-label="DAYS"><h2>DAYS</h2></section>
+        <section class="area area-status" aria-label="STATUS"><h2>STATUS</h2></section>
+      </div>
+    </main>
+  </div>
+  <script src="./js/app.js"></script>
 </body>
 </html>
