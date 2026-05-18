@@ -88,10 +88,15 @@
 .status-name{white-space:nowrap;text-align:left;overflow:hidden;text-overflow:clip}
 .status-value{white-space:nowrap;text-align:right;color:var(--green);overflow:hidden;text-overflow:clip}
 
-/* v34: DETAIL / STATUS 右側エリアのL字境界。
-   縦線は LOCATION右端 = DETAIL/STATUS左端。
-   横線は DETAIL/STATUSエリア右端（--content-right）までで止める。
-   中身配置の基準線なので、既存の外枠座標・DAYS/STATUS内容は触らない。 */
+/* v35: DETAIL / STATUS 右側エリアのL字境界。
+   既存の外枠座標・DAYS/STATUS内容は触らず、L字だけ微調整。
+   - 縦線は DETAIL/STATUS の文字へくっ付かないよう少し左へ逃がす
+   - 下の横線は STATUS の文字より上に置く
+   - 横線の右端は右エリア端（--content-right）で止める */
+:root{
+  --l-boundary-left:548px;
+  --l-boundary-y:374px;
+}
 .l-boundary{
   position:absolute;
   background:#b8b8b8;
@@ -99,15 +104,15 @@
   pointer-events:none;
 }
 .l-boundary-vertical{
-  left:var(--right-col-left);
+  left:var(--l-boundary-left);
   top:var(--area-top);
   width:1px;
-  height:calc(var(--bottom-area-y) - var(--area-top));
+  height:calc(var(--l-boundary-y) - var(--area-top));
 }
 .l-boundary-horizontal{
-  left:var(--right-col-left);
-  top:var(--bottom-area-y);
-  width:calc(var(--content-right) - var(--right-col-left));
+  left:var(--l-boundary-left);
+  top:var(--l-boundary-y);
+  width:calc(var(--content-right) - var(--l-boundary-left));
   height:1px;
 }
 .area-days,.area-status{z-index:3}

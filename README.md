@@ -36,3 +36,10 @@ CSS参照は GitHub Pages 対応の相対パス `./css/...`。
 - DETAIL/STATUS右側エリアのL字境界線のみ追加。
 - 横線は右エリアの右端（予約登録ボタン右端基準のcontent-right）までで停止。
 - 外枠座標・DAYSカード・STATUS内容は変更しない。
+
+
+## v35 L字境界微調整
+- v34 / v31 ベースのDAYSカード・STATUS内容は維持。
+- L字の縦線を少し左へ移動し、DETAIL/STATUS文字との接触感を回避。
+- L字の横線をSTATUS文字より上に配置。
+- 横線の右端は右エリア端で停止。
