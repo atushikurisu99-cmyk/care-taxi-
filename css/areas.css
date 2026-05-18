@@ -117,3 +117,21 @@
 }
 .area-days,.area-status{z-index:3}
 .area-location,.area-detail{z-index:3}
+
+
+/* LOCATION timeline v36 */
+.timeline-shell{width:100%;height:100%;display:flex;flex-direction:column;color:#153327}
+.timeline-header{height:30px;display:flex;border-bottom:1px solid #d7d7d7}
+.driver-col-header{width:94px;flex:0 0 94px}
+.timeline-hours{display:grid;grid-template-columns:repeat(10,1fr);flex:1;font-size:11px;font-weight:800;color:#3f3f3f;align-items:end;padding-bottom:6px}
+.timeline-hours div{text-align:center}
+.timeline-body{flex:1;display:flex;min-height:0}
+.driver-col{width:94px;flex:0 0 94px;border-right:1px solid #d7d7d7;display:grid;grid-template-rows:repeat(5,1fr)}
+.driver-col div{display:flex;align-items:center;padding-left:8px;font-size:12px;font-weight:800;color:#214733;border-bottom:1px solid #ececec}
+.timeline-scroll{flex:1;overflow-x:scroll;overflow-y:hidden}
+.timeline-grid{position:relative;width:960px;height:100%;background-image:linear-gradient(to right,#ececec 1px,transparent 1px),linear-gradient(to bottom,#ececec 1px,transparent 1px);background-size:96px 100%,100% 46px}
+.now-line{position:absolute;left:302px;top:0;width:2px;height:100%;background:#d94242;opacity:.7}
+.job{position:absolute;height:28px;border-radius:6px;background:#9ed36a;color:#183012;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 10px;white-space:nowrap}
+.job-a{left:120px;top:8px;width:92px}
+.job-b{left:360px;top:54px;width:88px}
+.job-c{left:610px;top:100px;width:96px}
