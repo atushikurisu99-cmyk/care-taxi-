@@ -1,0 +1,160 @@
+/*
+  v31: 各エリアをpxで確定。
+  外側基準：ハンバーガー左端 x=34px / 予約登録ボタン右端 x=696px。
+  下端基準：現状のDAYSカード下部 y=535px。
+  以後、外枠座標は触らず、各エリア内だけを育てる。
+*/
+:root{
+  --content-left:34px;
+  --content-right:696px;
+  --right-col-left:560px;
+  --area-top:84px;
+  --area-bottom:535px;
+  --top-label-y:62px;
+  --bottom-label-y:390px;
+  --top-area-h:260px;
+  --bottom-area-y:415px;
+  --bottom-area-h:120px;
+  --left-area-w:506px;
+  --right-area-w:136px;
+}
+
+.location-label{left:var(--content-left);top:var(--top-label-y)}
+.detail-label{left:var(--right-col-left);top:var(--top-label-y)}
+.days-label{left:var(--content-left);top:var(--bottom-label-y)}
+.status-label{left:var(--right-col-left);top:var(--bottom-label-y)}
+
+.area-location{left:var(--content-left);top:var(--area-top);width:var(--left-area-w);height:var(--top-area-h)}
+.area-detail{left:var(--right-col-left);top:var(--area-top);width:var(--right-area-w);height:var(--top-area-h)}
+.area-days{left:var(--content-left);top:var(--bottom-area-y);width:var(--left-area-w);height:var(--bottom-area-h)}
+.area-status{left:var(--right-col-left);top:var(--bottom-area-y);width:var(--right-area-w);height:var(--bottom-area-h)}
+
+/* DAYS：DAYSエリア内を広く使い、7枚を必ず1画面内に収める。 */
+.days-grid{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:repeat(7, 1fr);
+  gap:7px;
+  align-items:stretch;
+  padding:0;
+  overflow:hidden;
+}
+.day-card{
+  height:100%;
+  border:1.4px solid #a8d8c0;
+  border-radius:8px;
+  color:#0b2a1a;
+  background:#fff;
+  display:grid;
+  grid-template-rows:20px 8px repeat(5, 15px);
+  align-content:start;
+  justify-items:center;
+  padding:8px 4px 6px;
+  overflow:hidden;
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-0.04em;
+  text-align:center;
+}
+.day-date{
+  font-size:17px;
+  font-weight:900;
+  line-height:20px;
+  letter-spacing:-0.03em;
+}
+.day-spacer{height:8px}
+.day-empty{color:#b9c9c0;font-weight:900}
+
+/* STATUS：STATUSエリア内だけで完結。左にはみ出さない2列固定。 */
+.status-list{
+  width:100%;
+  height:100%;
+  display:grid;
+  grid-template-columns:70px 58px;
+  grid-auto-rows:15px;
+  column-gap:4px;
+  align-content:start;
+  justify-content:center;
+  padding:14px 2px 0;
+  overflow:hidden;
+  color:#06341f;
+  font-size:12px;
+  font-weight:800;
+  line-height:1;
+  letter-spacing:-0.04em;
+}
+.status-name{white-space:nowrap;text-align:left;overflow:hidden;text-overflow:clip}
+.status-value{white-space:nowrap;text-align:right;color:var(--green);overflow:hidden;text-overflow:clip}
+
+/* v35: DETAIL / STATUS 右側エリアのL字境界。
+   既存の外枠座標・DAYS/STATUS内容は触らず、L字だけ微調整。
+   - 縦線は DETAIL/STATUS の文字へくっ付かないよう少し左へ逃がす
+   - 下の横線は STATUS の文字より上に置く
+   - 横線の右端は右エリア端（--content-right）で止める */
+:root{
+  --l-boundary-left:548px;
+  --l-boundary-y:374px;
+}
+.l-boundary{
+  position:absolute;
+  background:#b8b8b8;
+  z-index:1;
+  pointer-events:none;
+}
+.l-boundary-vertical{
+  left:var(--l-boundary-left);
+  top:var(--area-top);
+  width:1px;
+  height:calc(var(--l-boundary-y) - var(--area-top));
+}
+.l-boundary-horizontal{
+  left:var(--l-boundary-left);
+  top:var(--l-boundary-y);
+  width:calc(var(--content-right) - var(--l-boundary-left));
+  height:1px;
+}
+.area-days,.area-status{z-index:3}
+.area-location,.area-detail{z-index:3}
+
+
+/* LOCATION timeline v36 */
+.timeline-shell{width:100%;height:100%;display:flex;flex-direction:column;color:#153327}
+.timeline-header{height:30px;display:flex;border-bottom:1px solid #d7d7d7}
+.driver-col-header{width:94px;flex:0 0 94px}
+.timeline-hours-viewport{flex:1;overflow:hidden;position:relative}
+.timeline-hours-track{position:relative;width:1296px;height:100%;font-size:11px;font-weight:800;color:#3f3f3f}
+.hour-label{position:absolute;bottom:6px;transform:translateX(-50%);white-space:nowrap;text-align:center}
+.timeline-body{flex:1;display:flex;min-height:0}
+.driver-col{width:94px;flex:0 0 94px;border-right:1px solid #d7d7d7;display:grid;grid-template-rows:repeat(5,1fr)}
+.driver-col div{display:flex;align-items:center;padding-left:8px;font-size:12px;font-weight:800;color:#214733;border-bottom:1px solid #ececec}
+.timeline-scroll{flex:1;overflow-x:scroll;overflow-y:hidden}
+.timeline-grid{position:relative;width:1296px;height:100%;background-image:linear-gradient(to right,#ececec 1px,transparent 1px),linear-gradient(to bottom,#ececec 1px,transparent 1px);background-size:48px 100%,100% 46px}
+.now-line{position:absolute;left:302px;top:0;width:2px;height:100%;background:#d94242;opacity:.7}
+.job{position:absolute;height:28px;border-radius:6px;background:#9ed36a;color:#183012;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;padding:0 10px;white-space:nowrap}
+.job-a{left:120px;top:8px;width:92px}
+.job-b{left:360px;top:54px;width:88px}
+.job-c{left:610px;top:100px;width:96px}
+
+
+/* v39: スクロール責任範囲を分離。
+   画面全体は固定。LOCATION横スクロール、DETAIL/STATUS内部スクロールのみ許可。 */
+.timeline-scroll{
+  touch-action:pan-x;
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+}
+.timeline-hours-viewport{
+  touch-action:none;
+  overscroll-behavior:contain;
+}
+.area-detail,
+.area-status{
+  -webkit-overflow-scrolling:touch;
+  overscroll-behavior:contain;
+  touch-action:pan-y;
+}
+.area-days{
+  touch-action:none;
+}

@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>介護タクシー管理アプリ</title>
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/header.css">
+  <link rel="stylesheet" href="./css/areas.css">
+</head>
+<body>
+  <div id="app">
+    <header class="app-header" aria-label="上部情報帯">
+      <div class="header-inner">
+        <button class="menu-button" aria-label="メニュー"><span></span><span></span><span></span></button>
+        <div class="header-date">5/10（日）</div>
+        <div class="header-time">05:14</div>
+        <button class="reserve-button">＋予約登録</button>
+      </div>
+    </header>
+
+    <main class="stage-wrap" aria-label="固定比率UIキャンバス">
+      <section class="stage" id="stage">
+        <div class="area-label location-label">LOCATION</div>
+        <div class="area-label detail-label">DETAIL</div>
+        <div class="area-label days-label">DAYS</div>
+        <div class="area-label status-label">STATUS</div>
+
+        <div class="l-boundary l-boundary-vertical" aria-hidden="true"></div>
+        <div class="l-boundary l-boundary-horizontal" aria-hidden="true"></div>
+
+        
+        <div class="area area-location" aria-label="LOCATIONエリア">
+          <div class="timeline-shell">
+            <div class="timeline-header">
+              <div class="driver-col-header"></div>
+              <div class="timeline-hours-viewport" aria-hidden="true">
+                <div class="timeline-hours-track">
+                  <div class="hour-label" style="left:48px">7:00</div>
+                  <div class="hour-label" style="left:144px">8:00</div>
+                  <div class="hour-label" style="left:240px">9:00</div>
+                  <div class="hour-label" style="left:336px">10:00</div>
+                  <div class="hour-label" style="left:432px">11:00</div>
+                  <div class="hour-label" style="left:528px">12:00</div>
+                  <div class="hour-label" style="left:624px">13:00</div>
+                  <div class="hour-label" style="left:720px">14:00</div>
+                  <div class="hour-label" style="left:816px">15:00</div>
+                  <div class="hour-label" style="left:912px">16:00</div>
+                  <div class="hour-label" style="left:1008px">17:00</div>
+                  <div class="hour-label" style="left:1104px">18:00</div>
+                  <div class="hour-label" style="left:1200px">19:00</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-body">
+              <div class="driver-col">
+                <div>広島ケア</div>
+                <div>あおば</div>
+                <div>みらい</div>
+                <div>さくら</div>
+                <div>中央</div>
+              </div>
+              <div class="timeline-scroll">
+                <div class="timeline-grid">
+                  <div class="now-line"></div>
+                  <div class="job job-a">田中様</div>
+                  <div class="job job-b">山本様</div>
+                  <div class="job job-c">佐藤様</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="area area-detail" aria-label="DETAILエリア"></div>
+
+        <div class="area area-days" aria-label="DAYSエリア">
+          <div class="days-grid" aria-label="DAYS 7日カード">
+            <article class="day-card">
+              <div class="day-date">5/10</div><div class="day-spacer"></div>
+              <div>案件 8</div><div>調整 1</div><div>未請求 2</div><div>未入金 1</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/11</div><div class="day-spacer"></div>
+              <div>案件 6</div><div>調整 0</div><div>確認 1</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/12</div><div class="day-spacer"></div>
+              <div>案件 9</div><div>調整 2</div><div>要調整</div><div>請求前</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/13</div><div class="day-spacer"></div>
+              <div>案件 5</div><div>調整 0</div><div class="day-empty">—</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/14</div><div class="day-spacer"></div>
+              <div>案件 7</div><div>調整 1</div><div>未支払</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/15</div><div class="day-spacer"></div>
+              <div>案件 4</div><div>調整 0</div><div class="day-empty">—</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/16</div><div class="day-spacer"></div>
+              <div>案件 3</div><div>調整 0</div><div>仮予約</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+          </div>
+        </div>
+
+        <div class="area area-status" aria-label="STATUSエリア">
+          <div class="status-list" aria-label="状態一覧">
+            <div class="status-name">広島ケア</div><div class="status-value">待機中</div>
+            <div class="status-name">あおば</div><div class="status-value">向かい中</div>
+            <div class="status-name">みらい</div><div class="status-value">搬送中</div>
+            <div class="status-name">さくら</div><div class="status-value">終了</div>
+            <div class="status-name">ひかり</div><div class="status-value">待機中</div>
+            <div class="status-name">中央</div><div class="status-value">確認中</div>
+            <div class="status-name">西部</div><div class="status-value">終了</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="./js/app-lock.js"></script>
+  <script src="./js/scale.js"></script>
+  <script src="./js/location-scroll.js"></script>
+</body>
+</html>
