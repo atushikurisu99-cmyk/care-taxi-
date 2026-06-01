@@ -30,13 +30,12 @@
         <div class="l-boundary l-boundary-vertical" aria-hidden="true"></div>
         <div class="l-boundary l-boundary-horizontal" aria-hidden="true"></div>
 
-        
         <div class="area area-location" aria-label="LOCATIONエリア">
           <div class="timeline-shell">
             <div class="timeline-header">
               <div class="driver-col-header"></div>
               <div class="timeline-hours-viewport" aria-hidden="true">
-                <div class="timeline-hours-track">
+                <div class="timeline-hours-track" id="timeline-hours-track">
                   <div class="hour-label" style="left:48px">7:00</div>
                   <div class="hour-label" style="left:144px">8:00</div>
                   <div class="hour-label" style="left:240px">9:00</div>
@@ -53,6 +52,7 @@
                 </div>
               </div>
             </div>
+
             <div class="timeline-body">
               <div class="driver-col">
                 <div>広島ケア</div>
@@ -61,7 +61,8 @@
                 <div>さくら</div>
                 <div>中央</div>
               </div>
-              <div class="timeline-scroll">
+
+              <div class="timeline-scroll" id="timeline-scroll">
                 <div class="timeline-grid">
                   <div class="now-line"></div>
                   <div class="job job-a">田中様</div>
@@ -72,6 +73,7 @@
             </div>
           </div>
         </div>
+
         <div class="area area-detail" aria-label="DETAILエリア"></div>
 
         <div class="area area-days" aria-label="DAYSエリア">
@@ -121,6 +123,7 @@
       </section>
     </main>
   </div>
+
   <script src="./js/app-lock.js"></script>
   <script src="./js/scale.js"></script>
   <script src="./js/location-scroll.js"></script>
