@@ -1,0 +1,215 @@
+<!doctype html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <title>介護タクシー管理アプリ</title>
+  <link rel="stylesheet" href="./css/reset.css">
+  <link rel="stylesheet" href="./css/layout.css">
+  <link rel="stylesheet" href="./css/header.css">
+  <link rel="stylesheet" href="./css/areas.css">
+  <link rel="stylesheet" href="./css/pc.css">
+</head>
+<body>
+  <div id="pc-app" aria-label="PC管理画面">
+    <aside class="pc-sidebar">
+      <div class="pc-brand"><div class="pc-brand-icon">介</div><div>介護タクシー管理</div></div>
+      <nav class="pc-menu" aria-label="PCメニュー">
+        <button class="active">⌂ ダッシュボード</button>
+        <button>✎ 案件入力</button>
+        <button>☷ 案件一覧</button>
+        <button>▤ 請求管理</button>
+        <button>￥ 入金管理</button>
+        <button>▣ 支払管理</button>
+        <button>□ 帳票ひな形</button>
+        <button>○ 患者管理</button>
+        <button>♢ 協力業者</button>
+        <button>⚙ 設定</button>
+      </nav>
+      <button class="pc-ipad-switch" data-view-mode="ipad">iPad表示に切替</button>
+    </aside>
+
+    <header class="pc-header">
+      <div class="pc-hamburger">☰</div>
+      <div class="pc-title-block">
+        <div class="pc-title">ダッシュボード</div>
+        <div class="pc-subtitle">請求・入金・支払の状況を確認します</div>
+      </div>
+      <div class="pc-search">患者名・案件番号・元請けで検索</div>
+      <div class="pc-user">管理者 ▾</div>
+    </header>
+
+    <main class="pc-main">
+      <div class="pc-main-inner">
+        <h1 class="pc-section-title">本日の管理状況</h1>
+        <div class="pc-section-note">まずは形だけのPC管理画面です。項目は後から増減します。</div>
+
+        <section class="pc-cards" aria-label="管理カード">
+          <article class="pc-card invoice"><div class="pc-card-top">未発行請求書 <span>▤</span></div><div class="pc-card-num">12<span>件</span></div><div class="pc-card-link">一覧を見る ＞</div></article>
+          <article class="pc-card payment"><div class="pc-card-top">未入金 <span>￥</span></div><div class="pc-card-num">8<span>件</span></div><div class="pc-card-link">一覧を見る ＞</div></article>
+          <article class="pc-card outsource"><div class="pc-card-top">未支払 <span>▣</span></div><div class="pc-card-num">5<span>件</span></div><div class="pc-card-link">一覧を見る ＞</div></article>
+          <article class="pc-card today"><div class="pc-card-top">本日案件 <span>□</span></div><div class="pc-card-num">7<span>件</span></div><div class="pc-card-link">一覧を見る ＞</div></article>
+          <article class="pc-card adjust"><div class="pc-card-top">調整中 <span>○</span></div><div class="pc-card-num">3<span>件</span></div><div class="pc-card-link">一覧を見る ＞</div></article>
+        </section>
+
+        <section class="pc-panel">
+          <div class="pc-panel-head"><span>本日の案件</span><button class="pc-outline-btn">案件一覧へ</button></div>
+          <table class="pc-table">
+            <thead><tr><th>時間</th><th>患者名</th><th>元請け</th><th>出発地</th><th>到着地</th><th>担当</th><th>状態</th></tr></thead>
+            <tbody>
+              <tr><td>09:00</td><td>山田 太郎 様</td><td>○○病院</td><td>自宅</td><td>○○病院</td><td>田中</td><td><span class="pc-badge ok">完了</span></td></tr>
+              <tr><td>10:30</td><td>佐藤 花子 様</td><td>△△クリニック</td><td>自宅</td><td>△△クリニック</td><td>鈴木</td><td><span class="pc-badge ok">完了</span></td></tr>
+              <tr><td>13:00</td><td>高橋 一郎 様</td><td>□□病院</td><td>自宅</td><td>□□病院</td><td>山本</td><td><span class="pc-badge move">移動中</span></td></tr>
+              <tr><td>15:00</td><td>伊藤 美咲 様</td><td>○○病院</td><td>自宅</td><td>○○病院</td><td>田中</td><td><span class="pc-badge plan">予定</span></td></tr>
+            </tbody>
+          </table>
+        </section>
+
+        <div class="pc-bottom-grid">
+          <section class="pc-panel"><div class="pc-panel-head">お知らせ・メモ</div><div class="pc-memo"><p>請求書の再発行ルールを追加予定 <time>2026/06/02</time></p><p>支払処理は月末締めで確認 <time>2026/06/01</time></p><p>帳票ひな形は後から調整 <time>2026/05/31</time></p></div></section>
+          <section class="pc-panel"><div class="pc-panel-head">クイックアクション</div><div class="pc-actions"><button>案件入力</button><button>案件一覧</button><button>請求書発行</button><button>入金登録</button><button>支払処理</button><button>帳票ひな形</button></div></section>
+        </div>
+      </div>
+    </main>
+
+    <aside class="pc-detail">
+      <div class="pc-detail-head"><h2>案件詳細</h2><button class="pc-close">閉じる ×</button></div>
+      <div class="pc-empty">案件を選択してください<br>案件一覧またはダッシュボードから選択すると詳細が表示されます。</div>
+      <section class="pc-detail-card">
+        <div class="pc-detail-row"><span>請求書</span><span class="pc-mini-status">未発行</span></div>
+        <button class="pc-primary-btn">請求書発行</button>
+        <button class="pc-secondary-btn">プレビュー</button>
+      </section>
+      <section class="pc-detail-card">
+        <div class="pc-detail-row"><span>発行履歴</span><span>履歴なし</span></div>
+      </section>
+      <section class="pc-detail-card">
+        <div class="pc-detail-row"><span>入金状況</span><span class="pc-mini-status">未入金</span></div>
+        <button class="pc-secondary-btn">入金登録</button>
+      </section>
+      <section class="pc-detail-card">
+        <div class="pc-detail-row"><span>支払状況</span><span class="pc-mini-status">未支払</span></div>
+        <button class="pc-secondary-btn">支払処理</button>
+      </section>
+    </aside>
+
+    <footer class="pc-footer"><span>© Care Taxi Management App</span><span>PC管理画面モック / v0.1</span></footer>
+  </div>
+
+  <div id="app">
+    <header class="app-header" aria-label="上部情報帯">
+      <div class="header-inner">
+        <button class="menu-button" aria-label="メニュー"><span></span><span></span><span></span></button>
+        <div class="header-date">5/10（日）</div>
+        <div class="header-time">05:14</div>
+        <button class="reserve-button">＋予約登録</button>
+      </div>
+    </header>
+
+    <main class="stage-wrap" aria-label="固定比率UIキャンバス">
+      <section class="stage" id="stage">
+        <div class="area-label location-label">LOCATION</div>
+        <div class="area-label detail-label">DETAIL</div>
+        <div class="area-label days-label">DAYS</div>
+        <div class="area-label status-label">STATUS</div>
+
+        <div class="l-boundary l-boundary-vertical" aria-hidden="true"></div>
+        <div class="l-boundary l-boundary-horizontal" aria-hidden="true"></div>
+
+        
+        <div class="area area-location" aria-label="LOCATIONエリア">
+          <div class="timeline-shell">
+            <div class="timeline-header">
+              <div class="driver-col-header"></div>
+              <div class="timeline-hours-viewport" aria-hidden="true">
+                <div class="timeline-hours-track">
+                  <div class="hour-label" style="left:48px">7:00</div>
+                  <div class="hour-label" style="left:144px">8:00</div>
+                  <div class="hour-label" style="left:240px">9:00</div>
+                  <div class="hour-label" style="left:336px">10:00</div>
+                  <div class="hour-label" style="left:432px">11:00</div>
+                  <div class="hour-label" style="left:528px">12:00</div>
+                  <div class="hour-label" style="left:624px">13:00</div>
+                  <div class="hour-label" style="left:720px">14:00</div>
+                  <div class="hour-label" style="left:816px">15:00</div>
+                  <div class="hour-label" style="left:912px">16:00</div>
+                  <div class="hour-label" style="left:1008px">17:00</div>
+                  <div class="hour-label" style="left:1104px">18:00</div>
+                  <div class="hour-label" style="left:1200px">19:00</div>
+                </div>
+              </div>
+            </div>
+            <div class="timeline-body">
+              <div class="driver-col">
+                <div>広島ケア</div>
+                <div>あおば</div>
+                <div>みらい</div>
+                <div>さくら</div>
+                <div>中央</div>
+              </div>
+              <div class="timeline-scroll">
+                <div class="timeline-grid">
+                  <div class="now-line"></div>
+                  <div class="job job-a">田中様</div>
+                  <div class="job job-b">山本様</div>
+                  <div class="job job-c">佐藤様</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+        <div class="area area-detail" aria-label="DETAILエリア"></div>
+
+        <div class="area area-days" aria-label="DAYSエリア">
+          <div class="days-grid" aria-label="DAYS 7日カード">
+            <article class="day-card">
+              <div class="day-date">5/10</div><div class="day-spacer"></div>
+              <div>案件 8</div><div>調整 1</div><div>未請求 2</div><div>未入金 1</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/11</div><div class="day-spacer"></div>
+              <div>案件 6</div><div>調整 0</div><div>確認 1</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/12</div><div class="day-spacer"></div>
+              <div>案件 9</div><div>調整 2</div><div>要調整</div><div>請求前</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/13</div><div class="day-spacer"></div>
+              <div>案件 5</div><div>調整 0</div><div class="day-empty">—</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/14</div><div class="day-spacer"></div>
+              <div>案件 7</div><div>調整 1</div><div>未支払</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/15</div><div class="day-spacer"></div>
+              <div>案件 4</div><div>調整 0</div><div class="day-empty">—</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+            <article class="day-card">
+              <div class="day-date">5/16</div><div class="day-spacer"></div>
+              <div>案件 3</div><div>調整 0</div><div>仮予約</div><div class="day-empty">—</div><div class="day-empty">—</div>
+            </article>
+          </div>
+        </div>
+
+        <div class="area area-status" aria-label="STATUSエリア">
+          <div class="status-list" aria-label="状態一覧">
+            <div class="status-name">広島ケア</div><div class="status-value">待機中</div>
+            <div class="status-name">あおば</div><div class="status-value">向かい中</div>
+            <div class="status-name">みらい</div><div class="status-value">搬送中</div>
+            <div class="status-name">さくら</div><div class="status-value">終了</div>
+            <div class="status-name">ひかり</div><div class="status-value">待機中</div>
+            <div class="status-name">中央</div><div class="status-value">確認中</div>
+            <div class="status-name">西部</div><div class="status-value">終了</div>
+          </div>
+        </div>
+      </section>
+    </main>
+  </div>
+  <script src="./js/view-mode.js"></script>
+  <script src="./js/app-lock.js"></script>
+  <script src="./js/scale.js"></script>
+  <script src="./js/location-scroll.js"></script>
+</body>
+</html>
