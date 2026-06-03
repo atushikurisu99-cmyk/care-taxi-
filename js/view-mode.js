@@ -1,28 +1,84 @@
 (function(){
-  function isPcLike(){
-    var w = window.innerWidth || document.documentElement.clientWidth || 0;
-    var touch = navigator.maxTouchPoints || 0;
-    return w >= 1100 && touch < 2;
+  var PC_MIN_WIDTH = 1000;
+
+  function getParamMode(){
+    var params = new URLSearchParams(window.location.search);
+    var mode = params.get('mode');
+    if(mode === 'pc' || mode === 'ipad') return mode;
+    return '';
   }
 
-  function applyMode(mode){
-    document.body.classList.remove('pc-mode','ipad-mode');
-    document.body.classList.add(mode === 'ipad' ? 'ipad-mode' : 'pc-mode');
-    localStorage.setItem('careTaxiViewMode', mode === 'ipad' ? 'ipad' : 'pc');
+  function isPcSize(){
+    return (window.innerWidth || document.documentElement.clientWidth) >= PC_MIN_WIDTH;
+  }
+
+  function setMode(mode){
+    var pcApp = document.getElementById('pc-app');
+    var ipadApp = document.getElementById('app');
+
+    if(!pcApp || !ipadApp) return;
+
+    document.body.classList.remove('view-pc','view-ipad');
+
+    if(mode === 'pc'){
+      document.body.classList.add('view-pc');
+      pcApp.style.display = 'grid';
+      ipadApp.style.display = 'none';
+      localStorage.setItem('careTaxiViewMode','pc');
+    }else{
+      document.body.classList.add('view-ipad');
+      pcApp.style.display = 'none';
+      ipadApp.style.display = 'block';
+      localStorage.setItem('careTaxiViewMode','ipad');
+    }
+  }
+
+  function decideInitialMode(){
+    var paramMode = getParamMode();
+
+    if(paramMode){
+      return paramMode;
+    }
+
+    /*
+      PCで開いたら必ずPC画面を優先。
+      iPad表示ボタンを押した記録が残っていても、
+      PC幅ならPCへ戻す。
+    */
+    if(isPcSize()){
+      return 'pc';
+    }
+
+    return 'ipad';
+  }
+
+  function bindButtons(){
+    document.addEventListener('click', function(e){
+      var ipadBtn = e.target.closest('[data-view="ipad"], .js-view-ipad');
+      var pcBtn = e.target.closest('[data-view="pc"], .js-view-pc');
+
+      if(ipadBtn){
+        e.preventDefault();
+        setMode('ipad');
+        return;
+      }
+
+      if(pcBtn){
+        e.preventDefault();
+        setMode('pc');
+      }
+    });
   }
 
   function boot(){
-    var saved = localStorage.getItem('careTaxiViewMode');
-    if(saved === 'ipad' || saved === 'pc'){
-      applyMode(saved);
-    }else{
-      applyMode(isPcLike() ? 'pc' : 'ipad');
-    }
+    bindButtons();
+    setMode(decideInitialMode());
 
-    var toIpad = document.querySelector('[data-view-mode="ipad"]');
-    var toPc = document.querySelector('[data-view-mode="pc"]');
-    if(toIpad){ toIpad.addEventListener('click', function(){ applyMode('ipad'); }); }
-    if(toPc){ toPc.addEventListener('click', function(){ applyMode('pc'); }); }
+    window.addEventListener('resize', function(){
+      if(isPcSize()){
+        setMode('pc');
+      }
+    });
   }
 
   if(document.readyState === 'loading'){
