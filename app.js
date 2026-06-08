@@ -1,1 +1,37 @@
-(function(){const BASE_H=900;const SIDE_W=265;const WORK_W=982;const DETAIL_W=260;const CONTENT_Y=126;const CONTENT_H=640;const SIDE_X=36;const MIN_GUTTER_A=24;const MIN_GUTTER_B=24;const MIN_GUTTER_C=28;const RATIO_A=.22;const RATIO_B=.46;const RATIO_C=.32;function clamp(n,min,max){return Math.max(min,Math.min(max,n))}function fit(){const screen=document.querySelector('.screen');const vw=window.innerWidth;const vh=window.innerHeight;const viewportRatio=vw/vh;const designRatio=clamp(viewportRatio,16/9,17/9);const designW=Math.round(BASE_H*designRatio);const fixedTotal=SIDE_X+SIDE_W+WORK_W+DETAIL_W;const minimumTotal=fixedTotal+MIN_GUTTER_A+MIN_GUTTER_B+MIN_GUTTER_C;const extra=Math.max(0,designW-minimumTotal);const gutterA=MIN_GUTTER_A+extra*RATIO_A;const gutterB=MIN_GUTTER_B+extra*RATIO_B;const gutterC=MIN_GUTTER_C+extra*RATIO_C;const workX=SIDE_X+SIDE_W+gutterA;const detailX=workX+WORK_W+gutterB;const scale=Math.min(vw/designW,vh/BASE_H);screen.style.setProperty('--screen-w',designW+'px');screen.style.setProperty('--scale',scale);screen.style.setProperty('--side-x',SIDE_X+'px');screen.style.setProperty('--side-w',SIDE_W+'px');screen.style.setProperty('--content-y',CONTENT_Y+'px');screen.style.setProperty('--content-h',CONTENT_H+'px');screen.style.setProperty('--work-x',workX+'px');screen.style.setProperty('--work-w',WORK_W+'px');screen.style.setProperty('--detail-x',detailX+'px');screen.style.setProperty('--detail-w',DETAIL_W+'px');screen.style.setProperty('--gutter-c',gutterC+'px')}window.addEventListener('resize',fit);window.addEventListener('orientationchange',fit);fit()})();
+(function(){
+  const BASE_H=660;
+  const BASE_W=1366;
+  const MIN_RATIO=16/9;
+  const MAX_RATIO=2.12; // ユーザーPCのChrome表示領域寄り。広すぎる場合は右余白で吸収。
+
+  const base={leftW:255, mainW:760, detailW:235, gapLeft:14, gapMD:14, rightFree:88};
+
+  function fit(){
+    const stage=document.getElementById('stage');
+    const vw=window.innerWidth;
+    const vh=window.innerHeight;
+    const ratio=Math.min(Math.max(vw/vh,MIN_RATIO),MAX_RATIO);
+    const designW=Math.round(BASE_H*ratio);
+    const extra=Math.max(0,designW-BASE_W);
+
+    // パーツ幅は維持。余りは、左→中央、中央→DETAIL、右外側へ逃がす。
+    const gapLeft=base.gapLeft+extra*0.18;
+    const gapMD=base.gapMD+extra*0.22;
+    const rightFree=base.rightFree+extra*0.60;
+
+    stage.style.setProperty('--w',designW+'px');
+    stage.style.setProperty('--h',BASE_H+'px');
+    stage.style.setProperty('--left-w',base.leftW+'px');
+    stage.style.setProperty('--main-w',base.mainW+'px');
+    stage.style.setProperty('--detail-w',base.detailW+'px');
+    stage.style.setProperty('--gap-left',gapLeft+'px');
+    stage.style.setProperty('--gap-main-detail',gapMD+'px');
+    stage.style.setProperty('--right-free',rightFree+'px');
+
+    const scale=Math.min(vw/designW,vh/BASE_H);
+    stage.style.transform=`translate(-50%,-50%) scale(${scale})`;
+  }
+  window.addEventListener('resize',fit);
+  window.addEventListener('orientationchange',fit);
+  fit();
+})();
