@@ -3,99 +3,100 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PC PDF Big Boxes Only v1</title>
+<title>PC Big Box Menu Text v1</title>
 <style>
-  *{box-sizing:border-box}
-  html,body{
-    margin:0;
-    width:100%;
-    height:100%;
-    overflow:hidden;
-    background:#dfeff3;
+  :root{
+    --base-w:1366;
+    --base-h:768;
+    --bg:#e8f4f7;
+    --nav:#07565c;
+    --nav2:#064d53;
+    --line:#1c3338;
+    --panel:#fff;
   }
-  body{
-    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
-  }
-
-  /* PDFのアプリ表示範囲だけを、ブラウザ表示領域いっぱいに再現 */
+  *{box-sizing:border-box;}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;color:#0f1b20;}
+  .viewport{position:fixed;inset:0;background:var(--bg);overflow:hidden;}
   .stage{
-    position:relative;
-    width:100vw;
-    height:100vh;
-    background:#dfeff3;
-  }
-
-  .box{
     position:absolute;
-    background:#fff;
-    border:1px solid #2b4248;
-    border-radius:3px;
+    left:0;top:0;
+    width:1366px;height:768px;
+    transform-origin:top left;
+    background:var(--bg);
   }
-
-  .side{
-    position:absolute;
-    left:0;
-    top:0;
-    width:19.3%;
-    height:100%;
-    background:#07555b;
+  /* 1366×768基準。箱の比率は固定。JSで全体のみscale */
+  .nav{
+    position:absolute;left:0;top:0;width:264px;height:768px;
+    background:linear-gradient(180deg,var(--nav),var(--nav2));
   }
-
-  /* 上部 */
-  .search{
-    left:20.6%;
-    top:1.2%;
-    width:24.6%;
-    height:4.9%;
+  .logo{
+    position:absolute;left:44px;top:28px;width:155px;height:58px;color:#fff;font-weight:900;
+    line-height:1.02;letter-spacing:.02em;
   }
+  .logo-main{font-size:27px;display:block;}
+  .logo-sub{font-size:11px;display:block;margin-top:2px;opacity:.95;}
+  .menu{position:absolute;left:42px;top:96px;width:154px;display:flex;flex-direction:column;gap:12px;}
+  .menu-item{height:24px;line-height:24px;color:#fff;font-size:13px;font-weight:800;white-space:nowrap;}
+  .menu-item.active{height:31px;line-height:31px;background:#1598a4;border-radius:5px;padding-left:13px;margin-left:-7px;width:140px;}
+  .switch{position:absolute;left:43px;bottom:91px;width:139px;height:29px;border:1px solid rgba(255,255,255,.75);border-radius:3px;color:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;}
+  .copy{position:absolute;left:44px;bottom:42px;color:#fff;font-size:10px;line-height:1.55;opacity:.9;}
 
-  .kpi1{left:59.3%; top:2.0%; width:10.3%; height:12.0%;}
-  .kpi2{left:70.2%; top:2.0%; width:9.3%; height:12.0%;}
-  .kpi3{left:80.1%; top:2.0%; width:9.3%; height:12.0%;}
-  .kpi4{left:90.0%; top:2.0%; width:8.9%; height:12.0%;}
+  .search{position:absolute;left:281px;top:113px;width:336px;height:32px;border:1.5px solid var(--line);background:#fff;border-radius:2px;}
+  .kpi{position:absolute;top:118px;width:128px;height:80px;border:1px solid var(--line);background:#fff;border-radius:2px;}
+  .k1{left:810px}.k2{left:959px}.k3{left:1094px}.k4{left:1228px}
+  .mainbox{position:absolute;left:278px;top:215px;width:821px;height:386px;border:1.4px solid var(--line);background:#fff;border-radius:2px;}
+  .detail{position:absolute;left:1111px;top:215px;width:242px;height:530px;border:1.4px solid var(--line);background:#fff;border-radius:2px;}
+  .memo{position:absolute;left:278px;top:610px;width:428px;height:136px;border:1.4px solid var(--line);background:#fff;border-radius:2px;}
+  .quick{position:absolute;left:719px;top:610px;width:380px;height:136px;border:1.4px solid var(--line);background:#fff;border-radius:2px;}
 
-  /* 大箱 */
-  .main{
-    left:20.35%;
-    top:16.7%;
-    width:60.1%;
-    height:58.3%;
-  }
-
-  .detail{
-    left:81.35%;
-    top:16.7%;
-    width:17.8%;
-    height:80.5%;
-  }
-
-  .memo{
-    left:20.35%;
-    top:76.35%;
-    width:31.3%;
-    height:20.9%;
-  }
-
-  .quick{
-    left:52.6%;
-    top:76.35%;
-    width:27.9%;
-    height:20.9%;
+  @media (min-width: 1px){
+    .stage{--s:1;}
   }
 </style>
 </head>
 <body>
-  <div class="stage">
-    <div class="side"></div>
-    <div class="box search"></div>
-    <div class="box kpi1"></div>
-    <div class="box kpi2"></div>
-    <div class="box kpi3"></div>
-    <div class="box kpi4"></div>
-    <div class="box main"></div>
-    <div class="box detail"></div>
-    <div class="box memo"></div>
-    <div class="box quick"></div>
+<div class="viewport" id="viewport">
+  <div class="stage" id="stage">
+    <aside class="nav">
+      <div class="logo"><span class="logo-main">スママネ</span><span class="logo-sub">Status Manager</span></div>
+      <div class="menu">
+        <div class="menu-item active">ダッシュボード</div>
+        <div class="menu-item">案件入力</div>
+        <div class="menu-item">案件一覧</div>
+        <div class="menu-item">請求管理</div>
+        <div class="menu-item">入金管理</div>
+        <div class="menu-item">支払管理</div>
+        <div class="menu-item">車両・乗務員管理</div>
+        <div class="menu-item">協力業者管理</div>
+        <div class="menu-item">マスター管理</div>
+        <div class="menu-item">設定</div>
+      </div>
+      <div class="switch">iPad 表示に切替</div>
+      <div class="copy">株式会社〇〇タクシー<br>Ver.1.0.0</div>
+    </aside>
+
+    <div class="search"></div>
+    <div class="kpi k1"></div><div class="kpi k2"></div><div class="kpi k3"></div><div class="kpi k4"></div>
+    <div class="mainbox"></div>
+    <div class="detail"></div>
+    <div class="memo"></div>
+    <div class="quick"></div>
   </div>
+</div>
+<script>
+(function(){
+  const stage=document.getElementById('stage');
+  const BW=1366, BH=768;
+  function fit(){
+    const sw=window.innerWidth, sh=window.innerHeight;
+    const s=Math.min(sw/BW, sh/BH);
+    stage.style.transform='scale('+s+')';
+    stage.style.left=Math.max(0,(sw-BW*s)/2)+'px';
+    stage.style.top=Math.max(0,(sh-BH*s)/2)+'px';
+  }
+  window.addEventListener('resize',fit,{passive:true});
+  fit();
+})();
+</script>
 </body>
 </html>
