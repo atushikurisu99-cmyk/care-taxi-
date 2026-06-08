@@ -1,140 +1,75 @@
 <!doctype html>
 <html lang="ja">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Status Manager｜ステマネ</title>
-  <link rel="stylesheet" href="./styles.css" />
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Status Manager｜ステマネ</title>
+<link rel="stylesheet" href="./styles.css" />
 </head>
 <body>
-  <div class="app" id="app">
-    <aside class="left-menu area-fixed">
-      <div class="brand">
-        <div class="brand-mark">S</div>
-        <div>
-          <div class="brand-ja">ステマネ</div>
-          <div class="brand-en">Status Manager</div>
-        </div>
-      </div>
-      <nav class="menu-list">
-        <div class="menu-item active">ダッシュボード</div>
-        <div class="menu-item">案件入力</div>
-        <div class="menu-item">案件一覧</div>
-        <div class="menu-item">請求管理</div>
-        <div class="menu-item">入金管理</div>
-        <div class="menu-item">支払管理</div>
-        <div class="menu-item">車両・乗務員管理</div>
-        <div class="menu-item">協力業者管理</div>
-        <div class="menu-item">マスター管理</div>
-        <div class="menu-item">設定</div>
-      </nav>
-      <div class="menu-bottom">
-        <div class="switch-ipad">iPad 表示に切替</div>
-        <div class="version">株式会社〇〇タクシー<br>Ver.1.0.0</div>
-      </div>
-    </aside>
+<div class="app">
+  <aside class="sidebar">
+    <div class="brand"><div class="brand-mark">S</div><div><div class="brand-ja">ステマネ</div><div class="brand-en">Status Manager</div></div></div>
+    <nav class="menu">
+      <div class="menu-item active">⌂　ダッシュボード</div>
+      <div class="menu-item">▣　案件入力</div>
+      <div class="menu-item">▤　案件一覧</div>
+      <div class="menu-item">▧　請求管理</div>
+      <div class="menu-item">◎　入金管理</div>
+      <div class="menu-item">▰　支払管理</div>
+      <div class="menu-item">▱　車両・乗務員管理</div>
+      <div class="menu-item">♙　協力業者管理</div>
+      <div class="menu-item">◇　マスター管理</div>
+      <div class="menu-item">⚙　設定</div>
+    </nav>
+    <div class="side-bottom">
+      <button class="ipad">▯　iPad 表示に切替</button>
+      <div class="company">株式会社〇〇タクシー<br>Ver.1.0.0</div>
+    </div>
+  </aside>
 
-    <main class="main-area">
-      <header class="header-row">
-        <h1>状況管理</h1>
-        <div class="search-box">患者名・元請先・担当者で検索</div>
-      </header>
+  <main class="workspace">
+    <div class="top-title">状況管理</div>
+    <input class="search" placeholder="患者名・元請先・担当者で検索" />
 
-      <section class="status-row">
-        <article class="status-card today">
-          <div class="card-head">本日の状況（6/15 木）</div>
-          <div class="today-line"><span>本日案件</span><strong>7</strong><em>件</em></div>
-          <div class="today-line orange"><span>調整中</span><strong>3</strong><em>件</em></div>
-        </article>
-        <article class="status-card">
-          <div class="card-head">請求（未発行）</div>
-          <div class="count">12<span>件</span></div>
-          <div class="go-link">請求管理へ</div>
-        </article>
-        <article class="status-card">
-          <div class="card-head">入金（未入金）</div>
-          <div class="count">15<span>件</span></div>
-          <div class="go-link">入金管理へ</div>
-        </article>
-        <article class="status-card">
-          <div class="card-head">支払（未支払）</div>
-          <div class="count">10<span>件</span></div>
-          <div class="go-link">支払管理へ</div>
-        </article>
-      </section>
+    <section class="status-row">
+      <article class="status-card today">
+        <h3>▣　本日の状況（6/15 木）</h3>
+        <div class="today-line blue"><span>本日案件</span><b>7</b><em>件</em></div>
+        <div class="today-line orange"><span>調整中</span><b>3</b><em>件</em></div>
+      </article>
+      <article class="status-card"><h3>▤　請求（未発行）</h3><div class="num">12<span>件</span></div><a>請求管理へ 〉</a></article>
+      <article class="status-card"><h3>◎　入金（未入金）</h3><div class="num">15<span>件</span></div><a>入金管理へ 〉</a></article>
+      <article class="status-card"><h3>▰　支払（未支払）</h3><div class="num">10<span>件</span></div><a>支払管理へ 〉</a></article>
+    </section>
 
-      <section class="job-list-card">
-        <div class="section-head">
-          <h2>本日の案件一覧</h2>
-          <div class="filter-row">
-            <button>2025/06/15（木）</button>
-            <button>すべての担当者</button>
-            <button>更新</button>
-          </div>
-        </div>
-        <table>
-          <thead><tr><th>時間</th><th>患者名</th><th>発着地</th><th>元請先</th><th>担当者</th><th>状態</th></tr></thead>
-          <tbody>
-            <tr class="selected"><td>08:00</td><td>山田 太郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>田中</td><td><span class="badge done">完了</span></td></tr>
-            <tr><td>09:00</td><td>鈴木 花子 様</td><td>自宅 → △△クリニック</td><td>△△</td><td>佐藤</td><td><span class="badge done">完了</span></td></tr>
-            <tr><td>10:00</td><td>佐々木 次郎 様</td><td>自宅 → □□病院</td><td>□□</td><td>田中</td><td><span class="badge done">完了</span></td></tr>
-            <tr><td>11:00</td><td>田中 一郎 様</td><td>自宅 → ○○病院</td><td>○○</td><td>佐藤</td><td><span class="badge move">移動中</span></td></tr>
-            <tr><td>13:00</td><td>高橋 美咲 様</td><td>自宅 → △△クリニック</td><td>△△</td><td>山本</td><td><span class="badge wait">受付済</span></td></tr>
-            <tr><td>14:30</td><td>伊藤 三郎 様</td><td>自宅 → □□病院</td><td>□□</td><td>田中</td><td><span class="badge wait">受付済</span></td></tr>
-            <tr><td>15:30</td><td>渡辺 四郎 様</td><td>自宅 → ○○病院</td><td>○○</td><td>山本</td><td><span class="badge wait">受付済</span></td></tr>
-          </tbody>
-        </table>
-      </section>
+    <section class="list panel">
+      <div class="list-top"><h2>本日の案件一覧</h2><div class="tools"><button>2025/06/15（木）</button><button>すべての担当者</button><button>↻　更新</button></div></div>
+      <table>
+        <thead><tr><th>時間</th><th>患者名</th><th>発着地</th><th>元請先</th><th>担当者</th><th>状態</th></tr></thead>
+        <tbody>
+          <tr class="sel"><td>08:00</td><td>山田 太郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>田中</td><td><span class="badge done">完了</span></td></tr>
+          <tr><td>09:00</td><td>鈴木 花子 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>佐藤</td><td><span class="badge done">完了</span></td></tr>
+          <tr><td>10:00</td><td>佐々木 次郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="badge done">完了</span></td></tr>
+          <tr><td>11:00</td><td>田中 一郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>佐藤</td><td><span class="badge moving">移動中</span></td></tr>
+          <tr><td>13:00</td><td>高橋 美咲 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>山本</td><td><span class="badge accepted">受付済</span></td></tr>
+          <tr><td>14:30</td><td>伊藤 三郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="badge accepted">受付済</span></td></tr>
+          <tr><td>15:30</td><td>渡辺 四郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>山本</td><td><span class="badge accepted">受付済</span></td></tr>
+        </tbody>
+      </table>
+    </section>
 
-      <section class="bottom-area">
-        <article class="notice-card">
-          <h3>お知らせ・メモ</h3>
-          <p>明日（6/16）は○○病院の請求締切日です <span>06/15</span></p>
-          <p>6/20（金）は月末締め処理日です <span>06/15</span></p>
-          <p>□□病院の洗車期間は6/25です <span>06/14</span></p>
-          <p>新しいバージョンをリリースしました <span>06/10</span></p>
-        </article>
-        <article class="quick-card">
-          <h3>クイック操作</h3>
-          <div class="quick-grid">
-            <button>新規案件入力</button>
-            <button>請求書一括発行</button>
-            <button>入金一括登録</button>
-            <button>支払一括処理</button>
-          </div>
-        </article>
-      </section>
-    </main>
+    <section class="memo panel"><h2>お知らせ・メモ</h2><p>・明日（6/16）は○○病院の請求締切日です <span>06/15</span></p><p>・6/20（金）は月末締め処理日です <span>06/15</span></p><p>・□□病院の洗車期間は6/25です <span>06/14</span></p><p>・新しいバージョンをリリースしました <span>06/10</span></p><a>すべてのお知らせを表示 〉</a></section>
+    <section class="quick panel"><h2>クイック操作</h2><div><button>＋　新規案件入力</button><button>▤　請求書一括発行</button><button>◎　入金一括登録</button><button>▰　支払一括処理</button></div></section>
+  </main>
 
-    <aside class="detail-area">
-      <div class="detail-empty">案件を選択してください。<br>案件一覧またはダッシュボードから選択すると詳細が表示されます。</div>
-      <section class="detail-card selected-job">
-        <div class="small-title">選択中の案件 <span>案件詳細を表示</span></div>
-        <h2>山田 太郎 様</h2>
-        <dl>
-          <dt>日時</dt><dd>2025/06/15（木）08:00</dd>
-          <dt>発着地</dt><dd>自宅 → ○○病院</dd>
-          <dt>元請先</dt><dd>○○病院</dd>
-          <dt>担当者</dt><dd>田中</dd>
-          <dt>状態</dt><dd><span class="badge done">完了</span></dd>
-        </dl>
-      </section>
-      <section class="detail-card action-card">
-        <div class="action-title">請求書 <span>状態：未発行</span></div>
-        <button class="primary">請求書発行</button>
-        <button>プレビュー</button>
-        <p>発行履歴　履歴なし</p>
-      </section>
-      <section class="detail-card action-card">
-        <div class="action-title">入金状況 <span>状態：未入金</span></div>
-        <button>入金登録</button>
-      </section>
-      <section class="detail-card action-card">
-        <div class="action-title">支払状況 <span>状態：未支払</span></div>
-        <button>支払処理</button>
-      </section>
-    </aside>
-  </div>
-  <script src="./app.js"></script>
+  <aside class="detail">
+    <section class="empty panel">案件を選択してください。<br>案件一覧またはダッシュボードから選択すると詳細が表示されます。</section>
+    <section class="case panel"><div class="mini-title">選択中の案件 <span>案件詳細を表示</span></div><h2>山田 太郎 様</h2><dl><dt>日時</dt><dd>2025/06/15（木）08:00</dd><dt>発着地</dt><dd>自宅 → ○○病院</dd><dt>元請先</dt><dd>○○病院</dd><dt>担当者</dt><dd>田中</dd><dt>状態</dt><dd><span class="badge done">完了</span></dd></dl></section>
+    <section class="bill panel"><h3>請求書 <span>状態：未発行</span></h3><button class="primary">請求書発行（1クリック）</button><button>プレビュー</button><p>発行履歴　　履歴なし</p></section>
+    <section class="pay panel"><h3>入金状況 <span>状態：未入金</span></h3><button>入金登録</button></section>
+    <section class="pay panel"><h3>支払状況 <span>状態：未支払</span></h3><button>支払処理</button></section>
+  </aside>
+</div>
 </body>
 </html>
