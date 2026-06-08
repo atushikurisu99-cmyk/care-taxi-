@@ -3,114 +3,96 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PC Big Box Trace v2</title>
+<title>PC PDF Big Boxes Only v1</title>
 <style>
-  :root{
-    --bg:#e7f4f7;
-    --nav:#05545b;
-    --line:#2f3f45;
-    --card:#ffffff;
-  }
-  *{box-sizing:border-box;}
+  *{box-sizing:border-box}
   html,body{
     margin:0;
     width:100%;
     height:100%;
-    background:var(--bg);
     overflow:hidden;
+    background:#dfeff3;
   }
   body{
-    font-family:Arial, sans-serif;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
   }
 
-  /* PDFスクショのアプリ領域だけを大箱で再現するための固定ステージ */
+  /* PDFのアプリ表示範囲だけを、ブラウザ表示領域いっぱいに再現 */
   .stage{
     position:relative;
-    width:994px;
-    height:405px;
-    margin:0;
-    background:var(--bg);
-  }
-
-  .nav{
-    position:absolute;
-    left:0;
-    top:0;
-    width:193px;
-    height:405px;
-    background:var(--nav);
-  }
-
-  .main{
-    position:absolute;
-    left:193px;
-    top:0;
-    width:801px;
-    height:405px;
-    background:var(--bg);
+    width:100vw;
+    height:100vh;
+    background:#dfeff3;
   }
 
   .box{
     position:absolute;
-    background:var(--card);
-    border:1px solid var(--line);
+    background:#fff;
+    border:1px solid #2b4248;
     border-radius:3px;
   }
 
-  .search{
-    left:216px;
-    top:5px;
-    width:245px;
-    height:20px;
+  .side{
+    position:absolute;
+    left:0;
+    top:0;
+    width:19.3%;
+    height:100%;
+    background:#07555b;
   }
 
-  .kpi{ top:9px; width:95px; height:52px; }
-  .kpi1{ left:602px; }
-  .kpi2{ left:704px; }
-  .kpi3{ left:806px; }
-  .kpi4{ left:908px; width:86px; }
+  /* 上部 */
+  .search{
+    left:20.6%;
+    top:1.2%;
+    width:24.6%;
+    height:4.9%;
+  }
 
-  .case{
-    left:214px;
-    top:68px;
-    width:598px;
-    height:236px;
+  .kpi1{left:59.3%; top:2.0%; width:10.3%; height:12.0%;}
+  .kpi2{left:70.2%; top:2.0%; width:9.3%; height:12.0%;}
+  .kpi3{left:80.1%; top:2.0%; width:9.3%; height:12.0%;}
+  .kpi4{left:90.0%; top:2.0%; width:8.9%; height:12.0%;}
+
+  /* 大箱 */
+  .main{
+    left:20.35%;
+    top:16.7%;
+    width:60.1%;
+    height:58.3%;
   }
 
   .detail{
-    left:820px;
-    top:68px;
-    width:177px;
-    height:326px;
+    left:81.35%;
+    top:16.7%;
+    width:17.8%;
+    height:80.5%;
   }
 
   .memo{
-    left:214px;
-    top:311px;
-    width:310px;
-    height:84px;
+    left:20.35%;
+    top:76.35%;
+    width:31.3%;
+    height:20.9%;
   }
 
   .quick{
-    left:534px;
-    top:311px;
-    width:278px;
-    height:84px;
+    left:52.6%;
+    top:76.35%;
+    width:27.9%;
+    height:20.9%;
   }
 </style>
 </head>
 <body>
-  <div class="stage" aria-label="PC dashboard big box trace">
-    <div class="nav"></div>
-    <div class="main"></div>
-
+  <div class="stage">
+    <div class="side"></div>
     <div class="box search"></div>
-    <div class="box kpi kpi1"></div>
-    <div class="box kpi kpi2"></div>
-    <div class="box kpi kpi3"></div>
-    <div class="box kpi kpi4"></div>
-
-    <div class="box case"></div>
+    <div class="box kpi1"></div>
+    <div class="box kpi2"></div>
+    <div class="box kpi3"></div>
+    <div class="box kpi4"></div>
+    <div class="box main"></div>
     <div class="box detail"></div>
     <div class="box memo"></div>
     <div class="box quick"></div>
