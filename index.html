@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PC Big Boxes Fixed Scale</title>
+<title>PC Fixed Canvas Scale v1</title>
 <style>
   *{box-sizing:border-box}
   html,body{
@@ -17,7 +17,7 @@
 
   :root{
     --base-w:1366;
-    --base-h:662;
+    --base-h:663;
     --scale:1;
   }
 
@@ -29,14 +29,22 @@
     background:#dfeff3;
   }
 
-  .stage{
+  .canvas-wrap{
     position:absolute;
     left:0;
     top:0;
-    width:1366px;
-    height:662px;
+    width:calc(var(--base-w) * 1px * var(--scale));
+    height:calc(var(--base-h) * 1px * var(--scale));
+  }
+
+  .canvas{
+    position:absolute;
+    left:0;
+    top:0;
+    width:calc(var(--base-w) * 1px);
+    height:calc(var(--base-h) * 1px);
     transform:scale(var(--scale));
-    transform-origin:left top;
+    transform-origin:0 0;
     background:#dfeff3;
   }
 
@@ -52,7 +60,7 @@
     left:0;
     top:0;
     width:264px;
-    height:662px;
+    height:663px;
     background:#07555b;
     color:#fff;
     overflow:hidden;
@@ -60,117 +68,112 @@
 
   .logo{
     position:absolute;
-    left:42px;
+    left:40px;
     top:24px;
     font-weight:900;
-    font-size:30px;
-    letter-spacing:-2px;
+    font-size:34px;
     line-height:.9;
+    letter-spacing:-1px;
   }
-  .logo small{
-    display:block;
-    margin-top:7px;
+  .logo-sub{
+    position:absolute;
+    left:44px;
+    top:60px;
     font-size:10px;
-    letter-spacing:0;
+    font-weight:800;
   }
-
-  .nav{
+  .menu{
     position:absolute;
     left:30px;
-    top:70px;
+    top:72px;
     width:150px;
-  }
-  .nav div{
-    height:27px;
-    line-height:27px;
-    margin-bottom:4px;
-    padding-left:10px;
-    font-size:12px;
     font-weight:800;
-    white-space:nowrap;
+    font-size:13px;
+    line-height:1;
   }
-  .nav .active{
-    background:#159ba4;
-    border-radius:4px;
-  }
-
+  .menu div{height:31px;display:flex;align-items:center;padding-left:8px;white-space:nowrap}
+  .menu .active{height:27px;background:#17a2ad;border-radius:4px;margin-bottom:5px;padding-left:12px}
   .switch{
     position:absolute;
     left:43px;
-    bottom:78px;
+    bottom:77px;
     width:132px;
-    height:25px;
+    height:27px;
     border:1px solid rgba(255,255,255,.85);
     border-radius:3px;
-    font-size:11px;
-    font-weight:800;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    display:flex;align-items:center;justify-content:center;
+    font-size:11px;font-weight:800;
   }
-
-  .company{
+  .foot{
     position:absolute;
-    left:43px;
-    bottom:32px;
-    font-size:9px;
-    font-weight:700;
+    left:42px;
+    bottom:34px;
+    font-size:10px;
     line-height:1.45;
+    font-weight:700;
   }
 
+  /* pc_pdf_big_boxes_only_v1 の位置を px 化。伸縮は canvas 全体だけ */
   .search{left:281px; top:8px; width:336px; height:32px;}
-
-  .kpi1{left:810px; top:13px; width:141px; height:79px;}
-  .kpi2{left:959px; top:13px; width:127px; height:79px;}
-  .kpi3{left:1094px; top:13px; width:127px; height:79px;}
-  .kpi4{left:1229px; top:13px; width:122px; height:79px;}
-
-  .main{left:278px; top:111px; width:821px; height:386px;}
-  .detail{left:1111px; top:111px; width:243px; height:533px;}
-  .memo{left:278px; top:506px; width:428px; height:138px;}
-  .quick{left:718px; top:506px; width:381px; height:138px;}
+  .kpi1{left:810px; top:13px; width:141px; height:80px;}
+  .kpi2{left:959px; top:13px; width:127px; height:80px;}
+  .kpi3{left:1094px; top:13px; width:127px; height:80px;}
+  .kpi4{left:1229px; top:13px; width:122px; height:80px;}
+  .main{left:278px; top:111px; width:821px; height:387px;}
+  .detail{left:1111px; top:111px; width:243px; height:534px;}
+  .memo{left:278px; top:506px; width:428px; height:139px;}
+  .quick{left:718px; top:506px; width:381px; height:139px;}
 </style>
 </head>
 <body>
   <div class="viewport">
-    <div class="stage" id="stage">
-      <div class="side">
-        <div class="logo">スママネ<small>Status Manager</small></div>
-        <div class="nav">
-          <div class="active">ダッシュボード</div>
-          <div>案件入力</div>
-          <div>案件一覧</div>
-          <div>請求管理</div>
-          <div>入金管理</div>
-          <div>支払管理</div>
-          <div>車両・乗務員管理</div>
-          <div>協力業者管理</div>
-          <div>マスター管理</div>
-          <div>設定</div>
+    <div class="canvas-wrap">
+      <div class="canvas" id="canvas">
+        <div class="side">
+          <div class="logo">スママネ</div>
+          <div class="logo-sub">Status Manager</div>
+          <div class="menu">
+            <div class="active">ダッシュボード</div>
+            <div>案件入力</div>
+            <div>案件一覧</div>
+            <div>請求管理</div>
+            <div>入金管理</div>
+            <div>支払管理</div>
+            <div>車両・乗務員管理</div>
+            <div>協力業者管理</div>
+            <div>マスター管理</div>
+            <div>設定</div>
+          </div>
+          <div class="switch">iPad 表示に切替</div>
+          <div class="foot">株式会社〇〇タクシー<br>Ver.1.0.0</div>
         </div>
-        <div class="switch">iPad 表示に切替</div>
-        <div class="company">株式会社○○タクシー<br>Ver.1.0.0</div>
+
+        <div class="box search"></div>
+        <div class="box kpi1"></div>
+        <div class="box kpi2"></div>
+        <div class="box kpi3"></div>
+        <div class="box kpi4"></div>
+        <div class="box main"></div>
+        <div class="box detail"></div>
+        <div class="box memo"></div>
+        <div class="box quick"></div>
       </div>
-      <div class="box search"></div>
-      <div class="box kpi1"></div>
-      <div class="box kpi2"></div>
-      <div class="box kpi3"></div>
-      <div class="box kpi4"></div>
-      <div class="box main"></div>
-      <div class="box detail"></div>
-      <div class="box memo"></div>
-      <div class="box quick"></div>
     </div>
   </div>
 <script>
 (function(){
-  const BASE_W = 1366;
-  const BASE_H = 662;
+  var BASE_W = 1366;
+  var BASE_H = 663;
   function fit(){
-    const scale = Math.min(window.innerWidth / BASE_W, window.innerHeight / BASE_H);
-    document.documentElement.style.setProperty('--scale', String(scale));
+    var vw = window.innerWidth;
+    var vh = window.innerHeight;
+    var s = Math.min(vw / BASE_W, vh / BASE_H);
+    // 大きいモニターで無制限に巨大化させない。必要なら 1.15 などに変更。
+    s = Math.min(s, 1);
+    document.documentElement.style.setProperty('--scale', String(s));
   }
-  window.addEventListener('resize', fit, {passive:true});
+  window.addEventListener('resize', fit);
+  window.addEventListener('orientationchange', fit);
   fit();
 })();
 </script>
