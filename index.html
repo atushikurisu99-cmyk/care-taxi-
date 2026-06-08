@@ -1,51 +1,69 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>スママネ PC Dashboard Trace</title>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>スママネ PC Dashboard Trace v3</title>
 <style>
-*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;overflow:hidden;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;color:#10242b;background:#eaf3f6;font-size:11px}.app{width:100vw;height:100vh;display:flex;background:#eaf3f6}.sideNav{width:160px;height:100vh;background:linear-gradient(180deg,#084f58 0%,#06424a 100%);color:#fff;flex:0 0 160px;position:relative;padding-top:20px}.brand{height:43px;margin-left:36px;font-weight:900;font-size:18px;line-height:1.05;letter-spacing:.02em}.brand small{display:block;font-size:9px;font-weight:700}.menu{margin-top:12px;padding:0 14px}.menu div{height:29px;display:flex;align-items:center;padding-left:10px;border-radius:5px;margin-bottom:8px;font-size:12px;font-weight:800}.menu .on{background:#12909d}.ipadBtn{position:absolute;left:38px;bottom:50px;width:96px;height:26px;border:1px solid rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-size:10px}.version{position:absolute;left:40px;bottom:23px;font-size:9px;line-height:1.4;opacity:.85}.work{position:relative;width:825px;height:500px;margin-left:8px;margin-top:0}.search{position:absolute;left:0;top:20px;width:230px;height:22px;background:#fff;border:1px solid #c2d2d8;border-radius:3px}.labelStatus{position:absolute;left:18px;top:57px;width:210px;height:28px;background:#dcebf0;border-radius:2px;padding:8px 0 0 18px;font-weight:700;font-size:12px}.kpis{position:absolute;left:350px;top:12px;width:475px;height:62px;display:grid;grid-template-columns:repeat(4,1fr);gap:7px}.kpi{background:#fff;border:1px solid #cfdae0;border-radius:3px;height:62px;padding:7px 8px;position:relative;font-size:9px}.kpi .num{position:absolute;right:8px;top:22px;color:#ff1717;font-size:15px;font-weight:900}.kpi .sub{position:absolute;left:8px;bottom:5px;color:#096cb0;font-size:8px;font-weight:700}.mainCard{position:absolute;left:0;top:67px;width:497px;height:232px;background:#fff;border:1px solid #cbd9df;border-radius:4px;padding:12px 12px}.caseTitle{font-size:12px;font-weight:900;margin-bottom:7px}.filters{position:absolute;right:17px;top:8px;display:flex;gap:6px}.filter{height:18px;border:1px solid #cad6dc;border-radius:3px;background:#fff;padding:2px 8px;font-size:9px}.refresh{width:42px;text-align:center;color:#16619a}.caseTable{width:100%;border-collapse:collapse;table-layout:fixed;font-size:10px}.caseTable th{height:24px;text-align:left;border-bottom:1px solid #e3ecef;font-size:9px}.caseTable td{height:26px;border-bottom:1px solid #e3ecef;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.caseTable th:nth-child(1),.caseTable td:nth-child(1){width:52px}.caseTable th:nth-child(2),.caseTable td:nth-child(2){width:95px}.caseTable th:nth-child(3),.caseTable td:nth-child(3){width:110px}.caseTable th:nth-child(4),.caseTable td:nth-child(4){width:88px}.caseTable th:nth-child(5),.caseTable td:nth-child(5){width:56px}.caseTable th:nth-child(6),.caseTable td:nth-child(6){width:54px;text-align:center}.badge{display:inline-block;min-width:35px;height:17px;line-height:17px;border-radius:3px;text-align:center;font-size:9px;font-weight:800}.bBlue{background:#d7eaff;color:#0860a6}.bGreen{background:#def4df;color:#247b36}.bOrange{background:#ffe5b5;color:#936000}.scrollbar{position:absolute;right:5px;top:52px;width:5px;height:108px;background:#c9c9c9;border-radius:5px}.bottom{position:absolute;left:0;top:306px;width:497px;height:86px;display:grid;grid-template-columns:1fr 1fr;gap:10px}.memo,.quick{background:#fff;border:1px solid #cbd9df;border-radius:4px;padding:9px 11px}.boxTitle{font-size:12px;font-weight:900;margin-bottom:6px}.memoRow{height:14px;display:flex;justify-content:space-between;font-size:9px}.quickGrid{display:grid;grid-template-columns:1fr 1fr;gap:7px}.quickGrid button{height:22px;background:#fff;border:1px solid #87a8c2;border-radius:3px;color:#08609b;font-weight:800;font-size:10px}.rightPanel{position:absolute;left:506px;top:67px;width:145px;height:392px;background:#fff;border:1px solid #cbd9df;border-radius:4px;padding:42px 12px 10px}.guideText{font-size:9px;line-height:1.55;font-weight:700;margin-bottom:38px}.paper{width:124px;height:64px;background:#fff;border:1px solid #d2dde2;margin:0 auto 13px;position:relative}.paper.big{height:95px}.paper:before{content:"";position:absolute;left:12px;top:12px;width:42px;height:5px;background:#e8eef1}.paper:after{content:"";position:absolute;left:12px;top:24px;width:70px;height:4px;background:#edf2f4}.paper.big .stripe{position:absolute;left:12px;top:22px;width:100px;height:10px;background:#0b7f88;border-radius:2px}.rightEmpty{position:absolute;left:662px;top:0;width:163px;height:500px}.scale{transform-origin:top left}
-@media (min-width:1200px){.work{margin-left:12px}}
+  *{box-sizing:border-box}
+  html,body{margin:0;width:100%;height:100%;overflow:hidden;background:#e6f2f5;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;color:#16252c}
+  #fit{position:absolute;left:0;top:0;width:1024px;height:600px;transform-origin:0 0;background:#e6f2f5;overflow:hidden}
+  .sidebar{position:absolute;left:0;top:0;width:198px;height:600px;background:linear-gradient(180deg,#064f58 0%,#05434b 100%);color:#fff}
+  .side-inner{position:absolute;left:40px;top:24px;width:125px}
+  .logo{position:relative;height:52px;font-weight:900;font-size:22px;letter-spacing:.02em;line-height:1.05;padding-left:42px}
+  .logo:before{content:"🚕";position:absolute;left:0;top:5px;font-size:27px;filter:grayscale(1) brightness(2)}
+  .logo small{display:block;font-size:11px;font-weight:700;letter-spacing:0;margin-top:2px;opacity:.95}
+  .nav{position:absolute;left:39px;top:86px;width:126px;display:flex;flex-direction:column;gap:14px}
+  .nav div{height:28px;display:flex;align-items:center;color:#fff;font-size:13px;font-weight:800;white-space:nowrap;padding-left:33px;position:relative}
+  .nav div:before{position:absolute;left:8px;top:4px;font-size:17px;font-weight:400;opacity:.95}
+  .nav .active{height:34px;background:#15939d;border-radius:5px;box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)}
+  .nav .active:before{top:6px}
+  .i1:before{content:"◆"}.i2:before{content:"▣"}.i3:before{content:"▤"}.i4:before{content:"▧"}.i5:before{content:"◎"}.i6:before{content:"▱"}.i7:before{content:"◇"}.i8:before{content:"⬡"}.i9:before{content:"⚙"}
+  .ipad{position:absolute;left:39px;bottom:80px;width:126px;height:34px;border:1px solid rgba(255,255,255,.55);border-radius:4px;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:800;gap:6px}.ipad:before{content:"▯";font-size:19px}.corp{position:absolute;left:39px;bottom:26px;font-size:10px;line-height:1.45;color:rgba(255,255,255,.8)}
+
+  .search{position:absolute;left:222px;top:10px;width:318px;height:26px;background:#fff;border:1px solid #4c6067;border-radius:2px}
+  .label-status{position:absolute;left:247px;top:55px;font-size:18px;color:#4a5d64;letter-spacing:.15em}
+
+  .kpi-row{position:absolute;left:595px;top:14px;width:386px;height:56px;display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+  .kpi{background:#fff;border:1px solid #cfdde3;border-radius:2px;position:relative;padding:8px 8px;color:#1b2c34;overflow:hidden}
+  .kpi .ico{position:absolute;left:8px;top:8px;color:#0b6574;font-size:16px}.kpi .title{position:absolute;left:28px;top:9px;font-size:9px;font-weight:900}.kpi .red{position:absolute;right:10px;top:23px;color:#f00;font-size:18px;font-weight:900}.kpi .unit{font-size:10px;margin-left:2px}.kpi .small{position:absolute;left:10px;bottom:7px;font-size:9px;color:#0e5c8c;font-weight:800}.kpi .arrow{position:absolute;right:8px;bottom:6px;color:#1d75b7;font-weight:900}
+
+  .main-card{position:absolute;left:211px;top:113px;width:595px;height:270px;background:#fff;border:1px solid #4a6066;border-radius:4px;overflow:hidden}.card-title{font-size:16px;font-weight:900}.main-card .card-title{position:absolute;left:16px;top:16px}.toolbar{position:absolute;right:13px;top:12px;display:flex;gap:10px}.select{height:26px;border:1px solid #ccd8dd;border-radius:3px;background:#fff;font-size:11px;font-weight:800;display:flex;align-items:center;justify-content:center;color:#24363d}.date{width:108px}.person{width:112px}.refresh{width:64px;color:#1c70aa}.thead,.row{position:absolute;left:14px;right:15px;display:grid;grid-template-columns:72px 135px 139px 106px 70px 65px;align-items:center}.thead{top:57px;height:28px;font-size:11px;font-weight:900;border-bottom:1px solid #dce5e9}.row{height:31px;font-size:12px;border-bottom:1px solid #dce5e9}.r1{top:86px}.r2{top:117px}.r3{top:148px}.r4{top:179px}.r5{top:210px}.r6{top:241px}.r7{top:272px}.patient{font-weight:900}.badge{display:inline-flex;align-items:center;justify-content:center;width:48px;height:22px;border-radius:4px;font-size:12px;font-weight:900;border:1px solid}.done{background:#d8ecff;color:#125d9d;border-color:#9dc8ec}.move{background:#ffe4ba;color:#a76000;border-color:#e5b66d}.ok{background:#dff5df;color:#268241;border-color:#96d296}.scrollbar{position:absolute;right:7px;top:92px;width:7px;height:162px;background:#d5dce0;border-radius:5px}.scrollbar:after{content:"";position:absolute;left:0;top:26px;width:7px;height:105px;background:#6b7378;border-radius:5px}
+
+  .notice{position:absolute;left:211px;top:391px;width:304px;height:90px;background:#fff;border:1px solid #4a6066;border-radius:3px;padding:11px 14px}.notice .card-title{font-size:13px;margin-bottom:8px}.nrow{height:17px;font-size:11px;display:flex;justify-content:space-between;align-items:center;color:#1f2f36}.nrow span:first-child{font-weight:700}.nrow span:last-child{color:#44525a}.nlink{position:absolute;right:18px;bottom:8px;font-size:11px;color:#0067b1;font-weight:900}
+  .quick{position:absolute;left:526px;top:391px;width:280px;height:90px;background:#fff;border:1px solid #4a6066;border-radius:3px;padding:11px 14px}.quick .card-title{font-size:13px;margin-bottom:9px}.qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px}.qbtn{height:29px;border:1px solid #5b8eb9;border-radius:4px;background:#fff;color:#07558d;font-size:12px;font-weight:900;display:flex;align-items:center;justify-content:center;gap:8px}.qbtn .plus{font-size:24px;font-weight:300;line-height:1}.qbtn .ico{font-size:16px;color:#156a8b}
+
+  .detail{position:absolute;left:817px;top:113px;width:167px;height:368px;background:#fff;border:1px solid #cbd9de;overflow:hidden}.detail-text{position:absolute;left:30px;top:74px;width:112px;font-size:11px;font-weight:700;line-height:1.65;color:#29383f}.sheet1{position:absolute;left:29px;top:184px;width:119px;height:73px;border:1px solid #9aa7ad;background:#fff}.sheet1 .ttl{position:absolute;left:13px;top:13px;font-size:8px;font-weight:900}.sheet1 .blue{position:absolute;right:10px;top:13px;color:#1467a8;font-size:6px;font-weight:900}.sheet1 .line{position:absolute;left:13px;height:3px;background:#e8eef1}.sheet1 .l1{top:29px;width:45px}.sheet1 .l2{top:39px;width:76px}.sheet2{position:absolute;left:29px;top:269px;width:119px;height:92px;border:1px solid #c3ced4;background:#fff}.sheet2 .bar{position:absolute;left:16px;top:21px;width:88px;height:11px;background:#007a83;border-radius:1px}.sheet2 .line{position:absolute;left:16px;height:3px;background:#e8eef1}.sheet2 .l1{top:12px;width:42px}.sheet2 .l2{top:42px;width:75px}.sheet2 .l3{top:60px;width:64px}
+
+  @media (min-width:1px){body{background:#e6f2f5}}
 </style>
 </head>
 <body>
-<div class="app">
-  <aside class="sideNav">
-    <div class="brand">スママネ<small>Stella Manager</small></div>
-    <div class="menu">
-      <div class="on">ダッシュボード</div><div>案件入力</div><div>案件一覧</div><div>請求管理</div><div>入金管理</div><div>支払管理</div><div>協力業者管理</div><div>マスター管理</div><div>設定</div>
-    </div>
-    <div class="ipadBtn">iPad 表示に切替</div><div class="version">株式会社○○タクシー<br>Ver.1.0.0</div>
+<div id="fit">
+  <aside class="sidebar">
+    <div class="side-inner"><div class="logo">スママネ<small>Status Manager</small></div></div>
+    <div class="nav"><div class="active i1">ダッシュボード</div><div class="i2">案件入力</div><div class="i3">案件一覧</div><div class="i4">請求管理</div><div class="i5">入金管理</div><div class="i6">支払管理</div><div class="i6">車両・乗務員管理</div><div class="i7">協力業者管理</div><div class="i8">マスター管理</div><div class="i9">設定</div></div>
+    <div class="ipad">iPad 表示に切替</div><div class="corp">株式会社〇〇タクシー<br>Ver.1.0.0</div>
   </aside>
-  <main class="work">
-    <div class="search"></div>
-    <div class="labelStatus">状況管理</div>
-    <div class="kpis">
-      <div class="kpi">本日案件<div class="num">7件</div><div class="sub">詳細表示 ＞</div></div>
-      <div class="kpi">未請求<div class="num">12件</div><div class="sub">詳細表示 ＞</div></div>
-      <div class="kpi">未入金<div class="num">15件</div><div class="sub">詳細表示 ＞</div></div>
-      <div class="kpi">支払待ち<div class="num">10件</div><div class="sub">詳細表示 ＞</div></div>
-    </div>
-    <section class="mainCard">
-      <div class="caseTitle">本日の案件一覧</div>
-      <div class="filters"><div class="filter">2025/06/15(日)</div><div class="filter">すべての担当者</div><div class="filter refresh">更新</div></div>
-      <table class="caseTable"><thead><tr><th>時間</th><th>患者名</th><th>発着地</th><th>病院先</th><th>担当者</th><th>状態</th></tr></thead><tbody>
-        <tr><td>08:00</td><td>山田 太郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>田中</td><td><span class="badge bBlue">完了</span></td></tr>
-        <tr><td>09:00</td><td>鈴木 花子 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>佐藤</td><td><span class="badge bBlue">完了</span></td></tr>
-        <tr><td>10:00</td><td>佐々木 次郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="badge bBlue">完了</span></td></tr>
-        <tr><td>11:00</td><td>田中 一郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>佐藤</td><td><span class="badge bOrange">移動中</span></td></tr>
-        <tr><td>13:00</td><td>高橋 美咲 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>山本</td><td><span class="badge bGreen">受付済</span></td></tr>
-        <tr><td>14:30</td><td>伊藤 三郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="badge bGreen">受付済</span></td></tr>
-        <tr><td>15:30</td><td>渡辺 四郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>山本</td><td><span class="badge bGreen">受付済</span></td></tr>
-      </tbody></table><div class="scrollbar"></div>
-    </section>
-    <section class="bottom">
-      <div class="memo"><div class="boxTitle">お知らせ・メモ</div><div class="memoRow"><span>明日 6/16 は○○病院の請求締切日です</span><span>06/15</span></div><div class="memoRow"><span>6/20 は月末請求の確認日です</span><span>06/15</span></div><div class="memoRow"><span>□□病院の支払期限は6/25です</span><span>06/14</span></div><div class="memoRow"><span>新しいバージョンをリリースしました</span><span>06/10</span></div></div>
-      <div class="quick"><div class="boxTitle">クイック操作</div><div class="quickGrid"><button>＋ 新規案件入力</button><button>請求書一括発行</button><button>入金一括登録</button><button>支払一括処理</button></div></div>
-    </section>
-    <aside class="rightPanel"><div class="guideText">案件を選択してください。<br>案件一覧またはダッシュボードから選択すると詳細が表示されます。</div><div class="paper"></div><div class="paper big"><div class="stripe"></div></div></aside>
-  </main>
+  <div class="search"></div><div class="label-status">状況管理</div>
+  <section class="kpi-row"><div class="kpi"><div class="ico">▣</div><div class="title">本日の状況（6/15 木）</div><div class="small">本日案件</div><div class="red">7<span class="unit">件</span></div></div><div class="kpi"><div class="ico">▤</div><div class="title">請求（未発行）</div><div class="red">12<span class="unit">件</span></div><div class="small">請求管理へ</div><div class="arrow">›</div></div><div class="kpi"><div class="ico">◎</div><div class="title">入金（未入金）</div><div class="red">15<span class="unit">件</span></div><div class="small">入金管理へ</div><div class="arrow">›</div></div><div class="kpi"><div class="ico">▰</div><div class="title">支払（未支払）</div><div class="red">10<span class="unit">件</span></div><div class="small">支払管理へ</div><div class="arrow">›</div></div></section>
+  <section class="main-card"><div class="card-title">本日の案件一覧</div><div class="toolbar"><div class="select date">2025/06/15（木）</div><div class="select person">すべての担当者⌄</div><div class="select refresh">⟳　更新</div></div><div class="thead"><div>時間</div><div>患者名</div><div>発着地</div><div>元請先</div><div>担当者</div><div>状態</div></div><div class="row r1"><div>08:00</div><div class="patient">山田 太郎 様</div><div>自宅 → ○○病院</div><div>○○病院</div><div>田中</div><div><span class="badge done">完了</span></div></div><div class="row r2"><div>09:00</div><div class="patient">鈴木 花子 様</div><div>自宅 → △△クリニック</div><div>△△クリニック</div><div>佐藤</div><div><span class="badge done">完了</span></div></div><div class="row r3"><div>10:00</div><div class="patient">佐々木 次郎 様</div><div>自宅 → □□病院</div><div>□□病院</div><div>田中</div><div><span class="badge done">完了</span></div></div><div class="row r4"><div>11:00</div><div class="patient">田中 一郎 様</div><div>自宅 → ○○病院</div><div>○○病院</div><div>佐藤</div><div><span class="badge move">移動中</span></div></div><div class="row r5"><div>13:00</div><div class="patient">高橋 美咲 様</div><div>自宅 → △△クリニック</div><div>△△クリニック</div><div>山本</div><div><span class="badge ok">受付済</span></div></div><div class="row r6"><div>14:30</div><div class="patient">伊藤 三郎 様</div><div>自宅 → □□病院</div><div>□□病院</div><div>田中</div><div><span class="badge ok">受付済</span></div></div><div class="row r7"><div>15:30</div><div class="patient">渡辺 四郎 様</div><div>自宅 → ○○病院</div><div>○○病院</div><div>山本</div><div><span class="badge ok">受付済</span></div></div><div class="scrollbar"></div></section>
+  <section class="notice"><div class="card-title">お知らせ・メモ</div><div class="nrow"><span>・明日（6/16）は○○病院の請求締切日です</span><span>06/15</span></div><div class="nrow"><span>・6/20（金）は月末締め処理日です</span><span>06/15</span></div><div class="nrow"><span>・□□病院の洗車期間は6/25です</span><span>06/14</span></div><div class="nrow"><span>・新しいバージョンをリリースしました。</span><span>06/10</span></div><div class="nlink">すべてのお知らせを表示　›</div></section>
+  <section class="quick"><div class="card-title">クイック操作</div><div class="qgrid"><div class="qbtn"><span class="plus">＋</span>新規案件入力</div><div class="qbtn"><span class="ico">▤</span>請求書一括発行</div><div class="qbtn"><span class="ico">◎</span>入金一括登録</div><div class="qbtn"><span class="ico">▰</span>支払一括処理</div></div></section>
+  <aside class="detail"><div class="detail-text">案件を選択してください。<br>案件一覧またはダッシュボードから選択すると詳細が表示されます。</div><div class="sheet1"><div class="ttl">選択中の案件</div><div class="blue">案件詳細を表示</div><div class="line l1"></div><div class="line l2"></div></div><div class="sheet2"><div class="line l1"></div><div class="bar"></div><div class="line l2"></div><div class="line l3"></div></div></aside>
 </div>
+<script>
+(function(){
+  var baseW=1024, baseH=600, fit=document.getElementById('fit');
+  function size(){
+    var s=Math.min(window.innerWidth/baseW, window.innerHeight/baseH);
+    fit.style.transform='scale('+s+')';
+    fit.style.left='0px';
+    fit.style.top='0px';
+  }
+  window.addEventListener('resize',size,{passive:true});
+  size();
+})();
+</script>
 </body>
 </html>
