@@ -1,75 +1,14 @@
 <!doctype html>
 <html lang="ja">
 <head>
-<meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>Status Manager｜ステマネ</title>
-<link rel="stylesheet" href="./styles.css" />
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>スママネ PC Dashboard</title>
+<style>
+*{box-sizing:border-box}html,body{margin:0;width:100%;height:100%;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;background:#eef5f7;overflow:hidden;color:#1f2d35}.app{width:100vw;height:100vh;display:grid;grid-template-columns:180px 1fr}.sidebar{background:linear-gradient(180deg,#064c55,#063c45);color:#fff;padding:22px 18px}.logo{font-weight:900;font-size:20px;line-height:1.1;margin-bottom:28px}.logo small{display:block;font-size:11px;opacity:.8}.nav{display:flex;flex-direction:column;gap:10px}.nav button{height:36px;border:0;border-radius:6px;background:transparent;color:#fff;text-align:left;padding:0 12px;font-weight:700}.nav button.active{background:#0f8b97}.main-wrap{padding:24px 28px 28px 28px;display:grid;grid-template-rows:64px 1fr;gap:18px}.header{display:grid;grid-template-columns:1fr 470px;gap:22px;align-items:start}.search{width:320px;height:32px;border:1px solid #c8d7de;border-radius:4px;background:#fff}.kpis{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}.kpi{height:58px;background:#fff;border:1px solid #d4e0e5;border-radius:4px;padding:8px 10px;font-size:12px}.kpi strong{display:block;color:#e22;font-size:18px;text-align:right}.content-grid{display:grid;grid-template-columns:1fr 300px;gap:22px;min-height:0}.center{display:grid;grid-template-rows:1fr 106px;gap:14px;min-height:0}.card{background:#fff;border:1px solid #d4e0e5;border-radius:5px}.case-card{padding:14px 16px;overflow:hidden}.card-title{font-weight:900;margin-bottom:12px}.table{width:100%;border-collapse:collapse;font-size:13px}.table th,.table td{height:34px;border-bottom:1px solid #e5ecef;text-align:left;white-space:nowrap}.status{display:inline-block;min-width:46px;text-align:center;padding:3px 8px;border-radius:4px;background:#d8ebff;color:#075aa5;font-size:12px;font-weight:700}.status.green{background:#dff3df;color:#21733a}.status.orange{background:#ffe8bd;color:#9a6200}.bottom{display:grid;grid-template-columns:1fr 1fr;gap:14px}.memo,.quick{padding:12px 14px}.memo-row{display:flex;justify-content:space-between;font-size:12px;line-height:1.8}.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}.quick-grid button{height:34px;border:1px solid #9db8cc;background:#fff;border-radius:4px;font-weight:800;color:#126090}.side{display:grid;grid-template-rows:1fr;min-height:0}.preview{padding:18px;overflow:hidden}.preview-text{font-size:12px;line-height:1.7;margin-bottom:28px}.paper{width:150px;height:92px;background:#fff;border:1px solid #cfdbe0;margin:0 auto 14px}.paper.small{height:118px}.board{width:min(1180px,100%);height:100%;margin:0 auto}
+</style>
 </head>
 <body>
-<div class="app">
-  <aside class="sidebar">
-    <div class="brand"><div class="brand-mark">S</div><div><div class="brand-ja">ステマネ</div><div class="brand-en">Status Manager</div></div></div>
-    <nav class="menu">
-      <div class="menu-item active">⌂　ダッシュボード</div>
-      <div class="menu-item">▣　案件入力</div>
-      <div class="menu-item">▤　案件一覧</div>
-      <div class="menu-item">▧　請求管理</div>
-      <div class="menu-item">◎　入金管理</div>
-      <div class="menu-item">▰　支払管理</div>
-      <div class="menu-item">▱　車両・乗務員管理</div>
-      <div class="menu-item">♙　協力業者管理</div>
-      <div class="menu-item">◇　マスター管理</div>
-      <div class="menu-item">⚙　設定</div>
-    </nav>
-    <div class="side-bottom">
-      <button class="ipad">▯　iPad 表示に切替</button>
-      <div class="company">株式会社〇〇タクシー<br>Ver.1.0.0</div>
-    </div>
-  </aside>
-
-  <main class="workspace">
-    <div class="top-title">状況管理</div>
-    <input class="search" placeholder="患者名・元請先・担当者で検索" />
-
-    <section class="status-row">
-      <article class="status-card today">
-        <h3>▣　本日の状況（6/15 木）</h3>
-        <div class="today-line blue"><span>本日案件</span><b>7</b><em>件</em></div>
-        <div class="today-line orange"><span>調整中</span><b>3</b><em>件</em></div>
-      </article>
-      <article class="status-card"><h3>▤　請求（未発行）</h3><div class="num">12<span>件</span></div><a>請求管理へ 〉</a></article>
-      <article class="status-card"><h3>◎　入金（未入金）</h3><div class="num">15<span>件</span></div><a>入金管理へ 〉</a></article>
-      <article class="status-card"><h3>▰　支払（未支払）</h3><div class="num">10<span>件</span></div><a>支払管理へ 〉</a></article>
-    </section>
-
-    <section class="list panel">
-      <div class="list-top"><h2>本日の案件一覧</h2><div class="tools"><button>2025/06/15（木）</button><button>すべての担当者</button><button>↻　更新</button></div></div>
-      <table>
-        <thead><tr><th>時間</th><th>患者名</th><th>発着地</th><th>元請先</th><th>担当者</th><th>状態</th></tr></thead>
-        <tbody>
-          <tr class="sel"><td>08:00</td><td>山田 太郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>田中</td><td><span class="badge done">完了</span></td></tr>
-          <tr><td>09:00</td><td>鈴木 花子 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>佐藤</td><td><span class="badge done">完了</span></td></tr>
-          <tr><td>10:00</td><td>佐々木 次郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="badge done">完了</span></td></tr>
-          <tr><td>11:00</td><td>田中 一郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>佐藤</td><td><span class="badge moving">移動中</span></td></tr>
-          <tr><td>13:00</td><td>高橋 美咲 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>山本</td><td><span class="badge accepted">受付済</span></td></tr>
-          <tr><td>14:30</td><td>伊藤 三郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="badge accepted">受付済</span></td></tr>
-          <tr><td>15:30</td><td>渡辺 四郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>山本</td><td><span class="badge accepted">受付済</span></td></tr>
-        </tbody>
-      </table>
-    </section>
-
-    <section class="memo panel"><h2>お知らせ・メモ</h2><p>・明日（6/16）は○○病院の請求締切日です <span>06/15</span></p><p>・6/20（金）は月末締め処理日です <span>06/15</span></p><p>・□□病院の洗車期間は6/25です <span>06/14</span></p><p>・新しいバージョンをリリースしました <span>06/10</span></p><a>すべてのお知らせを表示 〉</a></section>
-    <section class="quick panel"><h2>クイック操作</h2><div><button>＋　新規案件入力</button><button>▤　請求書一括発行</button><button>◎　入金一括登録</button><button>▰　支払一括処理</button></div></section>
-  </main>
-
-  <aside class="detail">
-    <section class="empty panel">案件を選択してください。<br>案件一覧またはダッシュボードから選択すると詳細が表示されます。</section>
-    <section class="case panel"><div class="mini-title">選択中の案件 <span>案件詳細を表示</span></div><h2>山田 太郎 様</h2><dl><dt>日時</dt><dd>2025/06/15（木）08:00</dd><dt>発着地</dt><dd>自宅 → ○○病院</dd><dt>元請先</dt><dd>○○病院</dd><dt>担当者</dt><dd>田中</dd><dt>状態</dt><dd><span class="badge done">完了</span></dd></dl></section>
-    <section class="bill panel"><h3>請求書 <span>状態：未発行</span></h3><button class="primary">請求書発行（1クリック）</button><button>プレビュー</button><p>発行履歴　　履歴なし</p></section>
-    <section class="pay panel"><h3>入金状況 <span>状態：未入金</span></h3><button>入金登録</button></section>
-    <section class="pay panel"><h3>支払状況 <span>状態：未支払</span></h3><button>支払処理</button></section>
-  </aside>
-</div>
+<div class="app"><aside class="sidebar"><div class="logo">スママネ<small>Stella Manager</small></div><nav class="nav"><button class="active">ダッシュボード</button><button>案件入力</button><button>案件一覧</button><button>請求管理</button><button>入金管理</button><button>支払管理</button><button>協力業者管理</button><button>マスター管理</button><button>設定</button></nav></aside><main class="main-wrap"><div class="board"><section class="header"><input class="search" type="text"><div class="kpis"><div class="kpi">本日案件<strong>7件</strong></div><div class="kpi">未請求<strong>12件</strong></div><div class="kpi">未入金<strong>15件</strong></div><div class="kpi">支払待ち<strong>10件</strong></div></div></section><section class="content-grid"><div class="center"><section class="card case-card"><div class="card-title">本日の案件一覧</div><table class="table"><thead><tr><th>時間</th><th>患者名</th><th>発着地</th><th>病院先</th><th>担当者</th><th>状態</th></tr></thead><tbody><tr><td>08:00</td><td>山田 太郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>田中</td><td><span class="status">完了</span></td></tr><tr><td>09:00</td><td>鈴木 花子 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>佐藤</td><td><span class="status">完了</span></td></tr><tr><td>10:00</td><td>佐々木 次郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="status">完了</span></td></tr><tr><td>11:00</td><td>田中 一郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>佐藤</td><td><span class="status orange">移動中</span></td></tr><tr><td>13:00</td><td>高橋 美咲 様</td><td>自宅 → △△クリニック</td><td>△△クリニック</td><td>山本</td><td><span class="status green">受付済</span></td></tr><tr><td>14:30</td><td>伊藤 三郎 様</td><td>自宅 → □□病院</td><td>□□病院</td><td>田中</td><td><span class="status green">受付済</span></td></tr><tr><td>15:30</td><td>渡辺 四郎 様</td><td>自宅 → ○○病院</td><td>○○病院</td><td>山本</td><td><span class="status green">受付済</span></td></tr></tbody></table></section><section class="bottom"><div class="card memo"><div class="card-title">お知らせ・メモ</div><div class="memo-row"><span>明日 6/16 は○○病院の請求締切日です</span><span>06/15</span></div><div class="memo-row"><span>6/20 は月末請求の確認日です</span><span>06/15</span></div><div class="memo-row"><span>□□病院の支払期限は6/25です</span><span>06/14</span></div></div><div class="card quick"><div class="card-title">クイック操作</div><div class="quick-grid"><button>＋ 新規案件入力</button><button>請求書一括発行</button><button>入金一括登録</button><button>支払一括処理</button></div></div></section></div><aside class="side"><div class="card preview"><div class="preview-text">案件を選択してください。<br>案件一覧またはダッシュボードから選択すると詳細が表示されます。</div><div class="paper"></div><div class="paper small"></div></div></aside></section></div></main></div>
 </body>
 </html>
