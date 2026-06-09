@@ -99,6 +99,130 @@
     border:1px solid #24434a;
     border-radius:3px;
   }
+
+  /* ─── KPIカード 中身 ─── */
+  .kpi-inner{
+    display:flex;
+    flex-direction:column;
+    justify-content:space-between;
+    width:100%;
+    height:100%;
+    padding:8px 10px 7px;
+    overflow:hidden;
+  }
+  .kpi-label{
+    font-size:11px;
+    font-weight:800;
+    color:#3a5a62;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    line-height:1.2;
+  }
+  .kpi-num{
+    font-size:28px;
+    font-weight:900;
+    color:#0a2e35;
+    line-height:1;
+    text-align:right;
+    white-space:nowrap;
+  }
+  .kpi-num span{
+    font-size:12px;
+    font-weight:800;
+    margin-left:2px;
+    color:#3a5a62;
+  }
+  /* 未処理カードは赤系で注意喚起 */
+  #kpi2 .kpi-num{ color:#c0392b; }
+  /* 調整ありカードはオレンジ系 */
+  #kpi4 .kpi-num{ color:#c07800; }
+
+  /* ─── 右DETAILパネル 中身 ─── */
+  .detail-inner{
+    width:100%;
+    height:100%;
+    display:flex;
+    flex-direction:column;
+    overflow:hidden;
+  }
+  .detail-header{
+    padding:9px 12px 7px;
+    border-bottom:1px solid #c8dde4;
+    flex:0 0 auto;
+  }
+  .detail-header-label{
+    font-size:10px;
+    font-weight:800;
+    color:#6a8a92;
+    letter-spacing:.04em;
+  }
+  .detail-header-name{
+    font-size:16px;
+    font-weight:900;
+    color:#0a2e35;
+    margin-top:2px;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+  }
+  .detail-body{
+    flex:1;
+    overflow-y:auto;
+    padding:8px 12px 10px;
+  }
+  .detail-row{
+    display:flex;
+    align-items:baseline;
+    gap:6px;
+    min-height:22px;
+    border-bottom:1px solid #eef3f5;
+    padding:3px 0;
+  }
+  .detail-row:last-child{
+    border-bottom:none;
+  }
+  .detail-key{
+    font-size:10px;
+    font-weight:800;
+    color:#6a8a92;
+    flex:0 0 52px;
+    white-space:nowrap;
+  }
+  .detail-val{
+    font-size:12px;
+    font-weight:800;
+    color:#0a2e35;
+    flex:1;
+    word-break:break-all;
+  }
+  /* 状態バッジ */
+  .d-badge{
+    display:inline-block;
+    font-size:11px;
+    font-weight:900;
+    padding:1px 7px;
+    border-radius:3px;
+    white-space:nowrap;
+  }
+  .d-badge.moving { background:#fff2dd; color:#c07800; border:1px solid #f0c060; }
+  .d-badge.uninvoiced { background:#fde8e8; color:#b02020; border:1px solid #e8a0a0; }
+  .d-badge.unpaid    { background:#fff0e0; color:#b05000; border:1px solid #f0c090; }
+  .d-badge.unsettled { background:#fde8f8; color:#801870; border:1px solid #e0a0d8; }
+  /* 空状態（案件未選択） */
+  .detail-empty{
+    width:100%;
+    height:100%;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    text-align:center;
+    font-size:12px;
+    font-weight:800;
+    color:#8aacb4;
+    line-height:1.8;
+    padding:20px;
+  }
 </style>
 </head>
 <body>
@@ -121,14 +245,100 @@
     <div class="foot">株式会社〇〇タクシー<br>Ver.1.0.0</div>
   </aside>
 
+  <!-- 検索バー（中身は後で） -->
   <div class="box" id="search"></div>
-  <div class="box" id="kpi1"></div>
-  <div class="box" id="kpi2"></div>
-  <div class="box" id="kpi3"></div>
-  <div class="box" id="kpi4"></div>
+
+  <!-- KPI①：本日案件 -->
+  <div class="box" id="kpi1">
+    <div class="kpi-inner">
+      <div class="kpi-label">本日案件</div>
+      <div class="kpi-num">12<span>件</span></div>
+    </div>
+  </div>
+
+  <!-- KPI②：未処理 -->
+  <div class="box" id="kpi2">
+    <div class="kpi-inner">
+      <div class="kpi-label">未処理</div>
+      <div class="kpi-num">3<span>件</span></div>
+    </div>
+  </div>
+
+  <!-- KPI③：本日売上 -->
+  <div class="box" id="kpi3">
+    <div class="kpi-inner">
+      <div class="kpi-label">本日売上</div>
+      <div class="kpi-num" style="font-size:19px;">86,400<span>円</span></div>
+    </div>
+  </div>
+
+  <!-- KPI④：調整あり -->
+  <div class="box" id="kpi4">
+    <div class="kpi-inner">
+      <div class="kpi-label">調整あり</div>
+      <div class="kpi-num">2<span>件</span></div>
+    </div>
+  </div>
+
+  <!-- 中央メインエリア（中身は後で） -->
   <div class="box" id="main"></div>
-  <div class="box" id="detail"></div>
+
+  <!-- 右DETAIL：仮データ表示 -->
+  <div class="box" id="detail">
+    <div class="detail-inner">
+      <div class="detail-header">
+        <div class="detail-header-label">選択中の案件</div>
+        <div class="detail-header-name">山田 花子 様</div>
+      </div>
+      <div class="detail-body">
+        <div class="detail-row">
+          <div class="detail-key">時間</div>
+          <div class="detail-val">09:30 – 10:20</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">患者名</div>
+          <div class="detail-val">山田 花子</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">出発</div>
+          <div class="detail-val">広島市中区 ○○病院</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">到着</div>
+          <div class="detail-val">広島市南区 ○○施設</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">搬送対応</div>
+          <div class="detail-val">佐藤介護タクシー</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">状態</div>
+          <div class="detail-val"><span class="d-badge moving">搬送中</span></div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">特記</div>
+          <div class="detail-val">車いす対応</div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">請求状態</div>
+          <div class="detail-val"><span class="d-badge uninvoiced">未請求</span></div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">入金状態</div>
+          <div class="detail-val"><span class="d-badge unpaid">未入金</span></div>
+        </div>
+        <div class="detail-row">
+          <div class="detail-key">支払状態</div>
+          <div class="detail-val"><span class="d-badge unsettled">未支払</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 下部：お知らせ・メモ（中身は後で） -->
   <div class="box" id="memo"></div>
+
+  <!-- 下部：クイック操作（中身は後で） -->
   <div class="box" id="quick"></div>
 </div>
 <script>
