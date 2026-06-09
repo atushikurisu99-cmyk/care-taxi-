@@ -3,9 +3,9 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1" />
-<title>PC Fixed Canvas Scale v2</title>
+<title>PC Layout Engine Separate Scale v1</title>
 <style>
-  *{box-sizing:border-box}
+  *{ box-sizing:border-box; }
   html,body{
     margin:0;
     width:100%;
@@ -14,179 +14,205 @@
     background:#dfeff3;
     font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
   }
-
-  :root{
-    --base-w:1366;
-    --base-h:663;
-  }
-
-  /* 画面全体。中身は JS で「1枚板」として等倍拡縮する */
-  .viewport{
+  .stage{
     position:relative;
     width:100vw;
     height:100vh;
+    background:#dfeff3;
     overflow:hidden;
-    background:#dfeff3;
   }
-
-  /* 1366×663 を基準にした固定キャンバス。カード単体は伸縮しない */
-  .canvas{
-    position:absolute;
-    left:0;
-    top:0;
-    width:1366px;
-    height:663px;
-    transform-origin:0 0;
-    background:#dfeff3;
-  }
-
-  .box{
-    position:absolute;
-    background:#fff;
-    border:1px solid #2b4248;
-    border-radius:3px;
-  }
-
   .side{
     position:absolute;
     left:0;
     top:0;
-    width:264px;
-    height:663px;
-    background:#07555b;
+    bottom:0;
+    background:#07595f;
     color:#fff;
     overflow:hidden;
   }
-
   .logo{
     position:absolute;
-    left:30px;
-    top:24px;
-    line-height:1;
+    left:15%;
+    top:3.0%;
     font-weight:900;
     font-size:34px;
-    letter-spacing:-2px;
-  }
-  .sub-logo{
-    position:absolute;
-    left:32px;
-    top:63px;
-    font-size:9px;
-    font-weight:800;
-  }
-
-  .menu{
-    position:absolute;
-    left:30px;
-    top:72px;
-    width:154px;
-  }
-  .menu-item{
-    height:31px;
-    display:flex;
-    align-items:center;
-    padding-left:10px;
-    color:#fff;
-    font-size:13px;
-    font-weight:800;
-    border-radius:4px;
-    margin-bottom:7px;
+    line-height:.9;
+    letter-spacing:-1px;
     white-space:nowrap;
   }
-  .menu-item.active{background:#13a0aa;}
-
-  .ipad-btn{
+  .logo small{
+    display:block;
+    font-size:10px;
+    margin-top:8px;
+    letter-spacing:0;
+  }
+  .menu{
     position:absolute;
-    left:43px;
-    bottom:75px;
-    width:132px;
+    left:11.5%;
+    right:11.5%;
+    top:9.2%;
+    display:flex;
+    flex-direction:column;
+    gap:15px;
+    font-weight:800;
+    font-size:13px;
+    white-space:nowrap;
+  }
+  .menu div{
+    height:18px;
+    display:flex;
+    align-items:center;
+  }
+  .menu .active{
+    height:28px;
+    padding-left:13px;
+    background:#18a1aa;
+    border-radius:4px;
+  }
+  .switch{
+    position:absolute;
+    left:16%;
+    bottom:10.0%;
+    width:54%;
     height:26px;
     border:1px solid rgba(255,255,255,.9);
     border-radius:3px;
     display:flex;
     align-items:center;
     justify-content:center;
-    font-size:11px;
-    font-weight:800;
-  }
-  .company{
-    position:absolute;
-    left:43px;
-    bottom:31px;
     font-size:10px;
     font-weight:800;
-    line-height:1.45;
+    white-space:nowrap;
   }
-
-  /* v1の位置関係をpx固定化 */
-  .search{left:282px; top:8px; width:336px; height:33px;}
-
-  .kpi1{left:810px; top:13px; width:141px; height:80px;}
-  .kpi2{left:959px; top:13px; width:127px; height:80px;}
-  .kpi3{left:1094px; top:13px; width:127px; height:80px;}
-  .kpi4{left:1229px; top:13px; width:122px; height:80px;}
-
-  .main{left:278px; top:111px; width:821px; height:387px;}
-  .detail{left:1111px; top:111px; width:243px; height:534px;}
-  .memo{left:278px; top:506px; width:428px; height:139px;}
-  .quick{left:719px; top:506px; width:381px; height:139px;}
+  .foot{
+    position:absolute;
+    left:16%;
+    bottom:4.2%;
+    font-size:10px;
+    font-weight:700;
+    line-height:1.45;
+    white-space:nowrap;
+  }
+  .box{
+    position:absolute;
+    background:#fff;
+    border:1px solid #24434a;
+    border-radius:3px;
+  }
 </style>
 </head>
 <body>
-  <div class="viewport">
-    <div class="canvas" id="canvas">
-      <div class="side">
-        <div class="logo">スママネ</div>
-        <div class="sub-logo">Status Manager</div>
-        <div class="menu">
-          <div class="menu-item active">ダッシュボード</div>
-          <div class="menu-item">案件入力</div>
-          <div class="menu-item">案件一覧</div>
-          <div class="menu-item">請求管理</div>
-          <div class="menu-item">入金管理</div>
-          <div class="menu-item">支払管理</div>
-          <div class="menu-item">車両・乗務員管理</div>
-          <div class="menu-item">協力業者管理</div>
-          <div class="menu-item">マスター管理</div>
-          <div class="menu-item">設定</div>
-        </div>
-        <div class="ipad-btn">iPad 表示に切替</div>
-        <div class="company">株式会社〇〇タクシー<br>Ver.1.0.0</div>
-      </div>
-
-      <div class="box search"></div>
-      <div class="box kpi1"></div>
-      <div class="box kpi2"></div>
-      <div class="box kpi3"></div>
-      <div class="box kpi4"></div>
-      <div class="box main"></div>
-      <div class="box detail"></div>
-      <div class="box memo"></div>
-      <div class="box quick"></div>
+<div class="stage" id="stage">
+  <aside class="side" id="side">
+    <div class="logo">スママネ<small>Status Manager</small></div>
+    <div class="menu">
+      <div class="active">ダッシュボード</div>
+      <div>案件入力</div>
+      <div>案件一覧</div>
+      <div>請求管理</div>
+      <div>入金管理</div>
+      <div>支払管理</div>
+      <div>車両・乗務員管理</div>
+      <div>協力業者管理</div>
+      <div>マスター管理</div>
+      <div>設定</div>
     </div>
-  </div>
+    <div class="switch">iPad 表示に切替</div>
+    <div class="foot">株式会社〇〇タクシー<br>Ver.1.0.0</div>
+  </aside>
+
+  <div class="box" id="search"></div>
+  <div class="box" id="kpi1"></div>
+  <div class="box" id="kpi2"></div>
+  <div class="box" id="kpi3"></div>
+  <div class="box" id="kpi4"></div>
+  <div class="box" id="main"></div>
+  <div class="box" id="detail"></div>
+  <div class="box" id="memo"></div>
+  <div class="box" id="quick"></div>
+</div>
 <script>
 (function(){
-  const BASE_W = 1366;
-  const BASE_H = 663;
-  const canvas = document.getElementById('canvas');
+  const $ = id => document.getElementById(id);
+  const clamp = (v,min,max) => Math.max(min, Math.min(max, v));
+  const set = (id, r) => {
+    const el = $(id);
+    el.style.left = Math.round(r.x) + 'px';
+    el.style.top = Math.round(r.y) + 'px';
+    el.style.width = Math.round(r.w) + 'px';
+    el.style.height = Math.round(r.h) + 'px';
+  };
 
-  function fit(){
-    const vw = window.innerWidth;
-    const vh = window.innerHeight;
-    /*
-      位置が合っている v1 を「1366×663の1枚板」として扱う。
-      カード単体は伸縮させず、全体だけを等倍拡縮。
-      通常の1366×768実機フル画面では scale=1 になる。
-    */
-    const scale = Math.min(vw / BASE_W, vh / BASE_H);
-    canvas.style.transform = 'scale(' + scale + ')';
-    canvas.style.left = '0px';
-    canvas.style.top = '0px';
+  function layout(){
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    // 左帯：縮尺対象ではなく、常に画面の上下端まで塗る
+    const sideW = clamp(W * 0.193, 190, 264);
+    $('side').style.width = Math.round(sideW) + 'px';
+
+    // 右側の基準余白
+    const left = sideW + clamp(W * 0.010, 12, 16);
+    const rightMargin = clamp(W * 0.012, 12, 18);
+    const bottomMargin = clamp(H * 0.026, 16, 22);
+    const gap = clamp(W * 0.009, 8, 13);
+
+    // 下部カード群：画面下端を基準にする。高さは守る。
+    const bottomH = clamp(H * 0.178, 104, 136);
+    const bottomY = H - bottomMargin - bottomH;
+
+    // DETAIL：下部カード群と下端を揃える。幅は狭くしすぎない。
+    const detailW = clamp(W * 0.178, 190, 244);
+    const detailX = W - rightMargin - detailW;
+    const centerRight = detailX - gap;
+    const centerW = centerRight - left;
+
+    // 中央大枠：下部カード群の上から逆算。主役なので最後まで守る。
+    const mainTop = clamp(H * 0.255, 154, 194);
+    const mainBottom = bottomY - gap;
+    const mainH = Math.max(220, mainBottom - mainTop);
+
+    // 下部2カード：中央大枠の左右基準に合わせる。
+    const memoW = Math.round(centerW * 0.515);
+    const quickX = left + memoW + gap;
+    const quickW = centerRight - quickX;
+
+    set('main',   {x:left,      y:mainTop, w:centerW, h:mainH});
+    set('memo',   {x:left,      y:bottomY, w:memoW,   h:bottomH});
+    set('quick',  {x:quickX,    y:bottomY, w:quickW,  h:bottomH});
+    set('detail', {x:detailX,   y:mainTop, w:detailW, h:(H - bottomMargin - mainTop)});
+
+    // 検索＋上部4カード：余った上部空間だけで処理。先に小さくなる。
+    const headerBottom = mainTop - clamp(H * 0.020, 10, 16);
+    const headerTop = clamp(H * 0.014, 8, 14);
+    const headerH = Math.max(36, headerBottom - headerTop);
+
+    const kGap = clamp(W * 0.007, 6, 10);
+    const kpiH = clamp(headerH * 0.58, 38, 78);
+    const kpiY = headerBottom - kpiH;
+    const kpiRight = W - rightMargin;
+
+    // 上部4カードは右下端基準。横が足りない場合はここだけ先に縮む。
+    const maxKpiW = 142;
+    const minKpiW = 52;
+    const availableK = kpiRight - (left + centerW * 0.52);
+    const kpiW = clamp((availableK - kGap * 3) / 4, minKpiW, maxKpiW);
+    const kTotal = kpiW * 4 + kGap * 3;
+    const kStart = kpiRight - kTotal;
+
+    set('kpi1', {x:kStart,                    y:kpiY, w:kpiW, h:kpiH});
+    set('kpi2', {x:kStart + (kpiW+kGap),      y:kpiY, w:kpiW, h:kpiH});
+    set('kpi3', {x:kStart + (kpiW+kGap)*2,    y:kpiY, w:kpiW, h:kpiH});
+    set('kpi4', {x:kStart + (kpiW+kGap)*3,    y:kpiY, w:kpiW, h:kpiH});
+
+    const searchW = clamp(centerW * 0.40, 180, 336);
+    const searchH = clamp(headerH * 0.28, 22, 32);
+    const searchY = headerTop + clamp(headerH * 0.05, 0, 6);
+    set('search', {x:left + 4, y:searchY, w:searchW, h:searchH});
   }
 
-  window.addEventListener('resize', fit);
-  fit();
+  window.addEventListener('resize', layout);
+  layout();
 })();
 </script>
 </body>
