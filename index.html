@@ -40,11 +40,21 @@
   .menu{
     position:absolute;
     left:11.5%;right:11.5%;top:9.2%;
-    display:flex;flex-direction:column;gap:15px;
-    font-weight:800;font-size:17px;white-space:nowrap;
+    display:flex;flex-direction:column;gap:17px;
+    font-weight:700;font-size:17px;white-space:nowrap;
   }
-  .menu div{height:18px;display:flex;align-items:center;cursor:pointer;}
-  .menu .active{height:28px;padding-left:13px;background:#18a1aa;border-radius:4px;}
+  .menu div{
+    height:22px;
+    display:flex;
+    align-items:center;
+    cursor:pointer;
+  }
+  .menu .active{
+    height:30px;
+    padding-left:13px;
+    background:#18a1aa;
+    border-radius:4px;
+  }
   .switch{
     position:absolute;left:16%;bottom:10.0%;width:54%;height:26px;
     border:1px solid rgba(255,255,255,.9);border-radius:3px;
@@ -62,6 +72,26 @@
     background:#fff;
     border:1px solid #24434a;
     border-radius:3px;
+  }
+
+  /* ── 検索窓 ── */
+  #search{
+    overflow:hidden;
+  }
+  .search-input{
+    width:100%;
+    height:100%;
+    border:none;
+    outline:none;
+    padding:0 12px;
+    font-size:13px;
+    font-weight:700;
+    color:#0a2e35;
+    background:transparent;
+  }
+  .search-input::placeholder{
+    color:#7fa0a8;
+    font-weight:700;
   }
 
   /* ── KPIカード ── */
@@ -226,7 +256,9 @@
   </aside>
 
   <!-- ブロックB：検索窓 -->
-  <div class="box" id="search"></div>
+  <div class="box" id="search">
+    <input class="search-input" type="text" placeholder="患者名・病院名・案件番号で検索">
+  </div>
 
   <!-- ブロックB：KPI×4 -->
   <div class="box" id="kpi1">
