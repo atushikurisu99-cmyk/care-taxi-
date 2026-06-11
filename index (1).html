@@ -1,0 +1,493 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>スママネ - Status Manager</title>
+<style>
+  *{ box-sizing:border-box; }
+  html,body{
+    margin:0;
+    width:100%;
+    height:100%;
+    overflow:hidden;
+    background:#dfeff3;
+    font-family:-apple-system,BlinkMacSystemFont,"Segoe UI","Noto Sans JP",sans-serif;
+  }
+  .stage{
+    position:relative;
+    width:100vw;
+    height:100vh;
+    background:#dfeff3;
+    overflow:hidden;
+  }
+
+  /* ── ブロックA：左メニュー ── */
+  .side{
+    position:absolute;
+    left:0;top:0;bottom:0;
+    background:#07595f;
+    color:#fff;
+    overflow:hidden;
+  }
+  .logo{
+    position:absolute;
+    left:15%;top:3.0%;
+    font-weight:900;font-size:34px;line-height:.9;
+    letter-spacing:-1px;white-space:nowrap;
+  }
+  .logo small{display:block;font-size:10px;margin-top:8px;letter-spacing:0;}
+  .menu{
+    position:absolute;
+    left:11.5%;right:11.5%;top:9.2%;
+    display:flex;flex-direction:column;gap:15px;
+    font-weight:800;font-size:13px;white-space:nowrap;
+  }
+  .menu div{height:18px;display:flex;align-items:center;cursor:pointer;}
+  .menu .active{height:28px;padding-left:13px;background:#18a1aa;border-radius:4px;}
+  .switch{
+    position:absolute;left:16%;bottom:10.0%;width:54%;height:26px;
+    border:1px solid rgba(255,255,255,.9);border-radius:3px;
+    display:flex;align-items:center;justify-content:center;
+    font-size:10px;font-weight:800;white-space:nowrap;cursor:pointer;
+  }
+  .foot{
+    position:absolute;left:16%;bottom:4.2%;
+    font-size:10px;font-weight:700;line-height:1.45;white-space:nowrap;
+  }
+
+  /* ── ボックス共通 ── */
+  .box{
+    position:absolute;
+    background:#fff;
+    border:1px solid #24434a;
+    border-radius:3px;
+  }
+
+  /* ── KPIカード ── */
+  .kpi-inner{
+    display:flex;flex-direction:column;justify-content:space-between;
+    width:100%;height:100%;padding:8px 10px 7px;overflow:hidden;
+  }
+  .kpi-label{font-size:11px;font-weight:800;color:#3a5a62;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;line-height:1.2;}
+  .kpi-num{font-size:28px;font-weight:900;color:#0a2e35;line-height:1;text-align:right;white-space:nowrap;}
+  .kpi-num span{font-size:12px;font-weight:800;margin-left:2px;color:#3a5a62;}
+  #kpi2 .kpi-num{color:#c0392b;}
+  #kpi4 .kpi-num{color:#c07800;}
+
+  /* ── 中央メイン：案件一覧 ── */
+  .main-inner{
+    width:100%;height:100%;
+    display:flex;flex-direction:column;
+    overflow:hidden;
+  }
+  .main-toolbar{
+    flex:0 0 auto;
+    height:44px;
+    padding:0 14px;
+    border-bottom:1px solid #d8e8ed;
+    display:flex;align-items:center;gap:10px;
+  }
+  .main-title{
+    font-size:15px;font-weight:900;color:#0a2e35;
+    white-space:nowrap;
+  }
+  .main-date{
+    font-size:12px;font-weight:700;color:#5a7a82;
+    white-space:nowrap;
+  }
+  .main-spacer{flex:1;}
+  .main-filter{
+    height:26px;padding:0 10px;
+    border:1px solid #b0ccd4;border-radius:4px;
+    font-size:12px;font-weight:700;color:#0a2e35;
+    background:#fff;cursor:pointer;
+  }
+  .main-refresh{
+    height:26px;padding:0 10px;
+    border:1px solid #b0ccd4;border-radius:4px;
+    font-size:12px;font-weight:700;color:#0a2e35;
+    background:#fff;cursor:pointer;white-space:nowrap;
+  }
+
+  /* テーブル */
+  .main-table-wrap{
+    flex:1;
+    overflow-y:auto;
+    overflow-x:hidden;
+  }
+  .main-table{
+    width:100%;
+    border-collapse:collapse;
+    font-size:13px;
+  }
+  .main-table thead th{
+    position:sticky;top:0;
+    background:#f0f7fa;
+    border-bottom:2px solid #c8dde4;
+    padding:7px 10px;
+    text-align:left;
+    font-size:11px;font-weight:900;
+    color:#4a6a72;
+    white-space:nowrap;
+    z-index:1;
+  }
+  .main-table tbody tr{
+    border-bottom:1px solid #e8f0f3;
+    cursor:pointer;
+    transition:background .12s;
+  }
+  .main-table tbody tr:hover{background:#f0f9fc;}
+  .main-table tbody tr.selected{background:#e0f4fa;}
+  .main-table tbody td{
+    padding:8px 10px;
+    font-weight:700;
+    color:#0a2e35;
+    white-space:nowrap;
+    overflow:hidden;
+    text-overflow:ellipsis;
+    max-width:160px;
+  }
+
+  /* 状態バッジ */
+  .badge{
+    display:inline-flex;align-items:center;justify-content:center;
+    min-width:52px;height:22px;
+    border-radius:4px;
+    font-size:11px;font-weight:900;
+    white-space:nowrap;padding:0 6px;
+  }
+  .badge-adjust  {background:#f0ecfd;color:#5b34b8;border:1px solid #c4b0f0;}
+  .badge-dispatch{background:#e0f0ff;color:#1060b0;border:1px solid #90c0f0;}
+  .badge-pickup  {background:#e0f8f8;color:#0a6060;border:1px solid #80d8d8;}
+  .badge-moving  {background:#fff2dd;color:#c07800;border:1px solid #f0c060;}
+  .badge-done    {background:#e8f4e8;color:#1a6a1a;border:1px solid #90d090;}
+  .badge-cancel  {background:#f4e8e8;color:#8a2020;border:1px solid #d09090;}
+
+  /* ── 右DETAILパネル ── */
+  .detail-inner{
+    width:100%;height:100%;
+    display:flex;flex-direction:column;overflow:hidden;
+  }
+  .detail-header{
+    padding:9px 12px 7px;
+    border-bottom:1px solid #c8dde4;flex:0 0 auto;
+  }
+  .detail-header-label{font-size:10px;font-weight:800;color:#6a8a92;letter-spacing:.04em;}
+  .detail-header-name{font-size:16px;font-weight:900;color:#0a2e35;margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .detail-empty-msg{
+    flex:1;display:flex;align-items:center;justify-content:center;
+    text-align:center;font-size:12px;font-weight:800;color:#8aacb4;
+    line-height:1.8;padding:20px;
+  }
+  .detail-body{flex:1;overflow-y:auto;padding:8px 12px 10px;}
+  .detail-row{
+    display:flex;align-items:baseline;gap:6px;
+    min-height:22px;border-bottom:1px solid #eef3f5;padding:3px 0;
+  }
+  .detail-row:last-child{border-bottom:none;}
+  .detail-key{font-size:10px;font-weight:800;color:#6a8a92;flex:0 0 52px;white-space:nowrap;}
+  .detail-val{font-size:12px;font-weight:800;color:#0a2e35;flex:1;word-break:break-all;}
+  .d-badge{display:inline-block;font-size:11px;font-weight:900;padding:1px 7px;border-radius:3px;white-space:nowrap;}
+  .d-badge.adjust  {background:#f0ecfd;color:#5b34b8;border:1px solid #c4b0f0;}
+  .d-badge.dispatch{background:#e0f0ff;color:#1060b0;border:1px solid #90c0f0;}
+  .d-badge.pickup  {background:#e0f8f8;color:#0a6060;border:1px solid #80d8d8;}
+  .d-badge.moving  {background:#fff2dd;color:#c07800;border:1px solid #f0c060;}
+  .d-badge.done    {background:#e8f4e8;color:#1a6a1a;border:1px solid #90d090;}
+  .d-badge.cancel  {background:#f4e8e8;color:#8a2020;border:1px solid #d09090;}
+  .d-badge.uninvoiced{background:#fde8e8;color:#b02020;border:1px solid #e8a0a0;}
+  .d-badge.unpaid    {background:#fff0e0;color:#b05000;border:1px solid #f0c090;}
+  .d-badge.unsettled {background:#fde8f8;color:#801870;border:1px solid #e0a0d8;}
+  .d-badge.invoiced  {background:#e8f4e8;color:#1a6a1a;border:1px solid #90d090;}
+  .d-badge.paid      {background:#e8f4e8;color:#1a6a1a;border:1px solid #90d090;}
+  .d-badge.settled   {background:#e8f4e8;color:#1a6a1a;border:1px solid #90d090;}
+</style>
+</head>
+<body>
+<div class="stage" id="stage">
+
+  <!-- ブロックA：左メニュー -->
+  <aside class="side" id="side">
+    <div class="logo">スママネ<small>Status Manager</small></div>
+    <div class="menu">
+      <div class="active">ダッシュボード</div>
+      <div>案件入力</div>
+      <div>案件一覧</div>
+      <div>請求管理</div>
+      <div>入金管理</div>
+      <div>支払管理</div>
+      <div>車両・乗務員管理</div>
+      <div>協力業者管理</div>
+      <div>マスター管理</div>
+      <div>設定</div>
+    </div>
+    <div class="switch">iPad 表示に切替</div>
+    <div class="foot">株式会社〇〇タクシー<br>Ver.1.0.0</div>
+  </aside>
+
+  <!-- ブロックB：検索窓 -->
+  <div class="box" id="search"></div>
+
+  <!-- ブロックB：KPI×4 -->
+  <div class="box" id="kpi1">
+    <div class="kpi-inner">
+      <div class="kpi-label">本日案件</div>
+      <div class="kpi-num">12<span>件</span></div>
+    </div>
+  </div>
+  <div class="box" id="kpi2">
+    <div class="kpi-inner">
+      <div class="kpi-label">未処理</div>
+      <div class="kpi-num">3<span>件</span></div>
+    </div>
+  </div>
+  <div class="box" id="kpi3">
+    <div class="kpi-inner">
+      <div class="kpi-label">本日売上</div>
+      <div class="kpi-num" style="font-size:19px;">86,400<span>円</span></div>
+    </div>
+  </div>
+  <div class="box" id="kpi4">
+    <div class="kpi-inner">
+      <div class="kpi-label">調整あり</div>
+      <div class="kpi-num">2<span>件</span></div>
+    </div>
+  </div>
+
+  <!-- ブロックC：中央メイン（案件一覧） -->
+  <div class="box" id="main">
+    <div class="main-inner">
+      <div class="main-toolbar">
+        <span class="main-title">本日の案件一覧</span>
+        <span class="main-date" id="today-label"></span>
+        <div class="main-spacer"></div>
+        <select class="main-filter" id="status-filter">
+          <option value="">すべての状態</option>
+          <option value="調整中">調整中</option>
+          <option value="配車済">配車済</option>
+          <option value="迎車">迎車</option>
+          <option value="搬送中">搬送中</option>
+          <option value="完了">完了</option>
+          <option value="キャンセル">キャンセル</option>
+        </select>
+        <button class="main-refresh">↻ 更新</button>
+      </div>
+      <div class="main-table-wrap">
+        <table class="main-table" id="case-table">
+          <thead>
+            <tr>
+              <th>時間</th>
+              <th>患者名</th>
+              <th>出発</th>
+              <th>到着</th>
+              <th>搬送対応</th>
+              <th>状態</th>
+            </tr>
+          </thead>
+          <tbody id="case-tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ブロックC：右DETAIL -->
+  <div class="box" id="detail">
+    <div class="detail-inner" id="detail-inner">
+      <div class="detail-header">
+        <div class="detail-header-label">選択中の案件</div>
+        <div class="detail-header-name" id="detail-name">案件を選択してください</div>
+      </div>
+      <div class="detail-empty-msg" id="detail-empty">
+        案件一覧から行を<br>クリックすると<br>詳細が表示されます
+      </div>
+      <div class="detail-body" id="detail-body" style="display:none;">
+        <div class="detail-row"><div class="detail-key">時間</div><div class="detail-val" id="d-time"></div></div>
+        <div class="detail-row"><div class="detail-key">患者名</div><div class="detail-val" id="d-patient"></div></div>
+        <div class="detail-row"><div class="detail-key">出発</div><div class="detail-val" id="d-from"></div></div>
+        <div class="detail-row"><div class="detail-key">経由地</div><div class="detail-val" id="d-via"></div></div>
+        <div class="detail-row"><div class="detail-key">到着</div><div class="detail-val" id="d-to"></div></div>
+        <div class="detail-row"><div class="detail-key">搬送対応</div><div class="detail-val" id="d-driver"></div></div>
+        <div class="detail-row"><div class="detail-key">状態</div><div class="detail-val" id="d-status"></div></div>
+        <div class="detail-row"><div class="detail-key">特記</div><div class="detail-val" id="d-note"></div></div>
+        <div class="detail-row"><div class="detail-key">請求状態</div><div class="detail-val" id="d-invoice"></div></div>
+        <div class="detail-row"><div class="detail-key">入金状態</div><div class="detail-val" id="d-payment"></div></div>
+        <div class="detail-row"><div class="detail-key">支払状態</div><div class="detail-val" id="d-settle"></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ブロックC：メモ・クイック -->
+  <div class="box" id="memo"></div>
+  <div class="box" id="quick"></div>
+
+</div>
+<script>
+(function(){
+  /* ━━━ ダミーデータ ━━━ */
+  const CASES = [
+    {id:1, time:'08:00',patient:'山田 太郎',from:'自宅',via:'',to:'○○病院',driver:'田中介護タクシー',status:'完了',note:'車いす対応',invoice:'未請求',payment:'未入金',settle:'未支払'},
+    {id:2, time:'09:00',patient:'鈴木 花子',from:'自宅',via:'',to:'△△クリニック',driver:'佐藤介護タクシー',status:'完了',note:'',invoice:'未請求',payment:'未入金',settle:'未支払'},
+    {id:3, time:'10:00',patient:'佐々木 次郎',from:'自宅',via:'',to:'□□病院',driver:'田中介護タクシー',status:'完了',note:'酸素ボンベ持参',invoice:'未請求',payment:'未入金',settle:'未支払'},
+    {id:4, time:'11:00',patient:'田中 一郎',from:'自宅',via:'△△クリニック',to:'○○病院',driver:'佐藤介護タクシー',status:'搬送中',note:'',invoice:'未請求',payment:'未入金',settle:'未支払'},
+    {id:5, time:'13:00',patient:'高橋 美咲',from:'自宅',via:'',to:'△△クリニック',driver:'山本介護タクシー',status:'配車済',note:'ストレッチャー対応',invoice:'未請求',payment:'未入金',settle:'未支払'},
+    {id:6, time:'14:30',patient:'伊藤 三郎',from:'自宅',via:'',to:'□□病院',driver:'田中介護タクシー',status:'迎車',note:'',invoice:'未請求',payment:'未入金',settle:'未支払'},
+    {id:7, time:'15:30',patient:'渡辺 四郎',from:'自宅',via:'',to:'○○病院',driver:'山本介護タクシー',status:'調整中',note:'担当確認中',invoice:'未請求',payment:'未入金',settle:'未支払'},
+  ];
+
+  /* ━━━ 状態→バッジクラス変換 ━━━ */
+  const STATUS_CLASS = {
+    '調整中':'adjust','配車済':'dispatch','迎車':'pickup',
+    '搬送中':'moving','完了':'done','キャンセル':'cancel'
+  };
+  const INVOICE_CLASS = {'未請求':'uninvoiced','請求済':'invoiced'};
+  const PAYMENT_CLASS = {'未入金':'unpaid','入金済':'paid'};
+  const SETTLE_CLASS  = {'未支払':'unsettled','支払済':'settled'};
+
+  function badge(text, map){
+    const cls = map[text] || '';
+    return `<span class="d-badge ${cls}">${text}</span>`;
+  }
+  function tableBadge(text, map){
+    const cls = map[text] || '';
+    return `<span class="badge badge-${cls}">${text}</span>`;
+  }
+
+  /* ━━━ 今日の日付表示 ━━━ */
+  const today = new Date();
+  const wdays = ['日','月','火','水','木','金','土'];
+  document.getElementById('today-label').textContent =
+    `${today.getFullYear()}/${today.getMonth()+1}/${today.getDate()}（${wdays[today.getDay()]}）`;
+
+  /* ━━━ テーブル描画 ━━━ */
+  let selectedId = null;
+
+  function renderTable(filter){
+    const tbody = document.getElementById('case-tbody');
+    const data = filter ? CASES.filter(c => c.status === filter) : CASES;
+    tbody.innerHTML = data.map(c => `
+      <tr data-id="${c.id}" class="${c.id === selectedId ? 'selected' : ''}">
+        <td>${c.time}</td>
+        <td>${c.patient} 様</td>
+        <td>${c.from}</td>
+        <td>${c.to}</td>
+        <td>${c.driver}</td>
+        <td>${tableBadge(c.status, STATUS_CLASS)}</td>
+      </tr>
+    `).join('');
+
+    tbody.querySelectorAll('tr').forEach(tr => {
+      tr.addEventListener('click', () => {
+        const id = parseInt(tr.dataset.id);
+        selectCase(id);
+      });
+    });
+  }
+
+  /* ━━━ DETAIL反映 ━━━ */
+  function selectCase(id){
+    selectedId = id;
+    const c = CASES.find(x => x.id === id);
+    if(!c) return;
+
+    renderTable(document.getElementById('status-filter').value);
+
+    document.getElementById('detail-name').textContent = c.patient + ' 様';
+    document.getElementById('detail-empty').style.display = 'none';
+    document.getElementById('detail-body').style.display  = 'block';
+
+    document.getElementById('d-time').textContent    = c.time;
+    document.getElementById('d-patient').textContent = c.patient;
+    document.getElementById('d-from').textContent    = c.from;
+    document.getElementById('d-via').textContent     = c.via || '—';
+    document.getElementById('d-to').textContent      = c.to;
+    document.getElementById('d-driver').textContent  = c.driver;
+    document.getElementById('d-status').innerHTML    = badge(c.status,  STATUS_CLASS);
+    document.getElementById('d-note').textContent    = c.note || '—';
+    document.getElementById('d-invoice').innerHTML   = badge(c.invoice, INVOICE_CLASS);
+    document.getElementById('d-payment').innerHTML   = badge(c.payment, PAYMENT_CLASS);
+    document.getElementById('d-settle').innerHTML    = badge(c.settle,  SETTLE_CLASS);
+  }
+
+  /* ━━━ フィルター ━━━ */
+  document.getElementById('status-filter').addEventListener('change', function(){
+    selectedId = null;
+    document.getElementById('detail-name').textContent = '案件を選択してください';
+    document.getElementById('detail-empty').style.display = 'flex';
+    document.getElementById('detail-body').style.display  = 'none';
+    renderTable(this.value);
+  });
+
+  renderTable('');
+
+  /* ━━━ レイアウト計算 ━━━ */
+  const $ = id => document.getElementById(id);
+  const clamp = (v,mn,mx) => Math.max(mn, Math.min(mx, v));
+  const set = (id, r) => {
+    const el = $(id);
+    el.style.left   = Math.round(r.x) + 'px';
+    el.style.top    = Math.round(r.y) + 'px';
+    el.style.width  = Math.round(r.w) + 'px';
+    el.style.height = Math.round(r.h) + 'px';
+  };
+
+  function layout(){
+    const W = window.innerWidth;
+    const H = window.innerHeight;
+
+    const sideW = clamp(W * 0.193, 190, 264);
+    $('side').style.width = Math.round(sideW) + 'px';
+
+    const rightMargin  = clamp(W * 0.012, 12, 18);
+    const gap          = clamp(W * 0.009, 8, 13);
+    const bottomMargin = clamp(H * 0.026, 16, 22);
+    const blockLeft    = sideW + clamp(W * 0.010, 12, 16);
+    const blockRight   = W - rightMargin;
+    const detailW      = clamp(W * 0.178, 190, 244);
+    const detailX      = blockRight - detailW;
+    const centerRight  = detailX - gap;
+    const centerW      = centerRight - blockLeft;
+
+    const blockCstdH = Math.round(centerW * 0.72);
+    const blockBH    = clamp(H * 0.13, 58, 96);
+    const minTopPad  = clamp(H * 0.014, 8, 14);
+    const availableC = H - bottomMargin - minTopPad - blockBH - gap;
+    const blockCH    = Math.max(240, Math.min(blockCstdH, availableC));
+    const blockCbottom = H - bottomMargin;
+    const blockCtop    = blockCbottom - blockCH;
+
+    const bottomH = Math.round(blockCH * 0.22);
+    const bottomY = blockCbottom - bottomH;
+    const mainH   = Math.max(120, bottomY - gap - blockCtop);
+    const memoW   = Math.round(centerW * 0.515);
+    const quickX  = blockLeft + memoW + gap;
+    const quickW  = centerRight - quickX;
+
+    set('main',   {x:blockLeft, y:blockCtop, w:centerW, h:mainH});
+    set('detail', {x:detailX,  y:blockCtop, w:detailW, h:blockCH});
+    set('memo',   {x:blockLeft, y:bottomY,  w:memoW,   h:bottomH});
+    set('quick',  {x:quickX,   y:bottomY,  w:quickW,   h:bottomH});
+
+    const kpiH   = clamp(blockBH * 0.62, 36, 72);
+    const kpiY   = blockCtop - gap - kpiH;
+    const kGap   = clamp(W * 0.007, 6, 10);
+    const kpiW   = clamp((blockRight - (blockLeft + centerW * 0.52) - kGap * 3) / 4, 52, 142);
+    const kTotal = kpiW * 4 + kGap * 3;
+    const kStart = blockRight - kTotal;
+
+    set('kpi1', {x:kStart,               y:kpiY, w:kpiW, h:kpiH});
+    set('kpi2', {x:kStart+(kpiW+kGap),   y:kpiY, w:kpiW, h:kpiH});
+    set('kpi3', {x:kStart+(kpiW+kGap)*2, y:kpiY, w:kpiW, h:kpiH});
+    set('kpi4', {x:kStart+(kpiW+kGap)*3, y:kpiY, w:kpiW, h:kpiH});
+
+    const searchH = clamp(kpiH * 0.52, 22, 34);
+    const searchW = clamp(centerW * 0.40, 180, 336);
+    const searchY = kpiY + Math.round((kpiH - searchH) / 2);
+    set('search', {x:blockLeft + 4, y:searchY, w:searchW, h:searchH});
+  }
+
+  window.addEventListener('resize', layout);
+  layout();
+})();
+</script>
+</body>
+</html>
