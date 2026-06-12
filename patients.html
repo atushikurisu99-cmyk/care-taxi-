@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>患者マスター - スママネ</title>
+<title>患者マスター - ステマネ</title>
 <style>
 /* ━━━ リセット ━━━ */
 *{box-sizing:border-box;margin:0;padding:0;}
@@ -386,7 +386,7 @@ body{
   <aside class="sidebar">
     <div class="brand">
       <div class="brand-icon">ス</div>
-      スママネ
+      ステマネ
     </div>
     <nav class="nav">
       <button class="nav-item">ダッシュボード</button>
@@ -493,6 +493,7 @@ body{
             <div class="info-key">フリガナ</div><div class="info-val" id="d-kana">—</div>
             <div class="info-key">電話番号</div><div class="info-val" id="d-tel">—</div>
             <div class="info-key">住所</div><div class="info-val" id="d-addr">—</div>
+            <div class="info-key">建物種類</div><div class="info-val" id="d-building">—</div>
           </div>
         </div>
 
@@ -542,7 +543,7 @@ body{
 
   <!-- ━━━ フッター ━━━ -->
   <footer class="footer">
-    <span>スママネ - Status Manager</span>
+    <span>ステマネ - Status Manager</span>
     <span>患者マスター</span>
   </footer>
 
@@ -582,6 +583,16 @@ body{
         <label class="form-label">住所</label>
         <input class="form-input" id="f-addr" type="text" placeholder="広島市中区〇〇町1-2-3"/>
       </div>
+      <div class="form-row">
+        <label class="form-label">建物種類</label>
+        <select class="form-select" id="f-building">
+          <option>戸建て</option>
+          <option>集合住宅</option>
+          <option>施設</option>
+          <option>病院</option>
+          <option>その他</option>
+        </select>
+      </div>
 
       <div class="form-section">搬送情報</div>
       <div class="form-row">
@@ -612,26 +623,26 @@ body{
         <div class="form-row">
           <label class="form-label">エレベーター</label>
           <select class="form-select" id="f-elevator">
-            <option value="">—</option>
-            <option>あり</option>
             <option>なし</option>
+            <option>あり</option>
+            <option>不明</option>
           </select>
         </div>
         <div class="form-row">
           <label class="form-label">階段</label>
           <select class="form-select" id="f-stairs">
-            <option value="">—</option>
-            <option>あり</option>
             <option>なし</option>
+            <option>あり</option>
             <option>要介助</option>
+            <option>不明</option>
           </select>
         </div>
         <div class="form-row">
           <label class="form-label">キーボックス</label>
           <select class="form-select" id="f-keybox">
-            <option value="">—</option>
-            <option>あり</option>
             <option>なし</option>
+            <option>あり</option>
+            <option>不明</option>
           </select>
         </div>
       </div>
@@ -662,13 +673,13 @@ body{
 
   /* ━━━ ダミーデータ ━━━ */
   let patients = [
-    {id:1,ptno:'PT-001',name:'山田 花子',kana:'ヤマダ ハナコ',tel:'082-111-0001',addr:'広島市中区東白島町1-1',equip:['標準車いす'],pickup:'玄関前',parking:'敷地内',elevator:'あり',stairs:'なし',keybox:'なし',caution:'左手不自由、乗降時注意',memo:'明るい方。声かけ多めに。',status:'active',memos:[{date:'2026/06/10',author:'田中',body:'先週より体調やや不良。乗降時に確認を。'},{date:'2026/05/28',author:'佐藤',body:'新しい車いすに変更。旧車いすは不使用。'}]},
-    {id:2,ptno:'PT-002',name:'鈴木 一郎',kana:'スズキ イチロウ',tel:'082-222-0002',addr:'広島市南区宇品海岸2-2',equip:['酸素','標準車いす'],pickup:'2F病室前',parking:'来客用駐車場',elevator:'あり',stairs:'要介助',keybox:'あり',caution:'酸素ボンベ常時使用',memo:'',status:'active',memos:[]},
-    {id:3,ptno:'PT-003',name:'佐々木 次郎',kana:'ササキ ジロウ',tel:'082-333-0003',addr:'広島市西区己斐本町3-3',equip:['ストレッチャー'],pickup:'玄関',parking:'路上',elevator:'なし',stairs:'あり',keybox:'なし',caution:'完全臥床。ストレッチャー必須。',memo:'緊張しやすい。搬送中は声かけを。',status:'active',memos:[{date:'2026/06/01',author:'山本',body:'家族から連絡あり。次回は娘様同乗予定。'}]},
-    {id:4,ptno:'PT-004',name:'田中 美子',kana:'タナカ ヨシコ',tel:'082-444-0004',addr:'広島市東区温品4-4',equip:['歩行器'],pickup:'玄関前',parking:'敷地内',elevator:'—',stairs:'なし',keybox:'—',caution:'',memo:'',status:'active',memos:[]},
-    {id:5,ptno:'PT-005',name:'高橋 健二',kana:'タカハシ ケンジ',tel:'082-555-0005',addr:'広島市安佐南区5-5',equip:['標準車いす','吸引器'],pickup:'居室前',parking:'第2駐車場',elevator:'あり',stairs:'なし',keybox:'あり',caution:'吸引が必要な場合あり',memo:'早口で聞き取りにくいが丁寧に対応を。',status:'stop',memos:[]},
-    {id:6,ptno:'PT-006',name:'伊藤 幸子',kana:'イトウ サチコ',tel:'082-666-0006',addr:'広島市安佐北区6-6',equip:['付き添い'],pickup:'自室前',parking:'なし',elevator:'なし',stairs:'あり',keybox:'—',caution:'付き添いが必要',memo:'',status:'active',memos:[]},
-    {id:7,ptno:'PT-007',name:'渡辺 正男',kana:'ワタナベ マサオ',tel:'082-777-0007',addr:'廿日市市7-7',equip:['リクライニング車いす'],pickup:'玄関',parking:'前面道路',elevator:'—',stairs:'なし',keybox:'なし',caution:'リクライニング必須。角度60度',memo:'音楽が好き。搬送中BGMOKとのこと。',status:'active',memos:[]},
+    {id:1,ptno:'PT-001',name:'山田 花子',kana:'ヤマダ ハナコ',tel:'082-111-0001',addr:'広島市中区東白島町1-1',building:'集合住宅',equip:['標準車いす'],pickup:'玄関前',parking:'敷地内',elevator:'あり',stairs:'なし',keybox:'なし',caution:'左手不自由、乗降時注意',memo:'明るい方。声かけ多めに。',status:'active',memos:[{date:'2026/06/10',author:'田中',body:'先週より体調やや不良。乗降時に確認を。'},{date:'2026/05/28',author:'佐藤',body:'新しい車いすに変更。旧車いすは不使用。'}]},
+    {id:2,ptno:'PT-002',name:'鈴木 一郎',kana:'スズキ イチロウ',tel:'082-222-0002',addr:'広島市南区宇品海岸2-2',building:'病院',equip:['酸素','標準車いす'],pickup:'2F病室前',parking:'来客用駐車場',elevator:'あり',stairs:'要介助',keybox:'あり',caution:'酸素ボンベ常時使用',memo:'',status:'active',memos:[]},
+    {id:3,ptno:'PT-003',name:'佐々木 次郎',kana:'ササキ ジロウ',tel:'082-333-0003',addr:'広島市西区己斐本町3-3',building:'戸建て',equip:['ストレッチャー'],pickup:'玄関',parking:'路上',elevator:'なし',stairs:'あり',keybox:'なし',caution:'完全臥床。ストレッチャー必須。',memo:'緊張しやすい。搬送中は声かけを。',status:'active',memos:[{date:'2026/06/01',author:'山本',body:'家族から連絡あり。次回は娘様同乗予定。'}]},
+    {id:4,ptno:'PT-004',name:'田中 美子',kana:'タナカ ヨシコ',tel:'082-444-0004',addr:'広島市東区温品4-4',building:'戸建て',equip:['歩行器'],pickup:'玄関前',parking:'敷地内',elevator:'—',stairs:'なし',keybox:'—',caution:'',memo:'',status:'active',memos:[]},
+    {id:5,ptno:'PT-005',name:'高橋 健二',kana:'タカハシ ケンジ',tel:'082-555-0005',addr:'広島市安佐南区5-5',building:'施設',equip:['標準車いす','吸引器'],pickup:'居室前',parking:'第2駐車場',elevator:'あり',stairs:'なし',keybox:'あり',caution:'吸引が必要な場合あり',memo:'早口で聞き取りにくいが丁寧に対応を。',status:'stop',memos:[]},
+    {id:6,ptno:'PT-006',name:'伊藤 幸子',kana:'イトウ サチコ',tel:'082-666-0006',addr:'広島市安佐北区6-6',building:'戸建て',equip:['付き添い'],pickup:'自室前',parking:'なし',elevator:'なし',stairs:'あり',keybox:'—',caution:'付き添いが必要',memo:'',status:'active',memos:[]},
+    {id:7,ptno:'PT-007',name:'渡辺 正男',kana:'ワタナベ マサオ',tel:'082-777-0007',addr:'廿日市市7-7',building:'戸建て',equip:['リクライニング車いす'],pickup:'玄関',parking:'前面道路',elevator:'—',stairs:'なし',keybox:'なし',caution:'リクライニング必須。角度60度',memo:'音楽が好き。搬送中BGMOKとのこと。',status:'active',memos:[]},
   ];
 
   let selectedId = null;
@@ -726,6 +737,7 @@ body{
     document.getElementById('d-kana').textContent  = p.kana;
     document.getElementById('d-tel').textContent   = p.tel || '—';
     document.getElementById('d-addr').textContent  = p.addr || '—';
+    document.getElementById('d-building').textContent = p.building || '戸建て';
 
     const equipEl = document.getElementById('d-equip');
     equipEl.innerHTML = p.equip.length
@@ -817,9 +829,10 @@ body{
     ['f-name','f-kana','f-tel','f-ptno','f-addr','f-pickup','f-parking','f-caution','f-memo'].forEach(id => {
       document.getElementById(id).value = '';
     });
-    ['f-elevator','f-stairs','f-keybox'].forEach(id => {
-      document.getElementById(id).value = '';
-    });
+    document.getElementById('f-building').value = '戸建て';
+    document.getElementById('f-elevator').value = 'なし';
+    document.getElementById('f-stairs').value = 'なし';
+    document.getElementById('f-keybox').value = 'なし';
     document.querySelectorAll('#equip-checks .check-item').forEach(el => {
       el.classList.remove('checked');
       el.querySelector('input').checked = false;
@@ -832,6 +845,7 @@ body{
     document.getElementById('f-tel').value     = p.tel;
     document.getElementById('f-ptno').value    = p.ptno;
     document.getElementById('f-addr').value    = p.addr;
+    document.getElementById('f-building').value = p.building || '戸建て';
     document.getElementById('f-pickup').value  = p.pickup;
     document.getElementById('f-parking').value = p.parking;
     document.getElementById('f-elevator').value= p.elevator;
@@ -866,6 +880,7 @@ body{
       p.tel      = document.getElementById('f-tel').value.trim();
       p.ptno     = document.getElementById('f-ptno').value.trim() || p.ptno;
       p.addr     = document.getElementById('f-addr').value.trim();
+      p.building = document.getElementById('f-building').value;
       p.equip    = equip;
       p.pickup   = document.getElementById('f-pickup').value.trim();
       p.parking  = document.getElementById('f-parking').value.trim();
@@ -885,6 +900,7 @@ body{
         name, kana,
         tel:    document.getElementById('f-tel').value.trim(),
         addr:   document.getElementById('f-addr').value.trim(),
+        building: document.getElementById('f-building').value,
         equip,
         pickup:   document.getElementById('f-pickup').value.trim(),
         parking:  document.getElementById('f-parking').value.trim(),
