@@ -1,0 +1,638 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1"/>
+<title>患者カルテ - スママネ</title>
+<style>
+/* ━━━ リセット ━━━ */
+*{box-sizing:border-box;margin:0;padding:0;}
+html,body{width:100%;height:100%;overflow:hidden;
+  font-family:-apple-system,BlinkMacSystemFont,"Helvetica Neue","Yu Gothic",Meiryo,sans-serif;
+  background:#dcebf1;color:#24333a;}
+
+/* ━━━ カラー変数（ステマネ継承） ━━━ */
+:root{
+  --pc-primary:#178ea5;
+  --pc-primary-dark:#00636b;
+  --pc-primary-deep:#00484f;
+  --pc-bg:#dcebf1;
+  --pc-panel:#ffffff;
+  --pc-line:#c8d7dd;
+  --pc-text:#24333a;
+  --pc-muted:#6f828a;
+  --pc-warn:#fff3d6;
+  --pc-danger:#ffe4e7;
+  --pc-ok:#e4f5e3;
+  --pc-blue:#e5f2fb;
+}
+
+/* ━━━ アプリグリッド ━━━ */
+#app{
+  display:grid;
+  grid-template-columns:220px 1fr;
+  grid-template-rows:68px 1fr 30px;
+  width:100vw;height:100vh;overflow:hidden;
+}
+
+/* ━━━ サイドバー ━━━ */
+.sidebar{
+  grid-row:1/4;grid-column:1;
+  background:linear-gradient(180deg,var(--pc-primary-dark),var(--pc-primary-deep));
+  color:#fff;padding:22px 16px 18px;
+  display:flex;flex-direction:column;overflow:hidden;
+}
+.brand{display:flex;align-items:center;gap:10px;font-weight:900;font-size:17px;
+  letter-spacing:.02em;white-space:nowrap;margin-bottom:24px;}
+.brand-icon{width:34px;height:34px;border-radius:10px;background:#fff;
+  color:var(--pc-primary-dark);display:grid;place-items:center;font-weight:900;font-size:16px;flex-shrink:0;}
+.nav{display:flex;flex-direction:column;gap:4px;}
+.nav-item{width:100%;height:42px;border:0;border-radius:8px;background:transparent;color:#fff;
+  text-align:left;padding:0 14px;font-size:14px;font-weight:700;
+  display:flex;align-items:center;gap:10px;cursor:pointer;white-space:nowrap;}
+.nav-item:hover{background:rgba(255,255,255,.12);}
+.nav-item.active{background:rgba(255,255,255,.18);box-shadow:inset 0 0 0 1px rgba(255,255,255,.18);}
+.sidebar-bottom{margin-top:auto;display:flex;flex-direction:column;gap:10px;}
+.ipad-btn{height:42px;border:1px solid rgba(255,255,255,.45);border-radius:8px;
+  background:rgba(255,255,255,.08);color:#fff;font-size:13px;font-weight:900;cursor:pointer;}
+.company{font-size:10px;font-weight:700;color:rgba(255,255,255,.65);line-height:1.6;}
+
+/* ━━━ ヘッダー ━━━ */
+.header{
+  grid-column:2;grid-row:1;
+  background:#fff;border-bottom:1px solid var(--pc-line);
+  display:flex;align-items:center;gap:14px;padding:0 24px;
+}
+.back-btn{
+  height:34px;padding:0 14px;border:1px solid var(--pc-line);border-radius:8px;
+  background:#fff;color:var(--pc-muted);font-size:13px;font-weight:900;cursor:pointer;
+  white-space:nowrap;
+}
+.back-btn:hover{background:#f4f8fa;}
+.header-ptname{font-size:18px;font-weight:900;color:var(--pc-text);}
+.header-ptno{font-size:13px;font-weight:800;color:var(--pc-muted);margin-left:6px;}
+.header-badge{
+  display:inline-flex;align-items:center;height:24px;padding:0 10px;
+  border-radius:999px;font-size:12px;font-weight:900;margin-left:8px;
+}
+.badge-active{background:var(--pc-ok);color:#197229;border:1px solid #90d090;}
+.badge-stop{background:#eef1f3;color:#4e5f66;border:1px solid #c8d4d8;}
+.header-actions{margin-left:auto;display:flex;gap:8px;}
+.btn-primary{
+  height:36px;padding:0 18px;border:0;border-radius:8px;
+  background:linear-gradient(90deg,var(--pc-primary-dark),var(--pc-primary));
+  color:#fff;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;
+}
+.btn-outline{
+  height:36px;padding:0 18px;
+  border:1px solid var(--pc-primary);border-radius:8px;
+  background:#fff;color:var(--pc-primary-dark);font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;
+}
+
+/* ━━━ メインコンテンツ ━━━ */
+.main{
+  grid-column:2;grid-row:2;
+  overflow-y:auto;
+  padding:22px 24px 28px;
+  background:var(--pc-bg);
+}
+.main-inner{
+  max-width:1100px;margin:0 auto;
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  grid-template-areas:
+    "basic   basic   status"
+    "field   equip   status"
+    "bill    bill    next"
+    "history history history"
+    "memo    memo    memo";
+  gap:16px;
+}
+
+/* ━━━ カード共通 ━━━ */
+.card{
+  background:#fff;
+  border:1px solid var(--pc-line);
+  border-radius:10px;
+  box-shadow:0 2px 8px rgba(0,0,0,.05);
+  overflow:hidden;
+}
+.card-head{
+  height:44px;padding:0 16px;
+  display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid var(--pc-line);
+  font-size:13px;font-weight:900;color:var(--pc-primary-dark);
+  letter-spacing:.04em;background:#f8fbfc;
+}
+.card-head-icon{font-size:15px;margin-right:6px;}
+.card-body{padding:14px 16px 16px;}
+
+/* ━━━ 基本情報カード ━━━ */
+.card-basic{grid-area:basic;}
+.basic-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr 1fr;
+  gap:12px 20px;
+}
+.info-item{}
+.info-label{font-size:11px;font-weight:900;color:var(--pc-muted);letter-spacing:.04em;margin-bottom:3px;}
+.info-val{font-size:14px;font-weight:700;color:var(--pc-text);line-height:1.4;}
+.info-val.large{font-size:16px;font-weight:900;}
+
+/* ━━━ 状態サマリーカード ━━━ */
+.card-status{grid-area:status;}
+.status-item{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:10px 0;border-bottom:1px solid #edf2f4;
+  font-size:14px;font-weight:700;
+}
+.status-item:last-child{border-bottom:none;}
+.status-key{color:var(--pc-muted);font-size:13px;}
+.s-badge{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:24px;padding:0 10px;border-radius:999px;
+  font-size:12px;font-weight:900;white-space:nowrap;
+}
+.s-uninvoiced{background:#fde8e8;color:#b02020;border:1px solid #e8a0a0;}
+.s-invoiced  {background:var(--pc-ok);color:#197229;border:1px solid #90d090;}
+.s-unpaid    {background:#fff0e0;color:#b05000;border:1px solid #f0c090;}
+.s-paid      {background:var(--pc-ok);color:#197229;border:1px solid #90d090;}
+.s-unsettled {background:#fde8f8;color:#801870;border:1px solid #e0a0d8;}
+.s-settled   {background:var(--pc-ok);color:#197229;border:1px solid #90d090;}
+.s-plan      {background:var(--pc-blue);color:#1060b0;border:1px solid #90c0f0;}
+.s-num{font-size:22px;font-weight:900;color:var(--pc-text);}
+.s-unit{font-size:12px;font-weight:800;color:var(--pc-muted);margin-left:2px;}
+.alert-row{
+  margin-top:12px;padding:10px 12px;
+  background:#fff8e0;border:1px solid #f0d060;border-radius:8px;
+  font-size:13px;font-weight:800;color:#8a6000;
+  display:flex;align-items:center;gap:8px;
+}
+
+/* ━━━ 現場情報カード ━━━ */
+.card-field{grid-area:field;}
+.field-grid{display:grid;grid-template-columns:80px 1fr;gap:8px 10px;font-size:13px;}
+.field-key{font-weight:800;color:var(--pc-muted);padding-top:1px;}
+.field-val{font-weight:700;color:var(--pc-text);word-break:break-all;}
+
+/* ━━━ 必要資機材カード ━━━ */
+.card-equip{grid-area:equip;}
+.equip-list{display:flex;flex-wrap:wrap;gap:8px;padding:4px 0;}
+.equip-tag{
+  display:inline-flex;align-items:center;gap:5px;
+  height:30px;padding:0 12px;
+  border-radius:999px;
+  background:var(--pc-blue);color:#1060b0;
+  border:1px solid #90c0f0;
+  font-size:13px;font-weight:900;
+}
+.equip-tag.warn{background:#fff0e0;color:#b05000;border-color:#f0c090;}
+.caution-box{
+  margin-top:12px;padding:10px 12px;
+  background:#fff3f3;border:1px solid #f0b0b0;border-radius:8px;
+  font-size:13px;font-weight:800;color:#8a2020;line-height:1.6;
+}
+.caution-label{font-size:11px;font-weight:900;color:#b02020;margin-bottom:4px;letter-spacing:.04em;}
+.memo-box{
+  margin-top:10px;padding:10px 12px;
+  background:#f4f8fa;border:1px solid var(--pc-line);border-radius:8px;
+  font-size:13px;font-weight:700;color:var(--pc-text);line-height:1.7;
+}
+.memo-label{font-size:11px;font-weight:900;color:var(--pc-primary-dark);margin-bottom:4px;letter-spacing:.04em;}
+
+/* ━━━ 請求先情報カード ━━━ */
+.card-bill{grid-area:bill;}
+.bill-grid{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:12px 24px;
+}
+
+/* ━━━ 次回予定カード ━━━ */
+.card-next{grid-area:next;}
+.next-item{
+  padding:10px 0;border-bottom:1px solid #edf2f4;
+  font-size:14px;
+}
+.next-item:last-child{border-bottom:none;}
+.next-date{font-weight:900;color:var(--pc-primary-dark);margin-bottom:2px;}
+.next-detail{font-weight:700;color:var(--pc-text);font-size:13px;}
+.next-driver{font-size:12px;font-weight:800;color:var(--pc-muted);margin-top:2px;}
+.no-next{font-size:13px;font-weight:700;color:var(--pc-muted);padding:8px 0;}
+
+/* ━━━ 搬送履歴カード ━━━ */
+.card-history{grid-area:history;}
+.history-toolbar{
+  display:flex;align-items:center;gap:10px;
+  padding:10px 16px;border-bottom:1px solid var(--pc-line);
+  background:#f8fbfc;
+}
+.history-filter{
+  height:28px;padding:0 10px;
+  border:1px solid var(--pc-line);border-radius:6px;
+  font-size:12px;color:var(--pc-text);background:#fff;cursor:pointer;
+}
+.history-count{font-size:12px;font-weight:800;color:var(--pc-muted);margin-left:auto;}
+.h-tbl{width:100%;border-collapse:collapse;font-size:13px;}
+.h-tbl thead th{
+  height:34px;background:#f4f8fa;
+  text-align:left;padding:0 12px;
+  font-size:11px;font-weight:900;color:#4c6068;
+  border-bottom:1px solid var(--pc-line);white-space:nowrap;
+}
+.h-tbl tbody tr{border-bottom:1px solid #edf2f4;transition:background .1s;cursor:pointer;}
+.h-tbl tbody tr:hover{background:#f0f9fc;}
+.h-tbl tbody td{height:40px;padding:0 12px;font-weight:700;white-space:nowrap;}
+.h-tbl tbody tr:last-child td{border-bottom:0;}
+
+/* ━━━ 申し送りカード ━━━ */
+.card-memo{grid-area:memo;}
+.memo-input-area{
+  display:grid;grid-template-columns:1fr auto;gap:10px;
+  align-items:start;padding:14px 16px;
+  border-bottom:1px solid var(--pc-line);
+  background:#f8fbfc;
+}
+.memo-textarea{
+  width:100%;min-height:60px;
+  border:1px solid var(--pc-line);border-radius:8px;
+  padding:10px 12px;font-size:13px;font-weight:700;
+  color:var(--pc-text);resize:vertical;outline:none;font-family:inherit;
+}
+.memo-textarea:focus{border-color:var(--pc-primary);}
+.memo-post-btn{
+  height:36px;padding:0 18px;border:0;border-radius:8px;
+  background:linear-gradient(90deg,var(--pc-primary-dark),var(--pc-primary));
+  color:#fff;font-size:13px;font-weight:900;cursor:pointer;white-space:nowrap;align-self:flex-end;
+}
+.memo-list{padding:12px 16px;display:flex;flex-direction:column;gap:10px;max-height:240px;overflow-y:auto;}
+.memo-entry{
+  background:#f4f8fa;border:1px solid var(--pc-line);
+  border-radius:8px;padding:10px 14px;
+}
+.memo-entry-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
+.memo-entry-date{font-size:11px;font-weight:800;color:var(--pc-muted);}
+.memo-entry-author{font-size:11px;font-weight:900;color:var(--pc-primary-dark);}
+.memo-entry-body{font-size:13px;font-weight:700;color:var(--pc-text);line-height:1.6;}
+
+/* ━━━ バッジ（履歴テーブル用） ━━━ */
+.tbadge{
+  display:inline-flex;align-items:center;justify-content:center;
+  height:22px;padding:0 8px;border-radius:4px;
+  font-size:11px;font-weight:900;white-space:nowrap;
+}
+.tbadge-done    {background:#e8f4e8;color:#1a6a1a;border:1px solid #90d090;}
+.tbadge-moving  {background:#fff2dd;color:#c07800;border:1px solid #f0c060;}
+.tbadge-cancel  {background:#f4e8e8;color:#8a2020;border:1px solid #d09090;}
+.tbadge-invoiced{background:var(--pc-blue);color:#1060b0;border:1px solid #90c0f0;}
+.tbadge-uninvoiced{background:#fde8e8;color:#b02020;border:1px solid #e8a0a0;}
+
+/* ━━━ フッター ━━━ */
+.footer{
+  grid-column:2;grid-row:3;
+  background:linear-gradient(90deg,var(--pc-primary-dark),var(--pc-primary));
+  color:#fff;display:flex;align-items:center;justify-content:space-between;
+  padding:0 18px;font-size:12px;font-weight:800;
+}
+</style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ━━━ サイドバー ━━━ -->
+  <aside class="sidebar">
+    <div class="brand">
+      <div class="brand-icon">ス</div>
+      スママネ
+    </div>
+    <nav class="nav">
+      <button class="nav-item" onclick="location.href='index.html'">ダッシュボード</button>
+      <button class="nav-item">案件入力</button>
+      <button class="nav-item">案件一覧</button>
+      <button class="nav-item">請求管理</button>
+      <button class="nav-item">入金管理</button>
+      <button class="nav-item">支払管理</button>
+      <button class="nav-item">車両・乗務員管理</button>
+      <button class="nav-item">協力業者管理</button>
+      <button class="nav-item active" onclick="location.href='patients.html'">マスター管理</button>
+      <button class="nav-item">設定</button>
+    </nav>
+    <div class="sidebar-bottom">
+      <button class="ipad-btn">iPad 表示に切替</button>
+      <div class="company">株式会社〇〇タクシー<br>Ver.1.0.0</div>
+    </div>
+  </aside>
+
+  <!-- ━━━ ヘッダー ━━━ -->
+  <header class="header">
+    <button class="back-btn" onclick="location.href='patients.html'">← 患者一覧へ戻る</button>
+    <span class="header-ptname" id="hd-name">山田 花子</span>
+    <span class="header-ptno" id="hd-no">PT-001</span>
+    <span class="header-badge badge-active" id="hd-badge">有効</span>
+    <div class="header-actions">
+      <button class="btn-outline" onclick="location.href='patients.html'">編集</button>
+      <button class="btn-primary">＋ 新規案件登録</button>
+    </div>
+  </header>
+
+  <!-- ━━━ メインコンテンツ ━━━ -->
+  <main class="main">
+    <div class="main-inner">
+
+      <!-- 基本情報 -->
+      <div class="card card-basic">
+        <div class="card-head"><span><span class="card-head-icon">👤</span>基本情報</span></div>
+        <div class="card-body">
+          <div class="basic-grid">
+            <div class="info-item">
+              <div class="info-label">氏名</div>
+              <div class="info-val large">山田 花子</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">フリガナ</div>
+              <div class="info-val">ヤマダ ハナコ</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">患者番号</div>
+              <div class="info-val">PT-001</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">電話番号</div>
+              <div class="info-val">082-111-0001</div>
+            </div>
+            <div class="info-item" style="grid-column:2/4;">
+              <div class="info-label">住所</div>
+              <div class="info-val">広島市中区東白島町1-1</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">緊急連絡先</div>
+              <div class="info-val">山田 太郎（夫）</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">緊急連絡先TEL</div>
+              <div class="info-val">090-1234-5678</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">続柄</div>
+              <div class="info-val">夫</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 状態サマリー -->
+      <div class="card card-status">
+        <div class="card-head"><span><span class="card-head-icon">📊</span>状態サマリー</span></div>
+        <div class="card-body">
+          <div class="status-item">
+            <span class="status-key">累計搬送回数</span>
+            <span><span class="s-num">24</span><span class="s-unit">回</span></span>
+          </div>
+          <div class="status-item">
+            <span class="status-key">今月の搬送</span>
+            <span><span class="s-num">3</span><span class="s-unit">回</span></span>
+          </div>
+          <div class="status-item">
+            <span class="status-key">未請求</span>
+            <span class="s-badge s-uninvoiced">2件 未請求</span>
+          </div>
+          <div class="status-item">
+            <span class="status-key">未入金</span>
+            <span class="s-badge s-unpaid">1件 未入金</span>
+          </div>
+          <div class="status-item">
+            <span class="status-key">支払状態</span>
+            <span class="s-badge s-settled">支払済</span>
+          </div>
+          <div class="status-item">
+            <span class="status-key">次回予定</span>
+            <span class="s-badge s-plan">6/20 予約あり</span>
+          </div>
+          <div class="alert-row">
+            ⚠️ 未請求の案件が2件あります
+          </div>
+        </div>
+      </div>
+
+      <!-- 現場情報 -->
+      <div class="card card-field">
+        <div class="card-head"><span><span class="card-head-icon">🏠</span>現場情報</span></div>
+        <div class="card-body">
+          <div class="field-grid">
+            <div class="field-key">お迎え場所</div>
+            <div class="field-val">玄関前</div>
+            <div class="field-key">駐車場所</div>
+            <div class="field-val">敷地内駐車場（A区画）</div>
+            <div class="field-key">エレベーター</div>
+            <div class="field-val">あり（1F正面）</div>
+            <div class="field-key">階段</div>
+            <div class="field-val">なし</div>
+            <div class="field-key">キーボックス</div>
+            <div class="field-val">なし</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 必要資機材・注意事項 -->
+      <div class="card card-equip">
+        <div class="card-head"><span><span class="card-head-icon">🚑</span>搬送情報・注意事項</span></div>
+        <div class="card-body">
+          <div class="info-label" style="margin-bottom:8px;">標準必要資機材</div>
+          <div class="equip-list">
+            <span class="equip-tag">標準車いす</span>
+            <span class="equip-tag warn">酸素</span>
+          </div>
+          <div class="caution-box" style="margin-top:14px;">
+            <div class="caution-label">⚠️ 注意事項</div>
+            左手が不自由なため乗降時に介助が必要。酸素ボンベは必ず確認すること。
+          </div>
+          <div class="memo-box" style="margin-top:10px;">
+            <div class="memo-label">💬 申し送り（最新）</div>
+            明るい方。声かけ多めに対応すること。先週より体調やや不良のため乗降時に確認を。
+          </div>
+        </div>
+      </div>
+
+      <!-- 請求先情報 -->
+      <div class="card card-bill">
+        <div class="card-head"><span><span class="card-head-icon">💴</span>請求先情報</span></div>
+        <div class="card-body">
+          <div class="bill-grid">
+            <div class="info-item">
+              <div class="info-label">請求先名</div>
+              <div class="info-val">○○病院 医事課</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">請求先電話</div>
+              <div class="info-val">082-000-1111</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">請求先住所</div>
+              <div class="info-val">広島市中区〇〇町2-3</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">支払方法</div>
+              <div class="info-val">後日請求</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">請求締日</div>
+              <div class="info-val">毎月末日</div>
+            </div>
+            <div class="info-item">
+              <div class="info-label">支払サイト</div>
+              <div class="info-val">翌月20日払い</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 次回予定 -->
+      <div class="card card-next">
+        <div class="card-head"><span><span class="card-head-icon">📅</span>次回予定</span></div>
+        <div class="card-body">
+          <div class="next-item">
+            <div class="next-date">6月20日（金）09:00</div>
+            <div class="next-detail">自宅 → ○○病院</div>
+            <div class="next-driver">担当：佐藤介護タクシー</div>
+          </div>
+          <div class="next-item">
+            <div class="next-date">6月27日（金）09:00</div>
+            <div class="next-detail">自宅 → ○○病院</div>
+            <div class="next-driver">担当：未定</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 搬送履歴 -->
+      <div class="card card-history">
+        <div class="card-head">
+          <span><span class="card-head-icon">📋</span>搬送履歴</span>
+        </div>
+        <div class="history-toolbar">
+          <select class="history-filter" id="history-filter">
+            <option value="">すべて</option>
+            <option value="完了">完了</option>
+            <option value="キャンセル">キャンセル</option>
+          </select>
+          <select class="history-filter" id="period-filter">
+            <option value="">全期間</option>
+            <option value="3">直近3ヶ月</option>
+            <option value="6">直近6ヶ月</option>
+            <option value="12">直近1年</option>
+          </select>
+          <span class="history-count" id="history-count">6件</span>
+        </div>
+        <div style="overflow-x:auto;">
+          <table class="h-tbl" id="history-table">
+            <thead>
+              <tr>
+                <th>日付</th>
+                <th>時間</th>
+                <th>出発</th>
+                <th>到着</th>
+                <th>搬送対応</th>
+                <th>状態</th>
+                <th>請求状態</th>
+                <th>金額</th>
+              </tr>
+            </thead>
+            <tbody id="history-tbody"></tbody>
+          </table>
+        </div>
+      </div>
+
+      <!-- 申し送り -->
+      <div class="card card-memo">
+        <div class="card-head"><span><span class="card-head-icon">✉️</span>申し送り履歴</span></div>
+        <div class="memo-input-area">
+          <textarea class="memo-textarea" id="memo-input" placeholder="新しい申し送りを入力..."></textarea>
+          <button class="memo-post-btn" onclick="postMemo()">登録</button>
+        </div>
+        <div class="memo-list" id="memo-list"></div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- ━━━ フッター ━━━ -->
+  <footer class="footer">
+    <span>スママネ - Status Manager</span>
+    <span>患者カルテ：山田 花子（PT-001）</span>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+
+  /* ━━━ 搬送履歴ダミーデータ ━━━ */
+  const HISTORY = [
+    {date:'2026/06/13',time:'09:00',from:'自宅',to:'○○病院',driver:'田中介護タクシー',status:'完了',invoice:'未請求',amount:8400},
+    {date:'2026/06/06',time:'09:00',from:'自宅',to:'○○病院',driver:'佐藤介護タクシー',status:'完了',invoice:'未請求',amount:8400},
+    {date:'2026/05/30',time:'09:30',from:'自宅',to:'○○病院',driver:'田中介護タクシー',status:'完了',invoice:'請求済',amount:8400},
+    {date:'2026/05/23',time:'09:00',from:'自宅',to:'○○病院',driver:'山本介護タクシー',status:'完了',invoice:'請求済',amount:8400},
+    {date:'2026/05/16',time:'10:00',from:'自宅',to:'△△クリニック',driver:'田中介護タクシー',status:'完了',invoice:'請求済',amount:6200},
+    {date:'2026/05/02',time:'09:00',from:'自宅',to:'○○病院',driver:'佐藤介護タクシー',status:'キャンセル',invoice:'—',amount:0},
+  ];
+
+  /* ━━━ 申し送りダミーデータ ━━━ */
+  let memos = [
+    {date:'2026/06/10',author:'田中',body:'先週より体調やや不良。乗降時に確認を。'},
+    {date:'2026/05/28',author:'佐藤',body:'新しい車いすに変更。旧車いすは不使用。'},
+    {date:'2026/05/16',author:'山本',body:'本日は娘様同乗。後部座席に2名乗車。'},
+  ];
+
+  /* ━━━ 履歴テーブル描画 ━━━ */
+  function renderHistory(){
+    const statusF = document.getElementById('history-filter').value;
+    let data = statusF ? HISTORY.filter(h => h.status === statusF) : HISTORY;
+    document.getElementById('history-count').textContent = data.length + '件';
+    document.getElementById('history-tbody').innerHTML = data.map(h => `
+      <tr>
+        <td>${h.date}</td>
+        <td>${h.time}</td>
+        <td>${h.from}</td>
+        <td>${h.to}</td>
+        <td>${h.driver}</td>
+        <td><span class="tbadge tbadge-${h.status==='完了'?'done':'cancel'}">${h.status}</span></td>
+        <td><span class="tbadge ${h.invoice==='請求済'?'tbadge-invoiced':h.invoice==='未請求'?'tbadge-uninvoiced':''}">${h.invoice}</span></td>
+        <td style="text-align:right;">${h.amount > 0 ? h.amount.toLocaleString()+'円' : '—'}</td>
+      </tr>
+    `).join('');
+  }
+
+  /* ━━━ 申し送り描画 ━━━ */
+  function renderMemos(){
+    document.getElementById('memo-list').innerHTML = memos.map(m => `
+      <div class="memo-entry">
+        <div class="memo-entry-head">
+          <span class="memo-entry-date">${m.date}</span>
+          <span class="memo-entry-author">${m.author}</span>
+        </div>
+        <div class="memo-entry-body">${m.body}</div>
+      </div>
+    `).join('');
+  }
+
+  /* ━━━ 申し送り登録 ━━━ */
+  window.postMemo = function(){
+    const body = document.getElementById('memo-input').value.trim();
+    if(!body) return;
+    const now = new Date();
+    const dateStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`;
+    memos.unshift({date:dateStr, author:'管理者', body});
+    document.getElementById('memo-input').value = '';
+    renderMemos();
+  };
+
+  /* ━━━ フィルター ━━━ */
+  document.getElementById('history-filter').addEventListener('change', renderHistory);
+
+  /* ━━━ 初期描画 ━━━ */
+  renderHistory();
+  renderMemos();
+
+})();
+</script>
+</body>
+</html>
