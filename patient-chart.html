@@ -272,7 +272,14 @@ html,body{width:100%;height:100%;overflow:hidden;
 }
 .memo-entry-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;}
 .memo-entry-date{font-size:11px;font-weight:800;color:var(--pc-muted);}
+.memo-entry-meta{display:flex;align-items:center;gap:10px;}
 .memo-entry-author{font-size:11px;font-weight:900;color:var(--pc-primary-dark);}
+.memo-edit-btn{
+  height:24px;padding:0 10px;border:1px solid var(--pc-primary);
+  border-radius:6px;background:#fff;color:var(--pc-primary-dark);
+  font-size:11px;font-weight:900;cursor:pointer;
+}
+.memo-edit-btn:hover{background:#f0f9fc;}
 .memo-entry-body{font-size:13px;font-weight:700;color:var(--pc-text);line-height:1.6;}
 
 /* ━━━ バッジ（履歴テーブル用） ━━━ */
@@ -601,23 +608,50 @@ html,body{width:100%;height:100%;overflow:hidden;
     `).join('');
   }
 
+  let editingMemoIndex = null;
+
   /* ━━━ 申し送り描画 ━━━ */
   function renderMemos(){
-    document.getElementById('memo-list').innerHTML = memos.map(m => `
+    document.getElementById('memo-list').innerHTML = memos.map((m, index) => `
       <div class="memo-entry">
         <div class="memo-entry-head">
           <span class="memo-entry-date">${m.date}</span>
-          <span class="memo-entry-author">${m.author}</span>
+          <div class="memo-entry-meta">
+            <span class="memo-entry-author">${m.author}</span>
+            <button class="memo-edit-btn" onclick="editMemo(${index})">編集</button>
+          </div>
         </div>
         <div class="memo-entry-body">${m.body}</div>
       </div>
     `).join('');
   }
 
-  /* ━━━ 申し送り登録 ━━━ */
+  /* ━━━ 申し送り編集開始 ━━━ */
+  window.editMemo = function(index){
+    const memo = memos[index];
+    if(!memo) return;
+    editingMemoIndex = index;
+    document.getElementById('memo-input').value = memo.body;
+    document.querySelector('.memo-post-btn').textContent = '更新';
+    document.getElementById('memo-input').focus();
+  };
+
+  /* ━━━ 申し送り登録・更新 ━━━ */
   window.postMemo = function(){
     const body = document.getElementById('memo-input').value.trim();
     if(!body) return;
+
+    if(editingMemoIndex !== null){
+      if(memos[editingMemoIndex]){
+        memos[editingMemoIndex].body = body;
+      }
+      editingMemoIndex = null;
+      document.querySelector('.memo-post-btn').textContent = '登録';
+      document.getElementById('memo-input').value = '';
+      renderMemos();
+      return;
+    }
+
     const now = new Date();
     const dateStr = `${now.getFullYear()}/${now.getMonth()+1}/${now.getDate()}`;
     memos.unshift({date:dateStr, author:'管理者', body});
