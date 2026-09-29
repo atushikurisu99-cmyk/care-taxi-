@@ -118,13 +118,11 @@ main{position:relative;min-height:0;overflow:hidden}
 .home-summary .card{min-height:92px}
 .home-actions{display:grid;grid-template-columns:1.35fr .65fr;gap:8px;height:100%}
 .home-actions .primary{width:100%}
-.vacant-center{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px}
-.vacant-status{text-align:center}
-.vacant-status .big{font-size:30px;font-weight:1000}
-.vacant-status .sub{margin-top:5px}
-.vacant-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.toolbtn{min-height:54px;border-radius:14px;border:1px solid #2a3a47;background:#12212d;color:#fff;font-size:16px;font-weight:900}
-.toolbtn.danger{background:#331b1d;border-color:#6e3438;color:#ffb4b7}
+.vacant-center{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:18px}
+.vacant-status{text-align:left;padding:2px 4px}
+.vacant-status .big{font-size:25px;font-weight:1000}
+.vacant-status .sub{margin-top:4px;font-size:14px}
+.menuitem.danger{color:#ff9b9f}
 .info-back{min-height:54px}
 .shift-card{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .shift-time{font-size:22px;font-weight:900}
@@ -200,10 +198,6 @@ main{position:relative;min-height:0;overflow:hidden}
    <div class="vacant-status">
     <div class="big">空車</div>
     <div id="vacantShiftTime" class="sub">乗務中</div>
-   </div>
-   <div class="vacant-tools">
-    <button class="toolbtn" onclick="openInfo('vacant')">情報を見る</button>
-    <button class="toolbtn danger" onclick="endDuty()">乗務終了</button>
    </div>
   </div>
  </div>
@@ -309,6 +303,7 @@ main{position:relative;min-height:0;overflow:hidden}
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
    <div class="menuitem" onclick="show('verify')">◎ 位置精度検証</div>
    <div class="menuitem">⚙ 設定</div>
+   <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()">■ 乗務終了</div>
   </div>
  </div>
  <div class="action"><button class="primary secondary">ログアウト</button></div>
@@ -361,11 +356,13 @@ function renderDutyUI(){
  const hc=document.getElementById('homeShiftClock');
  const mb=document.getElementById('dutyMainButton');
  const vs=document.getElementById('vacantShiftTime');
+ const me=document.getElementById('menuDutyEnd');
  if(hb) hb.textContent=d.active?'乗務中':'未乗務';
  if(hs) hs.textContent=d.active?'乗務開始 '+new Date(d.start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'まだ開始していません';
  if(hc) hc.textContent=d.active?formatDuration(Date.now()-d.start):'--:--';
  if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
  if(vs) vs.textContent=d.active?'乗務 '+formatDuration(Date.now()-d.start):'未乗務';
+ if(me) me.style.display=d.active?'block':'none';
 }
 function handleDutyMain(){
  const d=getDutyState();
@@ -397,6 +394,8 @@ function openInfo(from){
 function backFromInfo(){
  const d=getDutyState();
  if(infoReturn==='vacant' && d.active) show('vacant');
+ else if(infoReturn==='home') show('home');
+ else if(d.active) show('vacant');
  else show('home');
 }
 setInterval(renderDutyUI,30000);
