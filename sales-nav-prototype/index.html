@@ -21,6 +21,15 @@ header h1{font-size:21px;margin:0}
 .badge{font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;background:#0f2431;border:1px solid #274052}
 .map-control{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;background:#0c1721;border:1px solid #22313d;border-radius:15px}
 .map-control .left{display:flex;align-items:center;gap:9px}
+.location-status{min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:10px 13px}
+.location-status .left{display:flex;align-items:center;gap:10px;min-width:0}
+.location-status .loc-icon{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:#102536;color:#73b2ff;font-size:18px;flex:0 0 36px}
+.location-status strong{display:block;font-size:15px;line-height:1.15}
+.location-status small{display:block;color:var(--muted);font-size:11px;margin-top:3px}
+.loc-pill{font-size:11px;font-weight:900;padding:6px 9px;border-radius:999px;white-space:nowrap;border:1px solid #31506a;background:#102536;color:#8ec0ff}
+.loc-pill.good{background:#123022;border-color:#2c6848;color:#9be1b8}
+.loc-pill.warn{background:#3a2f11;border-color:#7b641e;color:#ffe08b}
+.loc-pill.bad{background:#49191b;border-color:#8d3438;color:#ffb0b0}
 .map-control .map-icon{font-size:20px}
 .map-control strong{font-size:15px}
 .map-control small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
@@ -120,7 +129,7 @@ main{position:relative;min-height:0;overflow:hidden}
  :root{--header:52px;--nav:60px;--action:70px;--gap:7px}
  header h1{font-size:19px}.screen{padding:7px 9px}.card{padding:10px 11px}
  .value{font-size:23px}.sub,.label{font-size:12px}.reservation{min-height:72px}.reservation strong{font-size:24px}
- .primary{font-size:21px}.map-control{height:46px;flex-basis:46px}.map-control strong{font-size:14px}.map-control small{font-size:10px}.mapcard{min-height:170px}.quick .card{padding:8px 4px}.quick strong{font-size:14px}
+ .primary{font-size:21px}.map-control{height:46px;flex-basis:46px}.map-control strong{font-size:14px}.map-control small{font-size:10px}.location-status{min-height:54px;padding:8px 11px}.location-status strong{font-size:14px}.location-status small{font-size:10px}.loc-pill{font-size:10px}.mapcard{min-height:170px}.quick .card{padding:8px 4px}.quick strong{font-size:14px}
  .notice{left:9px;right:9px;top:7px;min-height:72px}.notice strong{font-size:16px}.notice span{font-size:12px}
  .safety{width:200px;height:185px}.triangle{width:172px;height:150px;padding-bottom:21px}.triangle span{font-size:76px}.safetytext{font-size:14px}
 }
@@ -138,6 +147,11 @@ main{position:relative;min-height:0;overflow:hidden}
   <div class="map-control">
    <div class="left"><span class="map-icon">⌖</span><div><strong>地図表示</strong><small id="mapStateText">OFF・情報表示を優先</small></div></div>
    <button id="mapSwitch" class="switch" aria-label="地図表示切替" onclick="toggleMap()"><span class="knob"></span></button>
+  </div>
+
+  <div class="location-status" onclick="requestLocation()">
+   <div class="left"><span class="loc-icon">◎</span><div><strong id="locTitle">位置情報を確認中</strong><small id="locDetail">GPSの取得を開始します</small></div></div>
+   <span id="locPill" class="loc-pill">取得中</span>
   </div>
 
   <div id="homeInfo" class="home-info">
@@ -163,7 +177,7 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="ride" class="screen">
  <div class="content">
-  <div class="card drive-state"><div><div class="label">状態</div><strong>実車中</strong></div><span class="badge">GPS取得中</span></div>
+  <div class="card drive-state"><div><div class="label">状態</div><strong>実車中</strong></div><span class="badge" id="rideGpsBadge">GPS取得中</span></div>
   <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
   <div class="grid2">
    <div class="card"><div class="label">乗車時刻</div><div class="value">20:05</div></div>
@@ -268,8 +282,68 @@ function show(id){
  document.getElementById('title').textContent=titles[id]||'タクシー営業ナビ';
  document.getElementById('badge').textContent=id==='ride'?'実車中':id==='payment'?'支払':'空車';
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id));
+ if(id==='home'||id==='ride') startLocation();
  if(id==='ride')setTimeout(()=>showSafety(5200),700);
 }
+let geoWatchId=null;
+let latestPosition=null;
+
+function setLocationUI(state, detail, cls=''){
+ const title=document.getElementById('locTitle');
+ const info=document.getElementById('locDetail');
+ const pill=document.getElementById('locPill');
+ const ride=document.getElementById('rideGpsBadge');
+ if(title) title.textContent=state;
+ if(info) info.textContent=detail;
+ if(pill){
+   pill.textContent=state==='位置情報OK'?'取得中':state.replace('位置情報','').trim()||'確認中';
+   pill.className='loc-pill '+cls;
+ }
+ if(ride){
+   if(state==='位置情報OK') ride.textContent='GPS '+detail;
+   else if(state.includes('低精度')) ride.textContent='GPS 低精度';
+   else if(state.includes('OFF')||state.includes('許可')) ride.textContent='GPS OFF';
+   else ride.textContent='GPS取得中';
+ }
+}
+
+function handlePosition(pos){
+ latestPosition=pos;
+ const a=Math.round(pos.coords.accuracy||9999);
+ if(a<=25) setLocationUI('位置情報OK','精度 ±'+a+'m','good');
+ else if(a<=60) setLocationUI('位置情報 低精度','精度 ±'+a+'m','warn');
+ else setLocationUI('位置情報 低精度','精度 ±'+a+'m・判定保留','warn');
+}
+
+function handleLocationError(err){
+ if(err && err.code===1) setLocationUI('位置情報OFF','タップして許可を確認','bad');
+ else if(err && err.code===2) setLocationUI('位置情報 取得不能','現在地を取得できません','bad');
+ else if(err && err.code===3) setLocationUI('位置情報 取得遅延','再取得しています','warn');
+ else setLocationUI('位置情報 取得不能','再度お試しください','bad');
+}
+
+function startLocation(){
+ if(!navigator.geolocation){
+   setLocationUI('位置情報 非対応','このブラウザでは利用できません','bad');
+   return;
+ }
+ if(geoWatchId!==null) return;
+ setLocationUI('位置情報を確認中','高精度GPSを取得中','');
+ geoWatchId=navigator.geolocation.watchPosition(
+   handlePosition,
+   handleLocationError,
+   {enableHighAccuracy:true,maximumAge:3000,timeout:12000}
+ );
+}
+
+function requestLocation(){
+ if(geoWatchId!==null){
+   navigator.geolocation.clearWatch(geoWatchId);
+   geoWatchId=null;
+ }
+ startLocation();
+}
+
 let mapEnabled=false;
 function toggleMap(){
  mapEnabled=!mapEnabled;
@@ -291,6 +365,7 @@ function toast(msg='保存しました'){const t=document.getElementById('toast'
 function finishRide(){toast('実績を保存しました');setTimeout(()=>show('home'),500)}
 setTimeout(()=>showNotice('info','i','イベント情報','19:00 ライブ予定あり',5500),1000);
 setTimeout(()=>showNotice('critical','!','JR 山陽線 運転見合わせ','広島〜海田市 / 需要変化に注意',6000),7600);
+startLocation();
 </script>
 </body>
 </html>
