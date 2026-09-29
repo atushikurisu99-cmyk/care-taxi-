@@ -114,6 +114,22 @@ main{position:relative;min-height:0;overflow:hidden}
 .verify-address{font-size:15px;font-weight:800;line-height:1.35}
 .verify-empty{padding:16px;text-align:center;color:var(--muted);font-size:13px}
 .smallbtn{border:1px solid #304252;background:#13212d;color:#fff;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
+.home-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.home-summary .card{min-height:92px}
+.home-actions{display:grid;grid-template-columns:1.35fr .65fr;gap:8px;height:100%}
+.home-actions .primary{width:100%}
+.vacant-center{flex:1;display:flex;flex-direction:column;justify-content:center;gap:12px}
+.vacant-status{text-align:center}
+.vacant-status .big{font-size:30px;font-weight:1000}
+.vacant-status .sub{margin-top:5px}
+.vacant-tools{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.toolbtn{min-height:54px;border-radius:14px;border:1px solid #2a3a47;background:#12212d;color:#fff;font-size:16px;font-weight:900}
+.toolbtn.danger{background:#331b1d;border-color:#6e3438;color:#ffb4b7}
+.info-back{min-height:54px}
+.shift-card{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.shift-time{font-size:22px;font-weight:900}
+.ride-state-main{display:flex;align-items:center;justify-content:space-between;gap:12px}
+.ride-state-main .ride-from{font-size:17px;font-weight:900;line-height:1.25;text-align:right;max-width:62%}
 
 /* ordinary info notification */
 .notice{position:absolute;z-index:50;left:12px;right:12px;top:10px;min-height:82px;display:none;align-items:center;gap:12px;padding:13px 15px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
@@ -158,8 +174,37 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="home" class="screen active">
  <div class="content">
-  <div class="idle-home">
-   <div class="idle-state">空車</div>
+  <div class="card">
+   <div class="row"><div><div class="label">今日の概要</div><h2 style="margin:3px 0 0">営業前チェック</h2></div><span id="homeDutyBadge" class="badge">未乗務</span></div>
+  </div>
+  <div class="home-summary">
+   <div class="card"><div class="label">天気</div><div class="value">晴れ</div><div class="sub">20:30頃から雨</div></div>
+   <div class="card"><div class="label">JR</div><div class="value">平常</div><div class="sub">異常時に通知</div></div>
+   <div class="card"><div class="label">イベント</div><div class="value">3件</div><div class="sub">夜に集中</div></div>
+   <div class="card"><div class="label">次の予約</div><div class="value">18:30</div><div class="sub">広島駅方面</div></div>
+  </div>
+  <div class="card shift-card">
+   <div><div class="label">乗務時間</div><div id="homeShiftStatus" class="sub">まだ開始していません</div></div>
+   <div id="homeShiftClock" class="shift-time">--:--</div>
+  </div>
+ </div>
+ <div class="action home-actions">
+  <button id="dutyMainButton" class="primary" onclick="handleDutyMain()">乗務開始</button>
+  <button class="primary secondary" onclick="openInfo('home')">情報</button>
+ </div>
+</section>
+
+<section id="vacant" class="screen">
+ <div class="content">
+  <div class="vacant-center">
+   <div class="vacant-status">
+    <div class="big">空車</div>
+    <div id="vacantShiftTime" class="sub">乗務中</div>
+   </div>
+   <div class="vacant-tools">
+    <button class="toolbtn" onclick="openInfo('vacant')">情報を見る</button>
+    <button class="toolbtn danger" onclick="endDuty()">乗務終了</button>
+   </div>
   </div>
  </div>
  <div class="action"><button class="primary" onclick="startRideCapture()">乗車</button></div>
@@ -167,12 +212,11 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="ride" class="screen">
  <div class="content">
-  <div class="card drive-state"><div><div class="label">状態</div><strong>実車中</strong></div><span class="badge" id="rideGpsBadge">GPS取得中</span></div>
-
-  <div class="ride-location">
-   <div class="label">乗車地</div>
-   <div id="rideStartAddress" class="address">住所取得中…</div>
-   <div id="rideStartMeta" class="meta">乗車地点を固定しています</div>
+  <div class="card drive-state">
+   <div class="ride-state-main">
+    <div><div class="label">状態</div><strong>実車中</strong><div id="rideStartMeta" class="sub">乗車地点を固定中</div></div>
+    <div><div class="label" style="text-align:right">乗車地</div><div id="rideStartAddress" class="ride-from">住所取得中…</div></div>
+   </div>
   </div>
 
   <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
@@ -212,17 +256,17 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="today" class="screen">
  <div class="content">
-  <div class="card"><h2>本日の情報</h2><div class="sub">9月29日（火）</div></div>
+  <div class="card"><div class="row"><div><h2 style="margin:0">営業情報</h2><div class="sub">乗務前・空車中どちらからでも確認</div></div><span class="badge">詳細</span></div></div>
   <div class="grid2">
    <div class="card"><div class="label">ライブ・イベント</div><div class="value">3件</div><div class="sub">終了見込みあり</div></div>
    <div class="card"><div class="label">スポーツ</div><div class="value">1件</div><div class="sub">夜に集中</div></div>
    <div class="card"><div class="label">JR運行</div><div class="value">平常</div><div class="sub">異常時に通知</div></div>
    <div class="card"><div class="label">バス</div><div class="value">平常</div><div class="sub">遅延なし</div></div>
    <div class="card"><div class="label">天気</div><div class="value">晴れ</div><div class="sub">20:30頃から雨</div></div>
-   <div class="card"><div class="label">営業補助</div><div class="value">通常</div><div class="sub">通知待機中</div></div>
+   <div class="card"><div class="label">本日の売上</div><div class="value">26,800円</div><div class="sub">12回 / 平均2,233円</div></div>
   </div>
  </div>
- <div class="action"><button class="primary secondary">詳細を見る</button></div>
+ <div class="action"><button class="primary secondary info-back" onclick="backFromInfo()">戻る</button></div>
 </section>
 
 <section id="sales" class="screen">
@@ -274,27 +318,89 @@ main{position:relative;min-height:0;overflow:hidden}
 <nav class="nav">
  <button class="active" data-target="home" onclick="show('home')"><b>⌂</b>ホーム</button>
  <button data-target="schedule" onclick="show('schedule')"><b>▣</b>予約</button>
- <button data-target="today" onclick="show('today')"><b>＋</b>本日</button>
+ <button data-target="today" onclick="openInfo(getDutyState().active?'vacant':'home')"><b>＋</b>情報</button>
  <button data-target="sales" onclick="show('sales')"><b>▥</b>売上</button>
  <button data-target="menu" onclick="show('menu')"><b>☰</b>メニュー</button>
 </nav>
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
-const titles={home:'タクシー営業ナビ',ride:'実車中',payment:'支払',schedule:'予約一覧',today:'本日の情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',today:'営業情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function show(id){
  hideNotice();hideSafety();
  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
  document.getElementById(id).classList.add('active');
  document.getElementById('title').textContent=titles[id]||'タクシー営業ナビ';
- document.getElementById('badge').textContent=id==='ride'?'実車中':id==='payment'?'支払':'空車';
- document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id));
- if(id==='home'||id==='ride') startLocation();
+ document.getElementById('badge').textContent=id==='ride'?'実車中':id==='payment'?'支払':id==='vacant'?'空車':'ホーム';
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id || (id==='vacant'&&b.dataset.target==='home')));
+ if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  if(id==='ride')setTimeout(()=>showSafety(5200),700);
+ renderDutyUI();
 }
+let infoReturn='home';
+function getDutyState(){
+ try{
+  return {
+   active:localStorage.getItem('taxi_duty_active')==='1',
+   start:Number(localStorage.getItem('taxi_duty_start')||0)
+  };
+ }catch(e){return {active:false,start:0}}
+}
+function formatDuration(ms){
+ const m=Math.max(0,Math.floor(ms/60000));
+ const h=Math.floor(m/60),mm=m%60;
+ return h+'時間'+String(mm).padStart(2,'0')+'分';
+}
+function renderDutyUI(){
+ const d=getDutyState();
+ const hb=document.getElementById('homeDutyBadge');
+ const hs=document.getElementById('homeShiftStatus');
+ const hc=document.getElementById('homeShiftClock');
+ const mb=document.getElementById('dutyMainButton');
+ const vs=document.getElementById('vacantShiftTime');
+ if(hb) hb.textContent=d.active?'乗務中':'未乗務';
+ if(hs) hs.textContent=d.active?'乗務開始 '+new Date(d.start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'まだ開始していません';
+ if(hc) hc.textContent=d.active?formatDuration(Date.now()-d.start):'--:--';
+ if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
+ if(vs) vs.textContent=d.active?'乗務 '+formatDuration(Date.now()-d.start):'未乗務';
+}
+function handleDutyMain(){
+ const d=getDutyState();
+ if(d.active){show('vacant');return}
+ localStorage.setItem('taxi_duty_active','1');
+ localStorage.setItem('taxi_duty_start',String(Date.now()));
+ toast('乗務を開始しました');
+ renderDutyUI();
+ setTimeout(()=>show('vacant'),350);
+}
+function endDuty(){
+ const d=getDutyState();
+ if(!d.active){show('home');return}
+ const dur=formatDuration(Date.now()-d.start);
+ if(!confirm('乗務を終了しますか？\n乗務時間 '+dur)) return;
+ localStorage.setItem('taxi_last_duty_end',String(Date.now()));
+ localStorage.setItem('taxi_last_duty_duration',dur);
+ localStorage.removeItem('taxi_duty_active');
+ localStorage.removeItem('taxi_duty_start');
+ currentRideStart=null;
+ toast('乗務を終了しました');
+ renderDutyUI();
+ setTimeout(()=>show('home'),450);
+}
+function openInfo(from){
+ infoReturn=from||'home';
+ show('today');
+}
+function backFromInfo(){
+ const d=getDutyState();
+ if(infoReturn==='vacant' && d.active) show('vacant');
+ else show('home');
+}
+setInterval(renderDutyUI,30000);
+
 let geoWatchId=null;
 let latestPosition=null;
 
@@ -419,6 +525,7 @@ function updateRideStartUI(rec){
  if(p) p.textContent=addr;
 }
 async function startRideCapture(){
+ if(!getDutyState().active){toast('先に乗務開始してください');show('home');return}
  if(!latestPosition){toast('位置情報を取得中です');startLocation();return}
  const p=latestPosition;
  currentRideStart={
@@ -447,7 +554,7 @@ async function finishRide(){
    toast('降車を記録しました');
  }
  currentRideStart=null;
- setTimeout(()=>show('home'),700);
+ setTimeout(()=>show(getDutyState().active?'vacant':'home'),700);
 }
 function renderVerify(){
  const el=document.getElementById('verifyList');if(!el)return;
@@ -467,6 +574,7 @@ function clearVerify(){
 setTimeout(()=>showNotice('info','i','イベント情報','19:00 ライブ予定あり',5500),1000);
 setTimeout(()=>showNotice('critical','!','JR 山陽線 運転見合わせ','広島〜海田市 / 需要変化に注意',6000),7600);
 startLocation();
+renderDutyUI();
 </script>
 </body>
 </html>
