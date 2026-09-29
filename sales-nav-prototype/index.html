@@ -292,7 +292,7 @@ main{position:relative;min-height:0;overflow:hidden}
 <section id="verify" class="screen">
  <div class="content">
   <div class="card">
-   <div class="row"><div><h2 style="margin:0">位置精度検証</h2><div class="sub">乗車・降車を押した地点を分かりやすく確認</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
+   <div class="row"><div><h2 style="margin:0">位置精度検証</h2><div class="sub">表示は町名のみ／緯度経度は保存</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
   </div>
   <div id="verifyList" class="list"></div>
  </div>
@@ -480,21 +480,14 @@ function hideSafety(){document.getElementById('safety').classList.remove('show')
 function toast(msg='保存しました'){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
 function shortPlaceLabel(d){
  const a=d.address||{};
- const named=d.name && !/^\d+$/.test(d.name) ? d.name : '';
- const objectType=d.type||'';
- const buildingLike=['building','amenity','shop','tourism','office','leisure','historic','railway','station'].includes(objectType);
- if(named && buildingLike) return named+'前';
+ const town=a.neighbourhood||a.quarter||a.suburb||a.city_district||a.village||a.town||a.hamlet||'';
+ if(town) return town;
 
- const area=a.neighbourhood||a.quarter||a.suburb||a.city_district||a.village||a.town||'';
- if(area) return area+'付近';
-
- const road=a.road||a.pedestrian||a.residential||a.footway||'';
- if(road) return road+'付近';
-
- if(named) return named+'付近';
+ const cityPart=a.borough||a.municipality||'';
+ if(cityPart) return cityPart;
 
  const first=(d.display_name||'').split(',')[0].trim();
- return first ? first+'付近' : '場所取得不能';
+ return first || '場所取得不能';
 }
 async function reverseGeocode(lat,lon){
  try{
@@ -577,7 +570,7 @@ async function finishRide(){
 function renderVerify(){
  const el=document.getElementById('verifyList');if(!el)return;
  const log=getVerifyLog();
- if(!log.length){el.innerHTML='<div class="verify-empty">まだ検証データがありません。<br>「乗車する」「実績を保存」を押すと記録されます。</div>';return}
+ if(!log.length){el.innerHTML='<div class="verify-empty">まだ検証データがありません。<br>乗車・降車時に町名と緯度経度を記録します。</div>';return}
  el.innerHTML=log.map(r=>`
   <div class="verify-card">
    <div class="verify-head"><strong>${r.type}</strong><span class="badge">±${r.accuracy}m</span></div>
