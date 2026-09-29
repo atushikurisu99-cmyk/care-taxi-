@@ -3,382 +3,263 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<meta name="theme-color" content="#f6f7f4">
-<title>タクシー営業ナビ UI試作</title>
+<meta name="theme-color" content="#08111a">
+<title>タクシー営業ナビ</title>
 <style>
 :root{
-  --bg:#f6f7f4;--card:#fff;--text:#1d2520;--muted:#707873;--line:#e2e7e3;
-  --green:#5f9278;--green-bg:#eaf3ee;--blue:#6b8fa8;--blue-bg:#edf4f8;
-  --yellow:#c0912f;--yellow-bg:#fff4d8;--red:#b65d5d;--red-bg:#fde9e9;
-  --purple:#8778a3;--purple-bg:#f1edf7;--shadow:0 5px 18px rgba(37,49,40,.06);
-  --header-h:58px;--nav-h:66px;--action-h:76px;--gap:10px;
+ --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
+ --blue:#2f86ff;--green:#49a775;--yellow:#f4c34f;--red:#ff5757;--cyan:#5cbad6;
+ --header:58px;--nav:66px;--action:78px;--gap:10px;
 }
 *{box-sizing:border-box}
-html,body{height:100%;margin:0;overflow:hidden;overscroll-behavior:none;background:var(--bg)}
-body{position:fixed;inset:0;width:100%;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:var(--text);touch-action:manipulation}
-button,input,textarea{font:inherit}
-button{-webkit-tap-highlight-color:transparent}
-.app{width:min(430px,100%);height:100dvh;margin:0 auto;background:var(--bg);display:grid;grid-template-rows:var(--header-h) minmax(0,1fr) var(--nav-h);overflow:hidden;position:relative}
-.topbar{height:var(--header-h);display:flex;align-items:center;padding:10px 14px 8px;border-bottom:1px solid rgba(0,0,0,.035);background:rgba(246,247,244,.96);backdrop-filter:blur(12px);z-index:20}
-.titleRow{display:flex;width:100%;align-items:center;justify-content:space-between;gap:10px}
-h1{font-size:21px;line-height:1;margin:0;font-weight:800;letter-spacing:.01em}
-.state{font-size:12px;padding:6px 10px;border:1px solid #dbe2dd;border-radius:999px;background:#fff;color:#526159}
-main{height:100%;min-height:0;overflow:hidden;position:relative}
-.screen{display:none;height:100%;padding:10px 12px;grid-template-rows:minmax(0,1fr) var(--action-h);gap:var(--gap);overflow:hidden}
+html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
+body{position:fixed;inset:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:var(--text);touch-action:manipulation}
+button,input{font:inherit}
+.app{width:min(430px,100%);height:100dvh;margin:auto;display:grid;grid-template-rows:var(--header) minmax(0,1fr) var(--nav);background:linear-gradient(#08131d,#071019)}
+header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
+header h1{font-size:21px;margin:0}
+.badge{font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;background:#0f2431;border:1px solid #274052}
+main{position:relative;min-height:0;overflow:hidden}
+.screen{display:none;height:100%;padding:10px 12px;grid-template-rows:minmax(0,1fr) var(--action);gap:var(--gap)}
 .screen.active{display:grid}
-.content-zone{min-height:0;overflow:hidden;display:flex;flex-direction:column;gap:9px}
-.card{background:var(--card);border:1px solid var(--line);border-radius:17px;padding:13px 14px;box-shadow:var(--shadow)}
-.hero{background:var(--green-bg);border-color:#d8e7dd}
-.hero h2,.card h2{font-size:18px;margin:0 0 3px}
-.sub{font-size:13px;line-height:1.38;color:var(--muted)}
-.mini{font-size:13px;color:var(--muted);font-weight:600}
-.metric{font-size:26px;line-height:1.05;font-weight:800;margin-top:4px}
+.content{min-height:0;display:flex;flex-direction:column;gap:10px;overflow:hidden}
+.card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:13px 14px}
+.card h2{font-size:18px;margin:0 0 4px}
+.label{font-size:13px;color:var(--muted);font-weight:700}
+.value{font-size:27px;font-weight:900;line-height:1.05;margin-top:4px}
+.sub{font-size:13px;color:var(--muted);line-height:1.35}
+.row{display:flex;align-items:center;justify-content:space-between;gap:8px}
 .grid2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.row{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1px solid var(--line)}
-.row:last-child{border-bottom:none}
-.tag{font-size:12px;font-weight:700;padding:5px 8px;border-radius:999px;white-space:nowrap}
-.tag.green{background:var(--green-bg);color:#426b57}.tag.blue{background:var(--blue-bg);color:#55748a}
-.tag.yellow{background:var(--yellow-bg);color:#8e6919}.tag.red{background:var(--red-bg);color:#985151}
-.tag.purple{background:var(--purple-bg);color:#716388}
-.reservation{
-  min-height:84px;display:flex;align-items:center;justify-content:space-between;
-  padding:14px 16px;background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:var(--shadow)
-}
-.reservation .label{font-size:13px;font-weight:700;color:var(--muted);margin-bottom:3px}
-.reservation strong{font-size:26px;line-height:1}
-.reservation .arrow{font-size:28px;color:#8b918d}
-.action-zone{height:var(--action-h);min-height:var(--action-h);max-height:var(--action-h);display:flex;gap:8px}
-.primary{flex:1;border:none;border-radius:18px;background:var(--green);color:#fff;font-size:23px;font-weight:800;box-shadow:var(--shadow)}
-.primary.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
-.primary.danger{background:#8b6a6a}
-.action-zone.split .primary{font-size:18px}
-.action-zone.empty{visibility:hidden}
+.reservation{min-height:86px;display:flex;align-items:center;justify-content:space-between;background:#0c1721;border:1px solid #22313d;border-radius:16px;padding:13px 15px}
+.reservation strong{display:block;font-size:28px;line-height:1}
+.chev{font-size:26px;color:#80919e}
+.action{display:flex;gap:8px}
+.primary{flex:1;border:none;border-radius:16px;background:var(--blue);color:white;font-size:24px;font-weight:900}
+.primary.pay{background:#ff4f57}
+.primary.secondary{background:#12212d;border:1px solid #2a3a47;color:white}
+.primary.danger{background:#7f5555}
+.nav{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #1a2833;background:#09131d;padding:5px 4px calc(5px + env(safe-area-inset-bottom))}
+.nav button{border:0;background:transparent;color:#8d9ca7;font-size:10px;border-radius:12px}
+.nav button b{display:block;font-size:18px;margin-bottom:2px}
+.nav button.active{background:#112739;color:#71b0ff;font-weight:800}
+.mapcard{flex:1;min-height:210px;border-radius:18px;border:1px solid #1d2d38;background:
+ radial-gradient(circle at 72% 32%,rgba(255,197,84,.22),transparent 16%),
+ radial-gradient(circle at 38% 65%,rgba(43,139,255,.2),transparent 18%),
+ linear-gradient(135deg,#152938,#0d1822 55%,#112634);position:relative;overflow:hidden}
+.mapcard:before,.mapcard:after{content:"";position:absolute;inset:0;background:repeating-linear-gradient(27deg,transparent 0 25px,rgba(255,255,255,.055) 26px 28px,transparent 29px 55px)}
+.mapcard:after{transform:rotate(68deg)}
+.maplabel{position:absolute;left:14px;top:13px;z-index:2;font-size:13px;color:#b9c7d0}
+.mapdot{position:absolute;width:18px;height:18px;border-radius:50%;background:#ff5d62;border:4px solid white;left:56%;top:45%;z-index:2;box-shadow:0 0 0 6px rgba(255,93,98,.2)}
+.quick{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.quick .card{text-align:center;padding:10px 5px}
+.quick strong{font-size:16px;display:block}
+.quick span{font-size:10px;color:var(--muted)}
+.weather-now{font-size:28px;font-weight:900}
+.weather-next{font-size:14px;font-weight:800;color:#dce8ee;margin-top:3px}
+.drive-state{display:flex;align-items:center;justify-content:space-between;min-height:90px;background:#10251b;border-color:#25533a}
+.drive-state strong{font-size:27px}
+.drive-note{margin:auto 0;text-align:center;color:#7e909d;font-size:14px}
 .payopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.payopt{min-height:60px;border:1px solid var(--line);background:#fff;border-radius:14px;font-size:16px;font-weight:800}
-.payopt.selected{background:var(--green-bg);border-color:#b8d1c2;color:#426b57}
-.trip-summary{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.trip-summary .card{padding:12px}
-.fare{font-size:42px;font-weight:900;line-height:1;margin-top:6px}
-.segment{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;background:#edf0ed;padding:4px;border-radius:12px}
-.segment button{border:none;background:transparent;padding:9px 4px;border-radius:9px;font-size:12px}
-.segment button.active{background:#fff;font-weight:800;box-shadow:0 1px 4px rgba(0,0,0,.06)}
-.daygrid{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}
-.day{border:1px solid var(--line);background:#fff;border-radius:11px;padding:7px 3px;text-align:center;min-height:62px}
-.day strong{font-size:14px}.day small{display:block;color:var(--muted);font-size:9px;margin-top:4px;line-height:1.3}
-.day.hot{background:#f8eeee}.day.mid{background:#f8f3e8}.day.cool{background:#edf4f1}
-.form-card{display:grid;grid-template-columns:1fr 1fr;gap:8px 10px;padding:11px}
-.formRow{min-width:0}.formRow.wide{grid-column:1/-1}
-.formRow label{display:block;font-size:10px;color:#667068;margin-bottom:3px}
-input,textarea{width:100%;height:34px;padding:6px 8px;border:1px solid #dce3de;border-radius:8px;background:#fafbfa;color:var(--text);font-size:12px}
-textarea{height:38px;min-height:38px;resize:none}
-.scheduleItem{display:grid;grid-template-columns:54px 50px 1fr;gap:6px;align-items:center;padding:8px 0;border-bottom:1px solid var(--line);font-size:12px}
-.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
-.calcell{min-height:44px;border:1px solid var(--line);background:#fff;border-radius:8px;padding:4px;font-size:9px}
-.calcell.sel{outline:2px solid #8baa99}
-.calcell .ev{display:block;margin-top:2px;padding:1px 2px;border-radius:4px;background:var(--purple-bg);font-size:7px;overflow:hidden;white-space:nowrap}
+.payopt{min-height:60px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
+.payopt.selected{background:#123456;border-color:#2f86ff}
+.fare{font-size:44px;font-weight:1000}
+.list{display:flex;flex-direction:column;gap:8px}
+.listitem{background:#0c1721;border:1px solid #22313d;border-radius:14px;padding:12px 13px;display:grid;grid-template-columns:62px 1fr auto;gap:8px;align-items:center}
+.time{font-size:18px;font-weight:900}
+.dot{width:10px;height:10px;border-radius:50%;background:#49a775;display:inline-block;margin-right:5px}
+.segment{display:grid;grid-template-columns:repeat(3,1fr);background:#0a141d;border:1px solid #21303c;border-radius:12px;padding:4px}
+.segment button{border:0;background:transparent;color:#8999a5;padding:8px;border-radius:8px;font-size:12px}
+.segment button.active{background:#16304a;color:#fff;font-weight:800}
+.bars{height:180px;display:flex;align-items:flex-end;gap:7px;padding:14px}
+.bar{flex:1;background:#2388ff;border-radius:4px 4px 0 0}
+.heat{flex:1;min-height:250px;border-radius:18px;border:1px solid #24323d;background:
+ radial-gradient(circle at 65% 38%,rgba(255,54,54,.8),transparent 10%),
+ radial-gradient(circle at 49% 55%,rgba(255,196,0,.75),transparent 12%),
+ radial-gradient(circle at 30% 62%,rgba(40,160,255,.7),transparent 15%),
+ linear-gradient(135deg,#163044,#101b24)}
+.menuitem{padding:14px 0;border-bottom:1px solid #22313d;font-size:16px;font-weight:700}
+.menuitem:last-child{border-bottom:0}
 
-/* Notification overlay: does not move any layout */
-.notice-overlay{
-  position:absolute;z-index:50;left:12px;right:12px;top:10px;
-  min-height:78px;border-radius:18px;padding:14px 16px;
-  display:none;align-items:center;gap:12px;box-shadow:0 10px 28px rgba(0,0,0,.14);
-  border:1px solid transparent;pointer-events:none
-}
-.notice-overlay.show{display:flex;animation:noticeIn .18s ease-out}
-.notice-overlay.normal{background:#edf6f1;border-color:#c8ddcf;color:#315846}
-.notice-overlay.normal.blue{background:#edf4f8;border-color:#cbdce6;color:#3e647a}
-.notice-overlay.caution{background:#fff4d8;border-color:#efd99b;color:#755510}
-.notice-overlay.important{background:#fde9e9;border-color:#edbebe;color:#7c3939}
-.notice-icon{width:48px;height:48px;flex:0 0 48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:900;background:rgba(255,255,255,.7)}
-.notice-text{min-width:0}.notice-text strong{display:block;font-size:18px;line-height:1.15;margin-bottom:5px}.notice-text span{display:block;font-size:14px;line-height:1.3}
-@keyframes noticeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:none}}
+/* ordinary info notification */
+.notice{position:absolute;z-index:50;left:12px;right:12px;top:10px;min-height:82px;display:none;align-items:center;gap:12px;padding:13px 15px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
+.notice.show{display:flex;animation:drop .18s ease-out}
+.notice.normal{background:#123022;border:1px solid #2c6848}
+.notice.info{background:#12304a;border:1px solid #2e6390}
+.notice.warn{background:#3a2f11;border:1px solid #7b641e}
+.notice.critical{background:#49191b;border:1px solid #8d3438}
+.notice .icon{width:48px;height:48px;flex:0 0 48px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);font-size:27px;font-weight:900}
+.notice strong{display:block;font-size:18px}
+.notice span{display:block;font-size:14px;margin-top:4px;color:#e8eef1}
+@keyframes drop{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
 
-/* Safety alert: separate from ordinary information notifications */
-.safety-alert{
-  position:absolute;z-index:70;left:50%;top:46%;transform:translate(-50%,-50%);
-  width:220px;height:190px;display:none;align-items:center;justify-content:center;
-  pointer-events:none;
-}
-.safety-alert.show{display:flex}
-.safety-triangle{
-  width:190px;height:165px;clip-path:polygon(50% 0,100% 100%,0 100%);
-  background:#f5c84d;display:flex;align-items:flex-end;justify-content:center;
-  padding-bottom:24px;filter:drop-shadow(0 10px 18px rgba(112,83,8,.28));
-  animation:safetyPulse 1.45s ease-in-out infinite;
-}
-.safety-triangle span{
-  color:#5f4610;font-size:86px;font-weight:1000;line-height:.75;text-shadow:0 2px 0 rgba(255,255,255,.45)
-}
-.safety-caption{
-  position:absolute;bottom:-2px;left:50%;transform:translateX(-50%);
-  background:#fff8dd;border:1px solid #e7cc75;color:#614a10;border-radius:999px;
-  font-size:16px;font-weight:800;padding:8px 14px;white-space:nowrap;
-  box-shadow:0 5px 14px rgba(0,0,0,.1)
-}
-@keyframes safetyPulse{
-  0%,100%{opacity:.55;filter:drop-shadow(0 7px 12px rgba(112,83,8,.18))}
-  50%{opacity:1;filter:drop-shadow(0 13px 22px rgba(112,83,8,.38))}
-}
+/* safety alert */
+.safety{position:absolute;z-index:70;left:50%;top:47%;transform:translate(-50%,-50%);width:240px;height:220px;display:none;align-items:center;justify-content:center;pointer-events:none}
+.safety.show{display:flex}
+.triangle{width:205px;height:180px;clip-path:polygon(50% 0,100% 100%,0 100%);background:#f5c84d;display:flex;align-items:flex-end;justify-content:center;padding-bottom:25px;animation:pulse 1.5s ease-in-out infinite;filter:drop-shadow(0 12px 24px rgba(245,200,77,.22))}
+.triangle span{font-size:92px;font-weight:1000;color:#17130a;line-height:.7}
+.safetytext{position:absolute;bottom:-1px;background:#19170e;border:1px solid #806b25;color:#ffe998;font-size:17px;font-weight:900;border-radius:999px;padding:8px 15px}
+@keyframes pulse{0%,100%{opacity:.5;transform:scale(.97)}50%{opacity:1;transform:scale(1.03)}}
 
-.tabs{height:var(--nav-h);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:6px 4px calc(5px + env(safe-area-inset-bottom));z-index:20}
-.tab{border:none;background:transparent;color:#7b827e;font-size:10px;padding:4px 1px;border-radius:12px}
-.tab.active{color:#4f7d66;background:var(--green-bg);font-weight:800}
-.tab b{display:block;font-size:18px;line-height:1;margin-bottom:3px}
-.system-toast{position:fixed;z-index:90;left:50%;transform:translateX(-50%);bottom:calc(var(--nav-h) + 16px);background:#263029;color:#fff;border-radius:16px;padding:12px 18px;font-size:15px;font-weight:700;line-height:1.2;min-width:180px;text-align:center;box-shadow:0 8px 24px rgba(0,0,0,.2);opacity:0;pointer-events:none;transition:.2s}
-.system-toast.show{opacity:1}
+/* save confirmation */
+.toast{position:fixed;z-index:90;left:50%;bottom:calc(var(--nav) + 16px);transform:translateX(-50%);background:#e9f7ef;color:#174c31;border:1px solid #79b995;border-radius:14px;padding:12px 18px;font-size:15px;font-weight:900;opacity:0;pointer-events:none;transition:.2s;min-width:190px;text-align:center}
+.toast.show{opacity:1}
 
-/* driving screens: intentionally sparse */
-#top .content-zone{justify-content:flex-start}
-#top .top-summary{display:grid;grid-template-columns:1.15fr .85fr;gap:9px}
-#top .compact-card{min-height:88px}
-#ride .content-zone{gap:10px}
-#ride .drive-state{min-height:92px;display:flex;align-items:center}
-#ride .drive-note{margin-top:auto;margin-bottom:auto;text-align:center;color:#8b918d;font-size:13px}
-#payment .content-zone{gap:10px}
-#events .row{padding:6px 0}
-
-@media (max-height:740px){
-  :root{--header-h:52px;--nav-h:60px;--action-h:68px;--gap:7px}
-  h1{font-size:19px}.screen{padding:7px 9px}.card{padding:10px 11px}.hero h2,.card h2{font-size:16px}
-  .sub{font-size:11px}.mini{font-size:11px}.metric{font-size:22px}
-  .reservation{min-height:72px;padding:11px 13px}.reservation strong{font-size:23px}
-  .primary{font-size:21px}.payopt{min-height:52px;font-size:14px}
-  .fare{font-size:36px}.day{min-height:52px}.day small{font-size:8px}
-  .calcell{min-height:36px}.scheduleItem{padding:6px 0;font-size:11px}
-  input,textarea{height:30px;font-size:11px}textarea{min-height:30px}
-  .notice-overlay{left:9px;right:9px;top:7px;min-height:70px;padding:11px 13px}.notice-icon{width:44px;height:44px;flex-basis:44px;font-size:25px}
-  .safety-alert{width:190px;height:165px}.safety-triangle{width:164px;height:142px;padding-bottom:21px}.safety-triangle span{font-size:72px}.safety-caption{font-size:14px;padding:7px 12px}
-  .notice-text strong{font-size:16px}.notice-text span{font-size:12px}
+@media(max-height:740px){
+ :root{--header:52px;--nav:60px;--action:70px;--gap:7px}
+ header h1{font-size:19px}.screen{padding:7px 9px}.card{padding:10px 11px}
+ .value{font-size:23px}.sub,.label{font-size:12px}.reservation{min-height:72px}.reservation strong{font-size:24px}
+ .primary{font-size:21px}.mapcard{min-height:170px}.quick .card{padding:8px 4px}.quick strong{font-size:14px}
+ .notice{left:9px;right:9px;top:7px;min-height:72px}.notice strong{font-size:16px}.notice span{font-size:12px}
+ .safety{width:200px;height:185px}.triangle{width:172px;height:150px;padding-bottom:21px}.triangle span{font-size:76px}.safetytext{font-size:14px}
 }
 </style>
 </head>
 <body>
 <div class="app">
-  <header class="topbar">
-    <div class="titleRow"><h1 id="pageTitle">タクシー営業ナビ</h1><span class="state" id="stateBadge">空車</span></div>
-  </header>
+<header><h1 id="title">タクシー営業ナビ</h1><span class="badge" id="badge">空車</span></header>
+<main>
+<div id="notice" class="notice normal"><div class="icon" id="nicon">i</div><div><strong id="ntitle">通知</strong><span id="nbody">お知らせ</span></div></div>
+<div id="safety" class="safety"><div class="triangle"><span>!</span></div><div class="safetytext">生活道路に注意</div></div>
 
-  <main>
-    <div id="noticeOverlay" class="notice-overlay normal">
-      <div class="notice-icon" id="noticeIcon">i</div>
-      <div class="notice-text"><strong id="noticeTitle">通知</strong><span id="noticeBody">お知らせがあります</span></div>
-    </div>
-    <div id="safetyAlert" class="safety-alert" aria-live="polite">
-      <div class="safety-triangle"><span>!</span></div>
-      <div class="safety-caption">生活道路に注意</div>
-    </div>
+<section id="home" class="screen active">
+ <div class="content">
+  <div class="mapcard"><div class="maplabel">空車営業中</div><div class="mapdot"></div></div>
+  <div class="quick">
+   <div class="card"><strong>18:30</strong><span>予約</span></div>
+   <div class="card"><strong>3件</strong><span>ライブ</span></div>
+   <div class="card"><strong>平常</strong><span>JR</span></div>
+   <div class="card"><strong>晴れ</strong><span>天気</span></div>
+  </div>
+  <div class="grid2">
+   <div class="card"><div class="label">次の予約</div><div class="value">18:30</div><div class="sub">広島駅方面</div></div>
+   <div class="card"><div class="label">天気</div><div class="weather-now">晴れ</div><div class="weather-next">20:30頃から雨</div></div>
+  </div>
+ </div>
+ <div class="action"><button class="primary" onclick="show('ride')">乗車する</button></div>
+</section>
 
-    <section id="top" class="screen active">
-      <div class="content-zone">
-        <div class="reservation" onclick="toast('予約詳細を表示')">
-          <div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><div class="arrow">›</div>
-        </div>
+<section id="ride" class="screen">
+ <div class="content">
+  <div class="card drive-state"><div><div class="label">状態</div><strong>実車中</strong></div><span class="badge">GPS取得中</span></div>
+  <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
+  <div class="grid2">
+   <div class="card"><div class="label">乗車時刻</div><div class="value">20:05</div></div>
+   <div class="card"><div class="label">乗車時間</div><div class="value">12分</div></div>
+  </div>
+  <div class="drive-note">交通・イベント・生活道路の情報は<br>必要な時だけ重ねて表示</div>
+ </div>
+ <div class="action"><button class="primary pay" onclick="show('payment')">降車・支払へ</button></div>
+</section>
 
-        <div class="top-summary">
-          <div class="card compact-card">
-            <div class="mini">今日の営業</div>
-            <div class="metric">26,800円</div>
-            <div class="sub">12回</div>
-          </div>
-          <div class="card compact-card">
-            <div class="mini">天気</div>
-            <div class="metric" style="font-size:27px">晴れ</div>
-            <div class="sub"><strong style="color:#425b4d">20:30頃から雨</strong></div>
-          </div>
-        </div>
+<section id="payment" class="screen">
+ <div class="content">
+  <div class="card"><div class="label">運賃</div><div class="fare">3,680円</div></div>
+  <div class="card"><h2>支払方法</h2><div class="payopts">
+   <button class="payopt selected" onclick="pickPay(this)">現金</button>
+   <button class="payopt" onclick="pickPay(this)">カード</button>
+   <button class="payopt" onclick="pickPay(this)">その他</button>
+  </div></div>
+  <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
+ </div>
+ <div class="action"><button class="primary" onclick="finishRide()">実績を保存</button></div>
+</section>
 
-        <div class="card" onclick="showScreen('events')">
-          <div class="row"><div><strong>今日のイベント 3件</strong><div class="sub">詳細はタップ</div></div><span style="font-size:24px;color:#8b918d">›</span></div>
-        </div>
+<section id="schedule" class="screen">
+ <div class="content">
+  <div class="segment"><button class="active">すべて</button><button>時間あり</button><button>時間なし</button></div>
+  <div class="list">
+   <div class="listitem"><div class="time">10:00</div><div><strong><span class="dot"></span>広島駅</strong><div class="sub">→ 広島空港</div></div><span class="badge">時間指定</span></div>
+   <div class="listitem"><div class="time">未定</div><div><strong><span class="dot"></span>中区</strong><div class="sub">市内迎え</div></div><span class="badge">時間なし</span></div>
+   <div class="listitem"><div class="time">17:30</div><div><strong><span class="dot"></span>平和公園</strong><div class="sub">→ ホテルグランヴィア</div></div><span class="badge">時間指定</span></div>
+  </div>
+ </div>
+ <div class="action"><button class="primary">＋ 予約を追加</button></div>
+</section>
 
-        <div class="card">
-          <div class="row"><div><strong>交通情報</strong><div class="sub">通常時は詳細を常駐させない</div></div><span class="tag green">平常</span></div>
-        </div>
-      </div>
-      <div class="action-zone"><button class="primary" onclick="showScreen('ride')">乗車</button></div>
-    </section>
+<section id="today" class="screen">
+ <div class="content">
+  <div class="card"><h2>本日の情報</h2><div class="sub">9月29日（火）</div></div>
+  <div class="grid2">
+   <div class="card"><div class="label">ライブ・イベント</div><div class="value">3件</div><div class="sub">終了見込みあり</div></div>
+   <div class="card"><div class="label">スポーツ</div><div class="value">1件</div><div class="sub">夜に集中</div></div>
+   <div class="card"><div class="label">JR運行</div><div class="value">平常</div><div class="sub">異常時に通知</div></div>
+   <div class="card"><div class="label">バス</div><div class="value">平常</div><div class="sub">遅延なし</div></div>
+   <div class="card"><div class="label">天気</div><div class="value">晴れ</div><div class="sub">20:30頃から雨</div></div>
+   <div class="card"><div class="label">営業補助</div><div class="value">通常</div><div class="sub">通知待機中</div></div>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary">詳細を見る</button></div>
+</section>
 
-    <section id="ride" class="screen">
-      <div class="content-zone">
-        <div class="card hero drive-state"><div><div class="mini">状態</div><h2 style="font-size:24px">実車中</h2><div class="sub">運転中は必要最小限のみ表示</div></div></div>
+<section id="sales" class="screen">
+ <div class="content">
+  <div class="segment"><button>日別</button><button class="active">10日間</button><button>グラフ</button></div>
+  <div class="card"><h2>9月21日〜9月30日</h2><div class="bars">
+   <div class="bar" style="height:45%"></div><div class="bar" style="height:64%"></div><div class="bar" style="height:52%"></div><div class="bar" style="height:82%"></div><div class="bar" style="height:70%"></div><div class="bar" style="height:92%"></div><div class="bar" style="height:55%"></div><div class="bar" style="height:66%"></div><div class="bar" style="height:74%"></div><div class="bar" style="height:88%"></div>
+  </div></div>
+  <div class="grid2"><div class="card"><div class="label">10日合計</div><div class="value">268,400円</div></div><div class="card"><div class="label">乗車回数</div><div class="value">126回</div></div></div>
+ </div>
+ <div class="action"><button class="primary secondary">金額を表示</button></div>
+</section>
 
-        <div class="reservation" onclick="toast('予約詳細を表示')">
-          <div><div class="label">予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><div class="arrow">›</div>
-        </div>
+<section id="analysis" class="screen">
+ <div class="content">
+  <div class="segment"><button class="active">地図</button><button>分析</button><button>一覧</button></div>
+  <div class="heat"></div>
+  <div class="card"><div class="label">需要が多いエリア</div><div class="row"><strong>広島駅周辺</strong><span>28回</span></div><div class="row"><strong>紙屋町・八丁堀</strong><span>21回</span></div><div class="row"><strong>平和公園周辺</strong><span>13回</span></div></div>
+ </div>
+ <div class="action"><button class="primary secondary">直近10日間</button></div>
+</section>
 
-        <div class="drive-note">交通・イベント・生活道路の注意は<br>必要な時だけ数秒表示</div>
-      </div>
-      <div class="action-zone"><button class="primary" onclick="showScreen('payment')">支払</button></div>
-    </section>
+<section id="menu" class="screen">
+ <div class="content">
+  <div class="card"><h2>メニュー</h2>
+   <div class="menuitem" onclick="show('home')">⌂ ホーム</div>
+   <div class="menuitem" onclick="show('schedule')">▣ 予約</div>
+   <div class="menuitem" onclick="show('today')">＋ 本日の情報</div>
+   <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
+   <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
+   <div class="menuitem">⚙ 設定</div>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary">ログアウト</button></div>
+</section>
+</main>
 
-    <section id="payment" class="screen">
-      <div class="content-zone">
-        <div class="card">
-          <div class="mini">運賃金額</div>
-          <div class="fare">3,680円</div>
-        </div>
-
-        <div class="card">
-          <h2>支払方法</h2>
-          <div class="payopts">
-            <button class="payopt selected" onclick="pickPay(this)">現金</button>
-            <button class="payopt" onclick="pickPay(this)">アプリ</button>
-            <button class="payopt" onclick="pickPay(this)">その他</button>
-          </div>
-        </div>
-
-        <div class="reservation">
-          <div><div class="label">次の予約</div><strong style="font-size:23px">18:30</strong><div class="sub">広島駅方面</div></div><div class="arrow">›</div>
-        </div>
-      </div>
-      <div class="action-zone"><button class="primary" onclick="finishRide()">降車確定</button></div>
-    </section>
-
-    <section id="reports" class="screen">
-      <div class="content-zone">
-        <div class="segment"><button class="active">1〜10日</button><button>11〜20日</button><button>21〜末日</button></div>
-        <div class="grid2">
-          <div class="card"><div class="mini">売上</div><div class="metric">268,400円</div></div>
-          <div class="card"><div class="mini">乗車回数</div><div class="metric">126回</div></div>
-        </div>
-        <div class="daygrid">
-          <button class="day hot" onclick="showScreen('reportEdit')"><strong>1</strong><small>28,600円<br>14回</small></button>
-          <button class="day mid" onclick="showScreen('reportEdit')"><strong>2</strong><small>22,400円<br>11回</small></button>
-          <button class="day cool" onclick="showScreen('reportEdit')"><strong>3</strong><small>16,800円<br>9回</small></button>
-          <button class="day cool" onclick="showScreen('reportEdit')"><strong>4</strong><small>12,300円<br>7回</small></button>
-          <button class="day hot" onclick="showScreen('reportEdit')"><strong>5</strong><small>34,200円<br>18回</small></button>
-          <button class="day hot" onclick="showScreen('reportEdit')"><strong>6</strong><small>30,100円<br>15回</small></button>
-          <button class="day hot" onclick="showScreen('reportEdit')"><strong>7</strong><small>32,800円<br>17回</small></button>
-          <button class="day mid" onclick="showScreen('reportEdit')"><strong>8</strong><small>18,600円<br>9回</small></button>
-          <button class="day cool" onclick="showScreen('reportEdit')"><strong>9</strong><small>11,200円<br>6回</small></button>
-          <button class="day mid" onclick="showScreen('reportEdit')"><strong>10</strong><small>26,800円<br>12回</small></button>
-        </div>
-        <div class="card"><div class="row"><span>推定給与</span><button class="tag green" onclick="toast('推定給与 187,900円')">表示</button></div></div>
-      </div>
-      <div class="action-zone"><button class="primary secondary" onclick="showScreen('reportEdit')">日報詳細</button></div>
-    </section>
-
-    <section id="reportEdit" class="screen">
-      <div class="content-zone">
-        <div class="card form-card">
-          <div class="formRow"><label>日付</label><input value="2026/10/08"></div>
-          <div class="formRow"><label>出庫</label><input value="08:30"></div>
-          <div class="formRow"><label>帰庫</label><input value="17:50"></div>
-          <div class="formRow"><label>売上</label><input value="26800"></div>
-          <div class="formRow"><label>乗車回数</label><input value="12"></div>
-          <div class="formRow"><label>実車キロ</label><input value="124.5"></div>
-          <div class="formRow"><label>走行キロ</label><input value="189.3"></div>
-          <div class="formRow"><label>現金</label><input value="18400"></div>
-          <div class="formRow"><label>カード</label><input value="6800"></div>
-          <div class="formRow"><label>QR</label><input value="1600"></div>
-          <div class="formRow"><label>その他</label><input value="0"></div>
-          <div class="formRow wide"><label>メモ</label><textarea>深川からの長距離あり。</textarea></div>
-        </div>
-      </div>
-      <div class="action-zone"><button class="primary" onclick="toast('日報を更新しました（試作）')">更新する</button></div>
-    </section>
-
-    <section id="schedule" class="screen">
-      <div class="content-zone">
-        <div class="card">
-          <h2>今後の予定</h2>
-          <div class="scheduleItem"><strong>10/01</strong><span class="tag yellow">予約</span><div>17:30 児玉社長向かえ</div></div>
-          <div class="scheduleItem"><strong>10/03</strong><span class="tag red">休み</span><div>家族予定</div></div>
-          <div class="scheduleItem"><strong>10/08</strong><span class="tag yellow">予約</span><div>17:50 深川発</div></div>
-          <div class="scheduleItem"><strong>10/12</strong><span class="tag red">休み</span><div>食事</div></div>
-          <div class="scheduleItem"><strong>10/18</strong><span class="tag yellow">予約</span><div>17:00 迎え</div></div>
-        </div>
-      </div>
-      <div class="action-zone split">
-        <button class="primary" onclick="toast('予約：日付→時間あり/なし→メモ')">予約追加</button>
-        <button class="primary danger" onclick="toast('休み：日付→メモ')">休み追加</button>
-      </div>
-    </section>
-
-    <section id="events" class="screen">
-      <div class="content-zone">
-        <div class="card">
-          <div class="row"><strong>2026年10月</strong><span class="tag green">試用機能</span></div>
-          <div class="calendar">
-            <div class="calcell">1</div><div class="calcell">2<span class="ev">ライブ</span></div><div class="calcell">3</div><div class="calcell">4</div><div class="calcell">5</div><div class="calcell">6<span class="ev">サッカー</span></div><div class="calcell">7</div>
-            <div class="calcell">8</div><div class="calcell">9</div><div class="calcell sel">10<span class="ev">ライブ+2</span></div><div class="calcell">11</div><div class="calcell">12</div><div class="calcell">13</div><div class="calcell">14</div>
-            <div class="calcell">15</div><div class="calcell">16</div><div class="calcell">17</div><div class="calcell">18<span class="ev">野球</span></div><div class="calcell">19</div><div class="calcell">20</div><div class="calcell">21</div>
-            <div class="calcell">22</div><div class="calcell">23</div><div class="calcell">24</div><div class="calcell">25</div><div class="calcell">26</div><div class="calcell">27</div><div class="calcell">28</div>
-          </div>
-        </div>
-        <div class="card">
-          <h2>10月10日</h2>
-          <div class="row"><div><span class="tag purple">ライブ</span><strong style="display:block;margin-top:4px">アーティスト公演</strong><div class="sub">18:30〜21:15見込み / グリーンアリーナ</div></div><span>›</span></div>
-          <div class="row"><div><span class="tag blue">スポーツ</span><strong style="display:block;margin-top:4px">サッカー試合</strong><div class="sub">19:00〜21:00 / ピースウイング</div></div><span>›</span></div>
-          <div class="row"><div><span class="tag yellow">将来分析</span><strong style="display:block;margin-top:4px">長距離傾向</strong><div class="sub">県外送り・客層傾向を蓄積後に表示</div></div><span>›</span></div>
-        </div>
-      </div>
-      <div class="action-zone empty"><button class="primary">空き</button></div>
-    </section>
-
-  </main>
-
-  <nav class="tabs">
-    <button class="tab active" data-target="top" onclick="showScreen('top')"><b>⌂</b>トップ</button>
-    <button class="tab" data-target="reports" onclick="showScreen('reports')"><b>▤</b>日報</button>
-    <button class="tab" data-target="schedule" onclick="showScreen('schedule')"><b>▣</b>予約</button>
-    <button class="tab" data-target="events" onclick="showScreen('events')"><b>★</b>イベント</button>
-    <button class="tab" onclick="toast('設定画面は次段階で実装')"><b>⚙</b>設定</button>
-  </nav>
+<nav class="nav">
+ <button class="active" data-target="home" onclick="show('home')"><b>⌂</b>ホーム</button>
+ <button data-target="schedule" onclick="show('schedule')"><b>▣</b>予約</button>
+ <button data-target="today" onclick="show('today')"><b>＋</b>本日</button>
+ <button data-target="sales" onclick="show('sales')"><b>▥</b>売上</button>
+ <button data-target="menu" onclick="show('menu')"><b>☰</b>メニュー</button>
+</nav>
 </div>
-
-<div class="system-toast" id="toast"></div>
-
+<div class="toast" id="toast">保存しました</div>
 <script>
-const titles={top:'タクシー営業ナビ',ride:'実車中',payment:'お支払い',reports:'日報',reportEdit:'日報修正',schedule:'予約・休み',events:'イベント'};
-let noticeTimer;
-
-function showScreen(id){
-  hideNotice();
-  hideSafetyAlert();
-  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
-  document.getElementById(id).classList.add('active');
-  document.getElementById('pageTitle').textContent=titles[id]||'タクシー営業ナビ';
-  document.getElementById('stateBadge').textContent=id==='ride'?'実車中':'空車';
-  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.target===id||(id==='reportEdit'&&t.dataset.target==='reports')));
-  if(id==='ride'){
-    setTimeout(()=>showSafetyAlert(5200),650);
-  }
-}
-
-function showNotice(level,icon,title,body,duration=5500,blue=false){
-  const n=document.getElementById('noticeOverlay');
-  n.className='notice-overlay show '+level+(blue?' blue':'');
-  document.getElementById('noticeIcon').textContent=icon;
-  document.getElementById('noticeTitle').textContent=title;
-  document.getElementById('noticeBody').textContent=body;
-  clearTimeout(noticeTimer);
-  noticeTimer=setTimeout(hideNotice,duration);
-}
-function hideNotice(){
-  const n=document.getElementById('noticeOverlay');
-  n.className='notice-overlay normal';
-  clearTimeout(noticeTimer);
-}
-let safetyTimer;
-function showSafetyAlert(duration=5200){
-  const s=document.getElementById('safetyAlert');
-  s.classList.add('show');
-  clearTimeout(safetyTimer);
-  safetyTimer=setTimeout(hideSafetyAlert,duration);
-}
-function hideSafetyAlert(){
-  const s=document.getElementById('safetyAlert');
-  if(s) s.classList.remove('show');
-  clearTimeout(safetyTimer);
+const titles={home:'タクシー営業ナビ',ride:'乗車中',payment:'降車・支払',schedule:'予約一覧',today:'本日の情報',sales:'売上・10日間実績',analysis:'営業分析',menu:'メニュー'};
+let nt,st;
+function show(id){
+ hideNotice();hideSafety();
+ document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+ document.getElementById(id).classList.add('active');
+ document.getElementById('title').textContent=titles[id]||'タクシー営業ナビ';
+ document.getElementById('badge').textContent=id==='ride'?'実車中':id==='payment'?'支払':'空車';
+ document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id));
+ if(id==='ride')setTimeout(()=>showSafety(5200),700);
 }
 function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
-function finishRide(){toast('降車を確定しました（試作）');setTimeout(()=>showScreen('top'),450)}
-let tt;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2300)}
-
-/* UI prototype notification demo */
-setTimeout(()=>showNotice('normal','i','イベント情報','19:00 ライブ予定あり',5500),1000);
-setTimeout(()=>showNotice('important','!','呉線 運転見合わせ','駅周辺の需要変化に注意',6000),7600);
+function showNotice(level,icon,title,body,duration=5500){
+ const n=document.getElementById('notice');n.className='notice show '+level;
+ n.querySelector('#nicon').textContent=icon;n.querySelector('#ntitle').textContent=title;n.querySelector('#nbody').textContent=body;
+ clearTimeout(nt);nt=setTimeout(hideNotice,duration);
+}
+function hideNotice(){document.getElementById('notice').className='notice normal';clearTimeout(nt)}
+function showSafety(duration=5200){const s=document.getElementById('safety');s.classList.add('show');clearTimeout(st);st=setTimeout(hideSafety,duration)}
+function hideSafety(){document.getElementById('safety').classList.remove('show');clearTimeout(st)}
+function toast(msg='保存しました'){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
+function finishRide(){toast('実績を保存しました');setTimeout(()=>show('home'),500)}
+setTimeout(()=>showNotice('info','i','イベント情報','19:00 ライブ予定あり',5500),1000);
+setTimeout(()=>showNotice('critical','!','JR 山陽線 運転見合わせ','広島〜海田市 / 需要変化に注意',6000),7600);
 </script>
 </body>
 </html>
