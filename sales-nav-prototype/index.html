@@ -1,0 +1,258 @@
+<!doctype html>
+<html lang="ja">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="theme-color" content="#f6f7f4">
+<title>タクシー営業ナビ UI試作</title>
+<style>
+:root{
+  --bg:#f6f7f4;--card:#fff;--text:#1d2520;--muted:#6f7772;--line:#e7eae7;
+  --green:#5d8d76;--green-bg:#eaf2ed;--yellow:#b38b2f;--yellow-bg:#fbf4dc;
+  --red:#b76c6c;--red-bg:#f8eaea;--blue:#6f8fa8;--blue-bg:#edf3f7;--purple:#8d80a9;--purple-bg:#f0edf6;
+  --shadow:0 6px 22px rgba(32,48,38,.06);
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:var(--text)}
+.app{max-width:430px;margin:0 auto;min-height:100dvh;background:var(--bg);padding-bottom:88px}
+.topbar{position:sticky;top:0;z-index:20;background:rgba(246,247,244,.94);backdrop-filter:blur(12px);padding:18px 18px 10px;border-bottom:1px solid rgba(0,0,0,.03)}
+.titleRow{display:flex;justify-content:space-between;align-items:center;gap:10px}
+h1{font-size:23px;margin:0;font-weight:800;letter-spacing:.01em}
+.state{font-size:12px;padding:7px 10px;border:1px solid #dfe5e1;border-radius:999px;background:#fff;color:#4f6056}
+.screen{display:none;padding:14px 14px 18px}
+.screen.active{display:block}
+.card{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:15px;margin-bottom:12px;box-shadow:var(--shadow)}
+.hero{background:var(--green-bg);border-color:#dce9e1}
+.hero h2,.card h2{margin:0 0 5px;font-size:18px}
+.sub{font-size:12px;color:var(--muted)}
+.grid2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.metric{font-size:26px;font-weight:800;margin-top:5px}
+.mini{font-size:13px;color:var(--muted)}
+.row{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 0;border-bottom:1px solid var(--line)}
+.row:last-child{border-bottom:none}
+.tag{font-size:11px;font-weight:700;padding:5px 8px;border-radius:999px;white-space:nowrap}
+.tag.green{background:var(--green-bg);color:#426b57}
+.tag.yellow{background:var(--yellow-bg);color:#8e6b1c}
+.tag.red{background:var(--red-bg);color:#9e5353}
+.tag.blue{background:var(--blue-bg);color:#54758d}
+.tag.purple{background:var(--purple-bg);color:#74668f}
+.btn{width:100%;border:none;border-radius:16px;padding:16px 14px;font-size:17px;font-weight:800;background:var(--green);color:#fff;box-shadow:var(--shadow)}
+.btn.secondary{background:#fff;color:var(--text);border:1px solid var(--line)}
+.btn.danger{background:#8b6c6c}
+.btnRow{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.notice{font-size:14px;display:flex;justify-content:space-between;gap:8px;align-items:center}
+.notice strong{font-size:14px}
+.aiSlot{border-style:dashed;background:#fafbfa}
+.aiSlot .future{font-size:11px;color:#8b918d;margin-bottom:5px}
+.bigBang{height:150px;display:flex;align-items:center;justify-content:center;border-radius:18px;background:#fff7df;border:1px solid #f0dfae;margin-bottom:12px}
+.bigBang span{display:flex;align-items:center;justify-content:center;width:82px;height:82px;border-radius:50%;background:#f2c65c;color:#fff;font-size:52px;font-weight:900}
+.tabs{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:min(430px,100%);display:grid;grid-template-columns:repeat(5,1fr);background:rgba(255,255,255,.96);backdrop-filter:blur(14px);border-top:1px solid var(--line);padding:8px 6px calc(8px + env(safe-area-inset-bottom));z-index:30}
+.tab{border:none;background:transparent;color:#7a817d;font-size:11px;padding:6px 2px;border-radius:12px}
+.tab.active{color:#4f7d66;background:var(--green-bg);font-weight:800}
+.tab b{display:block;font-size:18px;line-height:1.1;margin-bottom:2px}
+.daygrid{display:grid;grid-template-columns:repeat(5,1fr);gap:7px}
+.day{border:1px solid var(--line);background:#fff;border-radius:13px;padding:9px 5px;text-align:center;min-height:78px}
+.day strong{font-size:15px}.day small{display:block;color:var(--muted);font-size:10px;margin-top:5px}
+.day.hot{background:#f8eeee}.day.mid{background:#f7f2e7}.day.cool{background:#edf4f1}
+.segment{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#eef0ee;padding:4px;border-radius:12px;margin-bottom:12px}
+.segment button{border:none;background:transparent;padding:9px;border-radius:9px;font-size:12px}
+.segment button.active{background:#fff;box-shadow:0 1px 5px rgba(0,0,0,.06);font-weight:800}
+.formRow{display:grid;grid-template-columns:110px 1fr;gap:10px;align-items:center;padding:9px 0;border-bottom:1px solid var(--line)}
+.formRow label{font-size:13px;color:#535d57}
+input,select,textarea{width:100%;padding:11px;border:1px solid #dfe4e0;border-radius:10px;background:#fafbfa;font:inherit}
+textarea{min-height:80px;resize:vertical}
+.scheduleItem{display:grid;grid-template-columns:58px 52px 1fr;gap:8px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line)}
+.calendar{display:grid;grid-template-columns:repeat(7,1fr);gap:4px}
+.calcell{min-height:58px;border:1px solid var(--line);background:#fff;border-radius:9px;padding:5px;font-size:11px}
+.calcell.sel{outline:2px solid #8caa99}
+.calcell .ev{display:block;margin-top:3px;padding:2px 3px;border-radius:5px;background:var(--purple-bg);font-size:8px;overflow:hidden;white-space:nowrap}
+.payopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.payopt{padding:14px 8px;border:1px solid var(--line);background:#fff;border-radius:14px;font-weight:700}
+.payopt.selected{background:var(--green-bg);border-color:#bdd4c6;color:#426b57}
+.toast{position:fixed;left:50%;bottom:92px;transform:translateX(-50%);background:#263029;color:#fff;padding:10px 14px;border-radius:999px;font-size:12px;opacity:0;pointer-events:none;transition:.25s;z-index:99}
+.toast.show{opacity:1}
+.hidden{display:none!important}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="topbar">
+    <div class="titleRow"><h1 id="pageTitle">タクシー営業ナビ</h1><span class="state" id="stateBadge">空車</span></div>
+  </header>
+
+  <main>
+    <section id="top" class="screen active">
+      <div class="card hero">
+        <h2>空車で営業中</h2>
+        <div class="sub">必要な情報だけ、ひと目で確認</div>
+      </div>
+
+      <div class="card aiSlot">
+        <div class="future">将来AI分析オプション用スペース</div>
+        <div class="row"><div><strong>今週・来週の営業傾向</strong><div class="sub">休みを決める参考に</div></div><span class="tag green">準備中</span></div>
+      </div>
+
+      <div class="grid2">
+        <div class="card"><div class="mini">次の予約</div><div class="metric" style="font-size:21px">予約18:30</div><div class="sub">広島駅方面</div></div>
+        <div class="card"><div class="mini">天気</div><div class="metric" style="font-size:18px">降水70%</div><div class="sub">3mm/h</div></div>
+      </div>
+
+      <div class="card">
+        <h2 style="font-size:16px">鉄道運行情報</h2>
+        <div class="row notice"><strong>呉線</strong><span class="tag red">運転見合わせ</span><span>需要高</span></div>
+        <div class="row notice"><strong>山陽線</strong><span class="tag yellow">遅延</span><span>需要中</span></div>
+      </div>
+
+      <div class="card" onclick="showScreen('events')">
+        <div class="row"><div><strong>今日のイベント 3件</strong><div class="sub">試用・サービス機能</div></div><span>›</span></div>
+        <div class="sub" style="margin-top:8px">17:00 サッカー試合　／　19:00 ライブ ほか</div>
+      </div>
+
+      <div class="card">
+        <div class="grid2">
+          <div><div class="mini">本日の売上</div><div class="metric">26,800円</div></div>
+          <div><div class="mini">乗車回数</div><div class="metric">12回</div></div>
+        </div>
+      </div>
+
+      <button class="btn" onclick="showScreen('ride')">乗車</button>
+    </section>
+
+    <section id="ride" class="screen">
+      <div class="card hero"><h2>実車中</h2><div class="sub">運転中は最小表示</div></div>
+      <div class="grid2">
+        <div class="card"><div class="mini">今回の売上</div><div class="metric">5,600円</div></div>
+        <div class="card"><div class="mini">乗車時間</div><div class="metric">18分</div></div>
+      </div>
+      <div class="card"><div class="row"><div><strong>予約18:30</strong><div class="sub">広島駅方面</div></div><span>›</span></div></div>
+      <div class="card">
+        <div class="row notice"><strong>呉線</strong><span class="tag red">見合わせ</span><span>需要高</span></div>
+        <div class="row notice"><strong>山陽線</strong><span class="tag yellow">遅延</span><span>需要中</span></div>
+      </div>
+      <div class="bigBang"><span>!</span></div>
+      <button class="btn" onclick="showScreen('payment')">支払へ</button>
+    </section>
+
+    <section id="payment" class="screen">
+      <div class="card">
+        <div class="mini">運賃金額</div>
+        <div class="metric" style="font-size:38px">3,680円</div>
+      </div>
+      <div class="card">
+        <h2 style="font-size:16px">支払方法</h2>
+        <div class="payopts">
+          <button class="payopt selected" onclick="pickPay(this)">現金</button>
+          <button class="payopt" onclick="pickPay(this)">アプリ</button>
+          <button class="payopt" onclick="pickPay(this)">その他</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="row"><span>乗車時刻</span><strong>15:20</strong></div>
+        <div class="row"><span>乗車地</span><strong>広島駅方面</strong></div>
+        <div class="row"><span>降車地</span><strong>広島市南区</strong></div>
+        <div class="row"><span>走行距離</span><strong>5.2km</strong></div>
+      </div>
+      <button class="btn" onclick="finishRide()">降車確定</button>
+    </section>
+
+    <section id="reports" class="screen">
+      <div class="segment"><button class="active">1〜10日</button><button>11〜20日</button><button>21〜末日</button></div>
+      <div class="card">
+        <div class="grid2">
+          <div><div class="mini">1〜10日の売上</div><div class="metric">268,400円</div></div>
+          <div><div class="mini">乗車回数</div><div class="metric">126回</div></div>
+        </div>
+        <div class="row"><span>推定給与を表示</span><button class="tag green" onclick="toast('推定給与 187,900円')">表示</button></div>
+      </div>
+      <div class="daygrid">
+        <button class="day hot" onclick="showScreen('reportEdit')"><strong>1</strong><small>28,600円<br>14回</small></button>
+        <button class="day mid" onclick="showScreen('reportEdit')"><strong>2</strong><small>22,400円<br>11回</small></button>
+        <button class="day cool" onclick="showScreen('reportEdit')"><strong>3</strong><small>16,800円<br>9回</small></button>
+        <button class="day cool" onclick="showScreen('reportEdit')"><strong>4</strong><small>12,300円<br>7回</small></button>
+        <button class="day hot" onclick="showScreen('reportEdit')"><strong>5</strong><small>34,200円<br>18回</small></button>
+        <button class="day hot" onclick="showScreen('reportEdit')"><strong>6</strong><small>30,100円<br>15回</small></button>
+        <button class="day hot" onclick="showScreen('reportEdit')"><strong>7</strong><small>32,800円<br>17回</small></button>
+        <button class="day mid" onclick="showScreen('reportEdit')"><strong>8</strong><small>18,600円<br>9回</small></button>
+        <button class="day cool" onclick="showScreen('reportEdit')"><strong>9</strong><small>11,200円<br>6回</small></button>
+        <button class="day mid" onclick="showScreen('reportEdit')"><strong>10</strong><small>26,800円<br>12回</small></button>
+      </div>
+    </section>
+
+    <section id="reportEdit" class="screen">
+      <div class="card">
+        <div class="formRow"><label>日付</label><input value="2026/10/08"></div>
+        <div class="formRow"><label>出庫</label><input value="08:30"></div>
+        <div class="formRow"><label>帰庫</label><input value="17:50"></div>
+        <div class="formRow"><label>売上</label><input value="26800"></div>
+        <div class="formRow"><label>乗車回数</label><input value="12"></div>
+        <div class="formRow"><label>実車キロ</label><input value="124.5"></div>
+        <div class="formRow"><label>走行キロ</label><input value="189.3"></div>
+        <div class="formRow"><label>現金</label><input value="18400"></div>
+        <div class="formRow"><label>カード</label><input value="6800"></div>
+        <div class="formRow"><label>QR</label><input value="1600"></div>
+        <div class="formRow"><label>その他</label><input value="0"></div>
+        <div class="formRow"><label>メモ</label><textarea>深川からの長距離あり。</textarea></div>
+      </div>
+      <button class="btn" onclick="toast('日報を更新しました（試作）')">更新する</button>
+    </section>
+
+    <section id="schedule" class="screen">
+      <div class="btnRow" style="margin-bottom:12px">
+        <button class="btn" onclick="toast('予約追加フロー：日付→時間あり/なし→メモ')">予約を追加</button>
+        <button class="btn danger" onclick="toast('休み追加フロー：日付→メモ')">休みを追加</button>
+      </div>
+      <div class="card">
+        <h2 style="font-size:16px">今後の予定</h2>
+        <div class="scheduleItem"><strong>10/01</strong><span class="tag yellow">予約</span><div>17:30 児玉社長向かえ</div></div>
+        <div class="scheduleItem"><strong>10/03</strong><span class="tag red">休み</span><div>家族予定</div></div>
+        <div class="scheduleItem"><strong>10/08</strong><span class="tag yellow">予約</span><div>17:50 深川発</div></div>
+        <div class="scheduleItem"><strong>10/12</strong><span class="tag red">休み</span><div>食事</div></div>
+        <div class="scheduleItem"><strong>10/18</strong><span class="tag yellow">予約</span><div>17:00 迎え</div></div>
+      </div>
+    </section>
+
+    <section id="events" class="screen">
+      <div class="card">
+        <div class="row"><strong>2026年10月</strong><button class="tag green">今日</button></div>
+        <div class="calendar">
+          <div class="calcell">1</div><div class="calcell">2<span class="ev">ライブ</span></div><div class="calcell">3</div><div class="calcell">4</div><div class="calcell">5</div><div class="calcell">6<span class="ev">サッカー</span></div><div class="calcell">7</div>
+          <div class="calcell">8</div><div class="calcell">9</div><div class="calcell sel">10<span class="ev">ライブ+2</span></div><div class="calcell">11</div><div class="calcell">12</div><div class="calcell">13</div><div class="calcell">14</div>
+          <div class="calcell">15</div><div class="calcell">16</div><div class="calcell">17</div><div class="calcell">18<span class="ev">野球</span></div><div class="calcell">19</div><div class="calcell">20</div><div class="calcell">21</div>
+          <div class="calcell">22</div><div class="calcell">23</div><div class="calcell">24</div><div class="calcell">25</div><div class="calcell">26</div><div class="calcell">27</div><div class="calcell">28</div>
+        </div>
+      </div>
+      <div class="card">
+        <h2 style="font-size:16px">10月10日のイベント</h2>
+        <div class="row"><div><span class="tag purple">ライブ</span><strong style="display:block;margin-top:6px">アーティスト公演</strong><div class="sub">18:30〜21:15見込み / 広島グリーンアリーナ</div></div><span class="tag green">需要検証中</span></div>
+        <div class="row"><div><span class="tag blue">スポーツ</span><strong style="display:block;margin-top:6px">サッカー試合</strong><div class="sub">19:00〜21:00 / エディオンピースウイング</div></div><span class="tag green">需要検証中</span></div>
+        <div class="row"><div><span class="tag yellow">将来分析</span><strong style="display:block;margin-top:6px">過去の長距離傾向</strong><div class="sub">イベント終了後の県外送り・長距離傾向を蓄積後に表示</div></div><span>›</span></div>
+      </div>
+    </section>
+  </main>
+</div>
+
+<nav class="tabs">
+  <button class="tab active" data-target="top" onclick="showScreen('top')"><b>⌂</b>トップ</button>
+  <button class="tab" data-target="reports" onclick="showScreen('reports')"><b>▤</b>日報</button>
+  <button class="tab" data-target="schedule" onclick="showScreen('schedule')"><b>▣</b>予約</button>
+  <button class="tab" data-target="events" onclick="showScreen('events')"><b>★</b>イベント</button>
+  <button class="tab" onclick="toast('設定画面は次段階で実装')"><b>⚙</b>設定</button>
+</nav>
+<div class="toast" id="toast"></div>
+
+<script>
+const titles={top:'タクシー営業ナビ',ride:'実車中',payment:'お支払い',reports:'日報',reportEdit:'日報修正',schedule:'予約・休み',events:'イベント'};
+function showScreen(id){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  document.getElementById('pageTitle').textContent=titles[id]||'タクシー営業ナビ';
+  document.getElementById('stateBadge').textContent=id==='ride'?'実車中':'空車';
+  document.querySelectorAll('.tab').forEach(t=>t.classList.toggle('active',t.dataset.target===id || (id==='reportEdit'&&t.dataset.target==='reports')));
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function finishRide(){toast('降車を確定しました（試作）');setTimeout(()=>showScreen('top'),500)}
+let tt;function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');clearTimeout(tt);tt=setTimeout(()=>t.classList.remove('show'),2200)}
+</script>
+</body>
+</html>
