@@ -100,6 +100,15 @@ main{position:relative;min-height:0;overflow:hidden}
  linear-gradient(135deg,#163044,#101b24)}
 .menuitem{padding:14px 0;border-bottom:1px solid #22313d;font-size:16px;font-weight:700}
 .menuitem:last-child{border-bottom:0}
+.verify-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
+.verify-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
+.verify-head strong{font-size:16px}
+.verify-row{display:grid;grid-template-columns:74px 1fr;gap:8px;padding:6px 0;border-top:1px solid #1d2a34;font-size:13px}
+.verify-row:first-of-type{border-top:0}
+.verify-row span{color:var(--muted)}
+.verify-address{font-size:15px;font-weight:800;line-height:1.35}
+.verify-empty{padding:16px;text-align:center;color:var(--muted);font-size:13px}
+.smallbtn{border:1px solid #304252;background:#13212d;color:#fff;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
 
 /* ordinary info notification */
 .notice{position:absolute;z-index:50;left:12px;right:12px;top:10px;min-height:82px;display:none;align-items:center;gap:12px;padding:13px 15px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
@@ -172,7 +181,7 @@ main{position:relative;min-height:0;overflow:hidden}
 
   <div id="homeMap" class="mapcard hidden"><div class="maplabel">地図表示モード（試作）</div><div class="mapdot"></div></div>
  </div>
- <div class="action"><button class="primary" onclick="show('ride')">乗車する</button></div>
+ <div class="action"><button class="primary" onclick="startRideCapture()">乗車する</button></div>
 </section>
 
 <section id="ride" class="screen">
@@ -248,6 +257,16 @@ main{position:relative;min-height:0;overflow:hidden}
  <div class="action"><button class="primary secondary">直近10日間</button></div>
 </section>
 
+<section id="verify" class="screen">
+ <div class="content">
+  <div class="card">
+   <div class="row"><div><h2 style="margin:0">位置精度検証</h2><div class="sub">乗車・降車を押した地点を住所で確認</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
+  </div>
+  <div id="verifyList" class="list"></div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('home')">ホームへ戻る</button></div>
+</section>
+
 <section id="menu" class="screen">
  <div class="content">
   <div class="card"><h2>メニュー</h2>
@@ -256,6 +275,7 @@ main{position:relative;min-height:0;overflow:hidden}
    <div class="menuitem" onclick="show('today')">＋ 本日の情報</div>
    <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
+   <div class="menuitem" onclick="show('verify')">◎ 位置精度検証</div>
    <div class="menuitem">⚙ 設定</div>
   </div>
  </div>
@@ -273,7 +293,7 @@ main{position:relative;min-height:0;overflow:hidden}
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
-const titles={home:'タクシー営業ナビ',ride:'乗車中',payment:'降車・支払',schedule:'予約一覧',today:'本日の情報',sales:'売上・10日間実績',analysis:'営業分析',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',ride:'乗車中',payment:'降車・支払',schedule:'予約一覧',today:'本日の情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function show(id){
  hideNotice();hideSafety();
@@ -283,6 +303,7 @@ function show(id){
  document.getElementById('badge').textContent=id==='ride'?'実車中':id==='payment'?'支払':'空車';
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id));
  if(id==='home'||id==='ride') startLocation();
+ if(id==='verify') renderVerify();
  if(id==='ride')setTimeout(()=>showSafety(5200),700);
 }
 let geoWatchId=null;
@@ -362,7 +383,64 @@ function hideNotice(){document.getElementById('notice').className='notice normal
 function showSafety(duration=5200){const s=document.getElementById('safety');s.classList.add('show');clearTimeout(st);st=setTimeout(hideSafety,duration)}
 function hideSafety(){document.getElementById('safety').classList.remove('show');clearTimeout(st)}
 function toast(msg='保存しました'){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
-function finishRide(){toast('実績を保存しました');setTimeout(()=>show('home'),500)}
+async function reverseGeocode(lat,lon){
+ try{
+   const u='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=18&addressdetails=1&accept-language=ja';
+   const r=await fetch(u,{headers:{'Accept':'application/json'}});
+   if(!r.ok) throw new Error('reverse failed');
+   const d=await r.json();
+   return d.display_name||'住所取得不能';
+ }catch(e){
+   return '住所取得不能';
+ }
+}
+function getVerifyLog(){
+ try{return JSON.parse(localStorage.getItem('taxi_verify_log')||'[]')}catch(e){return[]}
+}
+function saveVerifyLog(log){localStorage.setItem('taxi_verify_log',JSON.stringify(log.slice(0,20)))}
+async function capturePoint(type){
+ if(!latestPosition){toast('位置情報を取得できていません');return null}
+ const p=latestPosition;
+ const rec={
+   type,
+   time:new Date().toLocaleString('ja-JP',{hour12:false}),
+   lat:p.coords.latitude,
+   lon:p.coords.longitude,
+   accuracy:Math.round(p.coords.accuracy||0),
+   address:'住所取得中…'
+ };
+ const log=getVerifyLog();log.unshift(rec);saveVerifyLog(log);renderVerify();
+ rec.address=await reverseGeocode(rec.lat,rec.lon);
+ const log2=getVerifyLog();
+ const idx=log2.findIndex(x=>x.type===rec.type&&x.time===rec.time&&Math.abs(x.lat-rec.lat)<0.0000001);
+ if(idx>=0){log2[idx]=rec;saveVerifyLog(log2)}
+ renderVerify();
+ return rec;
+}
+async function startRideCapture(){
+ await capturePoint('乗車');
+ show('ride');
+}
+async function finishRide(){
+ await capturePoint('降車');
+ toast('実績を保存しました');
+ setTimeout(()=>show('home'),500);
+}
+function renderVerify(){
+ const el=document.getElementById('verifyList');if(!el)return;
+ const log=getVerifyLog();
+ if(!log.length){el.innerHTML='<div class="verify-empty">まだ検証データがありません。<br>「乗車する」「実績を保存」を押すと記録されます。</div>';return}
+ el.innerHTML=log.map(r=>`
+  <div class="verify-card">
+   <div class="verify-head"><strong>${r.type}</strong><span class="badge">±${r.accuracy}m</span></div>
+   <div class="verify-address">${r.address||'住所取得中…'}</div>
+   <div class="verify-row"><span>時刻</span><strong>${r.time}</strong></div>
+   <div class="verify-row"><span>緯度経度</span><strong>${r.lat.toFixed(6)}, ${r.lon.toFixed(6)}</strong></div>
+  </div>`).join('');
+}
+function clearVerify(){
+ localStorage.removeItem('taxi_verify_log');renderVerify();toast('検証履歴をクリアしました');
+}
 setTimeout(()=>showNotice('info','i','イベント情報','19:00 ライブ予定あり',5500),1000);
 setTimeout(()=>showNotice('critical','!','JR 山陽線 運転見合わせ','広島〜海田市 / 需要変化に注意',6000),7600);
 startLocation();
