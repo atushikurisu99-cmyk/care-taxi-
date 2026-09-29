@@ -38,6 +38,11 @@ header h1{font-size:21px;margin:0}
 .switch.on{background:#17456f;border-color:#2f86ff;justify-content:flex-end}
 .switch.on .knob{background:#69aaff}
 .home-info{display:flex;flex-direction:column;gap:10px;min-height:0}
+.idle-home{flex:1;display:flex;align-items:center;justify-content:center}
+.idle-home .idle-state{text-align:center;color:#8295a3;font-size:14px}
+.ride-location{background:#0c1721;border:1px solid #22313d;border-radius:16px;padding:14px 15px}
+.ride-location .address{font-size:20px;font-weight:900;line-height:1.3;margin-top:5px}
+.ride-location .meta{font-size:12px;color:var(--muted);margin-top:6px}
 .home-info.hidden{display:none}
 .mapcard.hidden{display:none}
 main{position:relative;min-height:0;overflow:hidden}
@@ -153,48 +158,28 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="home" class="screen active">
  <div class="content">
-  <div class="map-control">
-   <div class="left"><span class="map-icon">⌖</span><div><strong>地図表示</strong><small id="mapStateText">OFF・情報表示を優先</small></div></div>
-   <button id="mapSwitch" class="switch" aria-label="地図表示切替" onclick="toggleMap()"><span class="knob"></span></button>
+  <div class="idle-home">
+   <div class="idle-state">空車</div>
   </div>
-
-  <div class="location-status" onclick="requestLocation()">
-   <div class="left"><span class="loc-icon">◎</span><div><strong id="locTitle">位置情報を確認中</strong><small id="locDetail">GPSの取得を開始します</small></div></div>
-   <span id="locPill" class="loc-pill">取得中</span>
-  </div>
-
-  <div id="homeInfo" class="home-info">
-   <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
-
-   <div class="grid2">
-    <div class="card"><div class="label">天気</div><div class="weather-now">晴れ</div><div class="weather-next">20:30頃から雨</div></div>
-    <div class="card"><div class="label">JR運行</div><div class="value" style="font-size:24px">平常</div><div class="sub">異常時は通知</div></div>
-   </div>
-
-   <div class="grid2">
-    <div class="card"><div class="label">今日のイベント</div><div class="value">3件</div><div class="sub">終了見込みあり</div></div>
-    <div class="card"><div class="label">本日の営業</div><div class="value" style="font-size:23px">26,800円</div><div class="sub">12回</div></div>
-   </div>
-
-   <div class="card"><div class="row"><div><div class="label">営業通知</div><strong style="font-size:17px">必要な時だけ画面に表示</strong></div><span class="badge">待機中</span></div></div>
-  </div>
-
-  <div id="homeMap" class="mapcard hidden"><div class="maplabel">地図表示モード（試作）</div><div class="mapdot"></div></div>
  </div>
- <div class="action"><button class="primary" onclick="startRideCapture()">乗車する</button></div>
+ <div class="action"><button class="primary" onclick="startRideCapture()">乗車</button></div>
 </section>
 
 <section id="ride" class="screen">
  <div class="content">
   <div class="card drive-state"><div><div class="label">状態</div><strong>実車中</strong></div><span class="badge" id="rideGpsBadge">GPS取得中</span></div>
-  <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
-  <div class="grid2">
-   <div class="card"><div class="label">乗車時刻</div><div class="value">20:05</div></div>
-   <div class="card"><div class="label">乗車時間</div><div class="value">12分</div></div>
+
+  <div class="ride-location">
+   <div class="label">乗車地</div>
+   <div id="rideStartAddress" class="address">住所取得中…</div>
+   <div id="rideStartMeta" class="meta">乗車地点を固定しています</div>
   </div>
-  <div class="drive-note">交通・イベント・生活道路の情報は<br>必要な時だけ重ねて表示</div>
+
+  <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
+
+  <div class="drive-note">通知は必要な時だけ重ねて表示</div>
  </div>
- <div class="action"><button class="primary pay" onclick="show('payment')">降車・支払へ</button></div>
+ <div class="action"><button class="primary pay" onclick="show('payment')">支払</button></div>
 </section>
 
 <section id="payment" class="screen">
@@ -205,9 +190,12 @@ main{position:relative;min-height:0;overflow:hidden}
    <button class="payopt" onclick="pickPay(this)">カード</button>
    <button class="payopt" onclick="pickPay(this)">その他</button>
   </div></div>
-  <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
+  <div class="ride-location">
+   <div class="label">乗車地</div>
+   <div id="paymentStartAddress" class="address">住所取得中…</div>
+  </div>
  </div>
- <div class="action"><button class="primary" onclick="finishRide()">実績を保存</button></div>
+ <div class="action"><button class="primary" onclick="finishRide()">降車</button></div>
 </section>
 
 <section id="schedule" class="screen">
@@ -293,7 +281,7 @@ main{position:relative;min-height:0;overflow:hidden}
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
-const titles={home:'タクシー営業ナビ',ride:'乗車中',payment:'降車・支払',schedule:'予約一覧',today:'本日の情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',ride:'実車中',payment:'支払',schedule:'予約一覧',today:'本日の情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function show(id){
  hideNotice();hideSafety();
@@ -304,6 +292,7 @@ function show(id){
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id));
  if(id==='home'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
+ if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  if(id==='ride')setTimeout(()=>showSafety(5200),700);
 }
 let geoWatchId=null;
@@ -417,14 +406,48 @@ async function capturePoint(type){
  renderVerify();
  return rec;
 }
+let currentRideStart=null;
+function updateRideStartUI(rec){
+ if(!rec) return;
+ const addr=rec.address||'住所取得中…';
+ const meta='精度 ±'+rec.accuracy+'m / '+rec.time;
+ const a=document.getElementById('rideStartAddress');
+ const m=document.getElementById('rideStartMeta');
+ const p=document.getElementById('paymentStartAddress');
+ if(a) a.textContent=addr;
+ if(m) m.textContent=meta;
+ if(p) p.textContent=addr;
+}
 async function startRideCapture(){
- await capturePoint('乗車');
+ if(!latestPosition){toast('位置情報を取得中です');startLocation();return}
+ const p=latestPosition;
+ currentRideStart={
+   type:'乗車',
+   time:new Date().toLocaleString('ja-JP',{hour12:false}),
+   lat:p.coords.latitude,
+   lon:p.coords.longitude,
+   accuracy:Math.round(p.coords.accuracy||0),
+   address:'住所取得中…'
+ };
+ const log=getVerifyLog();log.unshift(currentRideStart);saveVerifyLog(log);
  show('ride');
+ updateRideStartUI(currentRideStart);
+ currentRideStart.address=await reverseGeocode(currentRideStart.lat,currentRideStart.lon);
+ const log2=getVerifyLog();
+ const idx=log2.findIndex(x=>x.type==='乗車'&&x.time===currentRideStart.time&&Math.abs(x.lat-currentRideStart.lat)<0.0000001);
+ if(idx>=0){log2[idx]=currentRideStart;saveVerifyLog(log2)}
+ updateRideStartUI(currentRideStart);
+ renderVerify();
 }
 async function finishRide(){
- await capturePoint('降車');
- toast('実績を保存しました');
- setTimeout(()=>show('home'),500);
+ const rec=await capturePoint('降車');
+ if(rec && rec.address && rec.address!=='住所取得不能'){
+   toast('降車地を記録しました');
+ }else{
+   toast('降車を記録しました');
+ }
+ currentRideStart=null;
+ setTimeout(()=>show('home'),700);
 }
 function renderVerify(){
  const el=document.getElementById('verifyList');if(!el)return;
