@@ -19,6 +19,18 @@ button,input{font:inherit}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
 header h1{font-size:21px;margin:0}
 .badge{font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;background:#0f2431;border:1px solid #274052}
+.map-control{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;background:#0c1721;border:1px solid #22313d;border-radius:15px}
+.map-control .left{display:flex;align-items:center;gap:9px}
+.map-control .map-icon{font-size:20px}
+.map-control strong{font-size:15px}
+.map-control small{display:block;color:var(--muted);font-size:11px;margin-top:2px}
+.switch{width:54px;height:30px;border:1px solid #334552;background:#14222d;border-radius:999px;padding:3px;display:flex;align-items:center;transition:.2s}
+.switch .knob{width:22px;height:22px;border-radius:50%;background:#7c8b96;transition:.2s}
+.switch.on{background:#17456f;border-color:#2f86ff;justify-content:flex-end}
+.switch.on .knob{background:#69aaff}
+.home-info{display:flex;flex-direction:column;gap:10px;min-height:0}
+.home-info.hidden{display:none}
+.mapcard.hidden{display:none}
 main{position:relative;min-height:0;overflow:hidden}
 .screen{display:none;height:100%;padding:10px 12px;grid-template-rows:minmax(0,1fr) var(--action);gap:var(--gap)}
 .screen.active{display:grid}
@@ -108,7 +120,7 @@ main{position:relative;min-height:0;overflow:hidden}
  :root{--header:52px;--nav:60px;--action:70px;--gap:7px}
  header h1{font-size:19px}.screen{padding:7px 9px}.card{padding:10px 11px}
  .value{font-size:23px}.sub,.label{font-size:12px}.reservation{min-height:72px}.reservation strong{font-size:24px}
- .primary{font-size:21px}.mapcard{min-height:170px}.quick .card{padding:8px 4px}.quick strong{font-size:14px}
+ .primary{font-size:21px}.map-control{height:46px;flex-basis:46px}.map-control strong{font-size:14px}.map-control small{font-size:10px}.mapcard{min-height:170px}.quick .card{padding:8px 4px}.quick strong{font-size:14px}
  .notice{left:9px;right:9px;top:7px;min-height:72px}.notice strong{font-size:16px}.notice span{font-size:12px}
  .safety{width:200px;height:185px}.triangle{width:172px;height:150px;padding-bottom:21px}.triangle span{font-size:76px}.safetytext{font-size:14px}
 }
@@ -123,17 +135,28 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="home" class="screen active">
  <div class="content">
-  <div class="mapcard"><div class="maplabel">空車営業中</div><div class="mapdot"></div></div>
-  <div class="quick">
-   <div class="card"><strong>18:30</strong><span>予約</span></div>
-   <div class="card"><strong>3件</strong><span>ライブ</span></div>
-   <div class="card"><strong>平常</strong><span>JR</span></div>
-   <div class="card"><strong>晴れ</strong><span>天気</span></div>
+  <div class="map-control">
+   <div class="left"><span class="map-icon">⌖</span><div><strong>地図表示</strong><small id="mapStateText">OFF・情報表示を優先</small></div></div>
+   <button id="mapSwitch" class="switch" aria-label="地図表示切替" onclick="toggleMap()"><span class="knob"></span></button>
   </div>
-  <div class="grid2">
-   <div class="card"><div class="label">次の予約</div><div class="value">18:30</div><div class="sub">広島駅方面</div></div>
-   <div class="card"><div class="label">天気</div><div class="weather-now">晴れ</div><div class="weather-next">20:30頃から雨</div></div>
+
+  <div id="homeInfo" class="home-info">
+   <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
+
+   <div class="grid2">
+    <div class="card"><div class="label">天気</div><div class="weather-now">晴れ</div><div class="weather-next">20:30頃から雨</div></div>
+    <div class="card"><div class="label">JR運行</div><div class="value" style="font-size:24px">平常</div><div class="sub">異常時は通知</div></div>
+   </div>
+
+   <div class="grid2">
+    <div class="card"><div class="label">今日のイベント</div><div class="value">3件</div><div class="sub">終了見込みあり</div></div>
+    <div class="card"><div class="label">本日の営業</div><div class="value" style="font-size:23px">26,800円</div><div class="sub">12回</div></div>
+   </div>
+
+   <div class="card"><div class="row"><div><div class="label">営業通知</div><strong style="font-size:17px">必要な時だけ画面に表示</strong></div><span class="badge">待機中</span></div></div>
   </div>
+
+  <div id="homeMap" class="mapcard hidden"><div class="maplabel">地図表示モード（試作）</div><div class="mapdot"></div></div>
  </div>
  <div class="action"><button class="primary" onclick="show('ride')">乗車する</button></div>
 </section>
@@ -246,6 +269,14 @@ function show(id){
  document.getElementById('badge').textContent=id==='ride'?'実車中':id==='payment'?'支払':'空車';
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id));
  if(id==='ride')setTimeout(()=>showSafety(5200),700);
+}
+let mapEnabled=false;
+function toggleMap(){
+ mapEnabled=!mapEnabled;
+ document.getElementById('mapSwitch').classList.toggle('on',mapEnabled);
+ document.getElementById('mapStateText').textContent=mapEnabled?'ON・地図モード（試作）':'OFF・情報表示を優先';
+ document.getElementById('homeInfo').classList.toggle('hidden',mapEnabled);
+ document.getElementById('homeMap').classList.toggle('hidden',!mapEnabled);
 }
 function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
 function showNotice(level,icon,title,body,duration=5500){
