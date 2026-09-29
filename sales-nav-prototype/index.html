@@ -129,7 +129,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .shift-card{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .shift-time{font-size:22px;font-weight:900}
 .ride-state-main{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.ride-state-main .ride-from{font-size:17px;font-weight:900;line-height:1.25;text-align:right;max-width:62%}
+.ride-state-main .ride-from{font-size:20px;font-weight:900;line-height:1.2;text-align:right;max-width:62%}
 
 /* ordinary info notification */
 .notice{position:absolute;z-index:50;left:12px;right:12px;top:10px;min-height:82px;display:none;align-items:center;gap:12px;padding:13px 15px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
@@ -215,7 +215,7 @@ main{position:relative;min-height:0;overflow:hidden}
   <div class="card drive-state">
    <div class="ride-state-main">
     <div><div class="label">状態</div><strong>実車中</strong><div id="rideStartMeta" class="sub">乗車地点を固定中</div></div>
-    <div><div class="label" style="text-align:right">乗車地</div><div id="rideStartAddress" class="ride-from">住所取得中…</div></div>
+    <div><div class="label" style="text-align:right">乗車地</div><div id="rideStartAddress" class="ride-from">場所を確認中…</div></div>
    </div>
   </div>
 
@@ -236,7 +236,7 @@ main{position:relative;min-height:0;overflow:hidden}
   </div></div>
   <div class="ride-location">
    <div class="label">乗車地</div>
-   <div id="paymentStartAddress" class="address">住所取得中…</div>
+   <div id="paymentStartAddress" class="address">場所を確認中…</div>
   </div>
  </div>
  <div class="action"><button class="primary" onclick="finishRide()">降車</button></div>
@@ -292,7 +292,7 @@ main{position:relative;min-height:0;overflow:hidden}
 <section id="verify" class="screen">
  <div class="content">
   <div class="card">
-   <div class="row"><div><h2 style="margin:0">位置精度検証</h2><div class="sub">乗車・降車を押した地点を住所で確認</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
+   <div class="row"><div><h2 style="margin:0">位置精度検証</h2><div class="sub">乗車・降車を押した地点を分かりやすく確認</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
   </div>
   <div id="verifyList" class="list"></div>
  </div>
@@ -478,15 +478,33 @@ function hideNotice(){document.getElementById('notice').className='notice normal
 function showSafety(duration=5200){const s=document.getElementById('safety');s.classList.add('show');clearTimeout(st);st=setTimeout(hideSafety,duration)}
 function hideSafety(){document.getElementById('safety').classList.remove('show');clearTimeout(st)}
 function toast(msg='保存しました'){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
+function shortPlaceLabel(d){
+ const a=d.address||{};
+ const named=d.name && !/^\d+$/.test(d.name) ? d.name : '';
+ const objectType=d.type||'';
+ const buildingLike=['building','amenity','shop','tourism','office','leisure','historic','railway','station'].includes(objectType);
+ if(named && buildingLike) return named+'前';
+
+ const area=a.neighbourhood||a.quarter||a.suburb||a.city_district||a.village||a.town||'';
+ if(area) return area+'付近';
+
+ const road=a.road||a.pedestrian||a.residential||a.footway||'';
+ if(road) return road+'付近';
+
+ if(named) return named+'付近';
+
+ const first=(d.display_name||'').split(',')[0].trim();
+ return first ? first+'付近' : '場所取得不能';
+}
 async function reverseGeocode(lat,lon){
  try{
    const u='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=18&addressdetails=1&accept-language=ja';
    const r=await fetch(u,{headers:{'Accept':'application/json'}});
    if(!r.ok) throw new Error('reverse failed');
    const d=await r.json();
-   return d.display_name||'住所取得不能';
+   return shortPlaceLabel(d);
  }catch(e){
-   return '住所取得不能';
+   return '場所取得不能';
  }
 }
 function getVerifyLog(){
@@ -502,7 +520,7 @@ async function capturePoint(type){
    lat:p.coords.latitude,
    lon:p.coords.longitude,
    accuracy:Math.round(p.coords.accuracy||0),
-   address:'住所取得中…'
+   address:'場所を確認中…'
  };
  const log=getVerifyLog();log.unshift(rec);saveVerifyLog(log);renderVerify();
  rec.address=await reverseGeocode(rec.lat,rec.lon);
@@ -515,7 +533,7 @@ async function capturePoint(type){
 let currentRideStart=null;
 function updateRideStartUI(rec){
  if(!rec) return;
- const addr=rec.address||'住所取得中…';
+ const addr=rec.address||'場所を確認中…';
  const meta='精度 ±'+rec.accuracy+'m / '+rec.time;
  const a=document.getElementById('rideStartAddress');
  const m=document.getElementById('rideStartMeta');
@@ -534,7 +552,7 @@ async function startRideCapture(){
    lat:p.coords.latitude,
    lon:p.coords.longitude,
    accuracy:Math.round(p.coords.accuracy||0),
-   address:'住所取得中…'
+   address:'場所を確認中…'
  };
  const log=getVerifyLog();log.unshift(currentRideStart);saveVerifyLog(log);
  show('ride');
@@ -548,7 +566,7 @@ async function startRideCapture(){
 }
 async function finishRide(){
  const rec=await capturePoint('降車');
- if(rec && rec.address && rec.address!=='住所取得不能'){
+ if(rec && rec.address && rec.address!=='場所取得不能'){
    toast('降車地を記録しました');
  }else{
    toast('降車を記録しました');
@@ -563,7 +581,7 @@ function renderVerify(){
  el.innerHTML=log.map(r=>`
   <div class="verify-card">
    <div class="verify-head"><strong>${r.type}</strong><span class="badge">±${r.accuracy}m</span></div>
-   <div class="verify-address">${r.address||'住所取得中…'}</div>
+   <div class="verify-address">${r.address||'場所を確認中…'}</div>
    <div class="verify-row"><span>時刻</span><strong>${r.time}</strong></div>
    <div class="verify-row"><span>緯度経度</span><strong>${r.lat.toFixed(6)}, ${r.lon.toFixed(6)}</strong></div>
   </div>`).join('');
