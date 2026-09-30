@@ -118,8 +118,20 @@ main{position:relative;min-height:0;overflow:hidden}
 .verify-address{font-size:15px;font-weight:800;line-height:1.35}
 .verify-empty{padding:16px;text-align:center;color:var(--muted);font-size:13px}
 .smallbtn{border:1px solid #304252;background:#13212d;color:#fff;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
+.home-weather{
+ min-height:72px;display:flex;align-items:center;gap:12px;
+ padding:12px 16px;border-radius:16px;
+ background:linear-gradient(180deg,var(--panel2),var(--panel));
+ border:1px solid var(--line)
+}
+.home-weather .weather-icon{font-size:29px;line-height:1;flex:0 0 auto}
+.home-weather .weather-text{
+ font-size:20px;font-weight:700;line-height:1.2;
+ white-space:nowrap;overflow:hidden;text-overflow:clip
+}
 .home-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}
 .home-summary .card{min-height:92px}
+.home-summary .reservation-summary{grid-column:1 / -1}
 .home-actions{display:grid;grid-template-columns:1.35fr .65fr;gap:8px;height:100%}
 .home-actions .primary{width:100%}
 .vacant-center{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:18px}
@@ -219,12 +231,18 @@ main{position:relative;min-height:0;overflow:hidden}
   <div class="card">
    <div class="row"><div><div class="label">今日の概要</div><h2 style="margin:3px 0 0">営業前チェック</h2></div><span id="homeDutyBadge" class="badge">未乗務</span></div>
   </div>
+
+  <div class="home-weather">
+   <span class="weather-icon" aria-hidden="true">🌧</span>
+   <div class="weather-text">20:30頃から雨</div>
+  </div>
+
   <div class="home-summary">
-   <div class="card"><div class="label">天気</div><div class="value">晴れ</div><div class="sub">20:30頃から雨</div></div>
    <div class="card"><div class="label">JR</div><div class="value">平常</div><div class="sub">異常時に通知</div></div>
    <div class="card"><div class="label">イベント</div><div class="value">3件</div><div class="sub">夜に集中</div></div>
-   <div class="card"><div class="label">次の予約</div><div class="value">18:30</div><div class="sub">広島駅方面</div></div>
+   <div class="card reservation-summary"><div class="label">次の予約</div><div class="value">18:30</div><div class="sub">広島駅方面</div></div>
   </div>
+
   <div class="card shift-card">
    <div><div class="label">乗務時間</div><div id="homeShiftStatus" class="sub">まだ開始していません</div></div>
    <div id="homeShiftClock" class="shift-time">--:--</div>
