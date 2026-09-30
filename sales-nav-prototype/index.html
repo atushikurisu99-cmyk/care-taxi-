@@ -151,20 +151,20 @@ main{position:relative;min-height:0;overflow:hidden}
 }
 .info-card .info-top{
  font-size:18px;font-weight:900;line-height:1.15;white-space:nowrap;
- overflow:hidden;text-overflow:clip
+ overflow:hidden;text-overflow:clip;
+ display:grid;grid-template-columns:5.2em .8em minmax(0,1fr);align-items:baseline
 }
 .info-card .info-bottom{
  font-size:16px;font-weight:800;line-height:1.2;color:#dce5eb;
- display:flex;align-items:baseline;min-width:0;white-space:nowrap;
- letter-spacing:-.02em
+ display:grid;grid-template-columns:7.5em .8em minmax(0,1fr);
+ align-items:baseline;min-width:0;white-space:nowrap;letter-spacing:-.02em
 }
-.info-card .info-bottom .grow{
+.info-card .info-key,.info-card .info-left{
  min-width:0;overflow:hidden;text-overflow:clip;white-space:nowrap
 }
-.info-card .info-bottom .fixed{flex:0 0 auto;white-space:nowrap}
-.info-card .clip-name{
- display:inline-block;max-width:7.5em;overflow:hidden;
- text-overflow:clip;white-space:nowrap;vertical-align:bottom
+.info-card .info-sep{text-align:center}
+.info-card .info-main,.info-card .info-right{
+ min-width:0;overflow:hidden;text-overflow:clip;white-space:nowrap
 }
 .info-card.state-warn{border-color:#7b641e;background:linear-gradient(180deg,#261f10,#171710)}
 .info-card.state-alert{border-color:#8d3438;background:linear-gradient(180deg,#2d1719,#191214)}
@@ -298,23 +298,23 @@ main{position:relative;min-height:0;overflow:hidden}
 
   <div class="info-grid">
    <div class="info-card state-alert" onclick="showNotice('critical','!','JR 山陽線 運転見合わせ','広島〜西条 / 20:35〜',5500)">
-    <div class="info-top">JR｜見合わせ</div>
-    <div class="info-bottom"><span class="grow">山陽線 広島〜西条</span><span class="fixed">｜20:35〜</span></div>
+    <div class="info-top"><span class="info-key">JR</span><span class="info-sep">｜</span><span class="info-main">見合わせ</span></div>
+    <div class="info-bottom"><span class="info-left">山陽線 広島〜西条</span><span class="info-sep">｜</span><span class="info-right">20:35〜</span></div>
    </div>
 
    <div class="info-card">
-    <div class="info-top">バス｜広島駅方面</div>
-    <div class="info-bottom"><span class="grow">通過 3分前</span><span class="fixed">｜次便 12分後</span></div>
+    <div class="info-top"><span class="info-key">バス</span><span class="info-sep">｜</span><span class="info-main">広島駅方面</span></div>
+    <div class="info-bottom"><span class="info-left">通過 3分前</span><span class="info-sep">｜</span><span class="info-right">次便 12分後</span></div>
    </div>
 
    <div class="info-card">
-    <div class="info-top">ライブ｜3件</div>
-    <div class="info-bottom"><span class="clip-name">サザンオールスターズ</span><span class="fixed">｜17:00</span></div>
+    <div class="info-top"><span class="info-key">ライブ</span><span class="info-sep">｜</span><span class="info-main">3件</span></div>
+    <div class="info-bottom"><span class="info-left">サザンオールスターズ</span><span class="info-sep">｜</span><span class="info-right">17:00</span></div>
    </div>
 
    <div class="info-card">
-    <div class="info-top">スポーツ｜1件</div>
-    <div class="info-bottom"><span class="clip-name">広島−阪神</span><span class="fixed">｜8回裏</span></div>
+    <div class="info-top"><span class="info-key">スポーツ</span><span class="info-sep">｜</span><span class="info-main">1件</span></div>
+    <div class="info-bottom"><span class="info-left">広島−阪神</span><span class="info-sep">｜</span><span class="info-right">8回裏</span></div>
    </div>
   </div>
  </div>
