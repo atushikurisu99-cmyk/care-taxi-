@@ -238,7 +238,13 @@ main{position:relative;min-height:0;overflow:hidden}
  position:absolute;bottom:-1px;background:#171313;border:1px solid #8f3f3f;
  color:#fff;font-size:17px;font-weight:900;border-radius:999px;padding:8px 15px
 }
-@keyframes pulse{0%,100%{opacity:.55;transform:scale(.97)}50%{opacity:1;transform:scale(1.03)}}
+@keyframes safetyBlink{
+ 0%{opacity:.28}
+ 25%{opacity:1}
+ 50%{opacity:.28}
+ 75%{opacity:1}
+ 100%{opacity:.28}
+}
 
 /* save confirmation */
 .toast{position:fixed;z-index:90;left:50%;bottom:calc(var(--nav) + 16px);transform:translateX(-50%);background:#e9f7ef;color:#174c31;border:1px solid #79b995;border-radius:14px;padding:12px 18px;font-size:15px;font-weight:900;opacity:0;pointer-events:none;transition:.2s;min-width:190px;text-align:center}
