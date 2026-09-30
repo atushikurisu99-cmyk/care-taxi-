@@ -142,28 +142,31 @@ main{position:relative;min-height:0;overflow:hidden}
  font-size:21px;font-weight:700;line-height:1.2;white-space:nowrap;
  overflow:hidden;text-overflow:clip
 }
-.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .info-card{
- min-height:138px;padding:16px 14px;border-radius:16px;
+ min-width:0;min-height:138px;padding:16px 13px;border-radius:16px;
  background:linear-gradient(180deg,var(--panel2),var(--panel));
  border:1px solid var(--line);
  display:grid;grid-template-rows:auto auto auto;align-content:center;gap:9px;
  overflow:hidden
 }
 .info-card .info-top{
- display:flex;align-items:baseline;justify-content:space-between;gap:12px;
- min-width:0;white-space:nowrap;line-height:1.15
+ display:grid;grid-template-columns:auto minmax(0,1fr);align-items:baseline;
+ column-gap:10px;min-width:0;white-space:nowrap;line-height:1.15
 }
 .info-card .info-key{
  flex:0 0 auto;font-size:17px;font-weight:700
 }
 .info-card .info-status{
- flex:0 1 auto;min-width:0;font-size:16px;font-weight:700;
+ min-width:0;font-size:16px;font-weight:700;
  text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip
 }
 .info-card .info-middle{
  font-size:16px;font-weight:700;line-height:1.2;color:#f2f6f8;
  min-width:0;white-space:nowrap;overflow:hidden;text-overflow:clip
+}
+.info-card .name-clip{
+ display:block;max-width:7.5em;overflow:hidden;text-overflow:clip;white-space:nowrap
 }
 .info-card .info-bottom{
  font-size:15px;font-weight:700;line-height:1.2;color:#dce5eb;
@@ -318,13 +321,13 @@ main{position:relative;min-height:0;overflow:hidden}
 
    <div class="info-card">
     <div class="info-top"><span class="info-key">ライブ</span><span class="info-status">3件</span></div>
-    <div class="info-middle">サザンオールスターズ</div>
+    <div class="info-middle"><span class="name-clip">サザンオールスターズ</span></div>
     <div class="info-bottom">17:00</div>
    </div>
 
    <div class="info-card">
     <div class="info-top"><span class="info-key">スポーツ</span><span class="info-status">1件</span></div>
-    <div class="info-middle">広島−阪神</div>
+    <div class="info-middle"><span class="name-clip">広島−阪神</span></div>
     <div class="info-bottom">8回裏</div>
    </div>
   </div>
@@ -650,8 +653,6 @@ function renderVerify(){
 function clearVerify(){
  localStorage.removeItem('taxi_verify_log');renderVerify();toast('検証履歴をクリアしました');
 }
-setTimeout(()=>showNotice('info','i','イベント情報','19:00 ライブ予定あり',5500),1000);
-setTimeout(()=>showNotice('critical','!','JR 山陽線 運転見合わせ','広島〜海田市 / 需要変化に注意',6000),7600);
 startLocation();
 renderDutyUI();
 </script>
