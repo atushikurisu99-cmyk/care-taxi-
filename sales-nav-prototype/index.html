@@ -22,7 +22,13 @@ button,input{font:inherit}
 .app{width:min(430px,100%);height:100dvh;margin:auto;display:grid;grid-template-rows:var(--header) minmax(0,1fr) var(--nav);background:linear-gradient(#08131d,#071019)}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
 header h1{font-size:21px;margin:0}
+header.state-only{justify-content:flex-end}
+header.state-only h1{display:none}
 .badge{font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;background:#0f2431;border:1px solid #274052}
+header .badge{
+ font-size:17px;font-weight:800;padding:9px 16px;min-width:76px;text-align:center;
+ border-radius:999px;line-height:1.1
+}
 .map-control{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;background:#0c1721;border:1px solid #22313d;border-radius:15px}
 .map-control .left{display:flex;align-items:center;gap:9px}
 .location-status{min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:10px 13px}
@@ -407,12 +413,23 @@ main{position:relative;min-height:0;overflow:hidden}
 <script>
 const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',today:'営業情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
+function stateLabelFor(id){
+ if(id==='ride') return '実車中';
+ if(id==='payment') return '支払';
+ if(id==='vacant') return '空車';
+ return getDutyState().active ? '空車' : '未乗務';
+}
 function show(id){
  hideNotice();hideSafety();
  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
  document.getElementById(id).classList.add('active');
- document.getElementById('title').textContent=titles[id]||'タクシー営業ナビ';
- document.getElementById('badge').textContent=id==='ride'?'実車中':id==='payment'?'支払':id==='vacant'?'空車':'ホーム';
+ const header=document.querySelector('header');
+ const title=document.getElementById('title');
+ const badge=document.getElementById('badge');
+ const isHome=id==='home';
+ header.classList.toggle('state-only',!isHome);
+ title.textContent=isHome?'タクシー営業ナビ':'';
+ badge.textContent=stateLabelFor(id);
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id || (id==='vacant'&&b.dataset.target==='home')));
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
@@ -448,6 +465,9 @@ function renderDutyUI(){
  if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
  if(vs) vs.textContent=d.active?'乗務 '+formatDuration(Date.now()-d.start):'未乗務';
  if(me) me.style.display=d.active?'block':'none';
+ const active=document.querySelector('.screen.active');
+ const badge=document.getElementById('badge');
+ if(active&&badge) badge.textContent=stateLabelFor(active.id);
 }
 function handleDutyMain(){
  const d=getDutyState();
