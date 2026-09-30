@@ -129,6 +129,47 @@ main{position:relative;min-height:0;overflow:hidden}
 .ride-state-main{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .ride-state-main .ride-from{font-size:20px;font-weight:900;line-height:1.2;text-align:right;max-width:62%;white-space:nowrap;writing-mode:horizontal-tb;word-break:keep-all}
 
+/* 営業情報画面 */
+.today-content{gap:12px}
+.weather-strip{
+ min-height:78px;display:flex;align-items:center;gap:12px;
+ padding:13px 16px;border-radius:16px;
+ background:linear-gradient(180deg,var(--panel2),var(--panel));
+ border:1px solid var(--line)
+}
+.weather-strip .weather-icon{font-size:30px;line-height:1;flex:0 0 auto}
+.weather-strip .weather-text{
+ font-size:21px;font-weight:900;line-height:1.2;white-space:nowrap;
+ overflow:hidden;text-overflow:clip
+}
+.info-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.info-card{
+ min-height:122px;padding:16px 14px;border-radius:16px;
+ background:linear-gradient(180deg,var(--panel2),var(--panel));
+ border:1px solid var(--line);display:flex;flex-direction:column;
+ justify-content:center;gap:12px;overflow:hidden
+}
+.info-card .info-top{
+ font-size:18px;font-weight:900;line-height:1.15;white-space:nowrap;
+ overflow:hidden;text-overflow:clip
+}
+.info-card .info-bottom{
+ font-size:16px;font-weight:800;line-height:1.2;color:#dce5eb;
+ display:flex;align-items:baseline;min-width:0;white-space:nowrap;
+ letter-spacing:-.02em
+}
+.info-card .info-bottom .grow{
+ min-width:0;overflow:hidden;text-overflow:clip;white-space:nowrap
+}
+.info-card .info-bottom .fixed{flex:0 0 auto;white-space:nowrap}
+.info-card .clip-name{
+ display:inline-block;max-width:7.5em;overflow:hidden;
+ text-overflow:clip;white-space:nowrap;vertical-align:bottom
+}
+.info-card.state-warn{border-color:#7b641e;background:linear-gradient(180deg,#261f10,#171710)}
+.info-card.state-alert{border-color:#8d3438;background:linear-gradient(180deg,#2d1719,#191214)}
+.info-card.state-alert .info-top{color:#ffb0b0}
+
 /* ordinary info notification */
 .notice{position:absolute;z-index:50;left:12px;right:12px;top:10px;min-height:82px;display:none;align-items:center;gap:12px;padding:13px 15px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
 .notice.show{display:flex;animation:drop .18s ease-out}
@@ -249,15 +290,32 @@ main{position:relative;min-height:0;overflow:hidden}
 </section>
 
 <section id="today" class="screen">
- <div class="content">
-  <div class="card"><div class="row"><div><h2 style="margin:0">営業情報</h2><div class="sub">乗務前・空車中どちらからでも確認</div></div><span class="badge">詳細</span></div></div>
-  <div class="grid2">
-   <div class="card"><div class="label">ライブ・イベント</div><div class="value">3件</div><div class="sub">終了見込みあり</div></div>
-   <div class="card"><div class="label">スポーツ</div><div class="value">1件</div><div class="sub">夜に集中</div></div>
-   <div class="card"><div class="label">JR運行</div><div class="value">平常</div><div class="sub">異常時に通知</div></div>
-   <div class="card"><div class="label">バス</div><div class="value">平常</div><div class="sub">遅延なし</div></div>
-   <div class="card"><div class="label">天気</div><div class="value">晴れ</div><div class="sub">20:30頃から雨</div></div>
-   <div class="card"><div class="label">本日の売上</div><div class="value">26,800円</div><div class="sub">12回 / 平均2,233円</div></div>
+ <div class="content today-content">
+  <div class="weather-strip">
+   <span class="weather-icon" aria-hidden="true">🌧</span>
+   <div class="weather-text">20:30頃から雨</div>
+  </div>
+
+  <div class="info-grid">
+   <div class="info-card state-alert" onclick="showNotice('critical','!','JR 山陽線 運転見合わせ','広島〜西条 / 20:35〜',5500)">
+    <div class="info-top">JR｜見合わせ</div>
+    <div class="info-bottom"><span class="grow">山陽線 広島〜西条</span><span class="fixed">｜20:35〜</span></div>
+   </div>
+
+   <div class="info-card">
+    <div class="info-top">バス｜広島駅方面</div>
+    <div class="info-bottom"><span class="grow">通過 3分前</span><span class="fixed">｜次便 12分後</span></div>
+   </div>
+
+   <div class="info-card">
+    <div class="info-top">ライブ｜3件</div>
+    <div class="info-bottom"><span class="clip-name">サザンオールスターズ</span><span class="fixed">｜17:00</span></div>
+   </div>
+
+   <div class="info-card">
+    <div class="info-top">スポーツ｜1件</div>
+    <div class="info-bottom"><span class="clip-name">広島−阪神</span><span class="fixed">｜8回裏</span></div>
+   </div>
   </div>
  </div>
  <div class="action"><button class="primary secondary info-back" onclick="backFromInfo()">戻る</button></div>
