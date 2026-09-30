@@ -486,13 +486,29 @@ function show(id){
  renderDutyUI();
 }
 let infoReturn='home';
+let dutyFallback={active:false,start:0};
 function getDutyState(){
  try{
-  return {
-   active:localStorage.getItem('taxi_duty_active')==='1',
-   start:Number(localStorage.getItem('taxi_duty_start')||0)
-  };
- }catch(e){return {active:false,start:0}}
+  const active=localStorage.getItem('taxi_duty_active')==='1';
+  const start=Number(localStorage.getItem('taxi_duty_start')||0);
+  if(active&&start>0) dutyFallback={active:true,start};
+  else if(!active) dutyFallback={active:false,start:0};
+  return {active,start};
+ }catch(e){
+  return dutyFallback;
+ }
+}
+function saveDutyState(active,start=0){
+ dutyFallback={active:!!active,start:active?start:0};
+ try{
+  if(active){
+   localStorage.setItem('taxi_duty_active','1');
+   localStorage.setItem('taxi_duty_start',String(start));
+  }else{
+   localStorage.removeItem('taxi_duty_active');
+   localStorage.removeItem('taxi_duty_start');
+  }
+ }catch(e){}
 }
 function formatDuration(ms){
  const m=Math.max(0,Math.floor(ms/60000));
@@ -520,21 +536,22 @@ function renderDutyUI(){
 function handleDutyMain(){
  const d=getDutyState();
  if(d.active){show('vacant');return}
- localStorage.setItem('taxi_duty_active','1');
- localStorage.setItem('taxi_duty_start',String(Date.now()));
+ const startedAt=Date.now();
+ saveDutyState(true,startedAt);
+ show('vacant');
  toast('乗務を開始しました');
  renderDutyUI();
- setTimeout(()=>show('vacant'),350);
 }
 function endDuty(){
  const d=getDutyState();
  if(!d.active){show('home');return}
  const dur=formatDuration(Date.now()-d.start);
  if(!confirm('乗務を終了しますか？\n乗務時間 '+dur)) return;
- localStorage.setItem('taxi_last_duty_end',String(Date.now()));
- localStorage.setItem('taxi_last_duty_duration',dur);
- localStorage.removeItem('taxi_duty_active');
- localStorage.removeItem('taxi_duty_start');
+ try{
+  localStorage.setItem('taxi_last_duty_end',String(Date.now()));
+  localStorage.setItem('taxi_last_duty_duration',dur);
+ }catch(e){}
+ saveDutyState(false);
  currentRideStart=null;
  toast('乗務を終了しました');
  renderDutyUI();
