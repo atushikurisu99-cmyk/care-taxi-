@@ -166,6 +166,8 @@ main{position:relative;min-height:0;overflow:hidden}
 .info-card .info-main,.info-card .info-right{
  min-width:0;overflow:hidden;text-overflow:clip;white-space:nowrap
 }
+.info-card .bus-bottom{font-size:15px;letter-spacing:-.04em}
+.info-card .bus-bottom{grid-template-columns:6.45em .5em minmax(0,1fr)}
 .info-card.state-warn{border-color:#7b641e;background:linear-gradient(180deg,#261f10,#171710)}
 .info-card.state-alert{border-color:#8d3438;background:linear-gradient(180deg,#2d1719,#191214)}
 .info-card.state-alert .info-top{color:#ffb0b0}
@@ -304,7 +306,7 @@ main{position:relative;min-height:0;overflow:hidden}
 
    <div class="info-card">
     <div class="info-top"><span class="info-key">バス</span><span class="info-sep">｜</span><span class="info-main">広島駅方面</span></div>
-    <div class="info-bottom"><span class="info-left">通過 3分前</span><span class="info-sep">｜</span><span class="info-right">次便 12分後</span></div>
+    <div class="info-bottom bus-bottom"><span class="info-left">通過 3分前</span><span class="info-sep">｜</span><span class="info-right">次便 12分後</span></div>
    </div>
 
    <div class="info-card">
