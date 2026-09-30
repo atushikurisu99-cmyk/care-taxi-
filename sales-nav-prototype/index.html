@@ -147,10 +147,25 @@ main{position:relative;min-height:0;overflow:hidden}
 .shift-card .shift-time{font-size:20px;font-weight:800}
 .home-actions{display:grid;grid-template-columns:1.35fr .65fr;gap:8px;height:100%}
 .home-actions .primary{width:100%}
-.vacant-center{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:18px}
-.vacant-status{text-align:left;padding:2px 4px}
-.vacant-status .big{font-size:25px;font-weight:1000}
-.vacant-status .sub{margin-top:4px;font-size:14px}
+.vacant-center{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:20px}
+.vacant-summary{
+ width:100%;display:flex;flex-direction:column;gap:10px
+}
+.vacant-summary-row{
+ min-height:68px;display:flex;align-items:center;justify-content:space-between;gap:14px;
+ padding:13px 15px;border:1px solid #22313d;border-radius:15px;background:#0c1721
+}
+.vacant-summary-row .k{
+ font-size:13px;font-weight:700;color:var(--muted);white-space:nowrap
+}
+.vacant-summary-row .v{
+ min-width:0;font-size:18px;font-weight:800;color:var(--text);
+ text-align:right;white-space:nowrap;overflow:hidden;text-overflow:clip
+}
+.vacant-summary-row.reservation-row .v{font-size:17px}
+.vacant-quiet-note{
+ margin-top:12px;text-align:center;color:#667985;font-size:12px
+}
 .menuitem.danger{color:#ff9b9f}
 .info-back{min-height:54px}
 .shift-card{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -270,10 +285,21 @@ main{position:relative;min-height:0;overflow:hidden}
 <section id="vacant" class="screen">
  <div class="content">
   <div class="vacant-center">
-   <div class="vacant-status">
-    <div class="big">空車</div>
-    <div id="vacantShiftTime" class="sub">乗務中</div>
+   <div class="vacant-summary">
+    <div class="vacant-summary-row">
+     <span class="k">乗務</span>
+     <span id="vacantShiftTime" class="v">0時間00分</span>
+    </div>
+    <div class="vacant-summary-row">
+     <span class="k">現在地</span>
+     <span id="vacantArea" class="v">取得中…</span>
+    </div>
+    <div class="vacant-summary-row reservation-row">
+     <span class="k">次の予約</span>
+     <span class="v">18:30　広島駅方面</span>
+    </div>
    </div>
+   <div class="vacant-quiet-note">必要な情報だけ表示</div>
   </div>
  </div>
  <div class="action"><button class="primary" onclick="startRideCapture()">乗車</button></div>
@@ -463,7 +489,7 @@ function renderDutyUI(){
  if(hs) hs.textContent=d.active?'乗務開始 '+new Date(d.start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'まだ開始していません';
  if(hc) hc.textContent=d.active?formatDuration(Date.now()-d.start):'--:--';
  if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
- if(vs) vs.textContent=d.active?'乗務 '+formatDuration(Date.now()-d.start):'未乗務';
+ if(vs) vs.textContent=d.active?formatDuration(Date.now()-d.start):'未乗務';
  if(me) me.style.display=d.active?'block':'none';
  const active=document.querySelector('.screen.active');
  const badge=document.getElementById('badge');
@@ -507,6 +533,8 @@ setInterval(renderDutyUI,30000);
 
 let geoWatchId=null;
 let latestPosition=null;
+let vacantAreaLookupAt=0;
+let vacantAreaLookupBusy=false;
 
 function setLocationUI(state, detail, cls=''){
  const title=document.getElementById('locTitle');
@@ -533,9 +561,29 @@ function handlePosition(pos){
  if(a<=25) setLocationUI('位置情報OK','精度 ±'+a+'m','good');
  else if(a<=60) setLocationUI('位置情報 低精度','精度 ±'+a+'m','warn');
  else setLocationUI('位置情報 低精度','精度 ±'+a+'m・判定保留','warn');
+ updateVacantArea(pos);
+}
+
+async function updateVacantArea(pos){
+ const el=document.getElementById('vacantArea');
+ if(!el||vacantAreaLookupBusy) return;
+ const now=Date.now();
+ if(now-vacantAreaLookupAt<300000) return;
+ vacantAreaLookupAt=now;
+ vacantAreaLookupBusy=true;
+ try{
+  const label=await reverseGeocode(pos.coords.latitude,pos.coords.longitude);
+  el.textContent=label&&label!=='場所取得不能'?label:'判定不能';
+ }catch(e){
+  el.textContent='判定不能';
+ }finally{
+  vacantAreaLookupBusy=false;
+ }
 }
 
 function handleLocationError(err){
+ const area=document.getElementById('vacantArea');
+ if(area) area.textContent='判定不能';
  if(err && err.code===1) setLocationUI('位置情報OFF','タップして許可を確認','bad');
  else if(err && err.code===2) setLocationUI('位置情報 取得不能','現在地を取得できません','bad');
  else if(err && err.code===3) setLocationUI('位置情報 取得遅延','再取得しています','warn');
