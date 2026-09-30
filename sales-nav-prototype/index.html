@@ -145,8 +145,8 @@ main{position:relative;min-height:0;overflow:hidden}
 .shift-card .label{font-size:15px}
 .shift-card .sub{font-size:14px}
 .shift-card .shift-time{font-size:20px;font-weight:800}
-.home-actions{display:grid;grid-template-columns:1.35fr .65fr;gap:8px;height:100%}
-.home-actions .primary{width:100%}
+.home-actions{display:block;height:100%}
+.home-actions .primary{width:100%;height:100%}
 .vacant-center{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:20px}
 .vacant-summary{
  width:100%;display:flex;flex-direction:column;gap:10px
@@ -300,7 +300,6 @@ main{position:relative;min-height:0;overflow:hidden}
  </div>
  <div class="action home-actions">
   <button id="dutyMainButton" class="primary" onclick="handleDutyMain()">乗務開始</button>
-  <button class="primary secondary" onclick="openInfo('home')">情報</button>
  </div>
 </section>
 
@@ -617,6 +616,7 @@ async function updateVacantArea(pos){
  try{
   const label=await reverseGeocode(pos.coords.latitude,pos.coords.longitude);
   el.textContent=label&&label!=='場所取得不能'?label:'判定不能';
+  if(el.textContent==='判定不能') vacantAreaLookupAt=0;
  }catch(e){
   el.textContent='判定不能';
  }finally{
@@ -684,16 +684,38 @@ function shortPlaceLabel(d){
  const first=(d.display_name||'').split(',')[0].trim();
  return first || '場所取得不能';
 }
-async function reverseGeocode(lat,lon){
+async function fetchJsonWithTimeout(url,ms=4500){
+ const controller=new AbortController();
+ const timer=setTimeout(()=>controller.abort(),ms);
  try{
-   const u='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=18&addressdetails=1&accept-language=ja';
-   const r=await fetch(u,{headers:{'Accept':'application/json'}});
-   if(!r.ok) throw new Error('reverse failed');
-   const d=await r.json();
-   return shortPlaceLabel(d);
- }catch(e){
-   return '場所取得不能';
+  const r=await fetch(url,{headers:{'Accept':'application/json'},signal:controller.signal,cache:'no-store'});
+  if(!r.ok) throw new Error('http '+r.status);
+  return await r.json();
+ }finally{
+  clearTimeout(timer);
  }
+}
+function shortPlaceLabelFallback(d){
+ const locality=d.locality||d.city||d.principalSubdivision||'';
+ const postcode=d.postcode||'';
+ return locality || postcode || '';
+}
+async function reverseGeocode(lat,lon){
+ const n='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=18&addressdetails=1&accept-language=ja';
+ try{
+  const d=await fetchJsonWithTimeout(n,4500);
+  const label=shortPlaceLabel(d);
+  if(label && label!=='場所取得不能') return label;
+ }catch(e){}
+
+ const b='https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&localityLanguage=ja';
+ try{
+  const d=await fetchJsonWithTimeout(b,4500);
+  const label=shortPlaceLabelFallback(d);
+  if(label) return label;
+ }catch(e){}
+
+ return '判定不能';
 }
 function getVerifyLog(){
  try{return JSON.parse(localStorage.getItem('taxi_verify_log')||'[]')}catch(e){return[]}
@@ -792,14 +814,42 @@ async function startRideCapture(){
  }
 }
 async function finishRide(){
- const rec=await capturePoint('降車');
- if(rec && rec.address && rec.address!=='場所取得不能'){
-   toast('降車地を記録しました');
- }else{
-   toast('降車を記録しました');
- }
+ const rideBeforeFinish=currentRideStart;
  currentRideStart=null;
- setTimeout(()=>show(getDutyState().active?'vacant':'home'),700);
+
+ // 降車操作は位置取得・住所変換を待たず即時反映。
+ show(getDutyState().active?'vacant':'home');
+ toast('降車しました');
+
+ const recordDropoff=async(p)=>{
+  const rec={
+   type:'降車',
+   time:new Date().toLocaleString('ja-JP',{hour12:false}),
+   lat:p.coords.latitude,
+   lon:p.coords.longitude,
+   accuracy:Math.round(p.coords.accuracy||0),
+   address:'場所を確認中…'
+  };
+  const log=getVerifyLog();
+  log.unshift(rec);
+  saveVerifyLog(log);
+
+  rec.address=await reverseGeocode(rec.lat,rec.lon);
+  const log2=getVerifyLog();
+  const idx=log2.findIndex(x=>x.type==='降車'&&x.time===rec.time);
+  if(idx>=0){log2[idx]=rec;saveVerifyLog(log2)}
+  renderVerify();
+ };
+
+ if(latestPosition){
+  recordDropoff(latestPosition);
+ }else if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(
+   p=>{latestPosition=p;recordDropoff(p)},
+   ()=>{},
+   {enableHighAccuracy:true,maximumAge:0,timeout:10000}
+  );
+ }
 }
 function renderVerify(){
  const el=document.getElementById('verifyList');if(!el)return;
