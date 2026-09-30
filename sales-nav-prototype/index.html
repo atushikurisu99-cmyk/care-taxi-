@@ -135,17 +135,6 @@ main{position:relative;min-height:0;overflow:hidden}
 
 /* 営業情報画面 */
 .today-content{gap:12px}
-.weather-strip{
- min-height:78px;display:flex;align-items:center;gap:12px;
- padding:13px 16px;border-radius:16px;
- background:linear-gradient(180deg,var(--panel2),var(--panel));
- border:1px solid var(--line)
-}
-.weather-strip .weather-icon{font-size:30px;line-height:1;flex:0 0 auto}
-.weather-strip .weather-text{
- font-size:21px;font-weight:700;line-height:1.2;white-space:nowrap;
- overflow:hidden;text-overflow:clip
-}
 .info-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .info-card{
  min-width:0;min-height:138px;padding:16px 13px;border-radius:16px;
@@ -305,11 +294,6 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="today" class="screen">
  <div class="content today-content">
-  <div class="weather-strip">
-   <span class="weather-icon" aria-hidden="true">🌧</span>
-   <div class="weather-text">20:30頃から雨</div>
-  </div>
-
   <div class="info-grid">
    <div class="info-card state-alert" onclick="showNotice('critical','!','JR 山陽本線 運転見合わせ','広島〜西条 / 20:35〜',5500)">
     <div class="info-top"><span class="info-key">JR</span><span class="info-status">見合わせ</span></div>
