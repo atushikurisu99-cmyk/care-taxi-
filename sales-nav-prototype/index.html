@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1828 -->
+<!-- BUILD:2026-10-01-UI-RECOVERY-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -20,19 +20,9 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
 body{position:fixed;inset:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:var(--text);touch-action:manipulation}
 button,input{font:inherit}
 .app{width:min(430px,100%);height:100dvh;margin:auto;display:grid;grid-template-rows:var(--header) minmax(0,1fr) var(--nav);background:linear-gradient(#08131d,#071019)}
-.app.header-collapsed{grid-template-rows:0 minmax(0,1fr) var(--nav)}
 .app>header{grid-row:1}
 .app>main{grid-row:2}
 .app>nav{grid-row:3}
-.app.header-collapsed header{
- display:flex;
- height:0;
- min-height:0;
- padding:0;
- border:0;
- overflow:hidden;
- visibility:hidden;
-}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
 header h1{font-size:21px;margin:0}
 header.state-only{justify-content:flex-end}
@@ -82,13 +72,38 @@ main{position:relative;min-height:0;overflow:hidden}
 .reservation{min-height:86px;display:flex;align-items:center;justify-content:space-between;background:#0c1721;border:1px solid #22313d;border-radius:16px;padding:13px 15px}
 .reservation strong{display:block;font-size:28px;line-height:1}
 .chev{font-size:26px;color:#80919e}
-.action{display:flex;gap:8px}
-.primary{flex:1;border:none;border-radius:16px;background:var(--blue);color:white;font-size:24px;font-weight:900}
+.action{display:flex;gap:8px;position:relative;z-index:10;pointer-events:auto}
+.primary{flex:1;border:none;border-radius:16px;background:var(--blue);color:white;font-size:24px;font-weight:900;touch-action:manipulation;pointer-events:auto}
 .primary.pay{background:#f08a24}
 .primary.secondary{background:#12212d;border:1px solid #2a3a47;color:white}
 .primary.danger{background:#7f5555}
-.nav{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #1a2833;background:#09131d;padding:5px 4px calc(5px + env(safe-area-inset-bottom))}
-.nav button{border:0;background:transparent;color:#8d9ca7;font-size:10px;border-radius:12px}
+.nav{
+ display:grid;
+ grid-template-columns:repeat(5,minmax(0,1fr));
+ grid-template-rows:1fr;
+ height:var(--nav);
+ min-height:var(--nav);
+ max-height:var(--nav);
+ align-items:stretch;
+ border-top:1px solid #1a2833;
+ background:#09131d;
+ padding:5px 4px calc(5px + env(safe-area-inset-bottom));
+ overflow:hidden;
+ z-index:20
+}
+.nav button{
+ border:0;
+ background:transparent;
+ color:#8d9ca7;
+ font-size:10px;
+ border-radius:12px;
+ min-width:0;
+ min-height:0;
+ height:100%;
+ max-height:100%;
+ padding:2px 0;
+ overflow:hidden
+}
 .nav button b{display:block;font-size:18px;margin-bottom:2px}
 .nav button.active{background:#112739;color:#71b0ff;font-weight:800}
 .mapcard{flex:1;min-height:210px;border-radius:18px;border:1px solid #1d2d38;background:
@@ -736,6 +751,36 @@ input,textarea,select{
  font-size:16px;
  touch-action:manipulation;
 }
+/* stable iPhone shell v4 */
+html,body{
+ overscroll-behavior:none;
+ -webkit-text-size-adjust:100%;
+}
+.app{
+ overflow:hidden;
+}
+.app>header,
+.app>main,
+.app>nav{
+ min-width:0;
+ width:100%;
+}
+.app>main{
+ overflow:hidden;
+ z-index:1;
+}
+.screen{
+ min-height:0;
+}
+.action,
+.action button,
+.nav,
+.nav button{
+ -webkit-user-select:none;
+ user-select:none;
+ -webkit-tap-highlight-color:transparent;
+ touch-action:manipulation;
+}
 </style>
 </head>
 <body>
@@ -1067,18 +1112,12 @@ input,textarea,select{
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
-function preventIosDoubleTapZoom(){
- let lastTouchEnd=0;
- document.addEventListener('touchend',function(e){
-  const now=Date.now();
-  if(now-lastTouchEnd<=300){
-   const t=e.target;
-   if(t && !['INPUT','TEXTAREA','SELECT'].includes(t.tagName)) e.preventDefault();
-  }
-  lastTouchEnd=now;
- },{passive:false});
+function preventIosPinchZoom(){
+ ['gesturestart','gesturechange','gestureend'].forEach(type=>{
+  document.addEventListener(type,e=>e.preventDefault(),{passive:false});
+ });
 }
-preventIosDoubleTapZoom();
+preventIosPinchZoom();
 
 const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
@@ -1096,9 +1135,9 @@ function show(id){
  const title=document.getElementById('title');
  const badge=document.getElementById('badge');
  const isHome=id==='home';
- header.classList.toggle('state-only',!isHome);
- document.querySelector('.app')?.classList.toggle('header-collapsed',!isHome);
- title.textContent=isHome?'タクシー営業ナビ':'';
+ header.classList.remove('state-only');
+ document.querySelector('.app')?.classList.remove('header-collapsed');
+ title.textContent=isHome?'タクシー営業ナビ':(titles[id]||'タクシー営業ナビ');
  badge.style.display=isHome?'':'none';
  if(isHome) badge.textContent=stateLabelFor(id);
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id || (id==='vacant'&&b.dataset.target==='home')));
