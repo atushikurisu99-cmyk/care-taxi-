@@ -8,7 +8,7 @@ on:
       - ".github/workflows/probe-jrwest-higashima.yml"
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   probe:
@@ -30,6 +30,19 @@ jobs:
               if x["train_count"]:
                   print(x["code"], x["name"], x["train_count"], "trains")
           PY
+      - name: Publish temporary UI snapshot
+        run: |
+          mkdir -p sales-nav-prototype/data
+          cp tmp/jrwest-higashima-probe.json sales-nav-prototype/data/jrwest-higashima-probe.json
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sales-nav-prototype/data/jrwest-higashima-probe.json
+          if git diff --cached --quiet; then
+            echo "No snapshot change"
+          else
+            git commit -m "Update JR West technical probe snapshot"
+            git push
+          fi
       - name: Upload temporary probe result
         uses: actions/upload-artifact@v4
         with:
