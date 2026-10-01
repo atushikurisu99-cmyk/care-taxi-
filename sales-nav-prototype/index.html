@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1725 -->
+<!-- BUILD:2026-10-01-1805 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -124,6 +124,26 @@ main{position:relative;min-height:0;overflow:hidden}
 .verify-address{font-size:15px;font-weight:800;line-height:1.35}
 .verify-empty{padding:16px;text-align:center;color:var(--muted);font-size:13px}
 .smallbtn{border:1px solid #304252;background:#13212d;color:#fff;border-radius:10px;padding:8px 10px;font-size:12px;font-weight:800}
+.reservation-empty{flex:1;display:flex;align-items:center;justify-content:center;text-align:center;color:var(--muted);font-size:14px;line-height:1.6;padding:24px}
+.reservation-list{display:flex;flex-direction:column;gap:8px;overflow:auto}
+.reservation-item{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
+.reservation-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
+.reservation-item-time{font-size:22px;font-weight:900;line-height:1.1}
+.reservation-item-place{font-size:16px;font-weight:800;margin-top:6px}
+.reservation-item-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.reservation-form{display:flex;flex-direction:column;gap:11px;overflow:auto;padding-bottom:4px}
+.form-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
+.form-label{font-size:13px;color:var(--muted);font-weight:800;margin-bottom:7px}
+.form-input,.form-textarea{width:100%;box-sizing:border-box;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:12px;padding:12px 13px;font-size:16px;outline:none}
+.form-input:focus,.form-textarea:focus{border-color:#4c91ff}
+.form-textarea{min-height:82px;resize:none}
+.form-row2{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.form-toggle{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+.form-toggle button{min-height:44px;border-radius:11px;border:1px solid #30404d;background:#101c26;color:#95a5b1;font-size:14px;font-weight:800}
+.form-toggle button.active{background:#163a5c;border-color:#398cff;color:#fff}
+.form-actions{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px}
+.form-actions .primary{min-height:58px;font-size:20px}
+.hidden{display:none!important}
 .home-weather{
  min-height:72px;display:flex;align-items:center;gap:12px;
  padding:12px 16px;border-radius:16px;
@@ -294,7 +314,7 @@ main{position:relative;min-height:0;overflow:hidden}
   <div class="home-summary">
    <div class="card"><div class="label">JR</div><div class="value">平常</div><div class="sub">異常時に通知</div></div>
    <div class="card"><div class="label">イベント</div><div class="value">3件</div><div class="sub">夜に集中</div></div>
-   <div class="card reservation-summary"><div class="label">次の予約</div><div class="value">18:30</div><div class="sub">広島駅方面</div></div>
+   <div class="card reservation-summary" onclick="show('schedule')"><div class="label">次の予約</div><div id="homeReservationValue" class="value">なし</div><div id="homeReservationSub" class="sub">タップして予約を登録</div></div>
   </div>
 
   <div class="card shift-card">
@@ -319,9 +339,9 @@ main{position:relative;min-height:0;overflow:hidden}
      <span class="k">現在地</span>
      <span id="vacantArea" class="v">取得中…</span>
     </div>
-    <div class="vacant-summary-row reservation-row">
+    <div class="vacant-summary-row reservation-row" onclick="show('schedule')">
      <span class="k">次の予約</span>
-     <span class="v">18:30　広島駅方面</span>
+     <span id="vacantReservationValue" class="v">なし</span>
     </div>
    </div>
    <div class="vacant-quiet-note">必要な情報だけ表示</div>
@@ -339,7 +359,7 @@ main{position:relative;min-height:0;overflow:hidden}
    </div>
   </div>
 
-  <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
+  <div id="rideReservationCard" class="reservation hidden" onclick="show('schedule')"><div><div class="label">予約</div><strong>予約あり</strong><div id="rideReservationSub" class="sub"></div></div><span class="chev">›</span></div>
 
   <div class="drive-note">通知は必要な時だけ重ねて表示</div>
  </div>
@@ -364,14 +384,67 @@ main{position:relative;min-height:0;overflow:hidden}
 
 <section id="schedule" class="screen">
  <div class="content">
-  <div class="segment"><button class="active">すべて</button><button>時間あり</button><button>時間なし</button></div>
-  <div class="list">
-   <div class="listitem"><div class="time">10:00</div><div><strong><span class="dot"></span>広島駅</strong><div class="sub">→ 広島空港</div></div><span class="badge">時間指定</span></div>
-   <div class="listitem"><div class="time">未定</div><div><strong><span class="dot"></span>中区</strong><div class="sub">市内迎え</div></div><span class="badge">時間なし</span></div>
-   <div class="listitem"><div class="time">17:30</div><div><strong><span class="dot"></span>平和公園</strong><div class="sub">→ ホテルグランヴィア</div></div><span class="badge">時間指定</span></div>
+  <div id="reservationEmpty" class="reservation-empty">
+   予約はまだありません。<br>下のボタンから登録できます。
+  </div>
+  <div id="reservationList" class="reservation-list"></div>
+ </div>
+ <div class="action"><button class="primary" onclick="openReservationEditor()">＋ 予約を追加</button></div>
+</section>
+
+<section id="reservationEdit" class="screen">
+ <div class="content reservation-form">
+  <div class="card"><h2 style="margin:0">予約を追加</h2><div class="sub">必要な項目だけ入力</div></div>
+
+  <div class="form-card">
+   <div class="form-label">時間指定</div>
+   <div class="form-toggle">
+    <button id="resTimedYes" class="active" type="button" onclick="setReservationTimed(true)">あり</button>
+    <button id="resTimedNo" type="button" onclick="setReservationTimed(false)">なし</button>
+   </div>
+  </div>
+
+  <div class="form-row2">
+   <div class="form-card">
+    <div class="form-label">日付</div>
+    <input id="resDate" class="form-input" type="date">
+   </div>
+   <div id="resTimeWrap" class="form-card">
+    <div class="form-label">時刻</div>
+    <input id="resTime" class="form-input" type="time">
+   </div>
+  </div>
+
+  <div class="form-card">
+   <div class="form-label">お迎え場所 <span style="color:#ff9b9f">必須</span></div>
+   <input id="resPickup" class="form-input" type="text" placeholder="例：広島駅 新幹線口" autocomplete="off">
+  </div>
+
+  <div class="form-card">
+   <div class="form-label">行き先</div>
+   <input id="resDestination" class="form-input" type="text" placeholder="未定なら空欄でOK" autocomplete="off">
+  </div>
+
+  <div class="form-row2">
+   <div class="form-card">
+    <div class="form-label">お名前</div>
+    <input id="resName" class="form-input" type="text" placeholder="任意" autocomplete="off">
+   </div>
+   <div class="form-card">
+    <div class="form-label">電話番号</div>
+    <input id="resPhone" class="form-input" type="tel" placeholder="任意" inputmode="tel">
+   </div>
+  </div>
+
+  <div class="form-card">
+   <div class="form-label">メモ</div>
+   <textarea id="resMemo" class="form-textarea" placeholder="目印・人数・荷物など"></textarea>
   </div>
  </div>
- <div class="action"><button class="primary">＋ 予約を追加</button></div>
+ <div class="action form-actions">
+  <button class="primary secondary" onclick="show('schedule')">戻る</button>
+  <button class="primary" onclick="saveReservation()">保存</button>
+ </div>
 </section>
 
 <section id="today" class="screen">
@@ -470,7 +543,7 @@ main{position:relative;min-height:0;overflow:hidden}
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',today:'営業情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',today:'営業情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -493,9 +566,113 @@ function show(id){
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id || (id==='vacant'&&b.dataset.target==='home')));
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
+ if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
  renderDutyUI();
+}
+let reservationTimed=true;
+function getReservations(){
+ try{
+  const v=JSON.parse(localStorage.getItem('taxi_reservations')||'[]');
+  return Array.isArray(v)?v:[];
+ }catch(e){return[]}
+}
+function saveReservations(v){
+ localStorage.setItem('taxi_reservations',JSON.stringify(v));
+}
+function localDateValue(d=new Date()){
+ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+ return y+'-'+m+'-'+day;
+}
+function setReservationTimed(v){
+ reservationTimed=!!v;
+ document.getElementById('resTimedYes')?.classList.toggle('active',reservationTimed);
+ document.getElementById('resTimedNo')?.classList.toggle('active',!reservationTimed);
+ document.getElementById('resTimeWrap')?.classList.toggle('hidden',!reservationTimed);
+}
+function openReservationEditor(){
+ const ids=['resPickup','resDestination','resName','resPhone','resMemo','resTime'];
+ ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
+ const date=document.getElementById('resDate');if(date)date.value=localDateValue();
+ setReservationTimed(true);
+ show('reservationEdit');
+}
+function reservationSortKey(r){
+ const date=r.date||'9999-12-31';
+ const time=r.timed?(r.time||'23:59'):'23:59';
+ return date+'T'+time;
+}
+function nextReservation(){
+ const now=new Date();
+ const today=localDateValue(now);
+ const nowTime=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+ return getReservations()
+  .filter(r=>r.date>today || r.date===today && (!r.timed || (r.time||'23:59')>=nowTime))
+  .sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)))[0]||null;
+}
+function escapeHtml(v){
+ return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
+}
+function renderReservations(){
+ const all=getReservations().sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+ const list=document.getElementById('reservationList');
+ const empty=document.getElementById('reservationEmpty');
+ if(list){
+  list.innerHTML=all.map(r=>{
+   const t=r.timed&&r.time?r.time:'時間なし';
+   const dest=r.destination?' → '+escapeHtml(r.destination):'';
+   const person=r.name?escapeHtml(r.name):'';
+   return '<div class="reservation-item">'+
+    '<div class="reservation-item-top"><div><div class="reservation-item-time">'+escapeHtml(t)+'</div>'+
+    '<div class="reservation-item-place">'+escapeHtml(r.pickup)+dest+'</div>'+
+    '<div class="reservation-item-sub">'+escapeHtml(r.date)+(person?' / '+person:'')+'</div></div>'+
+    '<button class="smallbtn" onclick="deleteReservation(\''+r.id+'\')">削除</button></div></div>';
+  }).join('');
+ }
+ if(empty) empty.style.display=all.length?'none':'flex';
+
+ const n=nextReservation();
+ const hv=document.getElementById('homeReservationValue');
+ const hs=document.getElementById('homeReservationSub');
+ if(hv) hv.textContent=n?(n.timed&&n.time?n.time:'時間なし'):'なし';
+ if(hs) hs.textContent=n?n.pickup:'タップして予約を登録';
+
+ const vv=document.getElementById('vacantReservationValue');
+ if(vv) vv.textContent=n?((n.timed&&n.time?n.time+'　':'')+n.pickup):'なし';
+
+ const ride=document.getElementById('rideReservationCard');
+ const rideSub=document.getElementById('rideReservationSub');
+ if(ride) ride.classList.toggle('hidden',!n);
+ if(rideSub) rideSub.textContent=n?(n.timed&&n.time?n.time+' / '+n.pickup:n.pickup):'';
+}
+function saveReservation(){
+ const date=document.getElementById('resDate')?.value||'';
+ const time=document.getElementById('resTime')?.value||'';
+ const pickup=(document.getElementById('resPickup')?.value||'').trim();
+ if(!date){toast('日付を入力してください');return}
+ if(reservationTimed&&!time){toast('時刻を入力してください');return}
+ if(!pickup){toast('お迎え場所を入力してください');return}
+ const r={
+  id:'r'+Date.now(),
+  date,
+  timed:reservationTimed,
+  time:reservationTimed?time:'',
+  pickup,
+  destination:(document.getElementById('resDestination')?.value||'').trim(),
+  name:(document.getElementById('resName')?.value||'').trim(),
+  phone:(document.getElementById('resPhone')?.value||'').trim(),
+  memo:(document.getElementById('resMemo')?.value||'').trim(),
+  createdAt:Date.now()
+ };
+ const all=getReservations();all.push(r);saveReservations(all);
+ renderReservations();
+ show('schedule');
+}
+function deleteReservation(id){
+ if(!confirm('この予約を削除しますか？')) return;
+ saveReservations(getReservations().filter(r=>r.id!==id));
+ renderReservations();
 }
 let infoReturn='home';
 let dutyFallback={active:false,start:0};
@@ -1365,6 +1542,7 @@ loadJarticSpeedData();
 startLocation();
 renderDutyUI();
 renderDutyDistance();
+renderReservations();
 </script>
 </body>
 </html>
