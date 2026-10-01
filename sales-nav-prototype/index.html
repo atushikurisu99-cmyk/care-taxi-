@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1525 -->
+<!-- BUILD:2026-10-01-1545 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -428,7 +428,7 @@ main{position:relative;min-height:0;overflow:hidden}
 <section id="verify" class="screen">
  <div class="content">
   <div class="card">
-   <div class="row"><div><h2 style="margin:0">位置精度検証</h2><div class="sub">表示は町名のみ／緯度経度は保存</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
+   <div class="row"><div><h2 style="margin:0">位置・警告検証</h2><div class="sub">GPSと30km/h警告の判定履歴を確認</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
   </div>
   <div id="verifyList" class="list"></div>
  </div>
@@ -443,7 +443,7 @@ main{position:relative;min-height:0;overflow:hidden}
    <div class="menuitem" onclick="show('today')">＋ 本日の情報</div>
    <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
-   <div class="menuitem" onclick="show('verify')">◎ 位置精度検証</div>
+   <div class="menuitem" onclick="show('verify')">◎ 位置・警告検証</div>
    <div class="menuitem">⚙ 設定</div>
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()">■ 乗務終了</div>
   </div>
@@ -751,6 +751,31 @@ function setSpeedLimitUI(speed){
  // 規制値は生活道路警告の判定材料としてのみ内部利用する。
  window.__lastSpeedEvidence=Number.isFinite(speed)?speed:null;
 }
+function recordSafetyWarning(pos,evidence){
+ const rec={
+  type:'30km/h警告',
+  time:new Date().toLocaleString('ja-JP',{hour12:false}),
+  lat:pos.coords.latitude,
+  lon:pos.coords.longitude,
+  accuracy:Math.round(pos.coords.accuracy||0),
+  address:'住所を確認中…',
+  evidence:evidence||{},
+  warning:true
+ };
+ const log=getVerifyLog();
+ log.unshift(rec);
+ saveVerifyLog(log);
+ renderVerify();
+ reverseGeocode(rec.lat,rec.lon).then(addr=>{
+  const log2=getVerifyLog();
+  const idx=log2.findIndex(x=>x.warning&&x.time===rec.time&&Math.abs(x.lat-rec.lat)<0.0000001);
+  if(idx>=0){
+   log2[idx]={...rec,address:addr};
+   saveVerifyLog(log2);
+   renderVerify();
+  }
+ }).catch(()=>{});
+}
 function evaluateSafetyZone(pos){
  if(currentScreenId()!=='ride'||!jarticSpeedData){setSpeedLimitUI(null);return}
  const acc=Number(pos.coords.accuracy||9999);
@@ -779,7 +804,16 @@ function evaluateSafetyZone(pos){
   }
   setSpeedLimitUI(nearest.speed);
   const shouldWarn=nearest.speed===30||!!nearest.f.zone30;
-  if(shouldWarn&&!safetyZoneActive) showSafety(5200);
+  if(shouldWarn&&!safetyZoneActive){
+   showSafety(5200);
+   recordSafetyWarning(pos,{
+    source:'JARTIC',
+    speed:nearest.speed,
+    zone30:!!nearest.f.zone30,
+    distance:Math.round(nearest.d),
+    code:nearest.f.code||null
+   });
+  }
   safetyZoneActive=shouldWarn;
   window.__roadDecision={
    state:'指定速度',
@@ -1115,13 +1149,22 @@ function renderVerify(){
  const el=document.getElementById('verifyList');if(!el)return;
  const log=getVerifyLog();
  if(!log.length){el.innerHTML='<div class="verify-empty">まだ検証データがありません。<br>乗車・降車時に町名と緯度経度を記録します。</div>';return}
- el.innerHTML=log.map(r=>`
+ el.innerHTML=log.map(r=>{
+  const warningDetail=r.warning
+   ? '<div class="verify-row"><span>判定</span><strong>'+
+      (r.evidence?.zone30?'ゾーン30':(r.evidence?.speed===30?'指定30':'30km/h候補'))+
+      '</strong></div><div class="verify-row"><span>根拠</span><strong>'+
+      (r.evidence?.source||'')+' / 道路差 '+(r.evidence?.distance??'-')+'m</strong></div>'
+   : '';
+  return `
   <div class="verify-card">
    <div class="verify-head"><strong>${r.type}</strong><span class="badge">±${r.accuracy}m</span></div>
    <div class="verify-address">${r.address||'場所を確認中…'}</div>
    <div class="verify-row"><span>時刻</span><strong>${r.time}</strong></div>
-   <div class="verify-row"><span>緯度経度</span><strong>${r.lat.toFixed(6)}, ${r.lon.toFixed(6)}</strong></div>
-  </div>`).join('');
+   ${warningDetail}
+   <div class="verify-row"><span>緯度経度</span><strong>${Number(r.lat).toFixed(6)}, ${Number(r.lon).toFixed(6)}</strong></div>
+  </div>`;
+ }).join('');
 }
 function clearVerify(){
  localStorage.removeItem('taxi_verify_log');renderVerify();
