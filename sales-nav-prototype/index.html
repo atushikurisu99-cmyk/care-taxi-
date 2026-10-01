@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-LIVE-REFRESH-1 -->
+<!-- BUILD:2026-10-01-MANUAL-REFRESH-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -236,6 +236,21 @@ main{position:relative;min-height:0;overflow:hidden}
 
 /* 営業情報画面 */
 .today-content{gap:12px}
+.force-refresh-btn{
+ width:100%;
+ min-height:46px;
+ border:1px solid #2f86ff;
+ border-radius:14px;
+ background:#10253a;
+ color:#dcebff;
+ font-size:16px;
+ font-weight:900;
+ touch-action:manipulation;
+ -webkit-tap-highlight-color:transparent;
+}
+.force-refresh-btn:disabled{
+ opacity:.55;
+}
 .info-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px}
 .info-card{
  min-width:0;min-height:138px;padding:16px 13px;border-radius:16px;
@@ -1006,6 +1021,7 @@ html,body{
 
 <section id="today" class="screen">
  <div class="content today-content">
+  <button id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
   <div class="info-grid">
    <div id="jrInfoCard" class="info-card">
     <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
@@ -2719,6 +2735,27 @@ loadBusRealtime(false);
 loadJrProbeSnapshot(false);
 setInterval(()=>loadBusRealtime(false),60000);
 setInterval(()=>loadJrProbeSnapshot(false),60000);
+
+async function forceRefreshLiveData(){
+ const btn=document.getElementById('forceRefreshButton');
+ if(btn){
+  btn.disabled=true;
+  btn.textContent='↻ 更新中…';
+ }
+ try{
+  await Promise.all([
+   loadJrProbeSnapshot(true),
+   loadBusRealtime(true)
+  ]);
+  renderJrProbe();
+  renderBusRealtime();
+ }finally{
+  if(btn){
+   btn.disabled=false;
+   btn.textContent='↻ 強制更新';
+  }
+ }
+}
 
 function refreshLiveFeedsNow(){
  loadJrProbeSnapshot(true);
