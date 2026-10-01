@@ -99,6 +99,7 @@ def main() -> None:
                         counts["zone30"] += 1
                     features.append({
                         "code": code,
+                        "shape": val(row, "点・線・面コード") or None,
                         "speed": speed,
                         "zone30": zone30 or None,
                         "kind": val(row, "県別規制種別名称") or None,
