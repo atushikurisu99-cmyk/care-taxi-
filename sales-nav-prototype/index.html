@@ -617,8 +617,7 @@ async function updateVacantArea(pos){
  vacantAreaLookupBusy=true;
  try{
   const label=await reverseGeocode(pos.coords.latitude,pos.coords.longitude);
-  el.textContent=label&&label!=='場所取得不能'?label:'判定不能';
-  if(el.textContent==='判定不能') vacantAreaLookupAt=0;
+  el.textContent=label||coordFallbackLabel(pos.coords.latitude,pos.coords.longitude);
  }catch(e){
   el.textContent='判定不能';
  }finally{
@@ -702,22 +701,45 @@ function shortPlaceLabelFallback(d){
  const postcode=d.postcode||'';
  return locality || postcode || '';
 }
+function coordFallbackLabel(lat,lon){
+ return Number(lat).toFixed(5)+', '+Number(lon).toFixed(5);
+}
+function geocodeCacheKey(lat,lon){
+ return 'taxi_geocode_'+Number(lat).toFixed(4)+'_'+Number(lon).toFixed(4);
+}
+function readGeocodeCache(lat,lon){
+ try{return localStorage.getItem(geocodeCacheKey(lat,lon))||''}catch(e){return ''}
+}
+function writeGeocodeCache(lat,lon,label){
+ if(!label||label==='判定不能'||label==='場所取得不能') return;
+ try{localStorage.setItem(geocodeCacheKey(lat,lon),label)}catch(e){}
+}
 async function reverseGeocode(lat,lon){
+ const cached=readGeocodeCache(lat,lon);
+ if(cached) return cached;
+
  const n='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=18&addressdetails=1&accept-language=ja';
  try{
   const d=await fetchJsonWithTimeout(n,4500);
   const label=shortPlaceLabel(d);
-  if(label && label!=='場所取得不能') return label;
+  if(label && label!=='場所取得不能'){
+   writeGeocodeCache(lat,lon,label);
+   return label;
+  }
  }catch(e){}
 
  const b='https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&localityLanguage=ja';
  try{
   const d=await fetchJsonWithTimeout(b,4500);
   const label=shortPlaceLabelFallback(d);
-  if(label) return label;
+  if(label){
+   writeGeocodeCache(lat,lon,label);
+   return label;
+  }
  }catch(e){}
 
- return '判定不能';
+ // GPSが取れている限り地点情報は失わない。
+ return coordFallbackLabel(lat,lon);
 }
 function getVerifyLog(){
  try{return JSON.parse(localStorage.getItem('taxi_verify_log')||'[]')}catch(e){return[]}
@@ -776,7 +798,7 @@ async function startRideCapture(){
   currentRideStart.lat=p.coords.latitude;
   currentRideStart.lon=p.coords.longitude;
   currentRideStart.accuracy=Math.round(p.coords.accuracy||0);
-  currentRideStart.address='場所を確認中…';
+  currentRideStart.address=coordFallbackLabel(currentRideStart.lat,currentRideStart.lon);
   updateRideStartUI(currentRideStart);
 
   const log=getVerifyLog();
@@ -804,14 +826,14 @@ async function startRideCapture(){
    p=>{ latestPosition=p; saveRidePoint(p); },
    ()=>{ 
     if(currentRideStart && currentRideStart.time===startedTime){
-     currentRideStart.address='判定不能';
+     currentRideStart.address='GPS取得不能';
      updateRideStartUI(currentRideStart);
     }
    },
    {enableHighAccuracy:true,maximumAge:0,timeout:10000}
   );
  }else{
-  currentRideStart.address='判定不能';
+  currentRideStart.address='GPS非対応';
   updateRideStartUI(currentRideStart);
  }
 }
@@ -829,7 +851,7 @@ async function finishRide(){
    lat:p.coords.latitude,
    lon:p.coords.longitude,
    accuracy:Math.round(p.coords.accuracy||0),
-   address:'場所を確認中…'
+   address:coordFallbackLabel(p.coords.latitude,p.coords.longitude)
   };
   const log=getVerifyLog();
   log.unshift(rec);
