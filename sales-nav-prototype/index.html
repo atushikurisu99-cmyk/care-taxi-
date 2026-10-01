@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-UI-RECOVERY-1 -->
+<!-- BUILD:2026-10-01-LIVE-REFRESH-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2719,6 +2719,16 @@ loadBusRealtime(false);
 loadJrProbeSnapshot(false);
 setInterval(()=>loadBusRealtime(false),60000);
 setInterval(()=>loadJrProbeSnapshot(false),60000);
+
+function refreshLiveFeedsNow(){
+ loadJrProbeSnapshot(true);
+ loadBusRealtime(true);
+}
+document.addEventListener('visibilitychange',()=>{
+ if(document.visibilityState==='visible') refreshLiveFeedsNow();
+});
+window.addEventListener('pageshow',refreshLiveFeedsNow);
+window.addEventListener('focus',refreshLiveFeedsNow);
 </script>
 </body>
 </html>
