@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-2005 -->
+<!-- BUILD:2026-10-01-2025 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -454,6 +454,204 @@ body{
 }
 #reservationEdit .form-actions .primary{
  min-height:62px;
+}
+/* 全画面レイアウト安定化 v3 */
+html,body,.app,main,.screen,.content{
+ min-width:0;
+ max-width:100%;
+}
+.screen{
+ overflow:hidden;
+}
+.screen>.content{
+ overflow-y:auto;
+ overflow-x:hidden;
+ -webkit-overflow-scrolling:touch;
+ overscroll-behavior-x:none;
+}
+.screen>.content>*{
+ flex-shrink:0;
+ min-width:0;
+ max-width:100%;
+}
+
+/* 共通カードは内容に合わせて伸びる。文字やボタンを潰さない */
+.card,
+.verify-card,
+.reservation-item,
+.vacant-summary-row,
+.reservation,
+.ride-location,
+.home-weather,
+.share-summary,
+.job-place,
+.job-note{
+ height:auto;
+ min-width:0;
+ max-width:100%;
+ overflow:visible;
+}
+
+/* 行レイアウトの子要素が横幅を押し広げない */
+.row,
+.shift-card,
+.ride-state-main,
+.reservation-item-top,
+.job-head{
+ min-width:0;
+}
+.row>*,
+.shift-card>*,
+.ride-state-main>*,
+.reservation-item-top>*,
+.job-head>*{
+ min-width:0;
+}
+.row strong,
+.row span,
+.sub,
+.label,
+.verify-address,
+.verify-row strong,
+.reservation-item-place,
+.reservation-item-sub,
+.ride-from{
+ overflow-wrap:anywhere;
+ word-break:normal;
+}
+
+/* 2列は必ず画面内に収める */
+.grid2,
+.form-row2,
+.job-meta,
+.share-choice,
+.home-summary,
+.info-grid{
+ width:100%;
+ min-width:0;
+ grid-template-columns:repeat(2,minmax(0,1fr));
+}
+.grid2>*,
+.form-row2>*,
+.job-meta>*,
+.share-choice>*,
+.home-summary>*,
+.info-grid>*{
+ min-width:0;
+ max-width:100%;
+}
+
+/* ボタンは親幅を超えず、必要なら文字を折り返す */
+button,
+.primary,
+.smallbtn,
+.payopt,
+.share-choice button{
+ max-width:100%;
+ min-width:0;
+ white-space:normal;
+}
+.action{
+ flex-shrink:0;
+ overflow:hidden;
+}
+.action>.primary{
+ min-width:0;
+}
+
+/* 予約一覧：操作ボタンで本文を圧迫しない */
+.reservation-item-top{
+ flex-wrap:wrap;
+}
+.reservation-item-top>div:first-child{
+ flex:1 1 210px;
+}
+.reservation-item-actions{
+ flex:0 1 auto;
+ flex-wrap:wrap;
+ margin-left:auto;
+ justify-content:flex-end;
+}
+.reservation-item-actions .smallbtn{
+ flex:0 0 auto;
+ white-space:nowrap;
+}
+
+/* 検証画面：上部カードが履歴に押し潰されない */
+#verify .content>.card{
+ flex:0 0 auto;
+ min-height:unset;
+}
+#verify .content>.card .row{
+ align-items:flex-start;
+}
+#verify .content>.card .row>div{
+ flex:1 1 auto;
+}
+#verifyList{
+ flex:0 0 auto;
+ display:flex;
+ flex-direction:column;
+ gap:8px;
+ min-height:0;
+}
+#verify .card .primary{
+ width:100%;
+ min-height:54px;
+ display:block;
+}
+
+/* 入力画面は縦スクロールのみ。入力欄は必ず親内 */
+#reservationEdit .content{
+ overflow-y:auto;
+ overflow-x:hidden!important;
+}
+#reservationEdit .reservation-field,
+#reservationEdit .form-input,
+#reservationEdit .form-textarea,
+#reservationEdit .form-toggle{
+ width:100%;
+ min-width:0;
+ max-width:100%;
+}
+
+/* 画面ごとの伸縮要素 */
+#home .content,
+#vacant .content,
+#ride .content,
+#payment .content,
+#today .content,
+#sales .content,
+#analysis .content,
+#menu .content{
+ min-height:0;
+}
+.heat{
+ flex:1 0 250px;
+}
+.mapcard{
+ flex:1 0 210px;
+}
+
+/* 長い現在地・予約名は横に飛び出させない */
+.vacant-summary-row .v,
+.ride-state-main .ride-from{
+ max-width:68%;
+ overflow:hidden;
+ text-overflow:ellipsis;
+ white-space:nowrap;
+}
+
+/* 小さい端末では操作系2列を必要時に1列へ */
+@media(max-width:360px){
+ .share-choice,
+ .job-meta{
+  grid-template-columns:1fr;
+ }
+ .reservation-item-actions{
+  width:100%;
+  justify-content:flex-start;
+ }
 }
 </style>
 </head>
