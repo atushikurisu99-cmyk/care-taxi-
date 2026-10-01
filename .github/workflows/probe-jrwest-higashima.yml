@@ -26,6 +26,20 @@ jobs:
           python-version: "3.12"
       - name: Fetch JR West technical probe
         run: python tools/probe_jrwest_hiroshima.py
+      - name: Check browser CORS header
+        run: |
+          python - <<'PY'
+          import urllib.request
+          u="https://www.train-guide.westjr.co.jp/api/v3/area_hiroshima_master.json"
+          req=urllib.request.Request(u, method="HEAD", headers={"Origin":"https://atushikurisu99-cmyk.github.io","User-Agent":"Mozilla/5.0"})
+          try:
+              with urllib.request.urlopen(req, timeout=15) as r:
+                  print("status", r.status)
+                  print("access-control-allow-origin", r.headers.get("Access-Control-Allow-Origin"))
+                  print("access-control-allow-methods", r.headers.get("Access-Control-Allow-Methods"))
+          except Exception as e:
+              print("cors_check_error", repr(e))
+          PY
       - name: Show compact summary
         run: |
           python - <<'PY'
