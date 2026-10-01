@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1705 -->
+<!-- BUILD:2026-10-01-1725 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -434,8 +434,9 @@ main{position:relative;min-height:0;overflow:hidden}
    <div class="row"><strong>本日のGPS</strong><span id="gpsQualitySummary">記録なし</span></div>
   </div>
   <div class="card">
-   <button class="primary" onclick="shareValidationData()">検証データをDriveへ送る</button>
-   <div class="sub" style="margin-top:8px">保存先：Google Drive「タクシー営業ナビ_検証データ」</div>
+   <button class="primary" onclick="copyValidationSummary()">検証結果をコピー</button>
+   <div class="sub" style="margin-top:8px">このチャットに貼り付ければ、そのまま解析できます。</div>
+   <button class="smallbtn" style="margin-top:10px" onclick="shareValidationData()">詳細JSONを共有</button>
   </div>
   <div id="verifyList" class="list"></div>
  </div>
@@ -1270,6 +1271,38 @@ function buildValidationExport(){
   warningAndPointLog:verify,
   note:'ChatGPT検証用。GPS・走行距離・30km/h警告判定の実走データ。'
  };
+}
+function validationSummaryText(){
+ const data=buildValidationExport();
+ const s=data.gpsSummary||{};
+ const warnings=(data.warningAndPointLog||[]).filter(x=>x.warning);
+ return [
+  '【タクシー営業ナビ 検証結果】',
+  '走行距離: '+Number(data.distance.km||0).toFixed(1)+' km',
+  'GPS記録数: '+(s.samples||0),
+  '平均GPS精度: '+(s.avgAccuracy!=null?'±'+s.avgAccuracy+'m':'記録なし'),
+  '±10m以内: '+(s.within10Pct!=null?s.within10Pct+'%':'記録なし'),
+  '±20m以内: '+(s.within20Pct!=null?s.within20Pct+'%':'記録なし'),
+  '30m超: '+(s.over30Count||0)+'回',
+  '最大途切れ: '+(s.maxGap||0)+'秒',
+  '記録時間: '+(s.durationMin||0)+'分',
+  '30km/h警告: '+warnings.length+'回'
+ ].join('\n');
+}
+async function copyValidationSummary(){
+ const txt=validationSummaryText();
+ try{
+  await navigator.clipboard.writeText(txt);
+  toast('検証結果をコピーしました');
+ }catch(e){
+  const ta=document.createElement('textarea');
+  ta.value=txt;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  ta.remove();
+  toast('検証結果をコピーしました');
+ }
 }
 async function shareValidationData(){
  const data=buildValidationExport();
