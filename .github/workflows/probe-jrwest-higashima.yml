@@ -1,0 +1,38 @@
+name: Probe JR West Hiroshima data
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/probe_jrwest_hiroshima.py"
+      - ".github/workflows/probe-jrwest-higashima.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Fetch JR West technical probe
+        run: python tools/probe_jrwest_hiroshima.py
+      - name: Show compact summary
+        run: |
+          python - <<'PY'
+          import json
+          p=json.load(open("tmp/jrwest-higashima-probe.json", encoding="utf-8"))
+          print(json.dumps(p["summary"], ensure_ascii=False, indent=2))
+          for x in p["lines"]:
+              if x["train_count"]:
+                  print(x["code"], x["name"], x["train_count"], "trains")
+          PY
+      - name: Upload temporary probe result
+        uses: actions/upload-artifact@v4
+        with:
+          name: jrwest-higashima-probe
+          path: tmp/jrwest-higashima-probe.json
+          retention-days: 3
