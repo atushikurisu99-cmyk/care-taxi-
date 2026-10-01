@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1822 -->
+<!-- BUILD:2026-10-01-1832 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -316,6 +316,44 @@ body{
  min-width:0;
  max-width:100%;
  box-sizing:border-box;
+}
+/* 予約入力レイアウト収まり修正 */
+*{box-sizing:border-box}
+.card,.form-card,.reservation-item,.vacant-summary-row,.reservation{
+ overflow:hidden;
+}
+.form-row2{
+ width:100%;
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+ gap:8px;
+}
+.form-row2>.form-card{
+ width:100%;
+ min-width:0;
+ max-width:100%;
+}
+.form-input,.form-textarea{
+ display:block;
+ width:100%;
+ min-width:0;
+ max-width:100%;
+}
+#resDate,#resTime{
+ width:100%;
+ min-width:0;
+ max-width:100%;
+}
+@media(max-width:430px){
+ .form-row2{
+  grid-template-columns:1fr 1fr;
+ }
+ .form-card{
+  padding:11px 12px;
+ }
+ .form-input,.form-textarea{
+  font-size:16px;
+  padding:11px 12px;
+ }
 }
 </style>
 </head>
