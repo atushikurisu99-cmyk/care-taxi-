@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1805 -->
+<!-- BUILD:2026-10-01-1822 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -281,6 +281,41 @@ main{position:relative;min-height:0;overflow:hidden}
  .primary{font-size:21px}.map-control{height:46px;flex-basis:46px}.map-control strong{font-size:14px}.map-control small{font-size:10px}.location-status{min-height:54px;padding:8px 11px}.location-status strong{font-size:14px}.location-status small{font-size:10px}.loc-pill{font-size:10px}.mapcard{min-height:170px}.quick .card{padding:8px 4px}.quick strong{font-size:14px}
  .notice{left:9px;right:9px;top:7px;min-height:72px}.notice strong{font-size:16px}.notice span{font-size:12px}
  .safety{width:min(86vw,330px);height:300px}.triangle{width:min(80vw,310px);height:auto}.safetytext{font-size:16px}
+}
+/* 横スクロール完全禁止 */
+html,body{
+ width:100%;
+ max-width:100%;
+ overflow-x:hidden !important;
+}
+body{
+ position:relative;
+ touch-action:pan-y;
+}
+.app,main,.screen,.content,.reservation-form,.reservation-list,
+.form-row2,.form-card,.action,.nav{
+ width:100%;
+ max-width:100%;
+ min-width:0;
+ box-sizing:border-box;
+ overflow-x:hidden !important;
+}
+.screen,.content,.reservation-form,.reservation-list{
+ overscroll-behavior-x:none;
+}
+.reservation-form{
+ overflow-y:auto;
+ -webkit-overflow-scrolling:touch;
+}
+.form-row2{
+ grid-template-columns:minmax(0,1fr) minmax(0,1fr);
+}
+.form-input,.form-textarea,
+.form-toggle,.form-toggle button,
+.primary,.smallbtn{
+ min-width:0;
+ max-width:100%;
+ box-sizing:border-box;
 }
 </style>
 </head>
