@@ -22,7 +22,7 @@ jobs:
         run: python tools/update_jartic_hiroshima.py
       - name: Commit generated data
         run: |
-          if git diff --quiet -- sales-nav-prototype/data/jartic-hiroshima-speed.json; then
+          if [ -z "$(git status --porcelain -- sales-nav-prototype/data/jartic-hiroshima-speed.json)" ]; then
             echo "No data change"
             exit 0
           fi
