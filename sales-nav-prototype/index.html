@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1545 -->
+<!-- BUILD:2026-10-01-1610 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -849,6 +849,52 @@ function setLocationUI(state, detail, cls=''){
  }
 }
 
+function getDutyDistanceState(){
+ try{
+  return JSON.parse(localStorage.getItem('taxi_duty_distance')||'{"meters":0,"last":null,"dutyStart":0}');
+ }catch(e){
+  return {meters:0,last:null,dutyStart:0};
+ }
+}
+function saveDutyDistanceState(s){
+ localStorage.setItem('taxi_duty_distance',JSON.stringify(s));
+}
+function resetDutyDistance(startTs){
+ const s={meters:0,last:null,dutyStart:startTs||Date.now()};
+ saveDutyDistanceState(s);
+ renderDutyDistance();
+}
+function renderDutyDistance(){
+ const el=document.getElementById('dutyDistance');
+ if(!el) return;
+ const s=getDutyDistanceState();
+ el.textContent=(Math.max(0,Number(s.meters)||0)/1000).toFixed(1)+' km';
+}
+function updateDutyDistance(pos){
+ const duty=getDutyState();
+ if(!duty.active) return;
+ const lat=pos.coords.latitude, lon=pos.coords.longitude;
+ const acc=Number(pos.coords.accuracy||9999);
+ const now=Date.now();
+ let s=getDutyDistanceState();
+ if(!s.dutyStart || Math.abs((s.dutyStart||0)-(duty.start||0))>1000){
+  s={meters:0,last:null,dutyStart:duty.start||now};
+ }
+ const cur={lat,lon,time:now,accuracy:acc};
+ if(!s.last){
+  s.last=cur; saveDutyDistanceState(s); renderDutyDistance(); return;
+ }
+ const dt=(now-(s.last.time||now))/1000;
+ const d=metersBetween(s.last.lat,s.last.lon,lat,lon);
+ // 実地検証用。極端なGPS飛び・低精度・長い欠測は距離へ加算しない。
+ const plausible=acc<=35 && dt>0 && dt<=30 && d<=Math.max(180,dt*55);
+ if(plausible && d>=2){
+  s.meters=(Number(s.meters)||0)+d;
+ }
+ s.last=cur;
+ saveDutyDistanceState(s);
+ renderDutyDistance();
+}
 function handlePosition(pos){
  latestPosition=pos;
  const a=Math.round(pos.coords.accuracy||9999);
@@ -1172,6 +1218,7 @@ function clearVerify(){
 loadJarticSpeedData();
 startLocation();
 renderDutyUI();
+renderDutyDistance();
 </script>
 </body>
 </html>
