@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1845 -->
+<!-- BUILD:2026-10-01-1910 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -133,6 +133,17 @@ main{position:relative;min-height:0;overflow:hidden}
 .reservation-item-sub{font-size:12px;color:var(--muted);margin-top:4px}
 .reservation-item-actions{display:flex;gap:7px;flex:0 0 auto}
 .reservation-item-actions .smallbtn{white-space:nowrap}
+.res-status{display:inline-flex;align-items:center;border:1px solid #30404d;border-radius:999px;padding:4px 8px;font-size:11px;font-weight:800;color:#aebdca;background:#101b24;margin-top:7px}
+.res-status.pending{border-color:#745f21;color:#ffe08b;background:#2e2812}
+.res-status.accepted{border-color:#2e6d4a;color:#a7e2bf;background:#10291d}
+.res-status.active{border-color:#315f8a;color:#9dccff;background:#10253a}
+.res-status.cancelled{border-color:#704045;color:#ffb0b0;background:#2e1719}
+.share-choice{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.share-choice button{min-height:100px;border-radius:16px;border:1px solid #2b3b48;background:#0d1923;color:white;font-size:17px;font-weight:900;padding:12px}
+.share-choice button small{display:block;color:var(--muted);font-size:11px;font-weight:600;margin-top:6px;line-height:1.35}
+.share-summary{background:#0c1721;border:1px solid #22313d;border-radius:16px;padding:14px}
+.share-summary strong{font-size:20px;display:block}
+.share-summary .sub{margin-top:5px}
 .reservation-form{display:flex;flex-direction:column;gap:11px;overflow:auto;padding-bottom:4px}
 .form-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
 .form-label{font-size:13px;color:var(--muted);font-weight:800;margin-bottom:7px}
@@ -522,6 +533,18 @@ body{
  </div>
 </section>
 
+<section id="reservationShare" class="screen">
+ <div class="content">
+  <div id="reservationShareSummary" class="share-summary"></div>
+  <div class="share-choice">
+   <button onclick="beginAppReservationShare()">アプリで共有<small>承認・迎車・完了状態を共有</small></button>
+   <button onclick="shareReservationLine()">LINEで共有<small>リンク無しの予約テキスト</small></button>
+  </div>
+  <div id="reservationShareState" class="card hidden"></div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('schedule')">戻る</button></div>
+</section>
+
 <section id="today" class="screen">
  <div class="content today-content">
   <div class="info-grid">
@@ -618,7 +641,7 @@ body{
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',today:'営業情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -647,6 +670,7 @@ function show(id){
  renderDutyUI();
 }
 let reservationTimed=true;
+let selectedReservationShareId=null;
 function getReservations(){
  try{
   const v=JSON.parse(localStorage.getItem('taxi_reservations')||'[]');
@@ -698,12 +722,18 @@ function renderReservations(){
    const t=r.timed&&r.time?r.time:'時間なし';
    const dest=r.destination?' → '+escapeHtml(r.destination):'';
    const person=r.name?escapeHtml(r.name):'';
+   const status=r.shareStatus||'';
+   const statusMap={pending:'依頼中',accepted:'承認済み',heading:'迎車中',onboard:'実車中',completed:'完了',cancelled:'キャンセル'};
+   const statusHtml=status?'<div class="res-status '+(status==='pending'?'pending':status==='accepted'?'accepted':status==='cancelled'?'cancelled':'active')+'">'+(statusMap[status]||escapeHtml(status))+'</div>':'';
+   const cancelBtn=(status&&status!=='completed'&&status!=='cancelled')
+    ?'<button class="smallbtn" onclick="cancelSharedReservation(\''+r.id+'\')">キャンセル</button>':'';
    return '<div class="reservation-item">'+
     '<div class="reservation-item-top"><div><div class="reservation-item-time">'+escapeHtml(t)+'</div>'+
     '<div class="reservation-item-place">'+escapeHtml(r.pickup)+dest+'</div>'+
-    '<div class="reservation-item-sub">'+escapeHtml(r.date)+(person?' / '+person:'')+'</div></div>'+
+    '<div class="reservation-item-sub">'+escapeHtml(r.date)+(person?' / '+person:'')+'</div>'+statusHtml+'</div>'+
     '<div class="reservation-item-actions">'+
-    '<button class="smallbtn" onclick="shareReservation(\''+r.id+'\')">共有</button>'+
+    '<button class="smallbtn" onclick="openReservationShare(\''+r.id+'\')">共有</button>'+
+    cancelBtn+
     '<button class="smallbtn" onclick="deleteReservation(\''+r.id+'\')">削除</button>'+
     '</div></div></div>';
   }).join('');
@@ -741,15 +771,17 @@ function saveReservation(){
   name:(document.getElementById('resName')?.value||'').trim(),
   phone:(document.getElementById('resPhone')?.value||'').trim(),
   memo:(document.getElementById('resMemo')?.value||'').trim(),
+  shareStatus:'',
+  sharedRole:'owner',
+  assignedUserId:'',
+  shareEvents:[],
   createdAt:Date.now()
  };
  const all=getReservations();all.push(r);saveReservations(all);
  renderReservations();
  show('schedule');
 }
-async function shareReservation(id){
- const r=getReservations().find(x=>x.id===id);
- if(!r) return;
+function reservationShareText(r){
  const lines=[
   '【予約】',
   '日付: '+(r.date||''),
@@ -760,7 +792,35 @@ async function shareReservation(id){
  if(r.name) lines.push('お名前: '+r.name);
  if(r.phone) lines.push('電話番号: '+r.phone);
  if(r.memo) lines.push('メモ: '+r.memo);
- const text=lines.join('\n');
+ return lines.join('\n');
+}
+function openReservationShare(id){
+ const r=getReservations().find(x=>x.id===id);
+ if(!r) return;
+ selectedReservationShareId=id;
+ const el=document.getElementById('reservationShareSummary');
+ if(el){
+  el.innerHTML='<div class="label">共有する予約</div><strong>'+
+   escapeHtml(r.timed&&r.time?r.time:'時間なし')+'　'+escapeHtml(r.pickup)+
+   '</strong><div class="sub">'+escapeHtml(r.date)+(r.destination?' → '+escapeHtml(r.destination):'')+'</div>';
+ }
+ const state=document.getElementById('reservationShareState');
+ if(state){
+  const map={pending:'依頼中',accepted:'承認済み',heading:'迎車中',onboard:'実車中',completed:'完了',cancelled:'キャンセル'};
+  if(r.shareStatus){
+   state.classList.remove('hidden');
+   state.innerHTML='<div class="label">アプリ共有状態</div><strong>'+(map[r.shareStatus]||escapeHtml(r.shareStatus))+'</strong>';
+  }else{
+   state.classList.add('hidden');
+   state.innerHTML='';
+  }
+ }
+ show('reservationShare');
+}
+async function shareReservationLine(){
+ const r=getReservations().find(x=>x.id===selectedReservationShareId);
+ if(!r) return;
+ const text=reservationShareText(r);
  try{
   if(navigator.share){
    await navigator.share({title:'予約',text});
@@ -774,13 +834,31 @@ async function shareReservation(id){
   toast('予約をコピーしました');
  }catch(e){
   const ta=document.createElement('textarea');
-  ta.value=text;
-  document.body.appendChild(ta);
-  ta.select();
-  document.execCommand('copy');
-  ta.remove();
+  ta.value=text;document.body.appendChild(ta);ta.select();
+  document.execCommand('copy');ta.remove();
   toast('予約をコピーしました');
  }
+}
+function beginAppReservationShare(){
+ const r=getReservations().find(x=>x.id===selectedReservationShareId);
+ if(!r) return;
+ // 実送信はFirebase接続後に有効化する。今は共有状態の土台だけ保持。
+ const state=document.getElementById('reservationShareState');
+ if(state){
+  state.classList.remove('hidden');
+  state.innerHTML='<div class="label">アプリ共有</div><strong>接続準備中</strong><div class="sub">相手への送信・承認は共通DB接続後に有効になります。</div>';
+ }
+}
+function cancelSharedReservation(id){
+ const all=getReservations();
+ const i=all.findIndex(r=>r.id===id);
+ if(i<0) return;
+ if(!confirm('この共有予約をキャンセルしますか？')) return;
+ all[i].shareStatus='cancelled';
+ all[i].shareEvents=Array.isArray(all[i].shareEvents)?all[i].shareEvents:[];
+ all[i].shareEvents.push({type:'cancelled',at:Date.now()});
+ saveReservations(all);
+ renderReservations();
 }
 function deleteReservation(id){
  if(!confirm('この予約を削除しますか？')) return;
