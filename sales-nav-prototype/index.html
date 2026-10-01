@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-0155 -->
+<!-- BUILD:2026-10-01-0925 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -671,8 +671,20 @@ function showNotice(level,icon,title,body,duration=5500){
  clearTimeout(nt);nt=setTimeout(hideNotice,duration);
 }
 function hideNotice(){document.getElementById('notice').className='notice normal';clearTimeout(nt)}
-function showSafety(duration=5200){const s=document.getElementById('safety');s.classList.add('show');clearTimeout(st);st=setTimeout(hideSafety,duration)}
-function hideSafety(){document.getElementById('safety').classList.remove('show');clearTimeout(st)}
+function showSafety(duration=5200){
+ const s=document.getElementById('safety');
+ const note=document.querySelector('.drive-note');
+ s.classList.add('show');
+ if(note) note.style.visibility='hidden';
+ clearTimeout(st);
+ st=setTimeout(hideSafety,duration);
+}
+function hideSafety(){
+ document.getElementById('safety').classList.remove('show');
+ const note=document.querySelector('.drive-note');
+ if(note) note.style.visibility='';
+ clearTimeout(st);
+}
 function toast(msg='保存しました'){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
 function shortPlaceLabel(d){
  const a=d.address||{};
@@ -765,9 +777,17 @@ async function capturePoint(type){
  return rec;
 }
 let currentRideStart=null;
+function isCoordFallbackLabel(v){
+ return /^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(String(v||''));
+}
+function visiblePlaceLabel(rec){
+ if(!rec) return '場所を確認中…';
+ if(isCoordFallbackLabel(rec.address)) return '住所を確認中…';
+ return rec.address||'場所を確認中…';
+}
 function updateRideStartUI(rec){
  if(!rec) return;
- const addr=rec.address||'場所を確認中…';
+ const addr=visiblePlaceLabel(rec);
  const meta=(Number.isFinite(rec.accuracy)?'精度 ±'+rec.accuracy+'m':'位置情報を確認中')+' / '+rec.time;
  const a=document.getElementById('rideStartAddress');
  const m=document.getElementById('rideStartMeta');
