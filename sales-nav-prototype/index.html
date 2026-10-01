@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1910 -->
+<!-- BUILD:2026-10-01-1945 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -246,6 +246,36 @@ main{position:relative;min-height:0;overflow:hidden}
 }
 .info-card.state-alert .info-top{color:#ffb0b0}
 
+/* reservation work screen: comes from bottom, closes downward */
+.reservation-job-layer{
+ position:absolute;z-index:65;inset:0;display:none;align-items:flex-end;
+ background:rgba(0,0,0,.32);overflow:hidden
+}
+.reservation-job-layer.show{display:flex}
+.reservation-job-sheet{
+ width:100%;max-height:86%;background:#09141e;border:1px solid #2a3a47;
+ border-bottom:0;border-radius:22px 22px 0 0;padding:8px 12px 14px;
+ box-shadow:0 -16px 38px rgba(0,0,0,.45);
+ transform:translateY(100%);transition:transform .22s ease-out;
+ overflow-y:auto;overflow-x:hidden;touch-action:pan-y
+}
+.reservation-job-layer.show .reservation-job-sheet{transform:translateY(0)}
+.reservation-job-sheet.dragging{transition:none}
+.job-handle{width:48px;height:5px;border-radius:999px;background:#536574;margin:2px auto 12px}
+.job-head{display:flex;align-items:flex-start;justify-content:space-between;gap:10px;margin-bottom:10px}
+.job-head .time{font-size:30px;font-weight:950}
+.job-status{font-size:12px;font-weight:900;padding:6px 9px;border-radius:999px;background:#123456;border:1px solid #2f86ff;color:#d8eaff}
+.job-place{background:#0c1721;border:1px solid #22313d;border-radius:16px;padding:13px 14px;margin-bottom:9px}
+.job-place .job-label{font-size:12px;color:var(--muted);font-weight:800}
+.job-place strong{display:block;font-size:21px;line-height:1.25;margin-top:5px}
+.job-meta{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:9px}
+.job-meta .card{padding:11px 12px}
+.job-note{background:#0c1721;border:1px solid #22313d;border-radius:14px;padding:12px 13px;color:#dce5eb;font-size:14px;line-height:1.4;margin-bottom:12px}
+.job-actions{display:flex;gap:8px;min-height:64px}
+.job-actions .primary{font-size:22px}
+.job-actions .secondary{flex:.7}
+@keyframes jobSheetIn{from{transform:translateY(100%)}to{transform:translateY(0)}}
+
 /* ordinary info notification */
 .notice{position:absolute;z-index:50;left:12px;right:12px;top:10px;min-height:82px;display:none;align-items:center;gap:12px;padding:13px 15px;border-radius:16px;box-shadow:0 12px 30px rgba(0,0,0,.35)}
 .notice.show{display:flex;animation:drop .18s ease-out}
@@ -384,6 +414,33 @@ body{
   </svg>
  </div>
  <div class="safetytext">生活道路に注意</div>
+</div>
+
+<div id="reservationJobLayer" class="reservation-job-layer" aria-hidden="true">
+ <div id="reservationJobSheet" class="reservation-job-sheet">
+  <div class="job-handle"></div>
+  <div class="job-head">
+   <div><div class="label">予約の仕事</div><div id="jobTime" class="time">--:--</div></div>
+   <div id="jobStatus" class="job-status">予約</div>
+  </div>
+  <div class="job-place">
+   <div class="job-label">迎車地</div>
+   <strong id="jobPickup">--</strong>
+  </div>
+  <div class="job-place">
+   <div class="job-label">行き先</div>
+   <strong id="jobDestination">未定</strong>
+  </div>
+  <div class="job-meta">
+   <div class="card"><div class="label">お名前</div><strong id="jobName">--</strong></div>
+   <div class="card"><div class="label">電話</div><strong id="jobPhone">--</strong></div>
+  </div>
+  <div id="jobMemoWrap" class="job-note hidden"></div>
+  <div class="job-actions">
+   <button class="primary secondary" onclick="closeReservationJob()">閉じる</button>
+   <button class="primary" onclick="startReservationJobRide()">乗車</button>
+  </div>
+ </div>
 </div>
 
 <section id="home" class="screen active">
@@ -726,15 +783,15 @@ function renderReservations(){
    const statusMap={pending:'依頼中',accepted:'承認済み',heading:'迎車中',onboard:'実車中',completed:'完了',cancelled:'キャンセル'};
    const statusHtml=status?'<div class="res-status '+(status==='pending'?'pending':status==='accepted'?'accepted':status==='cancelled'?'cancelled':'active')+'">'+(statusMap[status]||escapeHtml(status))+'</div>':'';
    const cancelBtn=(status&&status!=='completed'&&status!=='cancelled')
-    ?'<button class="smallbtn" onclick="cancelSharedReservation(\''+r.id+'\')">キャンセル</button>':'';
-   return '<div class="reservation-item">'+
+    ?'<button class="smallbtn" onclick="event.stopPropagation();cancelSharedReservation(\''+r.id+'\')">キャンセル</button>':'';
+   return '<div class="reservation-item" onclick="openReservationJob(\''+r.id+'\')">'+
     '<div class="reservation-item-top"><div><div class="reservation-item-time">'+escapeHtml(t)+'</div>'+
     '<div class="reservation-item-place">'+escapeHtml(r.pickup)+dest+'</div>'+
     '<div class="reservation-item-sub">'+escapeHtml(r.date)+(person?' / '+person:'')+'</div>'+statusHtml+'</div>'+
     '<div class="reservation-item-actions">'+
-    '<button class="smallbtn" onclick="openReservationShare(\''+r.id+'\')">共有</button>'+
+    '<button class="smallbtn" onclick="event.stopPropagation();openReservationShare(\''+r.id+'\')">共有</button>'+
     cancelBtn+
-    '<button class="smallbtn" onclick="deleteReservation(\''+r.id+'\')">削除</button>'+
+    '<button class="smallbtn" onclick="event.stopPropagation();deleteReservation(\''+r.id+'\')">削除</button>'+
     '</div></div></div>';
   }).join('');
  }
@@ -780,6 +837,82 @@ function saveReservation(){
  const all=getReservations();all.push(r);saveReservations(all);
  renderReservations();
  show('schedule');
+}
+let currentReservationJobId=null;
+let reservationJobTouchStartY=0;
+let reservationJobDragY=0;
+
+function openReservationJob(id){
+ const r=getReservations().find(x=>x.id===id);
+ if(!r) return;
+ currentReservationJobId=id;
+ const statusMap={pending:'依頼中',accepted:'承認済み',heading:'迎車中',onboard:'実車中',completed:'完了',cancelled:'キャンセル'};
+ document.getElementById('jobTime').textContent=r.timed&&r.time?r.time:'時間なし';
+ document.getElementById('jobStatus').textContent=statusMap[r.shareStatus]||'予約';
+ document.getElementById('jobPickup').textContent=r.pickup||'--';
+ document.getElementById('jobDestination').textContent=r.destination||'未定';
+ document.getElementById('jobName').textContent=r.name||'--';
+ document.getElementById('jobPhone').textContent=r.phone||'--';
+ const memo=document.getElementById('jobMemoWrap');
+ if(memo){
+  memo.textContent=r.memo||'';
+  memo.classList.toggle('hidden',!r.memo);
+ }
+ const layer=document.getElementById('reservationJobLayer');
+ const sheet=document.getElementById('reservationJobSheet');
+ if(sheet){sheet.style.transform='';sheet.classList.remove('dragging')}
+ if(layer){layer.classList.add('show');layer.setAttribute('aria-hidden','false')}
+}
+function closeReservationJob(){
+ const layer=document.getElementById('reservationJobLayer');
+ const sheet=document.getElementById('reservationJobSheet');
+ if(!layer||!sheet) return;
+ sheet.classList.remove('dragging');
+ sheet.style.transform='translateY(100%)';
+ setTimeout(()=>{
+  layer.classList.remove('show');
+  layer.setAttribute('aria-hidden','true');
+  sheet.style.transform='';
+ },220);
+}
+function startReservationJobRide(){
+ const all=getReservations();
+ const i=all.findIndex(x=>x.id===currentReservationJobId);
+ if(i>=0){
+  all[i].shareStatus='onboard';
+  all[i].shareEvents=Array.isArray(all[i].shareEvents)?all[i].shareEvents:[];
+  all[i].shareEvents.push({type:'onboard',at:Date.now()});
+  saveReservations(all);
+  renderReservations();
+ }
+ closeReservationJob();
+ setTimeout(()=>startRideCapture(),230);
+}
+function initReservationJobGestures(){
+ const sheet=document.getElementById('reservationJobSheet');
+ if(!sheet||sheet.dataset.gestureReady==='1') return;
+ sheet.dataset.gestureReady='1';
+ sheet.addEventListener('touchstart',e=>{
+  if(!e.touches||!e.touches[0]) return;
+  reservationJobTouchStartY=e.touches[0].clientY;
+  reservationJobDragY=0;
+  sheet.classList.add('dragging');
+ },{passive:true});
+ sheet.addEventListener('touchmove',e=>{
+  if(!e.touches||!e.touches[0]) return;
+  const dy=e.touches[0].clientY-reservationJobTouchStartY;
+  reservationJobDragY=Math.max(0,dy);
+  if(reservationJobDragY>0) sheet.style.transform='translateY('+reservationJobDragY+'px)';
+ },{passive:true});
+ sheet.addEventListener('touchend',()=>{
+  sheet.classList.remove('dragging');
+  if(reservationJobDragY>90){
+   closeReservationJob();
+  }else{
+   sheet.style.transform='';
+  }
+  reservationJobDragY=0;
+ },{passive:true});
 }
 function reservationShareText(r){
  const lines=[
@@ -864,6 +997,21 @@ function deleteReservation(id){
  if(!confirm('この予約を削除しますか？')) return;
  saveReservations(getReservations().filter(r=>r.id!==id));
  renderReservations();
+}
+function checkReservationAutoJob(){
+ const screen=currentScreenId();
+ if(screen==='ride'||screen==='payment') return;
+ const layer=document.getElementById('reservationJobLayer');
+ if(layer?.classList.contains('show')) return;
+ const now=new Date();
+ const today=localDateValue(now);
+ const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
+ const key='taxi_auto_job_'+today+'_'+hm;
+ if(sessionStorage.getItem(key)==='1') return;
+ const r=getReservations().find(x=>x.shareStatus==='accepted'&&x.timed&&x.date===today&&x.time===hm);
+ if(!r) return;
+ sessionStorage.setItem(key,'1');
+ openReservationJob(r.id);
 }
 let infoReturn='home';
 let dutyFallback={active:false,start:0};
@@ -1387,6 +1535,26 @@ function toggleMap(){
  document.getElementById('homeMap').classList.toggle('hidden',!mapEnabled);
 }
 function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function initNoticeSwipe(){
+ const n=document.getElementById('notice');
+ if(!n||n.dataset.swipeReady==='1') return;
+ n.dataset.swipeReady='1';
+ let sy=0,dy=0;
+ n.addEventListener('touchstart',e=>{
+  if(!e.touches||!e.touches[0]) return;
+  sy=e.touches[0].clientY;dy=0;
+ },{passive:true});
+ n.addEventListener('touchmove',e=>{
+  if(!e.touches||!e.touches[0]) return;
+  dy=e.touches[0].clientY-sy;
+  if(dy<0) n.style.transform='translateY('+dy+'px)';
+ },{passive:true});
+ n.addEventListener('touchend',()=>{
+  if(dy<-55) hideNotice();
+  n.style.transform='';
+  dy=0;
+ },{passive:true});
+}
 function showNotice(level,icon,title,body,duration=5500){
  const n=document.getElementById('notice');n.className='notice show '+level;
  n.querySelector('#nicon').textContent=icon;n.querySelector('#ntitle').textContent=title;n.querySelector('#nbody').textContent=body;
@@ -1734,6 +1902,9 @@ startLocation();
 renderDutyUI();
 renderDutyDistance();
 renderReservations();
+initReservationJobGestures();
+initNoticeSwipe();
+setInterval(checkReservationAutoJob,15000);
 </script>
 </body>
 </html>
