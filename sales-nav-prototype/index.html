@@ -2,13 +2,13 @@
 <html lang="ja">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1,maximum-scale=1,user-scalable=no,viewport-fit=cover">
 <meta name="theme-color" content="#08111a">
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1818 -->
+<!-- BUILD:2026-10-01-1828 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -717,6 +717,25 @@ button,
 /* app grid safety */
 .app>main{min-height:0;min-width:0}
 .app>nav{min-height:var(--nav);max-height:var(--nav)}
+/* iOS tap zoom prevention */
+html,body,.app,main,.screen,nav,button,.card,.menuitem,.reservation,.info-card,.vacant-summary-row{
+ touch-action:manipulation;
+ -webkit-tap-highlight-color:transparent;
+}
+button,
+.nav button,
+.menuitem,
+.info-card,
+.reservation,
+.vacant-summary-row,
+.card[onclick]{
+ -webkit-user-select:none;
+ user-select:none;
+}
+input,textarea,select{
+ font-size:16px;
+ touch-action:manipulation;
+}
 </style>
 </head>
 <body>
@@ -1048,6 +1067,19 @@ button,
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
+function preventIosDoubleTapZoom(){
+ let lastTouchEnd=0;
+ document.addEventListener('touchend',function(e){
+  const now=Date.now();
+  if(now-lastTouchEnd<=300){
+   const t=e.target;
+   if(t && !['INPUT','TEXTAREA','SELECT'].includes(t.tagName)) e.preventDefault();
+  }
+  lastTouchEnd=now;
+ },{passive:false});
+}
+preventIosDoubleTapZoom();
+
 const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
