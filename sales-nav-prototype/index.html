@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1635 -->
+<!-- BUILD:2026-10-01-1705 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -432,6 +432,10 @@ main{position:relative;min-height:0;overflow:hidden}
   </div>
   <div class="card">
    <div class="row"><strong>本日のGPS</strong><span id="gpsQualitySummary">記録なし</span></div>
+  </div>
+  <div class="card">
+   <button class="primary" onclick="shareValidationData()">検証データをDriveへ送る</button>
+   <div class="sub" style="margin-top:8px">保存先：Google Drive「タクシー営業ナビ_検証データ」</div>
   </div>
   <div id="verifyList" class="list"></div>
  </div>
@@ -1242,6 +1246,55 @@ async function finishRide(){
    {enableHighAccuracy:true,maximumAge:0,timeout:10000}
   );
  }
+}
+function buildValidationExport(){
+ const duty=getDutyState();
+ const distance=getDutyDistanceState();
+ const gps=getGpsQualityLog();
+ const verify=getVerifyLog();
+ return {
+  schema:'taxi-sales-nav-validation-v1',
+  exportedAt:new Date().toISOString(),
+  build:'2026-10-01-1705',
+  duty:{
+   active:!!duty.active,
+   start:duty.start||null
+  },
+  distance:{
+   meters:Number(distance.meters)||0,
+   km:Math.round((Number(distance.meters)||0)/100)/10,
+   dutyStart:distance.dutyStart||null
+  },
+  gpsSummary:gpsQualitySummary(),
+  gpsSamples:gps,
+  warningAndPointLog:verify,
+  note:'ChatGPT検証用。GPS・走行距離・30km/h警告判定の実走データ。'
+ };
+}
+async function shareValidationData(){
+ const data=buildValidationExport();
+ const d=new Date();
+ const pad=n=>String(n).padStart(2,'0');
+ const name='taxi-nav-validation_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+'.json';
+ const blob=new Blob([JSON.stringify(data,null,2)],{type:'application/json'});
+ const file=new File([blob],name,{type:'application/json'});
+ try{
+  if(navigator.canShare&&navigator.canShare({files:[file]})&&navigator.share){
+   await navigator.share({
+    files:[file],
+    title:'タクシー営業ナビ 検証データ',
+    text:'Google Driveの「タクシー営業ナビ_検証データ」フォルダへ保存'
+   });
+   return;
+  }
+ }catch(e){
+  if(e&&e.name==='AbortError') return;
+ }
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');
+ a.href=url;a.download=name;
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),1000);
 }
 function renderGpsQualitySummary(){
  const el=document.getElementById('gpsQualitySummary');
