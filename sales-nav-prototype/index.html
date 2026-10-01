@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-2205 -->
+<!-- BUILD:2026-10-01-2235 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -213,7 +213,7 @@ main{position:relative;min-height:0;overflow:hidden}
  min-width:0;min-height:138px;padding:16px 13px;border-radius:16px;
  background:linear-gradient(180deg,var(--panel2),var(--panel));
  border:1px solid var(--line);
- display:grid;grid-template-rows:auto auto auto;align-content:center;gap:9px;
+ display:grid;grid-template-rows:auto auto auto auto;align-content:center;gap:7px;
  overflow:hidden
 }
 .info-card .info-top{
@@ -770,6 +770,10 @@ button,
      <span class="k">JR</span>
      <span id="vacantJrValue" class="v">取得待ち</span>
     </div>
+    <div id="vacantJrImpactRow" class="vacant-summary-row hidden">
+     <span class="k">注目</span>
+     <span id="vacantJrImpact" class="v">—</span>
+    </div>
     <div class="vacant-summary-row reservation-row" onclick="show('schedule')">
      <span class="k">次の予約</span>
      <span id="vacantReservationValue" class="v">なし</span>
@@ -897,6 +901,7 @@ button,
     <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
     <div id="jrInfoMiddle" class="info-middle">検証データ待ち</div>
     <div id="jrInfoBottom" class="info-bottom">試用表示</div>
+    <div id="jrInfoImpact" class="sub" style="margin-top:2px"></div>
    </div>
 
    <div id="busInfoCard" class="info-card" onclick="show('busDetail')">
@@ -1316,29 +1321,59 @@ function checkReservationAutoJob(){
 let jrProbeData=null;
 let jrProbeFetchedAt=0;
 
+function maybeNotifyJrImpact(d){
+ const impacts=Array.isArray(d?.station_impacts)?d.station_impacts:[];
+ const top=impacts[0];
+ if(!top || top.level==='weak') return;
+ const key=[top.station,top.level,top.max_delay,top.delayed_trains].join('|');
+ const lastKey=localStorage.getItem('taxi_jr_last_impact_key')||'';
+ const lastAt=Number(localStorage.getItem('taxi_jr_last_impact_at')||0);
+ const now=Date.now();
+ if(key===lastKey && now-lastAt<30*60*1000) return;
+ localStorage.setItem('taxi_jr_last_impact_key',key);
+ localStorage.setItem('taxi_jr_last_impact_at',String(now));
+ const level=top.level==='strong'?'critical':'warn';
+ const body=top.station+'周辺 / 遅延 '+top.delayed_trains+'本 / 最大 '+top.max_delay+'分';
+ showNotice(level,'!','JR 注目候補',body,7000);
+}
+
 function renderJrProbe(){
  const d=jrProbeData;
  const st=document.getElementById('jrInfoStatus');
  const mid=document.getElementById('jrInfoMiddle');
  const bot=document.getElementById('jrInfoBottom');
+ const impact=document.getElementById('jrInfoImpact');
  const card=document.getElementById('jrInfoCard');
  const vv=document.getElementById('vacantJrValue');
+ const vir=document.getElementById('vacantJrImpactRow');
+ const vi=document.getElementById('vacantJrImpact');
  if(!d){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='検証データ待ち';
   if(bot) bot.textContent='試用表示';
+  if(impact) impact.textContent='';
   if(vv) vv.textContent='取得待ち';
+  if(vir) vir.classList.add('hidden');
   return;
  }
+
+ const age=Math.max(0,Math.floor(Date.now()/1000-Number(d.generated_at||0)));
+ const stale=age>900;
  const s=d.summary||{};
  const delayed=Number(s.delayed_trains||0);
  const b=s.delay_buckets||{};
  const severe=Number(b['15_plus']||0);
  const moderate=Number(b['10_14']||0);
+ const impacts=Array.isArray(d.station_impacts)?d.station_impacts:[];
+ const top=impacts[0]||null;
+
  let label='平常';
  let detail='目立つ遅れなし';
  let level='';
- if(severe>0){
+ if(stale){
+  label='更新待ち';
+  detail='検証データが古いため判定保留';
+ }else if(severe>0){
   label='大きな遅れ';
   detail='15分以上 '+severe+'本';
   level='state-alert';
@@ -1351,14 +1386,27 @@ function renderJrProbe(){
   detail='遅延 '+delayed+'本';
   level='state-warn';
  }
+
  if(card){
   card.classList.remove('state-alert','state-warn');
   if(level) card.classList.add(level);
  }
  if(st) st.textContent=label;
  if(mid) mid.textContent=detail;
- if(bot) bot.textContent='試用取得・自動表示';
- if(vv) vv.textContent=label==='平常'?'平常':label+' '+detail;
+ if(bot) bot.textContent='更新 '+formatAgo(d.generated_at)+'・試用取得';
+
+ if(!stale && top && top.level!=='weak'){
+  const impactText=top.station+'周辺　最大'+top.max_delay+'分';
+  if(impact) impact.textContent='注目候補 '+impactText;
+  if(vir) vir.classList.remove('hidden');
+  if(vi) vi.textContent=top.station+'周辺';
+  if(vv) vv.textContent=label==='平常'?'平常':label;
+  maybeNotifyJrImpact(d);
+ }else{
+  if(impact) impact.textContent='';
+  if(vir) vir.classList.add('hidden');
+  if(vv) vv.textContent=label==='平常'?'平常':label;
+ }
 }
 async function loadJrProbeSnapshot(force=false){
  const now=Date.now();
