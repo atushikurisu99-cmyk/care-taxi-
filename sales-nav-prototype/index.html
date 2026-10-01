@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1758 -->
+<!-- BUILD:2026-10-01-1805 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -763,7 +763,7 @@ button,
   </div>
 
   <div class="home-summary">
-   <div class="card"><div class="label">JR</div><div id="homeJrValue" class="value">取得待ち</div><div id="homeJrSub" class="sub">試用データ確認中</div></div>
+   <div class="card"><div class="label">JR</div><div id="homeJrValue" class="value">取得待ち</div><div id="homeJrSub" class="sub">データ確認中</div></div>
    <div class="card"><div class="label">イベント</div><div class="value">未接続</div><div class="sub">実データ連携準備中</div></div>
    <div class="card reservation-summary" onclick="show('schedule')"><div class="label">次の予約</div><div id="homeReservationValue" class="value">なし</div><div id="homeReservationSub" class="sub">タップして予約を登録</div></div>
   </div>
@@ -932,7 +932,7 @@ button,
    <div id="jrInfoCard" class="info-card">
     <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
     <div id="jrInfoMiddle" class="info-middle">検証データ待ち</div>
-    <div id="jrInfoBottom" class="info-bottom">試用表示</div>
+    <div id="jrInfoBottom" class="info-bottom">更新待ち</div>
     <div id="jrInfoImpact" class="sub" style="margin-top:2px"></div>
     <div id="jrInfoFacts" class="sub" style="margin-top:2px"></div>
    </div>
@@ -1486,12 +1486,12 @@ function renderJrProbe(){
  if(!d){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='検証データ待ち';
-  if(bot) bot.textContent='試用表示';
+  if(bot) bot.textContent='更新待ち';
   if(impact) impact.textContent='';
   if(factsEl) factsEl.textContent='';
   if(vv) vv.textContent='取得待ち';
   if(hv) hv.textContent='取得待ち';
-  if(hs) hs.textContent='試用データ確認中';
+  if(hs) hs.textContent='データ確認中';
   if(vir) vir.classList.add('hidden');
   if(vfr) vfr.classList.add('hidden');
   return;
@@ -1535,7 +1535,7 @@ function renderJrProbe(){
  }
  if(st) st.textContent=label;
  if(mid) mid.textContent=detail;
- if(bot) bot.textContent=stale?(formatAgo(d.generated_at)+'・試用'):('更新 '+formatAgo(d.generated_at));
+ if(bot) bot.textContent=stale?(formatAgo(d.generated_at)+''):('更新 '+formatAgo(d.generated_at));
  if(hv) hv.textContent=label;
  if(hs){
   if(stale) hs.textContent='データ更新待ち';
