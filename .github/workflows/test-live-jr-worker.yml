@@ -1,0 +1,43 @@
+name: Test live temporary JR Worker
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - ".github/workflows/test-live-jr-worker.yml"
+
+jobs:
+  test-live:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Test health and JR payload
+        run: |
+          python - <<'PY'
+          import json, urllib.request
+          base="https://taxi-jr-higashima-proxy.feather-wasp.workers.dev"
+          def get(path):
+              req=urllib.request.Request(
+                  base+path,
+                  headers={"Origin":"https://atushikurisu99-cmyk.github.io","User-Agent":"Mozilla/5.0"}
+              )
+              with urllib.request.urlopen(req, timeout=20) as r:
+                  body=json.loads(r.read().decode("utf-8"))
+                  cors=r.headers.get("Access-Control-Allow-Origin")
+                  return r.status, cors, body
+          hs,hcors,h=get("/health")
+          js,jcors,j=get("/api/jr/hiroshima")
+          assert hs==200 and h.get("ok") is True
+          assert js==200 and j.get("ok") is True
+          assert hcors=="https://atushikurisu99-cmyk.github.io"
+          assert jcors=="https://atushikurisu99-cmyk.github.io"
+          assert j.get("summary",{}).get("line_count")==6
+          assert len(j.get("lines",[]))==6
+          print(json.dumps({
+              "health":h,
+              "cors":jcors,
+              "summary":j.get("summary"),
+              "generated_at":j.get("generated_at"),
+              "cache_seconds":j.get("cache_seconds"),
+              "lines":[{"code":x.get("code"),"name":x.get("name"),"train_count":x.get("train_count")} for x in j.get("lines",[])]
+          },ensure_ascii=False,indent=2))
+          PY
