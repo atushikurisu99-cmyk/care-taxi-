@@ -2,6 +2,8 @@ name: Probe JR West Hiroshima data
 
 on:
   workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
   push:
     paths:
       - "tools/probe_jrwest_hiroshima.py"
@@ -9,6 +11,10 @@ on:
 
 permissions:
   contents: write
+
+concurrency:
+  group: jrwest-higashima-probe
+  cancel-in-progress: true
 
 jobs:
   probe:
