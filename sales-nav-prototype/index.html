@@ -546,7 +546,6 @@ function handleDutyMain(){
  const startedAt=Date.now();
  saveDutyState(true,startedAt);
  show('vacant');
- toast('乗務を開始しました');
  renderDutyUI();
 }
 function endDuty(){
@@ -560,7 +559,6 @@ function endDuty(){
  }catch(e){}
  saveDutyState(false);
  currentRideStart=null;
- toast('乗務を終了しました');
  renderDutyUI();
  setTimeout(()=>show('home'),450);
 }
@@ -823,7 +821,6 @@ async function finishRide(){
 
  // 降車操作は位置取得・住所変換を待たず即時反映。
  show(getDutyState().active?'vacant':'home');
- toast('降車しました');
 
  const recordDropoff=async(p)=>{
   const rec={
@@ -868,7 +865,7 @@ function renderVerify(){
   </div>`).join('');
 }
 function clearVerify(){
- localStorage.removeItem('taxi_verify_log');renderVerify();toast('検証履歴をクリアしました');
+ localStorage.removeItem('taxi_verify_log');renderVerify();
 }
 startLocation();
 renderDutyUI();
