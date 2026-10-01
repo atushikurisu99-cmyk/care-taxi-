@@ -119,6 +119,75 @@ def position_to_text(pos, stations: dict[str, str]) -> str:
     return "〜".join(names)
 
 
+def delay_weight(minutes: int) -> int:
+    if minutes >= 15:
+        return 4
+    if minutes >= 10:
+        return 3
+    if minutes >= 5:
+        return 2
+    if minutes > 0:
+        return 1
+    return 0
+
+
+def build_station_impacts(lines: list[dict]) -> list[dict]:
+    """遅延列車の現在位置から、駅・駅間ごとの影響候補を集計する。
+
+    これは「タクシー需要」の断定ではなく、運転手へ見せる注目候補。
+    同じ駅/駅間付近に複数の遅延列車が重なるほどスコアを上げる。
+    """
+    impacts: dict[str, dict] = {}
+    for line in lines:
+        line_name = str(line.get("name") or line.get("code") or "")
+        for tr in line.get("trains") or []:
+            try:
+                delay = int(tr.get("delayMinutes") or 0)
+            except Exception:
+                delay = 0
+            weight = delay_weight(delay)
+            if weight <= 0:
+                continue
+
+            pos_text = str(tr.get("positionText") or "").strip()
+            if not pos_text:
+                continue
+
+            # 駅間なら両端を候補にする。位置コードのままなら除外。
+            station_names = [x.strip() for x in pos_text.split("〜") if x.strip()]
+            for station in station_names:
+                if station.replace("-", "").replace("_", "").isalnum() and not any("\u3040" <= ch <= "\u9fff" for ch in station):
+                    continue
+                rec = impacts.setdefault(station, {
+                    "station": station,
+                    "score": 0,
+                    "delayed_trains": 0,
+                    "max_delay": 0,
+                    "lines": set(),
+                })
+                rec["score"] += weight
+                rec["delayed_trains"] += 1
+                rec["max_delay"] = max(rec["max_delay"], delay)
+                rec["lines"].add(line_name)
+
+    # 山陽本線・呉線が同時に海田市周辺へ掛かる場合は、接続点として情報価値が高い。
+    for rec in impacts.values():
+        if rec["station"] == "海田市":
+            names = " ".join(rec["lines"])
+            if ("山陽" in names) and ("呉" in names):
+                rec["score"] += 2
+                rec["junction"] = True
+
+    result = []
+    for rec in impacts.values():
+        rec["lines"] = sorted(rec["lines"])
+        score = int(rec["score"])
+        rec["level"] = "strong" if score >= 8 or rec["max_delay"] >= 15 else ("watch" if score >= 4 or rec["max_delay"] >= 10 else "weak")
+        result.append(rec)
+    result.sort(key=lambda x: (x["score"], x["max_delay"], x["delayed_trains"]), reverse=True)
+    return result[:10]
+
+
 def main():
     started = int(time.time())
     master_url = f"{BASE}/area_{AREA}_master.json"
@@ -187,11 +256,15 @@ def main():
             "trains": trains,
         })
 
+    impacts = build_station_impacts(report["lines"])
+    report["station_impacts"] = impacts
     report["summary"] = {
         "line_count": len(report["lines"]),
         "total_trains": total_trains,
         "delayed_trains": delayed_trains,
         "delay_buckets": delay_buckets,
+        "top_station": impacts[0]["station"] if impacts else None,
+        "top_station_level": impacts[0]["level"] if impacts else None,
     }
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
