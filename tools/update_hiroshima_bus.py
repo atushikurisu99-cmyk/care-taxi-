@@ -78,20 +78,40 @@ def summarize_operator(op: dict) -> dict:
     alert_items = []
     try:
         feed = decode_feed(f"{BASE}/realtime/{op_id}/alerts.bin")
+        now = int(time.time())
+        seen_alerts = set()
         for ent in feed.entity:
             if not ent.HasField("alert"):
                 continue
             a = ent.alert
+
+            # 有効期間が指定されている場合、現在有効なものだけ採用。
+            if a.active_period:
+                active_now = False
+                for p in a.active_period:
+                    start = int(p.start) if p.HasField("start") else 0
+                    end = int(p.end) if p.HasField("end") else 0
+                    if (not start or now >= start) and (not end or now <= end):
+                        active_now = True
+                        break
+                if not active_now:
+                    continue
+
             title = localized_text(a.header_text)
             desc = localized_text(a.description_text)
             route_names = []
             for ie in a.informed_entity:
                 if ie.route_id:
                     route_names.append(routes.get(ie.route_id, ie.route_id))
+            route_names = sorted(set(route_names))
+            key = (title, desc, tuple(route_names))
+            if key in seen_alerts:
+                continue
+            seen_alerts.add(key)
             alert_items.append({
                 "title": title or "運行情報あり",
                 "description": desc,
-                "routes": sorted(set(route_names)),
+                "routes": route_names,
             })
     except Exception:
         pass
@@ -107,13 +127,14 @@ def summarize_operator(op: dict) -> dict:
             tu = ent.trip_update
             trip_delays = []
             if tu.HasField("delay"):
-                trip_delays.append(abs(int(tu.delay)))
+                trip_delays.append(int(tu.delay))
             for stu in tu.stop_time_update:
                 if stu.arrival.HasField("delay"):
-                    trip_delays.append(abs(int(stu.arrival.delay)))
+                    trip_delays.append(int(stu.arrival.delay))
                 if stu.departure.HasField("delay"):
-                    trip_delays.append(abs(int(stu.departure.delay)))
-            d = max(trip_delays) if trip_delays else 0
+                    trip_delays.append(int(stu.departure.delay))
+            # 早着(負値)は遅延扱いしない。
+            d = max([x for x in trip_delays if x > 0], default=0)
             if d >= 180:
                 delayed_trips += 1
                 max_delay_sec = max(max_delay_sec, d)
