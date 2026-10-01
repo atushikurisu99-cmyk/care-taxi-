@@ -71,7 +71,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .chev{font-size:26px;color:#80919e}
 .action{display:flex;gap:8px}
 .primary{flex:1;border:none;border-radius:16px;background:var(--blue);color:white;font-size:24px;font-weight:900}
-.primary.pay{background:#ff4f57}
+.primary.pay{background:#f08a24}
 .primary.secondary{background:#12212d;border:1px solid #2a3a47;color:white}
 .primary.danger{background:#7f5555}
 .nav{display:grid;grid-template-columns:repeat(5,1fr);border-top:1px solid #1a2833;background:#09131d;padding:5px 4px calc(5px + env(safe-area-inset-bottom))}
@@ -226,17 +226,21 @@ main{position:relative;min-height:0;overflow:hidden}
 @keyframes drop{from{opacity:0;transform:translateY(-7px)}to{opacity:1;transform:none}}
 
 /* safety alert */
-.safety{position:absolute;z-index:70;left:50%;top:47%;transform:translate(-50%,-50%);width:240px;height:220px;display:none;align-items:center;justify-content:center;pointer-events:none}
+.safety{
+ position:absolute;z-index:70;left:50%;top:48%;transform:translate(-50%,-50%);
+ width:min(86vw,370px);height:340px;display:none;
+ align-items:center;justify-content:center;pointer-events:none
+}
 .safety.show{display:flex}
 .triangle{
- width:205px;height:180px;display:flex;align-items:center;justify-content:center;
- animation:pulse 1.5s ease-in-out infinite;
- filter:drop-shadow(0 12px 24px rgba(255,70,70,.25))
+ width:min(82vw,350px);height:auto;display:flex;align-items:center;justify-content:center;
+ animation:safetyBlink 1.6s linear infinite;
+ filter:drop-shadow(0 14px 30px rgba(255,70,70,.32))
 }
-.triangle svg{width:100%;height:100%;display:block}
+.triangle svg{width:100%;height:auto;display:block}
 .safetytext{
- position:absolute;bottom:-1px;background:#171313;border:1px solid #8f3f3f;
- color:#fff;font-size:17px;font-weight:900;border-radius:999px;padding:8px 15px
+ position:absolute;bottom:18px;background:#171313;border:1px solid #a34747;
+ color:#fff;font-size:18px;font-weight:900;border-radius:999px;padding:10px 18px
 }
 @keyframes safetyBlink{
  0%{opacity:.28}
@@ -256,7 +260,7 @@ main{position:relative;min-height:0;overflow:hidden}
  .value{font-size:23px}.sub,.label{font-size:12px}.reservation{min-height:72px}.reservation strong{font-size:24px}
  .primary{font-size:21px}.map-control{height:46px;flex-basis:46px}.map-control strong{font-size:14px}.map-control small{font-size:10px}.location-status{min-height:54px;padding:8px 11px}.location-status strong{font-size:14px}.location-status small{font-size:10px}.loc-pill{font-size:10px}.mapcard{min-height:170px}.quick .card{padding:8px 4px}.quick strong{font-size:14px}
  .notice{left:9px;right:9px;top:7px;min-height:72px}.notice strong{font-size:16px}.notice span{font-size:12px}
- .safety{width:200px;height:185px}.triangle{width:172px;height:150px;padding-bottom:21px}.triangle span{font-size:76px}.safetytext{font-size:14px}
+ .safety{width:min(86vw,330px);height:300px}.triangle{width:min(80vw,310px);height:auto}.safetytext{font-size:16px}
 }
 </style>
 </head>
