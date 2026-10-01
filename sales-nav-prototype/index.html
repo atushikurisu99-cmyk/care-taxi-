@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1832 -->
+<!-- BUILD:2026-10-01-1845 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -131,6 +131,8 @@ main{position:relative;min-height:0;overflow:hidden}
 .reservation-item-time{font-size:22px;font-weight:900;line-height:1.1}
 .reservation-item-place{font-size:16px;font-weight:800;margin-top:6px}
 .reservation-item-sub{font-size:12px;color:var(--muted);margin-top:4px}
+.reservation-item-actions{display:flex;gap:7px;flex:0 0 auto}
+.reservation-item-actions .smallbtn{white-space:nowrap}
 .reservation-form{display:flex;flex-direction:column;gap:11px;overflow:auto;padding-bottom:4px}
 .form-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
 .form-label{font-size:13px;color:var(--muted);font-weight:800;margin-bottom:7px}
@@ -700,7 +702,10 @@ function renderReservations(){
     '<div class="reservation-item-top"><div><div class="reservation-item-time">'+escapeHtml(t)+'</div>'+
     '<div class="reservation-item-place">'+escapeHtml(r.pickup)+dest+'</div>'+
     '<div class="reservation-item-sub">'+escapeHtml(r.date)+(person?' / '+person:'')+'</div></div>'+
-    '<button class="smallbtn" onclick="deleteReservation(\''+r.id+'\')">削除</button></div></div>';
+    '<div class="reservation-item-actions">'+
+    '<button class="smallbtn" onclick="shareReservation(\''+r.id+'\')">共有</button>'+
+    '<button class="smallbtn" onclick="deleteReservation(\''+r.id+'\')">削除</button>'+
+    '</div></div></div>';
   }).join('');
  }
  if(empty) empty.style.display=all.length?'none':'flex';
@@ -741,6 +746,41 @@ function saveReservation(){
  const all=getReservations();all.push(r);saveReservations(all);
  renderReservations();
  show('schedule');
+}
+async function shareReservation(id){
+ const r=getReservations().find(x=>x.id===id);
+ if(!r) return;
+ const lines=[
+  '【予約】',
+  '日付: '+(r.date||''),
+  '時間: '+(r.timed?(r.time||'未定'):'時間指定なし'),
+  'お迎え: '+(r.pickup||'')
+ ];
+ if(r.destination) lines.push('行き先: '+r.destination);
+ if(r.name) lines.push('お名前: '+r.name);
+ if(r.phone) lines.push('電話番号: '+r.phone);
+ if(r.memo) lines.push('メモ: '+r.memo);
+ const text=lines.join('\n');
+ try{
+  if(navigator.share){
+   await navigator.share({title:'予約',text});
+   return;
+  }
+ }catch(e){
+  if(e&&e.name==='AbortError') return;
+ }
+ try{
+  await navigator.clipboard.writeText(text);
+  toast('予約をコピーしました');
+ }catch(e){
+  const ta=document.createElement('textarea');
+  ta.value=text;
+  document.body.appendChild(ta);
+  ta.select();
+  document.execCommand('copy');
+  ta.remove();
+  toast('予約をコピーしました');
+ }
 }
 function deleteReservation(id){
  if(!confirm('この予約を削除しますか？')) return;
