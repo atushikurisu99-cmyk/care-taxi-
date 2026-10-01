@@ -486,7 +486,7 @@ function show(id){
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
- if(id==='ride')setTimeout(()=>showSafety(5200),700);
+ // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
  renderDutyUI();
 }
 let infoReturn='home';
