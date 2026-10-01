@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-2055 -->
+<!-- BUILD:2026-10-01-2135 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -889,16 +889,16 @@ button,
 <section id="today" class="screen">
  <div class="content today-content">
   <div class="info-grid">
-   <div class="info-card">
-    <div class="info-top"><span class="info-key">JR</span><span class="info-status">未接続</span></div>
-    <div class="info-middle">実データ連携準備中</div>
-    <div class="info-bottom">—</div>
+   <div class="info-card" onclick="openJrOfficial()">
+    <div class="info-top"><span class="info-key">JR</span><span class="info-status">公式</span></div>
+    <div class="info-middle">広島・山口 運行情報</div>
+    <div class="info-bottom">タップしてJR西日本公式を確認</div>
    </div>
 
-   <div class="info-card">
-    <div class="info-top"><span class="info-key">バス</span><span class="info-status">未接続</span></div>
-    <div class="info-middle">実データ連携準備中</div>
-    <div class="info-bottom">—</div>
+   <div id="busInfoCard" class="info-card" onclick="show('busDetail')">
+    <div class="info-top"><span class="info-key">バス</span><span id="busInfoStatus" class="info-status">取得中</span></div>
+    <div id="busInfoMiddle" class="info-middle">GTFSリアルタイムを確認中</div>
+    <div id="busInfoBottom" class="info-bottom">—</div>
    </div>
 
    <div class="info-card">
@@ -915,6 +915,16 @@ button,
   </div>
  </div>
  <div class="action"><button class="primary secondary info-back" onclick="backFromInfo()">戻る</button></div>
+</section>
+
+<section id="busDetail" class="screen">
+ <div class="content">
+  <div class="card">
+   <div class="row"><div><div class="label">広島県バス協会 GTFS</div><h2 style="margin:3px 0 0">バス運行状況</h2></div><span id="busUpdated" class="badge">更新待ち</span></div>
+  </div>
+  <div id="busDetailList" class="list"></div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('today')">戻る</button></div>
 </section>
 
 <section id="sales" class="screen">
@@ -982,7 +992,7 @@ button,
 </div>
 <div class="toast" id="toast">保存しました</div>
 <script>
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -1005,6 +1015,7 @@ function show(id){
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id || (id==='vacant'&&b.dataset.target==='home')));
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
+ if(id==='today'||id==='busDetail') loadBusRealtime(id==='busDetail');
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
@@ -1296,6 +1307,80 @@ function checkReservationAutoJob(){
  if(!r) return;
  sessionStorage.setItem(key,'1');
  openReservationJob(r.id);
+}
+let busRealtimeData=null;
+let busRealtimeFetchedAt=0;
+
+function openJrOfficial(){
+ window.open('https://trafficinfo.westjr.co.jp/chugoku.html','_blank','noopener');
+}
+function formatAgo(ts){
+ const sec=Math.max(0,Math.floor(Date.now()/1000-Number(ts||0)));
+ if(sec<60) return sec+'秒前';
+ if(sec<3600) return Math.floor(sec/60)+'分前';
+ return Math.floor(sec/3600)+'時間前';
+}
+function renderBusRealtime(){
+ const card=document.getElementById('busInfoCard');
+ const st=document.getElementById('busInfoStatus');
+ const mid=document.getElementById('busInfoMiddle');
+ const bot=document.getElementById('busInfoBottom');
+ const upd=document.getElementById('busUpdated');
+ const list=document.getElementById('busDetailList');
+ const d=busRealtimeData;
+ if(!d){
+  if(st) st.textContent='取得待ち';
+  if(mid) mid.textContent='GTFSリアルタイムを確認中';
+  if(bot) bot.textContent='—';
+  if(upd) upd.textContent='更新待ち';
+  if(list) list.innerHTML='<div class="verify-empty">データ更新を待っています。</div>';
+  return;
+ }
+ const age=Math.max(0,Math.floor(Date.now()/1000-(d.generated_at||0)));
+ const stale=age>900;
+ const s=d.summary||{};
+ if(card){
+  card.classList.toggle('state-warn',!stale&&((s.alerts||0)>0||(s.delayed_trips||0)>0));
+ }
+ if(st) st.textContent=stale?'更新待ち':((s.alerts||0)>0?'運行情報あり':((s.delayed_trips||0)>0?'遅れあり':'平常'));
+ if(mid){
+  if(stale) mid.textContent='リアルタイムデータが古いため判定保留';
+  else if((s.delayed_trips||0)>0) mid.textContent='遅延 '+s.delayed_trips+'便 / 最大 '+Math.round((s.max_delay_sec||0)/60)+'分';
+  else if((s.alerts||0)>0) mid.textContent='運行情報 '+s.alerts+'件';
+  else mid.textContent='主要6社で目立つ遅延なし';
+ }
+ if(bot) bot.textContent='更新 '+formatAgo(d.generated_at);
+ if(upd) upd.textContent=formatAgo(d.generated_at);
+ if(list){
+  const ops=Array.isArray(d.operators)?d.operators:[];
+  list.innerHTML=ops.map(op=>{
+   const delayed=Number(op.delayed_trips||0);
+   const alerts=Number(op.alert_count||0);
+   const maxMin=Math.round(Number(op.max_delay_sec||0)/60);
+   const route=(op.route_delays&&op.route_delays[0])?op.route_delays[0]:null;
+   const alert=(op.alerts&&op.alerts[0])?op.alerts[0]:null;
+   let detail='目立つ遅延なし';
+   if(delayed>0) detail='遅延 '+delayed+'便'+(maxMin?' / 最大 '+maxMin+'分':'');
+   if(alerts>0) detail=(detail==='目立つ遅延なし'?'':detail+' / ')+'運行情報 '+alerts+'件';
+   let extra='';
+   if(route) extra='<div class="sub" style="margin-top:5px">'+escapeHtml(route.route)+'　約'+Math.round(route.delay_sec/60)+'分</div>';
+   if(alert&&alert.title) extra+='<div class="sub" style="margin-top:5px">'+escapeHtml(alert.title)+'</div>';
+   return '<div class="verify-card"><div class="verify-head"><strong>'+escapeHtml(op.name)+'</strong><span class="badge">'+Number(op.vehicle_count||0)+'台</span></div><div>'+detail+'</div>'+extra+'</div>';
+  }).join('')||'<div class="verify-empty">データなし</div>';
+ }
+}
+async function loadBusRealtime(force=false){
+ const now=Date.now();
+ if(!force&&busRealtimeFetchedAt&&now-busRealtimeFetchedAt<60000) return;
+ busRealtimeFetchedAt=now;
+ try{
+  const r=await fetch('./data/bus-realtime.json?ts='+now,{cache:'no-store'});
+  if(!r.ok) throw new Error('http '+r.status);
+  busRealtimeData=await r.json();
+ }catch(e){
+  // 前回値があれば残す
+ }
+ renderBusRealtime();
 }
 let infoReturn='home';
 let dutyFallback={active:false,start:0};
@@ -2276,6 +2361,8 @@ renderWeatherData(readWeatherCache());
 initReservationJobGestures();
 initNoticeSwipe();
 setInterval(checkReservationAutoJob,15000);
+loadBusRealtime(false);
+setInterval(()=>loadBusRealtime(false),60000);
 </script>
 </body>
 </html>
