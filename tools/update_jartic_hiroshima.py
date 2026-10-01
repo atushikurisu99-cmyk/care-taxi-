@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""JARTIC公式オープンデータから広島市周辺の速度規制だけを抽出する。
+"""JARTIC公式オープンデータから広島市周辺の速度・道路構造規制を抽出する。
 
 - 公式 catalog: https://www.jartic.or.jp/d/opendata/opendata.json
 - 対象: typeD / R34 (広島県)
@@ -23,6 +23,16 @@ PREF_ID = "R34"
 # 広島市・府中町・海田町周辺。実車検証用の初期範囲。
 BBOX = [132.20, 34.20, 132.80, 34.60]  # west,south,east,north
 MAX_SPEED_CODES = {"112", "113", "114"}
+STRUCTURE_CODES = {
+    "15": "central_line",
+    "16": "central_line",
+    "20": "vehicle_lane",
+    "21": "vehicle_lane",
+    "24": "vehicle_lane",
+    "110": "vehicle_lane",
+    "118": "vehicle_lane",
+    "119": "lane_direction",
+}
 UA = {"User-Agent": "taxi-sales-nav/0.1 (+GitHub Actions)"}
 
 
@@ -60,7 +70,15 @@ def main() -> None:
     raw_zip = fetch(zip_url, 300)
 
     features = []
-    counts = {"rows": 0, "speed_rows": 0, "kept": 0, "zone30": 0}
+    structures = []
+    counts = {
+        "rows": 0,
+        "speed_rows": 0,
+        "kept": 0,
+        "zone30": 0,
+        "structure_rows": 0,
+        "structure_kept": 0,
+    }
     with zipfile.ZipFile(io.BytesIO(raw_zip)) as z:
         csv_infos = [i for i in z.infolist() if not i.is_dir() and i.filename.lower().endswith(".csv")]
         if not csv_infos:
@@ -83,12 +101,34 @@ def main() -> None:
                 for row in reader:
                     counts["rows"] += 1
                     code = val(row, "共通規制種別コード")
-                    if code not in MAX_SPEED_CODES:
+                    is_speed = code in MAX_SPEED_CODES
+                    is_structure = code in STRUCTURE_CODES
+                    if not is_speed and not is_structure:
                         continue
-                    counts["speed_rows"] += 1
+
                     coords = parse_coords(val(row, "規制場所の経度緯度"))
+                    if is_speed:
+                        counts["speed_rows"] += 1
+                    if is_structure:
+                        counts["structure_rows"] += 1
                     if not coords or not hits_bbox(coords):
                         continue
+
+                    if is_structure:
+                        structures.append({
+                            "code": code,
+                            "type": STRUCTURE_CODES[code],
+                            "shape": val(row, "点・線・面コード") or None,
+                            "kind": val(row, "県別規制種別名称") or None,
+                            "route": val(row, "路線名(代表)") or None,
+                            "updated": val(row, "データ更新日") or None,
+                            "coords": coords,
+                        })
+                        counts["structure_kept"] += 1
+
+                    if not is_speed:
+                        continue
+
                     speed_raw = val(row, "速度")
                     try:
                         speed = int(speed_raw) if speed_raw else None
@@ -113,13 +153,14 @@ def main() -> None:
         "source": "公益財団法人 日本道路交通情報センター（JARTIC）交通規制情報",
         "source_url": "https://www.jartic.or.jp/service/opendata/",
         "processed": True,
-        "processing_note": "広島市周辺の最高速度規制（112/113/114）のみ抽出",
+        "processing_note": "広島市周辺の最高速度規制と中央線・車両通行帯等の構造規制を抽出",
         "target_month": entry.get("targetMonth"),
         "release_day": entry.get("releaseDay"),
         "prefecture_id": PREF_ID,
         "bbox": BBOX,
         "counts": counts,
         "features": features,
+        "structures": structures,
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, ensure_ascii=False, separators=(",", ":")), encoding="utf-8")
