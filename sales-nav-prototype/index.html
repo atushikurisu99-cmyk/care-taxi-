@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1445 -->
+<!-- BUILD:2026-10-01-1510 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -590,6 +590,9 @@ let latestPosition=null;
 let vacantAreaLookupAt=0;
 let jarticSpeedData=null;
 let safetyZoneActive=false;
+const gsiRoadTileCache=new Map();
+let roadStructureEvalSeq=0;
+window.__roadDecision={state:'未判定'};
 
 async function loadJarticSpeedData(){
  try{
@@ -634,6 +637,125 @@ function distanceToFeatureMeters(f,lon,lat){
  for(let i=1;i<pts.length;i++) best=Math.min(best,distanceToSegmentMeters(lon,lat,pts[i-1],pts[i]));
  return best;
 }
+function lonLatToTile(lon,lat,z=16){
+ const n=Math.pow(2,z);
+ const x=Math.floor((lon+180)/360*n);
+ const r=lat*Math.PI/180;
+ const y=Math.floor((1-Math.asinh(Math.tan(r))/Math.PI)/2*n);
+ return {x,y,z};
+}
+async function fetchGsiRoadTile(z,x,y){
+ const key=z+'/'+x+'/'+y;
+ if(gsiRoadTileCache.has(key)) return gsiRoadTileCache.get(key);
+ const p=fetch('https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/'+key+'.geojson',{cache:'force-cache'})
+  .then(r=>r.ok?r.json():null)
+  .then(d=>d&&Array.isArray(d.features)?d.features:[])
+  .catch(()=>[]);
+ gsiRoadTileCache.set(key,p);
+ return p;
+}
+async function loadNearbyGsiRoads(lon,lat){
+ const t=lonLatToTile(lon,lat,16);
+ const jobs=[];
+ for(let dx=-1;dx<=1;dx++) for(let dy=-1;dy<=1;dy++) jobs.push(fetchGsiRoadTile(16,t.x+dx,t.y+dy));
+ const groups=await Promise.all(jobs);
+ return groups.flat();
+}
+function roadFeatureLines(f){
+ if(!f||!f.geometry) return [];
+ const g=f.geometry;
+ if(g.type==='LineString') return [g.coordinates||[]];
+ if(g.type==='MultiLineString') return g.coordinates||[];
+ return [];
+}
+function distanceToRoadFeatureMeters(f,lon,lat){
+ let best=Infinity;
+ for(const pts of roadFeatureLines(f)){
+  if(pts.length===1) best=Math.min(best,metersBetween(lon,lat,pts[0][0],pts[0][1]));
+  for(let i=1;i<pts.length;i++) best=Math.min(best,distanceToSegmentMeters(lon,lat,pts[i-1],pts[i]));
+ }
+ return best;
+}
+function roadWidthEvidence(props={}){
+ const raw=props.rnkWidth;
+ const n=Number(raw);
+ if(Number.isFinite(n)){
+  if(n===1) return '3-5.5m';
+  if(n===2) return '5.5-13m';
+  if(n===3) return '13-19.5m';
+  if(n===4) return '19.5m+';
+ }
+ const s=String(props.width||props.Width||props.幅員||'');
+ if(/3.*5\.5/.test(s)) return '3-5.5m';
+ if(/5\.5.*13/.test(s)) return '5.5-13m';
+ return '';
+}
+function roadCategory(props={}){
+ return String(props.rdCtg||props.roadCategory||props.category||'');
+}
+function nearestStructureEvidence(lon,lat){
+ const arr=(jarticSpeedData&&Array.isArray(jarticSpeedData.structures))?jarticSpeedData.structures:[];
+ let best=null;
+ for(const f of arr){
+  const d=distanceToFeatureMeters(f,lon,lat);
+  if(d<=14 && (!best||d<best.d)) best={f,d};
+ }
+ return best;
+}
+async function evaluateStatutory30Candidate(pos){
+ const seq=++roadStructureEvalSeq;
+ if(currentScreenId()!=='ride'||!jarticSpeedData) return;
+ const acc=Number(pos.coords.accuracy||9999);
+ if(acc>10){
+  window.__roadDecision={state:'判定保留',reason:'GPS精度',accuracy:acc};
+  return;
+ }
+ const lon=pos.coords.longitude,lat=pos.coords.latitude;
+ const roads=await loadNearbyGsiRoads(lon,lat);
+ if(seq!==roadStructureEvalSeq||currentScreenId()!=='ride') return;
+ let nearest=null;
+ for(const f of roads){
+  const d=distanceToRoadFeatureMeters(f,lon,lat);
+  if(!nearest||d<nearest.d) nearest={f,d};
+ }
+ if(!nearest||nearest.d>Math.max(8,acc+3)){
+  window.__roadDecision={state:'判定保留',reason:'道路スナップ低確度',distance:nearest?nearest.d:null};
+  return;
+ }
+ const props=nearest.f.properties||{};
+ const structure=nearestStructureEvidence(lon,lat);
+ const width=roadWidthEvidence(props);
+ const category=roadCategory(props);
+ if(structure){
+  window.__roadDecision={
+   state:'法定30対象外材料あり',
+   reason:structure.f.type,
+   code:structure.f.code,
+   structureDistance:Math.round(structure.d),
+   roadDistance:Math.round(nearest.d),
+   width,category
+  };
+  return;
+ }
+ const localRoad=!/国道|都道府県道|高速自動車国道/.test(category);
+ if(localRoad&&width==='3-5.5m'){
+  // 中央線・車両通行帯の「不存在」は公開データだけでは断定できない。
+  // そのため候補として保持するだけで、速度表示や警告はまだ出さない。
+  window.__roadDecision={
+   state:'法定30候補',
+   reason:'狭幅員の地域道路・構造規制ヒットなし',
+   roadDistance:Math.round(nearest.d),
+   width,category
+  };
+  return;
+ }
+ window.__roadDecision={
+  state:'判定保留',
+  reason:'法定30の必要条件を確定できない',
+  roadDistance:Math.round(nearest.d),
+  width,category
+ };
+}
 function setSpeedLimitUI(speed){
  const row=document.getElementById('speedLimitRow');
  const val=document.getElementById('speedLimitValue');
@@ -649,7 +771,12 @@ function setSpeedLimitUI(speed){
 function evaluateSafetyZone(pos){
  if(currentScreenId()!=='ride'||!jarticSpeedData){setSpeedLimitUI(null);return}
  const acc=Number(pos.coords.accuracy||9999);
- if(acc>15){safetyZoneActive=false;setSpeedLimitUI(null);return}
+ if(acc>15){
+  safetyZoneActive=false;
+  setSpeedLimitUI(null);
+  window.__roadDecision={state:'判定保留',reason:'GPS精度',accuracy:acc};
+  return;
+ }
  const lon=pos.coords.longitude,lat=pos.coords.latitude;
  const candidates=[];
  for(const f of jarticSpeedData.features){
@@ -658,16 +785,31 @@ function evaluateSafetyZone(pos){
   if(d<=14&&Number.isFinite(speed)) candidates.push({f,d,speed});
  }
  candidates.sort((a,b)=>a.d-b.d);
- if(!candidates.length){safetyZoneActive=false;setSpeedLimitUI(null);return}
+ if(candidates.length){
+  const nearest=candidates[0];
+  const conflict=candidates.some(x=>x!==nearest&&x.d<=nearest.d+4&&x.speed!==nearest.speed);
+  if(conflict){
+   safetyZoneActive=false;
+   setSpeedLimitUI(null);
+   window.__roadDecision={state:'判定保留',reason:'速度規制が競合'};
+   return;
+  }
+  setSpeedLimitUI(nearest.speed);
+  const shouldWarn=nearest.speed===30||!!nearest.f.zone30;
+  if(shouldWarn&&!safetyZoneActive) showSafety(5200);
+  safetyZoneActive=shouldWarn;
+  window.__roadDecision={
+   state:'指定速度',
+   speed:nearest.speed,
+   zone30:!!nearest.f.zone30,
+   distance:Math.round(nearest.d)
+  };
+  return;
+ }
 
- const nearest=candidates[0];
- const conflict=candidates.some(x=>x!==nearest&&x.d<=nearest.d+4&&x.speed!==nearest.speed);
- if(conflict){safetyZoneActive=false;setSpeedLimitUI(null);return}
-
- setSpeedLimitUI(nearest.speed);
- const shouldWarn=nearest.speed===30||!!nearest.f.zone30;
- if(shouldWarn&&!safetyZoneActive) showSafety(5200);
- safetyZoneActive=shouldWarn;
+ safetyZoneActive=false;
+ setSpeedLimitUI(null);
+ evaluateStatutory30Candidate(pos);
 }
 let vacantAreaLookupBusy=false;
 
