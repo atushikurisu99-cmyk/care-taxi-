@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-0925 -->
+<!-- BUILD:2026-10-01-1420 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -578,6 +578,61 @@ setInterval(renderDutyUI,30000);
 let geoWatchId=null;
 let latestPosition=null;
 let vacantAreaLookupAt=0;
+let jarticSpeedData=null;
+let safetyZoneActive=false;
+
+async function loadJarticSpeedData(){
+ try{
+  const r=await fetch('./data/jartic-hiroshima-speed.json?ts='+Date.now(),{cache:'no-store'});
+  if(!r.ok) return;
+  const d=await r.json();
+  if(d&&Array.isArray(d.features)) jarticSpeedData=d;
+ }catch(e){}
+}
+function currentScreenId(){
+ const el=document.querySelector('.screen.active');
+ return el?el.id:'';
+}
+function pointInPolygon(lon,lat,pts){
+ let inside=false;
+ for(let i=0,j=pts.length-1;i<pts.length;j=i++){
+  const xi=pts[i][0], yi=pts[i][1], xj=pts[j][0], yj=pts[j][1];
+  const cross=((yi>lat)!==(yj>lat)) && (lon < (xj-xi)*(lat-yi)/((yj-yi)||1e-12)+xi);
+  if(cross) inside=!inside;
+ }
+ return inside;
+}
+function metersBetween(lon1,lat1,lon2,lat2){
+ const y=(lat2-lat1)*111320;
+ const x=(lon2-lon1)*111320*Math.cos((lat1+lat2)*Math.PI/360);
+ return Math.hypot(x,y);
+}
+function distanceToSegmentMeters(lon,lat,a,b){
+ const scaleX=111320*Math.cos(lat*Math.PI/180), scaleY=111320;
+ const ax=(a[0]-lon)*scaleX, ay=(a[1]-lat)*scaleY;
+ const bx=(b[0]-lon)*scaleX, by=(b[1]-lat)*scaleY;
+ const dx=bx-ax, dy=by-ay;
+ const t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/((dx*dx+dy*dy)||1)));
+ return Math.hypot(ax+t*dx,ay+t*dy);
+}
+function featureMatchesZone30(f,lon,lat){
+ if(!f||!f.zone30||!Array.isArray(f.coords)||!f.coords.length) return false;
+ const pts=f.coords;
+ if(pts.length>=3 && pointInPolygon(lon,lat,pts)) return true;
+ let best=Infinity;
+ for(let i=1;i<pts.length;i++) best=Math.min(best,distanceToSegmentMeters(lon,lat,pts[i-1],pts[i]));
+ if(pts.length===1) best=metersBetween(lon,lat,pts[0][0],pts[0][1]);
+ return best<=25;
+}
+function evaluateSafetyZone(pos){
+ if(currentScreenId()!=='ride'||!jarticSpeedData) return;
+ const acc=Number(pos.coords.accuracy||9999);
+ if(acc>25){safetyZoneActive=false;return}
+ const lon=pos.coords.longitude,lat=pos.coords.latitude;
+ const inside=jarticSpeedData.features.some(f=>featureMatchesZone30(f,lon,lat));
+ if(inside&&!safetyZoneActive) showSafety(5200);
+ safetyZoneActive=inside;
+}
 let vacantAreaLookupBusy=false;
 
 function setLocationUI(state, detail, cls=''){
@@ -606,6 +661,7 @@ function handlePosition(pos){
  else if(a<=60) setLocationUI('位置情報 低精度','精度 ±'+a+'m','warn');
  else setLocationUI('位置情報 低精度','精度 ±'+a+'m・判定保留','warn');
  updateVacantArea(pos);
+ evaluateSafetyZone(pos);
 }
 
 async function updateVacantArea(pos){
@@ -909,6 +965,7 @@ function renderVerify(){
 function clearVerify(){
  localStorage.removeItem('taxi_verify_log');renderVerify();
 }
+loadJarticSpeedData();
 startLocation();
 renderDutyUI();
 </script>
