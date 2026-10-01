@@ -1,0 +1,41 @@
+name: Update Hiroshima bus realtime
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "*/5 * * * *"
+  push:
+    paths:
+      - "tools/update_hiroshima_bus.py"
+      - ".github/workflows/update-bus-realtime.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: bus-realtime
+  cancel-in-progress: true
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Install GTFS realtime parser
+        run: pip install gtfs-realtime-bindings
+      - name: Fetch bus realtime feeds
+        run: python tools/update_hiroshima_bus.py
+      - name: Commit generated data
+        run: |
+          if [ -z "$(git status --porcelain -- sales-nav-prototype/data/bus-realtime.json)" ]; then
+            echo "No data change"
+            exit 0
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add sales-nav-prototype/data/bus-realtime.json
+          git commit -m "Update Hiroshima bus realtime data"
+          git push
