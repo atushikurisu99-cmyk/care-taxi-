@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1610 -->
+<!-- BUILD:2026-10-01-1635 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -429,6 +429,9 @@ main{position:relative;min-height:0;overflow:hidden}
  <div class="content">
   <div class="card">
    <div class="row"><div><h2 style="margin:0">位置・警告検証</h2><div class="sub">GPSと30km/h警告の判定履歴を確認</div></div><button class="smallbtn" onclick="clearVerify()">履歴クリア</button></div>
+  </div>
+  <div class="card">
+   <div class="row"><strong>本日のGPS</strong><span id="gpsQualitySummary">記録なし</span></div>
   </div>
   <div id="verifyList" class="list"></div>
  </div>
@@ -895,6 +898,55 @@ function updateDutyDistance(pos){
  saveDutyDistanceState(s);
  renderDutyDistance();
 }
+function getGpsQualityLog(){
+ try{return JSON.parse(localStorage.getItem('taxi_gps_quality_log')||'[]')}catch(e){return[]}
+}
+function saveGpsQualityLog(log){
+ localStorage.setItem('taxi_gps_quality_log',JSON.stringify(log.slice(-12000)));
+}
+function recordGpsQuality(pos){
+ const duty=getDutyState();
+ if(!duty.active) return;
+ const now=Date.now();
+ const acc=Number(pos.coords.accuracy||9999);
+ const speedMps=Number.isFinite(pos.coords.speed)?Math.max(0,pos.coords.speed):null;
+ const log=getGpsQualityLog();
+ const prev=log.length?log[log.length-1]:null;
+ const gap=prev?Math.max(0,(now-prev.t)/1000):0;
+ log.push({
+  t:now,
+  accuracy:Math.round(acc),
+  gap:Math.round(gap*10)/10,
+  speedKmh:speedMps===null?null:Math.round(speedMps*3.6*10)/10,
+  lat:pos.coords.latitude,
+  lon:pos.coords.longitude
+ });
+ saveGpsQualityLog(log);
+}
+function resetGpsQualityLog(){
+ localStorage.removeItem('taxi_gps_quality_log');
+}
+function gpsQualitySummary(){
+ const log=getGpsQualityLog();
+ if(!log.length) return null;
+ const accs=log.map(x=>Number(x.accuracy)).filter(Number.isFinite);
+ const gaps=log.map(x=>Number(x.gap)).filter(Number.isFinite);
+ const within10=accs.filter(x=>x<=10).length;
+ const within20=accs.filter(x=>x<=20).length;
+ const over30=accs.filter(x=>x>30).length;
+ return {
+  samples:accs.length,
+  avgAccuracy:accs.length?Math.round((accs.reduce((a,b)=>a+b,0)/accs.length)*10)/10:null,
+  bestAccuracy:accs.length?Math.min(...accs):null,
+  worstAccuracy:accs.length?Math.max(...accs):null,
+  within10Pct:accs.length?Math.round(within10/accs.length*1000)/10:null,
+  within20Pct:accs.length?Math.round(within20/accs.length*1000)/10:null,
+  over30Count:over30,
+  maxGap:gaps.length?Math.max(...gaps):0,
+  durationMin:log.length>1?Math.round((log[log.length-1].t-log[0].t)/6000)/10:0
+ };
+}
+window.__gpsQualitySummary=gpsQualitySummary;
 function handlePosition(pos){
  latestPosition=pos;
  const a=Math.round(pos.coords.accuracy||9999);
@@ -1191,7 +1243,15 @@ async function finishRide(){
   );
  }
 }
+function renderGpsQualitySummary(){
+ const el=document.getElementById('gpsQualitySummary');
+ if(!el) return;
+ const s=gpsQualitySummary();
+ if(!s){el.textContent='記録なし';return}
+ el.textContent='平均 ±'+s.avgAccuracy+'m / ±10m以内 '+s.within10Pct+'% / 最大途切れ '+s.maxGap+'秒';
+}
 function renderVerify(){
+ renderGpsQualitySummary();
  const el=document.getElementById('verifyList');if(!el)return;
  const log=getVerifyLog();
  if(!log.length){el.innerHTML='<div class="verify-empty">まだ検証データがありません。<br>乗車・降車時に町名と緯度経度を記録します。</div>';return}
