@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-2315 -->
+<!-- BUILD:2026-10-01-1745 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -785,7 +785,7 @@ button,
      <span id="vacantJrValue" class="v">取得待ち</span>
     </div>
     <div id="vacantJrImpactRow" class="vacant-summary-row hidden">
-     <span class="k">JR影響</span>
+     <span class="k">JR待ち状況</span>
      <span id="vacantJrImpact" class="v">—</span>
     </div>
     <div id="vacantJrFactsRow" class="vacant-summary-row hidden">
@@ -1418,12 +1418,8 @@ function jrFactsForDriver(d){
  const impacts=Array.isArray(d?.station_impacts)?d.station_impacts:[];
  const top=impacts[0]||null;
  const trend=jrTrendText();
- const bus=currentBusFact();
- const rain=currentWeatherFact();
- const band=currentTimeBand();
  const lines=jrRelatedLines(top);
- const facts=[trend,lines,bus,rain,band].filter(Boolean);
- return {top,trend,bus,rain,band,lines,facts};
+ return {top,trend,lines};
 }
 function maybeNotifyJrFacts(d){
  const age=Math.max(0,Math.floor(Date.now()/1000-Number(d?.generated_at||0)));
@@ -1439,7 +1435,7 @@ function maybeNotifyJrFacts(d){
  if(!material) return;
  const screen=currentScreenId();
  if(screen==='ride'||screen==='payment') return;
- const key=[top?.station||'',delayed,severe,moderate,f.trend,f.bus,f.rain].join('|');
+ const key=[top?.station||'',delayed,severe,moderate,f.trend,f.lines].join('|');
  const lastKey=localStorage.getItem('taxi_jr_last_fact_key')||'';
  const lastAt=Number(localStorage.getItem('taxi_jr_last_fact_at')||0);
  const now=Date.now();
@@ -1452,8 +1448,7 @@ function maybeNotifyJrFacts(d){
   delayed?'遅延 '+delayed+'本':'',
   top?.max_delay?'最大 '+top.max_delay+'分':'',
   f.trend,
-  f.bus,
-  f.rain
+  f.lines
  ].filter(Boolean).join(' / ');
  showNotice(severe>0?'critical':'warn','!',title,body,7000);
 }
@@ -1526,7 +1521,7 @@ function renderJrProbe(){
  if(!stale && top && Number(top.delayed_trains||0)>0){
   const lineText=ctx.lines?(' / '+ctx.lines):'';
   const impactText=top.station+'周辺 / '+top.delayed_trains+'本 / 最大'+top.max_delay+'分'+lineText;
-  if(impact) impact.textContent='遅延集中 '+impactText;
+  if(impact) impact.textContent='列車状況 '+impactText;
   if(vir) vir.classList.remove('hidden');
   if(vi) vi.textContent=top.station+'周辺 最大'+top.max_delay+'分';
  }else{
@@ -1534,7 +1529,7 @@ function renderJrProbe(){
   if(vir) vir.classList.add('hidden');
  }
 
- const compactFacts=[ctx.trend,ctx.bus,ctx.rain].filter(Boolean);
+ const compactFacts=[ctx.trend,ctx.lines].filter(Boolean);
  if(!stale && compactFacts.length){
   if(factsEl) factsEl.textContent=compactFacts.join('・');
   if(vfr) vfr.classList.remove('hidden');
@@ -1630,7 +1625,6 @@ async function loadBusRealtime(force=false){
   // 前回値があれば残す
  }
  renderBusRealtime();
- if(jrProbeData) renderJrProbe();
 }
 let infoReturn='home';
 let dutyFallback={active:false,start:0};
@@ -2124,7 +2118,6 @@ async function updateWeather(pos,force=false){
  const now=Date.now();
  if(!force&&cached&&now-(cached.savedAt||0)<7200000){
   renderWeatherData(cached);
-  if(jrProbeData) renderJrProbe();
   return;
  }
  weatherFetchBusy=true;
@@ -2158,7 +2151,6 @@ async function updateWeather(pos,force=false){
   };
   writeWeatherCache(result);
   renderWeatherData(result);
-  if(jrProbeData) renderJrProbe();
  }catch(e){
   if(cached) renderWeatherData(cached);
   else{
