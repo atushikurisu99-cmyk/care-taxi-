@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1945 -->
+<!-- BUILD:2026-10-01-2005 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -398,6 +398,63 @@ body{
   padding:11px 12px;
  }
 }
+/* 予約入力画面 v2 */
+#reservationEdit .content{
+ overflow-y:auto;
+ overflow-x:hidden;
+ padding:2px 2px 10px;
+}
+.reservation-form-title{
+ padding:4px 2px 2px;
+}
+.reservation-form-title h2{
+ margin:0;
+ font-size:24px;
+ line-height:1.15;
+}
+.reservation-field{
+ width:100%;
+ min-width:0;
+ display:flex;
+ flex-direction:column;
+ gap:7px;
+}
+.reservation-field .form-label{
+ padding-left:2px;
+ font-size:14px;
+}
+.required-mark{color:#ff8f94}
+#reservationEdit .form-input,
+#reservationEdit .form-textarea{
+ width:100%;
+ min-width:0;
+ max-width:100%;
+ background:#0c1721;
+ border:1px solid #2a3a47;
+ border-radius:14px;
+ color:#fff;
+ font-size:17px;
+ padding:13px 14px;
+}
+#reservationEdit .form-textarea{
+ min-height:94px;
+}
+#reservationEdit .form-toggle{
+ display:grid;
+ grid-template-columns:1fr 1fr;
+ gap:8px;
+}
+#reservationEdit .form-toggle button{
+ min-height:52px;
+ border-radius:14px;
+ font-size:17px;
+}
+#reservationEdit .form-actions{
+ gap:8px;
+}
+#reservationEdit .form-actions .primary{
+ min-height:62px;
+}
 </style>
 </head>
 <body>
@@ -537,9 +594,11 @@ body{
 
 <section id="reservationEdit" class="screen">
  <div class="content reservation-form">
-  <div class="card"><h2 style="margin:0">予約を追加</h2><div class="sub">必要な項目だけ入力</div></div>
+  <div class="reservation-form-title">
+   <h2>予約を追加</h2>
+  </div>
 
-  <div class="form-card">
+  <div class="reservation-field">
    <div class="form-label">時間指定</div>
    <div class="form-toggle">
     <button id="resTimedYes" class="active" type="button" onclick="setReservationTimed(true)">あり</button>
@@ -547,39 +606,37 @@ body{
    </div>
   </div>
 
-  <div class="form-row2">
-   <div class="form-card">
-    <div class="form-label">日付</div>
-    <input id="resDate" class="form-input" type="date">
-   </div>
-   <div id="resTimeWrap" class="form-card">
-    <div class="form-label">時刻</div>
-    <input id="resTime" class="form-input" type="time">
-   </div>
+  <div class="reservation-field">
+   <div class="form-label">日付</div>
+   <input id="resDate" class="form-input" type="date">
   </div>
 
-  <div class="form-card">
-   <div class="form-label">お迎え場所 <span style="color:#ff9b9f">必須</span></div>
+  <div id="resTimeWrap" class="reservation-field">
+   <div class="form-label">時刻</div>
+   <input id="resTime" class="form-input" type="time">
+  </div>
+
+  <div class="reservation-field">
+   <div class="form-label">お迎え場所 <span class="required-mark">必須</span></div>
    <input id="resPickup" class="form-input" type="text" placeholder="例：広島駅 新幹線口" autocomplete="off">
   </div>
 
-  <div class="form-card">
+  <div class="reservation-field">
    <div class="form-label">行き先</div>
    <input id="resDestination" class="form-input" type="text" placeholder="未定なら空欄でOK" autocomplete="off">
   </div>
 
-  <div class="form-row2">
-   <div class="form-card">
-    <div class="form-label">お名前</div>
-    <input id="resName" class="form-input" type="text" placeholder="任意" autocomplete="off">
-   </div>
-   <div class="form-card">
-    <div class="form-label">電話番号</div>
-    <input id="resPhone" class="form-input" type="tel" placeholder="任意" inputmode="tel">
-   </div>
+  <div class="reservation-field">
+   <div class="form-label">お名前</div>
+   <input id="resName" class="form-input" type="text" placeholder="任意" autocomplete="off">
   </div>
 
-  <div class="form-card">
+  <div class="reservation-field">
+   <div class="form-label">電話番号</div>
+   <input id="resPhone" class="form-input" type="tel" placeholder="任意" inputmode="tel">
+  </div>
+
+  <div class="reservation-field">
    <div class="form-label">メモ</div>
    <textarea id="resMemo" class="form-textarea" placeholder="目印・人数・荷物など"></textarea>
   </div>
