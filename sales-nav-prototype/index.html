@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1745 -->
+<!-- BUILD:2026-10-01-1758 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -20,6 +20,8 @@ html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
 body{position:fixed;inset:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:var(--text);touch-action:manipulation}
 button,input{font:inherit}
 .app{width:min(430px,100%);height:100dvh;margin:auto;display:grid;grid-template-rows:var(--header) minmax(0,1fr) var(--nav);background:linear-gradient(#08131d,#071019)}
+.app.header-collapsed{grid-template-rows:0 minmax(0,1fr) var(--nav)}
+.app.header-collapsed header{display:none}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
 header h1{font-size:21px;margin:0}
 header.state-only{justify-content:flex-end}
@@ -689,6 +691,18 @@ button,
 #vacantJrImpactRow .v{
  font-size:15px;
 }
+/* compact two-column information cards */
+.info-card .info-middle,
+.info-card .info-bottom{
+ text-overflow:ellipsis;
+}
+@media(max-width:390px){
+ .info-card{padding-left:12px;padding-right:12px}
+ .info-card .info-key{font-size:16px}
+ .info-card .info-status{font-size:15px}
+ .info-card .info-middle{font-size:15px}
+ .info-card .info-bottom{font-size:14px}
+}
 </style>
 </head>
 <body>
@@ -749,7 +763,7 @@ button,
   </div>
 
   <div class="home-summary">
-   <div class="card"><div class="label">JR</div><div class="value">未接続</div><div class="sub">実データ連携準備中</div></div>
+   <div class="card"><div class="label">JR</div><div id="homeJrValue" class="value">取得待ち</div><div id="homeJrSub" class="sub">試用データ確認中</div></div>
    <div class="card"><div class="label">イベント</div><div class="value">未接続</div><div class="sub">実データ連携準備中</div></div>
    <div class="card reservation-summary" onclick="show('schedule')"><div class="label">次の予約</div><div id="homeReservationValue" class="value">なし</div><div id="homeReservationSub" class="sub">タップして予約を登録</div></div>
   </div>
@@ -1037,6 +1051,7 @@ function show(id){
  const badge=document.getElementById('badge');
  const isHome=id==='home';
  header.classList.toggle('state-only',!isHome);
+ document.querySelector('.app')?.classList.toggle('header-collapsed',!isHome);
  title.textContent=isHome?'タクシー営業ナビ':'';
  badge.style.display=isHome?'':'none';
  if(isHome) badge.textContent=stateLabelFor(id);
@@ -1462,6 +1477,8 @@ function renderJrProbe(){
  const factsEl=document.getElementById('jrInfoFacts');
  const card=document.getElementById('jrInfoCard');
  const vv=document.getElementById('vacantJrValue');
+ const hv=document.getElementById('homeJrValue');
+ const hs=document.getElementById('homeJrSub');
  const vir=document.getElementById('vacantJrImpactRow');
  const vi=document.getElementById('vacantJrImpact');
  const vfr=document.getElementById('vacantJrFactsRow');
@@ -1473,6 +1490,8 @@ function renderJrProbe(){
   if(impact) impact.textContent='';
   if(factsEl) factsEl.textContent='';
   if(vv) vv.textContent='取得待ち';
+  if(hv) hv.textContent='取得待ち';
+  if(hs) hs.textContent='試用データ確認中';
   if(vir) vir.classList.add('hidden');
   if(vfr) vfr.classList.add('hidden');
   return;
@@ -1495,7 +1514,7 @@ function renderJrProbe(){
  let level='';
  if(stale){
   label='更新待ち';
-  detail='検証データが古いため判定保留';
+  detail='データ更新待ち';
  }else if(severe>0){
   label='大きな遅れ';
   detail='15分以上 '+severe+'本 / 全体 '+delayed+'本';
@@ -1516,7 +1535,13 @@ function renderJrProbe(){
  }
  if(st) st.textContent=label;
  if(mid) mid.textContent=detail;
- if(bot) bot.textContent='更新 '+formatAgo(d.generated_at)+'・試用取得';
+ if(bot) bot.textContent=stale?(formatAgo(d.generated_at)+'・試用'):('更新 '+formatAgo(d.generated_at));
+ if(hv) hv.textContent=label;
+ if(hs){
+  if(stale) hs.textContent='データ更新待ち';
+  else if(top&&Number(top.delayed_trains||0)>0) hs.textContent=(top.station||'駅周辺')+' 最大'+Number(top.max_delay||0)+'分';
+  else hs.textContent='目立つ遅れなし';
+ }
 
  if(!stale && top && Number(top.delayed_trains||0)>0){
   const lineText=ctx.lines?(' / '+ctx.lines):'';
@@ -1588,12 +1613,12 @@ function renderBusRealtime(){
  }
  if(st) st.textContent=stale?'更新待ち':((s.alerts||0)>0?'運行情報あり':((s.delayed_trips||0)>0?'遅れあり':'平常'));
  if(mid){
-  if(stale) mid.textContent='リアルタイムデータが古いため判定保留';
+  if(stale) mid.textContent='データ更新待ち';
   else if((s.delayed_trips||0)>0) mid.textContent='遅延 '+s.delayed_trips+'便 / 最大 '+Math.round((s.max_delay_sec||0)/60)+'分';
   else if((s.alerts||0)>0) mid.textContent='運行情報 '+s.alerts+'件';
   else mid.textContent='主要6社で目立つ遅延なし';
  }
- if(bot) bot.textContent='更新 '+formatAgo(d.generated_at);
+ if(bot) bot.textContent=stale?formatAgo(d.generated_at):('更新 '+formatAgo(d.generated_at));
  if(upd) upd.textContent=formatAgo(d.generated_at);
  if(list){
   const ops=Array.isArray(d.operators)?d.operators:[];
