@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-2025 -->
+<!-- BUILD:2026-10-01-2055 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -653,6 +653,28 @@ button,
   justify-content:flex-start;
  }
 }
+/* iOS native input containment */
+#reservationEdit input[type="date"],
+#reservationEdit input[type="time"]{
+ -webkit-appearance:none;
+ appearance:none;
+ display:block;
+ inline-size:100%;
+ width:100%;
+ min-width:0;
+ max-width:100%;
+ box-sizing:border-box;
+ overflow:hidden;
+ border-radius:14px;
+}
+#reservationEdit input[type="date"]::-webkit-date-and-time-value,
+#reservationEdit input[type="time"]::-webkit-date-and-time-value{
+ text-align:left;
+ min-width:0;
+}
+#reservationEdit .reservation-field{
+ padding-right:1px;
+}
 </style>
 </head>
 <body>
@@ -705,13 +727,16 @@ button,
   </div>
 
   <div class="home-weather">
-   <span class="weather-icon" aria-hidden="true">🌧</span>
-   <div class="weather-text">20:30頃から雨</div>
+   <span id="weatherIcon" class="weather-icon" aria-hidden="true">--</span>
+   <div style="min-width:0">
+    <div id="weatherNow" class="weather-text">天気を取得中…</div>
+    <div id="weatherNext" class="sub">現在地から更新</div>
+   </div>
   </div>
 
   <div class="home-summary">
-   <div class="card"><div class="label">JR</div><div class="value">平常</div><div class="sub">異常時に通知</div></div>
-   <div class="card"><div class="label">イベント</div><div class="value">3件</div><div class="sub">夜に集中</div></div>
+   <div class="card"><div class="label">JR</div><div class="value">未接続</div><div class="sub">実データ連携準備中</div></div>
+   <div class="card"><div class="label">イベント</div><div class="value">未接続</div><div class="sub">実データ連携準備中</div></div>
    <div class="card reservation-summary" onclick="show('schedule')"><div class="label">次の予約</div><div id="homeReservationValue" class="value">なし</div><div id="homeReservationSub" class="sub">タップして予約を登録</div></div>
   </div>
 
@@ -736,6 +761,10 @@ button,
     <div class="vacant-summary-row">
      <span class="k">現在地</span>
      <span id="vacantArea" class="v">取得中…</span>
+    </div>
+    <div class="vacant-summary-row">
+     <span class="k">走行距離</span>
+     <span id="dutyDistance" class="v">0.0 km</span>
     </div>
     <div class="vacant-summary-row reservation-row" onclick="show('schedule')">
      <span class="k">次の予約</span>
@@ -860,28 +889,28 @@ button,
 <section id="today" class="screen">
  <div class="content today-content">
   <div class="info-grid">
-   <div class="info-card state-alert" onclick="showNotice('critical','!','JR 山陽本線 運転見合わせ','広島〜西条 / 20:35〜',5500)">
-    <div class="info-top"><span class="info-key">JR</span><span class="info-status">見合わせ</span></div>
-    <div class="info-middle">山陽本線 広島〜西条</div>
-    <div class="info-bottom">20:35〜</div>
+   <div class="info-card">
+    <div class="info-top"><span class="info-key">JR</span><span class="info-status">未接続</span></div>
+    <div class="info-middle">実データ連携準備中</div>
+    <div class="info-bottom">—</div>
    </div>
 
    <div class="info-card">
-    <div class="info-top"><span class="info-key">バス</span><span class="info-status">広島駅方面</span></div>
-    <div class="info-middle">通過 3分前</div>
-    <div class="info-bottom">次便 12分後</div>
+    <div class="info-top"><span class="info-key">バス</span><span class="info-status">未接続</span></div>
+    <div class="info-middle">実データ連携準備中</div>
+    <div class="info-bottom">—</div>
    </div>
 
    <div class="info-card">
-    <div class="info-top"><span class="info-key">ライブ</span><span class="info-status">3件</span></div>
-    <div class="info-middle"><span class="name-clip">サザンオールスターズ</span></div>
-    <div class="info-bottom">17:00</div>
+    <div class="info-top"><span class="info-key">ライブ</span><span class="info-status">未接続</span></div>
+    <div class="info-middle"><span class="name-clip">実データ連携準備中</span></div>
+    <div class="info-bottom">—</div>
    </div>
 
    <div class="info-card">
-    <div class="info-top"><span class="info-key">スポーツ</span><span class="info-status">1件</span></div>
-    <div class="info-middle"><span class="name-clip">広島−阪神</span></div>
-    <div class="info-bottom">8回裏</div>
+    <div class="info-top"><span class="info-key">スポーツ</span><span class="info-status">未接続</span></div>
+    <div class="info-middle"><span class="name-clip">実データ連携準備中</span></div>
+    <div class="info-bottom">—</div>
    </div>
   </div>
  </div>
@@ -1324,6 +1353,8 @@ function handleDutyMain(){
  if(d.active){show('vacant');return}
  const startedAt=Date.now();
  saveDutyState(true,startedAt);
+ resetDutyDistance(startedAt);
+ resetGpsQualityLog();
  show('vacant');
  renderDutyUI();
 }
@@ -1723,6 +1754,86 @@ function gpsQualitySummary(){
  };
 }
 window.__gpsQualitySummary=gpsQualitySummary;
+let weatherFetchBusy=false;
+function weatherLabel(code){
+ const c=Number(code);
+ if(c===0) return ['☀️','晴れ'];
+ if(c===1||c===2) return ['🌤','晴れ時々くもり'];
+ if(c===3) return ['☁️','くもり'];
+ if(c===45||c===48) return ['🌫','霧'];
+ if([51,53,55,56,57].includes(c)) return ['🌦','霧雨'];
+ if([61,63,65,66,67,80,81,82].includes(c)) return ['🌧','雨'];
+ if([71,73,75,77,85,86].includes(c)) return ['🌨','雪'];
+ if([95,96,99].includes(c)) return ['⛈','雷雨'];
+ return ['🌡','天気'];
+}
+function renderWeatherData(data){
+ const icon=document.getElementById('weatherIcon');
+ const nowEl=document.getElementById('weatherNow');
+ const nextEl=document.getElementById('weatherNext');
+ if(!icon||!nowEl||!nextEl||!data) return;
+ const [ic,label]=weatherLabel(data.code);
+ icon.textContent=ic;
+ nowEl.textContent=Math.round(data.temp)+'℃・'+label;
+ nextEl.textContent=data.next||'向こう12時間に目立つ雨予報なし';
+}
+function readWeatherCache(){
+ try{return JSON.parse(localStorage.getItem('taxi_weather_cache')||'null')}catch(e){return null}
+}
+function writeWeatherCache(v){
+ try{localStorage.setItem('taxi_weather_cache',JSON.stringify(v))}catch(e){}
+}
+async function updateWeather(pos,force=false){
+ if(!pos||weatherFetchBusy) return;
+ const cached=readWeatherCache();
+ const now=Date.now();
+ if(!force&&cached&&now-(cached.savedAt||0)<7200000){
+  renderWeatherData(cached);
+  return;
+ }
+ weatherFetchBusy=true;
+ const lat=pos.coords.latitude,lon=pos.coords.longitude;
+ const url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+
+  '&longitude='+encodeURIComponent(lon)+
+  '&current=temperature_2m,weather_code,precipitation,rain,wind_speed_10m'+
+  '&hourly=precipitation_probability,precipitation&forecast_hours=12&timezone=Asia%2FTokyo';
+ try{
+  const d=await fetchJsonWithTimeout(url,6500);
+  const current=d.current||{};
+  const times=d.hourly?.time||[];
+  const probs=d.hourly?.precipitation_probability||[];
+  const precs=d.hourly?.precipitation||[];
+  let next='';
+  for(let i=0;i<times.length;i++){
+   if(Number(probs[i])>=40||Number(precs[i])>=0.1){
+    const dt=new Date(times[i]);
+    const hm=String(dt.getHours()).padStart(2,'0')+':'+String(dt.getMinutes()).padStart(2,'0');
+    next=hm+'頃 雨 '+Math.round(Number(probs[i])||0)+'%';
+    break;
+   }
+  }
+  const result={
+   savedAt:now,
+   temp:Number(current.temperature_2m),
+   code:Number(current.weather_code),
+   precipitation:Number(current.precipitation||0),
+   wind:Number(current.wind_speed_10m||0),
+   next:next||'向こう12時間に目立つ雨予報なし'
+  };
+  writeWeatherCache(result);
+  renderWeatherData(result);
+ }catch(e){
+  if(cached) renderWeatherData(cached);
+  else{
+   const nowEl=document.getElementById('weatherNow');
+   const nextEl=document.getElementById('weatherNext');
+   if(nowEl) nowEl.textContent='天気取得不能';
+   if(nextEl) nextEl.textContent='次回GPS更新時に再取得';
+  }
+ }finally{
+  weatherFetchBusy=false;
+ }
+}
 function handlePosition(pos){
  latestPosition=pos;
  const a=Math.round(pos.coords.accuracy||9999);
@@ -1730,6 +1841,9 @@ function handlePosition(pos){
  else if(a<=60) setLocationUI('位置情報 低精度','精度 ±'+a+'m','warn');
  else setLocationUI('位置情報 低精度','精度 ±'+a+'m・判定保留','warn');
  updateVacantArea(pos);
+ updateDutyDistance(pos);
+ recordGpsQuality(pos);
+ updateWeather(pos,false);
  evaluateSafetyZone(pos);
 }
 
@@ -2030,10 +2144,11 @@ async function finishRide(){
  };
 
  if(latestPosition){
+  updateWeather(latestPosition,true);
   recordDropoff(latestPosition);
  }else if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(
-   p=>{latestPosition=p;recordDropoff(p)},
+   p=>{latestPosition=p;updateWeather(p,true);recordDropoff(p)},
    ()=>{},
    {enableHighAccuracy:true,maximumAge:0,timeout:10000}
   );
@@ -2157,6 +2272,7 @@ startLocation();
 renderDutyUI();
 renderDutyDistance();
 renderReservations();
+renderWeatherData(readWeatherCache());
 initReservationJobGestures();
 initNoticeSwipe();
 setInterval(checkReservationAutoJob,15000);
