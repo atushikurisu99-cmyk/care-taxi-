@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-2135 -->
+<!-- BUILD:2026-10-01-2205 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -766,6 +766,10 @@ button,
      <span class="k">走行距離</span>
      <span id="dutyDistance" class="v">0.0 km</span>
     </div>
+    <div id="vacantJrRow" class="vacant-summary-row">
+     <span class="k">JR</span>
+     <span id="vacantJrValue" class="v">取得待ち</span>
+    </div>
     <div class="vacant-summary-row reservation-row" onclick="show('schedule')">
      <span class="k">次の予約</span>
      <span id="vacantReservationValue" class="v">なし</span>
@@ -889,10 +893,10 @@ button,
 <section id="today" class="screen">
  <div class="content today-content">
   <div class="info-grid">
-   <div class="info-card" onclick="openJrOfficial()">
-    <div class="info-top"><span class="info-key">JR</span><span class="info-status">公式</span></div>
-    <div class="info-middle">広島・山口 運行情報</div>
-    <div class="info-bottom">タップしてJR西日本公式を確認</div>
+   <div id="jrInfoCard" class="info-card">
+    <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
+    <div id="jrInfoMiddle" class="info-middle">検証データ待ち</div>
+    <div id="jrInfoBottom" class="info-bottom">試用表示</div>
    </div>
 
    <div id="busInfoCard" class="info-card" onclick="show('busDetail')">
@@ -1016,6 +1020,7 @@ function show(id){
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
  if(id==='today'||id==='busDetail') loadBusRealtime(id==='busDetail');
+ if(id==='today'||id==='vacant'||id==='home') loadJrProbeSnapshot(false);
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
@@ -1307,6 +1312,64 @@ function checkReservationAutoJob(){
  if(!r) return;
  sessionStorage.setItem(key,'1');
  openReservationJob(r.id);
+}
+let jrProbeData=null;
+let jrProbeFetchedAt=0;
+
+function renderJrProbe(){
+ const d=jrProbeData;
+ const st=document.getElementById('jrInfoStatus');
+ const mid=document.getElementById('jrInfoMiddle');
+ const bot=document.getElementById('jrInfoBottom');
+ const card=document.getElementById('jrInfoCard');
+ const vv=document.getElementById('vacantJrValue');
+ if(!d){
+  if(st) st.textContent='取得待ち';
+  if(mid) mid.textContent='検証データ待ち';
+  if(bot) bot.textContent='試用表示';
+  if(vv) vv.textContent='取得待ち';
+  return;
+ }
+ const s=d.summary||{};
+ const delayed=Number(s.delayed_trains||0);
+ const b=s.delay_buckets||{};
+ const severe=Number(b['15_plus']||0);
+ const moderate=Number(b['10_14']||0);
+ let label='平常';
+ let detail='目立つ遅れなし';
+ let level='';
+ if(severe>0){
+  label='大きな遅れ';
+  detail='15分以上 '+severe+'本';
+  level='state-alert';
+ }else if(moderate>0){
+  label='遅れ';
+  detail='10〜14分 '+moderate+'本';
+  level='state-warn';
+ }else if(delayed>0){
+  label='小遅延';
+  detail='遅延 '+delayed+'本';
+  level='state-warn';
+ }
+ if(card){
+  card.classList.remove('state-alert','state-warn');
+  if(level) card.classList.add(level);
+ }
+ if(st) st.textContent=label;
+ if(mid) mid.textContent=detail;
+ if(bot) bot.textContent='試用取得・自動表示';
+ if(vv) vv.textContent=label==='平常'?'平常':label+' '+detail;
+}
+async function loadJrProbeSnapshot(force=false){
+ const now=Date.now();
+ if(!force&&jrProbeFetchedAt&&now-jrProbeFetchedAt<60000) return;
+ jrProbeFetchedAt=now;
+ try{
+  const r=await fetch('./data/jrwest-higashima-probe.json?ts='+now,{cache:'no-store'});
+  if(!r.ok) throw new Error('http '+r.status);
+  jrProbeData=await r.json();
+ }catch(e){}
+ renderJrProbe();
 }
 let busRealtimeData=null;
 let busRealtimeFetchedAt=0;
@@ -2362,7 +2425,9 @@ initReservationJobGestures();
 initNoticeSwipe();
 setInterval(checkReservationAutoJob,15000);
 loadBusRealtime(false);
+loadJrProbeSnapshot(false);
 setInterval(()=>loadBusRealtime(false),60000);
+setInterval(()=>loadJrProbeSnapshot(false),60000);
 </script>
 </body>
 </html>
