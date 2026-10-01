@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-1420 -->
+<!-- BUILD:2026-10-01-1445 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -94,6 +94,11 @@ main{position:relative;min-height:0;overflow:hidden}
 .weather-next{font-size:14px;font-weight:800;color:#dce8ee;margin-top:3px}
 .drive-state{display:flex;align-items:center;justify-content:space-between;min-height:90px;background:#10251b;border-color:#25533a}
 .drive-state strong{font-size:27px}
+.speed-limit-row{display:none;align-items:center;justify-content:space-between;min-height:52px;padding:9px 13px;border-radius:14px;background:#0c1721;border:1px solid #22313d}
+.speed-limit-row.show{display:flex}
+.speed-limit-row .speed-label{font-size:13px;color:var(--muted);font-weight:700}
+.speed-limit-row .speed-value{font-size:25px;font-weight:900;line-height:1}
+.speed-limit-row .speed-unit{font-size:12px;color:var(--muted);margin-left:3px}
 .drive-note{margin:auto 0;text-align:center;color:#7e909d;font-size:14px}
 .payopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .payopt{min-height:60px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
@@ -337,6 +342,11 @@ main{position:relative;min-height:0;overflow:hidden}
     <div><div class="label">状態</div><strong>実車中</strong><div id="rideStartMeta" class="sub">乗車地点を固定中</div></div>
     <div><div class="label" style="text-align:right">乗車地</div><div id="rideStartAddress" class="ride-from">場所を確認中…</div></div>
    </div>
+  </div>
+
+  <div id="speedLimitRow" class="speed-limit-row">
+   <div class="speed-label">制限速度</div>
+   <div><span id="speedLimitValue" class="speed-value">--</span><span class="speed-unit">km/h</span></div>
   </div>
 
   <div class="reservation"><div><div class="label">次の予約</div><strong>18:30</strong><div class="sub">広島駅方面</div></div><span class="chev">›</span></div>
@@ -615,23 +625,49 @@ function distanceToSegmentMeters(lon,lat,a,b){
  const t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/((dx*dx+dy*dy)||1)));
  return Math.hypot(ax+t*dx,ay+t*dy);
 }
-function featureMatchesZone30(f,lon,lat){
- if(!f||!f.zone30||!Array.isArray(f.coords)||!f.coords.length) return false;
+function distanceToFeatureMeters(f,lon,lat){
+ if(!f||!Array.isArray(f.coords)||!f.coords.length) return Infinity;
  const pts=f.coords;
- if(pts.length>=3 && pointInPolygon(lon,lat,pts)) return true;
+ if(f.shape==='3'&&pts.length>=3&&pointInPolygon(lon,lat,pts)) return 0;
+ if(pts.length===1) return metersBetween(lon,lat,pts[0][0],pts[0][1]);
  let best=Infinity;
  for(let i=1;i<pts.length;i++) best=Math.min(best,distanceToSegmentMeters(lon,lat,pts[i-1],pts[i]));
- if(pts.length===1) best=metersBetween(lon,lat,pts[0][0],pts[0][1]);
- return best<=25;
+ return best;
+}
+function setSpeedLimitUI(speed){
+ const row=document.getElementById('speedLimitRow');
+ const val=document.getElementById('speedLimitValue');
+ if(!row||!val) return;
+ if(Number.isFinite(speed)){
+  val.textContent=String(speed);
+  row.classList.add('show');
+ }else{
+  val.textContent='--';
+  row.classList.remove('show');
+ }
 }
 function evaluateSafetyZone(pos){
- if(currentScreenId()!=='ride'||!jarticSpeedData) return;
+ if(currentScreenId()!=='ride'||!jarticSpeedData){setSpeedLimitUI(null);return}
  const acc=Number(pos.coords.accuracy||9999);
- if(acc>25){safetyZoneActive=false;return}
+ if(acc>15){safetyZoneActive=false;setSpeedLimitUI(null);return}
  const lon=pos.coords.longitude,lat=pos.coords.latitude;
- const inside=jarticSpeedData.features.some(f=>featureMatchesZone30(f,lon,lat));
- if(inside&&!safetyZoneActive) showSafety(5200);
- safetyZoneActive=inside;
+ const candidates=[];
+ for(const f of jarticSpeedData.features){
+  const d=distanceToFeatureMeters(f,lon,lat);
+  const speed=Number(f.speed);
+  if(d<=14&&Number.isFinite(speed)) candidates.push({f,d,speed});
+ }
+ candidates.sort((a,b)=>a.d-b.d);
+ if(!candidates.length){safetyZoneActive=false;setSpeedLimitUI(null);return}
+
+ const nearest=candidates[0];
+ const conflict=candidates.some(x=>x!==nearest&&x.d<=nearest.d+4&&x.speed!==nearest.speed);
+ if(conflict){safetyZoneActive=false;setSpeedLimitUI(null);return}
+
+ setSpeedLimitUI(nearest.speed);
+ const shouldWarn=nearest.speed===30||!!nearest.f.zone30;
+ if(shouldWarn&&!safetyZoneActive) showSafety(5200);
+ safetyZoneActive=shouldWarn;
 }
 let vacantAreaLookupBusy=false;
 
