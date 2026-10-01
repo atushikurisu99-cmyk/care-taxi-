@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-VACANT-HIERARCHY-1 -->
+<!-- BUILD:2026-10-01-ANALYTICS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1771,6 +1771,71 @@ async function loadBusRealtime(force=false){
  }
  renderBusRealtime();
 }
+const ANALYTICS_EVENT_KEY='taxi_analytics_events_v1';
+const ANALYTICS_TRIP_KEY='taxi_trip_records_v1';
+const LAST_DROPOFF_KEY='taxi_last_dropoff_snapshot_v1';
+const ANALYTICS_SCHEMA='taxi-sales-nav-analytics-v1';
+
+function getAnalyticsEvents(){
+ try{return JSON.parse(localStorage.getItem(ANALYTICS_EVENT_KEY)||'[]')}catch(e){return[]}
+}
+function saveAnalyticsEvents(rows){
+ try{localStorage.setItem(ANALYTICS_EVENT_KEY,JSON.stringify(rows.slice(-6000)))}catch(e){}
+}
+function getTripRecords(){
+ try{return JSON.parse(localStorage.getItem(ANALYTICS_TRIP_KEY)||'[]')}catch(e){return[]}
+}
+function saveTripRecords(rows){
+ try{localStorage.setItem(ANALYTICS_TRIP_KEY,JSON.stringify(rows.slice(-2000)))}catch(e){}
+}
+function currentDutyId(){
+ const d=getDutyState();
+ return d.active&&d.start?'duty_'+String(d.start):null;
+}
+function currentPositionSnapshot(){
+ if(!latestPosition||!latestPosition.coords) return null;
+ return {
+  lat:latestPosition.coords.latitude,
+  lon:latestPosition.coords.longitude,
+  accuracy:Math.round(Number(latestPosition.coords.accuracy)||0)
+ };
+}
+function logAnalyticsEvent(type,data={}){
+ const now=Date.now();
+ const rows=getAnalyticsEvents();
+ rows.push({
+  schema:ANALYTICS_SCHEMA,
+  id:'ev_'+now+'_'+Math.random().toString(36).slice(2,8),
+  t:now,
+  iso:new Date(now).toISOString(),
+  dutyId:currentDutyId(),
+  type,
+  screen:currentScreenId(),
+  position:currentPositionSnapshot(),
+  build:'2026-10-01-ANALYTICS-1',
+  data
+ });
+ saveAnalyticsEvents(rows);
+}
+function getLastDropoffSnapshot(){
+ try{return JSON.parse(localStorage.getItem(LAST_DROPOFF_KEY)||'null')}catch(e){return null}
+}
+function saveLastDropoffSnapshot(v){
+ try{localStorage.setItem(LAST_DROPOFF_KEY,JSON.stringify(v))}catch(e){}
+}
+function currentDutyMeters(){
+ const s=getDutyDistanceState();
+ return Math.max(0,Number(s.meters)||0);
+}
+function upsertTripRecord(rideId,patch){
+ if(!rideId) return;
+ const rows=getTripRecords();
+ const idx=rows.findIndex(x=>x.rideId===rideId);
+ if(idx>=0) rows[idx]={...rows[idx],...patch};
+ else rows.push({schema:ANALYTICS_SCHEMA,rideId,...patch});
+ saveTripRecords(rows);
+}
+
 let infoReturn='home';
 let dutyFallback={active:false,start:0};
 function getDutyState(){
@@ -1829,6 +1894,8 @@ function handleDutyMain(){
  saveDutyState(true,startedAt);
  resetDutyDistance(startedAt);
  resetGpsQualityLog();
+ try{localStorage.removeItem(LAST_DROPOFF_KEY)}catch(e){}
+ logAnalyticsEvent('duty_start',{startedAt});
  show('vacant');
  renderDutyUI();
 }
@@ -1837,8 +1904,14 @@ function endDuty(){
  if(!d.active){show('home');return}
  const dur=formatDuration(Date.now()-d.start);
  if(!confirm('乗務を終了しますか？\n乗務時間 '+dur)) return;
+ const endedAt=Date.now();
+ logAnalyticsEvent('duty_end',{
+  endedAt,
+  durationMs:Math.max(0,endedAt-(d.start||endedAt)),
+  dutyDistanceMeters:currentDutyMeters()
+ });
  try{
-  localStorage.setItem('taxi_last_duty_end',String(Date.now()));
+  localStorage.setItem('taxi_last_duty_end',String(endedAt));
   localStorage.setItem('taxi_last_duty_duration',dur);
  }catch(e){}
  saveDutyState(false);
@@ -2399,6 +2472,7 @@ function initNoticeSwipe(){
  },{passive:true});
 }
 function showNotice(level,icon,title,body,duration=5500){
+ logAnalyticsEvent('notice_shown',{level,icon,title,body});
  const n=document.getElementById('notice');n.className='notice show '+level;
  n.querySelector('#nicon').textContent=icon;n.querySelector('#ntitle').textContent=title;n.querySelector('#nbody').textContent=body;
  clearTimeout(nt);nt=setTimeout(hideNotice,duration);
@@ -2532,15 +2606,37 @@ function updateRideStartUI(rec){
 async function startRideCapture(){
  if(!getDutyState().active){toast('先に乗務開始してください');show('home');return}
 
- const startedTime=new Date().toLocaleString('ja-JP',{hour12:false});
+ const rideStartedAt=Date.now();
+ const startedTime=new Date(rideStartedAt).toLocaleString('ja-JP',{hour12:false});
+ const rideId='ride_'+String(rideStartedAt);
+ const lastDropoff=getLastDropoffSnapshot();
+ const dutyMetersNow=currentDutyMeters();
+ const vacantSeconds=lastDropoff&&lastDropoff.t?Math.max(0,Math.round((rideStartedAt-lastDropoff.t)/1000)):null;
+ const vacantMeters=lastDropoff&&Number.isFinite(Number(lastDropoff.dutyMeters))
+   ?Math.max(0,Math.round(dutyMetersNow-Number(lastDropoff.dutyMeters))):null;
  currentRideStart={
    type:'乗車',
+   rideId,
+   startedAt:rideStartedAt,
    time:startedTime,
    lat:null,
    lon:null,
    accuracy:null,
    address:'位置情報を確認中…'
  };
+ upsertTripRecord(rideId,{
+  dutyId:currentDutyId(),
+  pickupTs:rideStartedAt,
+  pickupIso:new Date(rideStartedAt).toISOString(),
+  pickup:null,
+  dropoffTs:null,
+  dropoff:null,
+  vacantSeconds,
+  vacantMeters,
+  fare:null,
+  paymentMethod:null
+ });
+ logAnalyticsEvent('ride_start',{rideId,vacantSeconds,vacantMeters});
 
  // 乗車操作はGPS待ちにしない。まず実車画面へ即時切替。
  show('ride');
@@ -2552,6 +2648,14 @@ async function startRideCapture(){
   currentRideStart.lon=p.coords.longitude;
   currentRideStart.accuracy=Math.round(p.coords.accuracy||0);
   currentRideStart.address=coordFallbackLabel(currentRideStart.lat,currentRideStart.lon);
+  upsertTripRecord(currentRideStart.rideId,{
+   pickup:{
+    lat:currentRideStart.lat,
+    lon:currentRideStart.lon,
+    accuracy:currentRideStart.accuracy,
+    address:currentRideStart.address
+   }
+  });
   updateRideStartUI(currentRideStart);
 
   const log=getVerifyLog();
@@ -2561,6 +2665,14 @@ async function startRideCapture(){
   const addr=await reverseGeocode(currentRideStart.lat,currentRideStart.lon);
   if(!currentRideStart || currentRideStart.time!==startedTime) return;
   currentRideStart.address=addr;
+  upsertTripRecord(currentRideStart.rideId,{
+   pickup:{
+    lat:currentRideStart.lat,
+    lon:currentRideStart.lon,
+    accuracy:currentRideStart.accuracy,
+    address:addr
+   }
+  });
   const log2=getVerifyLog();
   const idx=log2.findIndex(x=>x.type==='乗車'&&x.time===startedTime);
   if(idx>=0){log2[idx]={...currentRideStart};saveVerifyLog(log2)}
@@ -2598,19 +2710,34 @@ async function finishRide(){
  show(getDutyState().active?'vacant':'home');
 
  const recordDropoff=async(p)=>{
+  const dropoffAt=Date.now();
   const rec={
    type:'降車',
-   time:new Date().toLocaleString('ja-JP',{hour12:false}),
+   time:new Date(dropoffAt).toLocaleString('ja-JP',{hour12:false}),
    lat:p.coords.latitude,
    lon:p.coords.longitude,
    accuracy:Math.round(p.coords.accuracy||0),
    address:coordFallbackLabel(p.coords.latitude,p.coords.longitude)
   };
+  const rideId=rideBeforeFinish&&rideBeforeFinish.rideId?rideBeforeFinish.rideId:null;
+  const payEl=document.querySelector('.payopt.selected');
+  const paymentMethod=payEl?payEl.textContent.trim():null;
+  upsertTripRecord(rideId,{
+   dropoffTs:dropoffAt,
+   dropoffIso:new Date(dropoffAt).toISOString(),
+   dropoff:{lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy,address:rec.address},
+   paymentMethod
+  });
+  saveLastDropoffSnapshot({t:dropoffAt,dutyMeters:currentDutyMeters(),lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy});
+  logAnalyticsEvent('ride_end',{rideId,paymentMethod});
   const log=getVerifyLog();
   log.unshift(rec);
   saveVerifyLog(log);
 
   rec.address=await reverseGeocode(rec.lat,rec.lon);
+  upsertTripRecord(rideId,{
+   dropoff:{lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy,address:rec.address}
+  });
   const log2=getVerifyLog();
   const idx=log2.findIndex(x=>x.type==='降車'&&x.time===rec.time);
   if(idx>=0){log2[idx]=rec;saveVerifyLog(log2)}
@@ -2649,6 +2776,9 @@ function buildValidationExport(){
   gpsSummary:gpsQualitySummary(),
   gpsSamples:gps,
   warningAndPointLog:verify,
+  analyticsSchema:ANALYTICS_SCHEMA,
+  analyticsEvents:getAnalyticsEvents(),
+  tripRecords:getTripRecords(),
   note:'ChatGPT検証用。GPS・走行距離・30km/h警告判定の実走データ。'
  };
 }
