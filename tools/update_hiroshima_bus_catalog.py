@@ -46,6 +46,22 @@ def parse_gtfs_time(v: str):
     except Exception:
         return None
 
+def direction_group(stop_name: str, next_stop: str):
+    # 八丁堀は「次の1停留所」では細かすぎるため、実際の幹線方向までまとめる。
+    # 立町→紙屋町のように同じ流れは1方面として扱う。
+    if stop_name == "八丁堀":
+        if next_stop in {"立町", "紙屋町", "県庁前", "広島バスセンター"}:
+            return "紙屋町・西／北西方面"
+        if next_stop in {"広島駅", "銀山町"}:
+            return "広島駅・東方面"
+        if next_stop in {"本通り"}:
+            return "本通・南西方面"
+        if next_stop in {"新天地"}:
+            return "富士見町・南方面"
+        if next_stop in {"京口門", "女学院前"}:
+            return "牛田・北東方面"
+    return f"{next_stop}方面" if next_stop else ""
+
 def active_services(calendar_rows, exception_rows, service_date):
     ymd = service_date.strftime("%Y%m%d")
     weekday = service_date.strftime("%A").lower()
@@ -71,7 +87,7 @@ def main():
         "operators": set(), "route_ids": set(), "last_bus": None, "last_buses_by_date": {}
     })})
     directions = defaultdict(lambda: defaultdict(lambda: {
-        "operators": set(), "route_ids": set(), "destinations": set(),
+        "operators": set(), "route_ids": set(), "destinations": set(), "next_stops": set(),
         "last_bus": None, "last_buses_by_date": {}
     }))
     errors = []
@@ -141,8 +157,14 @@ def main():
             for trip_id, rows in trip_rows.items():
                 rows.sort(key=lambda x: x[0])
                 for i, (seq, st) in enumerate(rows[:-1]):
-                    nxt = rows[i + 1][1]
-                    next_name = stop_name_by_id.get(nxt.get("stop_id",""), "").strip()
+                    current_name = stop_name_by_id.get(st.get("stop_id",""), "").strip()
+                    next_name = ""
+                    # 同じ名称の複数stop_id（乗り場違い等）は方向分岐として扱わない。
+                    for _, nxt in rows[i + 1:]:
+                        candidate = stop_name_by_id.get(nxt.get("stop_id",""), "").strip()
+                        if candidate and candidate != current_name:
+                            next_name = candidate
+                            break
                     if next_name:
                         next_stop_by_trip_seq[(trip_id, seq)] = next_name
 
@@ -174,10 +196,12 @@ def main():
 
                 next_stop = next_stop_by_trip_seq.get((trip_id, current_seq), "").strip()
                 direction_item = None
-                if next_stop:
-                    direction_item = directions[stop_name][next_stop]
+                direction_name = direction_group(stop_name, next_stop)
+                if direction_name:
+                    direction_item = directions[stop_name][direction_name]
                     direction_item["operators"].add(operator_name)
                     direction_item["destinations"].add(destination)
+                    direction_item["next_stops"].add(next_stop)
                     if rid:
                         direction_item["route_ids"].add(rid)
 
@@ -288,10 +312,12 @@ def main():
     # 方面（次停留所）をコンパクトに出力。終点一覧は内部データとして残す。
     for stop_name in sorted(directions):
         direction_rows = []
-        for next_stop, meta in directions[stop_name].items():
+        for direction_name, meta in directions[stop_name].items():
+            next_stops = sorted(meta["next_stops"])
             row = {
-                "name": f"{next_stop}方面",
-                "next_stop": next_stop,
+                "name": direction_name,
+                "next_stop": next_stops[0] if len(next_stops) == 1 else "",
+                "next_stops": next_stops,
                 "operators": sorted(meta["operators"]),
                 "route_ids": sorted(meta["route_ids"]),
                 "destinations": sorted(meta["destinations"]),
@@ -341,7 +367,8 @@ def main():
             stop: [
                 {
                     "name": d["name"],
-                    "next_stop": d["next_stop"],
+                    "next_stop": d.get("next_stop",""),
+                    "next_stops": d.get("next_stops",[]),
                     "destinations_count": len(d["destinations"]),
                     "destinations": d["destinations"][:8],
                     "last_bus": (d.get("last_bus") or {}).get("scheduled_time"),
