@@ -2661,25 +2661,31 @@ function normalizeJrLivePayload(d){
 function maybeNotifyBusFacts(d){
  if(!d||!canUseFreshSource(d.generated_at,600)) return;
  const ops=Array.isArray(d.operators)?d.operators:[];
+ const materialWord=/(運休|見合わせ|遅延|遅れ|迂回|通行止|事故|渋滞|運行中止|運行変更|区間運休|折返し|打ち切り)/;
  const alerts=[];
  for(const op of ops){
   for(const a of (Array.isArray(op.alerts)?op.alerts:[])){
    if(!a) continue;
-   const title=String(a.title||'運行情報あり').trim();
+   const title=String(a.title||'').trim();
+   const desc=String(a.description||'').trim();
+   if(!materialWord.test(title+' '+desc)) continue;
    const routes=Array.isArray(a.routes)?a.routes.filter(Boolean):[];
-   alerts.push({operator:op.name||'',title,routes});
+   alerts.push({operator:op.name||'',title:title||'運行情報',desc,routes});
   }
  }
  if(alerts.length){
   const a=alerts[0];
-  const body=[a.operator,a.routes.slice(0,2).join('・'),a.title].filter(Boolean).join(' / ');
-  const key='alert|'+alerts.map(x=>[x.operator,x.title,x.routes.join(',')].join(':')).sort().join('|');
+  const shortDesc=(a.desc||'').slice(0,44);
+  const body=[a.operator,a.routes.slice(0,2).join('・'),a.title,shortDesc].filter(Boolean).join(' / ');
+  const key='alert|'+alerts.map(x=>[x.operator,x.title,x.desc,x.routes.join(',')].join(':')).sort().join('|');
   notifyFact('bus',{
    level:'warn',icon:'!',title:'バス 運行情報',body,key,
    sourceTs:d.generated_at,maxAgeSec:600,minIntervalMs:15*60*1000
   });
   return;
  }
+
+ // 単純なGTFS遅延はノイズが出やすいので、複数便かつ15分以上の時だけ通知。
  const delayedOps=ops
   .map(op=>({name:op.name||'',count:Number(op.delayed_trips||0),max:Math.round(Number(op.max_delay_sec||0)/60),route:op.route_delays?.[0]?.route||''}))
   .filter(x=>x.count>=3&&x.max>=15)
