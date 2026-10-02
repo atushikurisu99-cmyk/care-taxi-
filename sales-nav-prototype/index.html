@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-TIME-CLARIFY-1 -->
+<!-- BUILD:2026-10-03-BUS-DIRECTION-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1277,7 +1277,7 @@ html,body{
 
   <div class="settings-card">
    <div class="settings-title">バス終バス通知</div>
-   <div class="settings-note">区 → バス停 → 行き先の順で選択。選んだ組み合わせだけ「終バス約15分前」と「終バス通過」を通知します。</div>
+   <div class="settings-note">区 → バス停 → 方面の順で選択。選んだ方面の最終バスだけ「約15分前」と「通過」を通知します。</div>
    <div class="settings-tabs">
     <button id="busWard中区" type="button" onclick="selectBusWard('中区')">中区</button>
     <button id="busWard西区" type="button" onclick="selectBusWard('西区')">西区</button>
@@ -1285,7 +1285,7 @@ html,body{
    </div>
    <div class="settings-subhead" style="margin-top:11px">バス停</div>
    <div id="busStopSettingsList" class="settings-list"></div>
-   <div class="settings-subhead" style="margin-top:12px">選択中バス停から行ける終点</div>
+   <div class="settings-subhead" style="margin-top:12px">選択中バス停の方面</div>
    <div id="busDestinationSettings"></div>
   </div>
 
@@ -1399,6 +1399,7 @@ async function loadBusDestinationCatalog(force=false){
   if(!r.ok) throw new Error('catalog http '+r.status);
   const d=await r.json();
   busDestinationCatalog=d&&d.stops?d:null;
+  migrateBusSelectionsToDirections();
  }catch(e){
   busDestinationCatalog=null;
  }
@@ -1442,6 +1443,31 @@ function getBusNotifySettings(){
   }
  }catch(e){}
  return {stops:{},destinations:{}};
+}
+function migrateBusSelectionsToDirections(){
+ if(!busDestinationCatalog) return;
+ let raw=null;
+ try{raw=JSON.parse(localStorage.getItem(BUS_NOTIFY_SETTINGS_KEY)||'null')}catch(e){}
+ if(!raw||typeof raw!=='object'||!raw.destinations) return;
+ let changed=false;
+ for(const [stop,values] of Object.entries(raw.destinations)){
+  if(!Array.isArray(values)||!values.length) continue;
+  const dirs=Array.isArray(busDestinationCatalog?.stops?.[stop]?.directions)
+   ?busDestinationCatalog.stops[stop].directions:[];
+  if(!dirs.length) continue;
+  const names=new Set(dirs.map(x=>x?.name).filter(Boolean));
+  const next=[];
+  for(const value of values){
+   if(names.has(value)){ if(!next.includes(value)) next.push(value); continue; }
+   const hit=dirs.find(x=>Array.isArray(x?.destinations)&&x.destinations.includes(value));
+   if(hit?.name && !next.includes(hit.name)){ next.push(hit.name); changed=true; }
+   else if(!String(value||'').endsWith('方面')) changed=true;
+  }
+  raw.destinations[stop]=next;
+ }
+ if(changed){
+  try{localStorage.setItem(BUS_NOTIFY_SETTINGS_KEY,JSON.stringify(raw))}catch(e){}
+ }
 }
 function saveBusNotifySettings(v){
  try{localStorage.setItem(BUS_NOTIFY_SETTINGS_KEY,JSON.stringify(v))}catch(e){}
@@ -1507,27 +1533,9 @@ function openBusDestinationSetting(stop){
  }
 }
 function destinationCandidatesForStop(stop){
- const out=[];
- const seen=new Set();
-
- const staticRows=Array.isArray(busDestinationCatalog?.stops?.[stop]?.destinations)
-  ?busDestinationCatalog.stops[stop].destinations:[];
- for(const d of staticRows){
-  const v=typeof d==='string'?d:(d.name||'');
-  if(v&&!seen.has(v)){seen.add(v);out.push(v)}
- }
-
- const liveStops=Array.isArray(busRealtimeData?.stops)?busRealtimeData.stops:[];
- for(const s of liveStops){
-  const name=s.name||s.stop_name||'';
-  if(name!==stop) continue;
-  const ds=Array.isArray(s.destinations)?s.destinations:[];
-  for(const d of ds){
-   const v=typeof d==='string'?d:(d.name||d.headsign||'');
-   if(v&&!seen.has(v)){seen.add(v);out.push(v)}
-  }
- }
- return out;
+ const rows=Array.isArray(busDestinationCatalog?.stops?.[stop]?.directions)
+  ?busDestinationCatalog.stops[stop].directions:[];
+ return rows.map(x=>typeof x==='string'?x:(x?.name||'')).filter(Boolean);
 }
 function addManualBusDestination(){
  const stop=busSettingsActiveStop;
@@ -1569,7 +1577,7 @@ function renderNotificationSettings(){
    const count=Array.isArray(cfg.destinations[stop])?cfg.destinations[stop].length:0;
    const active=busSettingsActiveStop===stop;
    return '<button type="button" class="setting-choice '+(on?'on ':'')+(active?'active-stop':'')+'" onclick="openBusDestinationSetting(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\')">'+
-    '<div><strong>'+escapeHtml(stop)+'</strong><small>'+(count?('行き先 '+count+'件選択'):(on?'選択済み・行き先を選択':'タップして選択'))+'</small></div>'+
+    '<div><strong>'+escapeHtml(stop)+'</strong><small>'+(count?('方面 '+count+'件選択'):(on?'選択済み・方面を選択':'タップして選択'))+'</small></div>'+
     '<span class="check">'+(on?'✓':'')+'</span></button>';
   }).join('')||'<div class="settings-empty">バス停データなし</div>';
  }
@@ -1577,7 +1585,7 @@ function renderNotificationSettings(){
  if(!box) return;
  const stop=busSettingsActiveStop;
  if(!stop){
-  box.innerHTML='<div class="settings-empty">上のバス停を選ぶと、行き先設定を表示します。</div>';
+  box.innerHTML='<div class="settings-empty">上のバス停を選ぶと、方面設定を表示します。</div>';
   return;
  }
  const candidates=destinationCandidatesForStop(stop);
@@ -1586,11 +1594,11 @@ function renderNotificationSettings(){
   ? '<div class="settings-list">'+candidates.map(d=>{
       const row=busCatalogDestinationRow(stop,d);
       const t=row?.last_bus?.scheduled_time?String(row.last_bus.scheduled_time).slice(0,5):'';
-      const at=row?.last_bus?.terminal_arrival_time?String(row.last_bus.terminal_arrival_time).slice(0,5):'';
-      const sub=t?('通過 '+escapeHtml(t)+(at&&at!==t?' → 終点 '+escapeHtml(at):'')):'本日運行なし';
+      const terminal=row?.last_bus?.terminal||'';
+      const sub=t?('方面最終 '+escapeHtml(t)+(terminal?' / 最終便 '+escapeHtml(terminal)+'行':'') ):'本日運行なし';
       return '<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong><small>'+sub+'</small></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>';
     }).join('')+'</div>'
-  : '<div class="settings-note" style="margin-top:7px">'+(busDestinationCatalogLoaded?'このバス停の行き先データを確認できません。':'行き先データを取得中…')+'</div>';
+  : '<div class="settings-note" style="margin-top:7px">'+(busDestinationCatalogLoaded?'このバス停の方面データを確認できません。':'方面データを取得中…')+'</div>';
  const chips=selected.length?'<div class="settings-chiprow">'+selected.map(d=>'<button class="settings-chip" type="button" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')">'+escapeHtml(d)+' ×</button>').join('')+'</div>':'';
  box.innerHTML='<div class="settings-note" style="margin-top:7px"><strong style="color:#fff">'+escapeHtml(stop)+'</strong></div>'+
   candidateHtml+chips;
@@ -2385,8 +2393,8 @@ function selectedBusNotifyPairs(){
  return out;
 }
 function busCatalogDestinationRow(stop,destination){
- const rows=Array.isArray(busDestinationCatalog?.stops?.[stop]?.destinations)
-  ?busDestinationCatalog.stops[stop].destinations:[];
+ const rows=Array.isArray(busDestinationCatalog?.stops?.[stop]?.directions)
+  ?busDestinationCatalog.stops[stop].directions:[];
  return rows.find(x=>(typeof x==='string'?x:x?.name)===destination)||null;
 }
 function gtfsScheduledEpoch(lastBus){
@@ -2515,21 +2523,21 @@ function renderBusRealtime(){
 
  if(card) card.classList.toggle('state-warn',!!urgent);
 
- if(hv) hv.textContent=count?count+'件設定':(hasStops?'行き先未設定':'未設定');
+ if(hv) hv.textContent=count?count+'件設定':(hasStops?'方面未設定':'未設定');
  if(hs){
-  if(!count) hs.textContent=hasStops?'選んだバス停の行き先を設定':'設定からバス停・行き先を選択';
+  if(!count) hs.textContent=hasStops?'選んだバス停の方面を設定':'設定からバス停・方面を選択';
   else if(urgent) hs.textContent=busLastBusStatusText(urgent.fact)+' / '+urgent.stop;
   else hs.textContent='終バス15分前・通過を通知';
  }
 
- if(st) st.textContent=count?'終バス':(hasStops?'行き先未設定':'未設定');
+ if(st) st.textContent=count?'終バス':(hasStops?'方面未設定':'未設定');
  if(mid){
-  if(!count) mid.textContent=hasStops?'選んだバス停の行き先を設定':'バス停・行き先を選択';
+  if(!count) mid.textContent=hasStops?'選んだバス停の方面を設定':'バス停・方面を選択';
   else if(urgent) mid.textContent=urgent.stop+' / '+urgent.destination;
   else mid.textContent=count+'件を通知対象に設定';
  }
  if(bot){
-  if(!count) bot.textContent=hasStops?'行き先を選択してください':'設定画面から選択';
+  if(!count) bot.textContent=hasStops?'方面を選択してください':'設定画面から選択';
   else if(urgent) bot.textContent=busLastBusStatusText(urgent.fact);
   else bot.textContent='15分前・通過時のみ通知';
  }
@@ -2537,7 +2545,7 @@ function renderBusRealtime(){
 
  if(list){
   if(!count){
-   const msg=hasStops?'選んだバス停の行き先を選んでください':'バス停と行き先を選んでください';
+   const msg=hasStops?'選んだバス停の方面を選んでください':'バス停と方面を選んでください';
    list.innerHTML='<div class="verify-empty" onclick="show(\'settings\')" style="cursor:pointer">設定画面で<br><strong style="color:#fff">'+msg+'</strong><br><span style="display:inline-block;margin-top:8px;color:#8ec0ff">設定を開く ›</span></div>';
   }else{
    const grouped={};
