@@ -5,7 +5,7 @@ import json
 import urllib.request
 import zipfile
 from collections import defaultdict
-from datetime import datetime, timezone
+from datetime import datetime, timezone, timedelta
 from pathlib import Path
 
 OPERATORS = {
@@ -38,9 +38,41 @@ def read_csv(zf: zipfile.ZipFile, name: str):
     raw = zf.read(name).decode("utf-8-sig", errors="replace")
     return list(csv.DictReader(io.StringIO(raw)))
 
+def parse_gtfs_time(v: str):
+    try:
+        h, m, sec = [int(x) for x in (v or "").split(":")]
+        return h * 3600 + m * 60 + sec
+    except Exception:
+        return None
+
+def active_services(calendar_rows, exception_rows, service_date):
+    ymd = service_date.strftime("%Y%m%d")
+    weekday = service_date.strftime("%A").lower()
+    active = set()
+    for r in calendar_rows:
+        sid = r.get("service_id","")
+        if not sid:
+            continue
+        if r.get("start_date","") <= ymd <= r.get("end_date","") and r.get(weekday,"0") == "1":
+            active.add(sid)
+    for r in exception_rows:
+        if r.get("date","") != ymd:
+            continue
+        sid = r.get("service_id","")
+        if r.get("exception_type") == "1":
+            active.add(sid)
+        elif r.get("exception_type") == "2":
+            active.discard(sid)
+    return active
+
 def main():
-    catalog = defaultdict(lambda: {"destinations": defaultdict(lambda: {"operators": set(), "route_ids": set()})})
+    catalog = defaultdict(lambda: {"destinations": defaultdict(lambda: {
+        "operators": set(), "route_ids": set(), "last_bus": None
+    })})
     errors = []
+    # GitHub Actions はUTC。広島の営業日判定はJSTで固定。
+    jst = timezone(timedelta(hours=9))
+    service_date = datetime.now(jst).date()
 
     for operator_id, operator_name in OPERATORS.items():
         try:
@@ -49,6 +81,9 @@ def main():
             trips = read_csv(zf, "trips.txt")
             stop_times = read_csv(zf, "stop_times.txt")
             routes = read_csv(zf, "routes.txt")
+            calendar_rows = read_csv(zf, "calendar.txt") if "calendar.txt" in zf.namelist() else []
+            exception_rows = read_csv(zf, "calendar_dates.txt") if "calendar_dates.txt" in zf.namelist() else []
+            active_service_ids = active_services(calendar_rows, exception_rows, service_date)
 
             stop_name_by_id = {r.get("stop_id",""): r.get("stop_name","").strip() for r in stops}
             route_name = {}
@@ -61,7 +96,10 @@ def main():
             for r in trips:
                 trip_id = r.get("trip_id","")
                 rid = r.get("route_id","")
-                trip_meta[trip_id] = {"route_id": rid}
+                trip_meta[trip_id] = {
+                    "route_id": rid,
+                    "service_id": r.get("service_id",""),
+                }
 
             # 「行き先」はGTFSのtrip_headsignではなく、その便の実際の終点停留所を使う。
             # 事業者によってtrip_headsignに「○号線」「○○経由」等が入るため、
@@ -86,11 +124,29 @@ def main():
                 destination = final_stop_by_trip.get(trip_id, "").strip()
                 if not destination or destination == stop_name:
                     continue
-                rid = trip_meta.get(trip_id, {}).get("route_id","")
+                meta = trip_meta.get(trip_id, {})
+                rid = meta.get("route_id","")
                 item = catalog[stop_name]["destinations"][destination]
                 item["operators"].add(operator_name)
                 if rid:
                     item["route_ids"].add(rid)
+
+                # 今日の運行サービスだけで、そのバス停を通る「終バス」を求める。
+                if meta.get("service_id") in active_service_ids:
+                    dep = (row.get("departure_time") or row.get("arrival_time") or "").strip()
+                    sec = parse_gtfs_time(dep)
+                    if sec is not None:
+                        current = item.get("last_bus")
+                        if current is None or sec > current["seconds"]:
+                            item["last_bus"] = {
+                                "operator_id": operator_id,
+                                "operator": operator_name,
+                                "trip_id": trip_id,
+                                "route_id": rid,
+                                "stop_id": row.get("stop_id",""),
+                                "scheduled_time": dep,
+                                "seconds": sec,
+                            }
         except Exception as e:
             errors.append({"operator_id":operator_id,"operator":operator_name,"error":str(e)})
 
@@ -98,11 +154,17 @@ def main():
     for stop_name in sorted(catalog):
         dests = []
         for name, meta in catalog[stop_name]["destinations"].items():
-            dests.append({
+            row = {
                 "name": name,
                 "operators": sorted(meta["operators"]),
                 "route_ids": sorted(meta["route_ids"]),
-            })
+            }
+            if meta.get("last_bus"):
+                last = dict(meta["last_bus"])
+                last.pop("seconds", None)
+                last["service_date"] = service_date.isoformat()
+                row["last_bus"] = last
+            dests.append(row)
         dests.sort(key=lambda x: x["name"])
         out_stops[stop_name] = {"destinations": dests}
 
@@ -110,6 +172,7 @@ def main():
         "source": "広島県バス協会 GTFS-JP current data",
         "source_url": "https://www.bus-kyo.or.jp/gtfs-open-data",
         "generated_at": datetime.now(timezone.utc).isoformat(),
+        "service_date": service_date.isoformat(),
         "operators": list(OPERATORS.values()),
         "stops": out_stops,
         "errors": errors,
