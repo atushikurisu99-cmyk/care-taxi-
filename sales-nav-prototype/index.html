@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-02-JR-LIVE-WORKER-1 -->
+<!-- BUILD:2026-10-02-LIVE-SPORTS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1056,16 +1056,16 @@ html,body{
     <div id="busInfoBottom" class="info-bottom">—</div>
    </div>
 
-   <div class="info-card">
-    <div class="info-top"><span class="info-key">ライブ</span><span class="info-status">未接続</span></div>
-    <div class="info-middle"><span class="name-clip">実データ連携準備中</span></div>
-    <div class="info-bottom">—</div>
+   <div id="liveInfoCard" class="info-card">
+    <div class="info-top"><span class="info-key">ライブ</span><span id="liveInfoStatus" class="info-status">取得中</span></div>
+    <div id="liveInfoMiddle" class="info-middle"><span class="name-clip">確認中</span></div>
+    <div id="liveInfoBottom" class="info-bottom">—</div>
    </div>
 
-   <div class="info-card">
-    <div class="info-top"><span class="info-key">スポーツ</span><span class="info-status">未接続</span></div>
-    <div class="info-middle"><span class="name-clip">実データ連携準備中</span></div>
-    <div class="info-bottom">—</div>
+   <div id="sportsInfoCard" class="info-card">
+    <div class="info-top"><span class="info-key">スポーツ</span><span id="sportsInfoStatus" class="info-status">取得中</span></div>
+    <div id="sportsInfoMiddle" class="info-middle"><span class="name-clip">確認中</span></div>
+    <div id="sportsInfoBottom" class="info-bottom">—</div>
    </div>
   </div>
  </div>
@@ -1179,6 +1179,7 @@ function show(id){
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
  if(id==='today'||id==='busDetail') loadBusRealtime(id==='busDetail');
+ if(id==='today') loadEventSportsRealtime(false);
  if(id==='today'||id==='vacant'||id==='home') loadJrProbeSnapshot(false);
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
@@ -1724,6 +1725,89 @@ async function loadJrProbeSnapshot(force=false){
  }
  renderJrProbe();
 }
+let eventRealtimeData=null;
+let sportsRealtimeData=null;
+let eventSportsFetchedAt=0;
+const LIVE_EVENTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima';
+const SPORTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/sports/hiroshima';
+
+function renderLiveEvents(){
+ const d=eventRealtimeData;
+ const st=document.getElementById('liveInfoStatus');
+ const mid=document.getElementById('liveInfoMiddle');
+ const bot=document.getElementById('liveInfoBottom');
+ const card=document.getElementById('liveInfoCard');
+ if(!d){
+  if(st) st.textContent='取得待ち';
+  if(mid) mid.textContent='確認中';
+  if(bot) bot.textContent='—';
+  return;
+ }
+ const events=Array.isArray(d.events)?d.events:[];
+ const e=events[0]||null;
+ if(card) card.classList.toggle('state-warn',events.length>0);
+ if(st) st.textContent=events.length?events.length+'件':(d.coverage==='partial'?'確認中':'0件');
+ if(mid) mid.textContent=e?.name||'本日の登録なし';
+ if(bot){
+  if(e){
+   const t=e.start_time?e.start_time+'〜':'時刻確認中';
+   bot.textContent=t+(e.venue?' / '+e.venue:'');
+  }else{
+   bot.textContent=d.coverage==='partial'?'一部会場を確認中':'更新 '+formatAgo(d.generated_at);
+  }
+ }
+}
+function renderSportsRealtime(){
+ const d=sportsRealtimeData;
+ const st=document.getElementById('sportsInfoStatus');
+ const mid=document.getElementById('sportsInfoMiddle');
+ const bot=document.getElementById('sportsInfoBottom');
+ const card=document.getElementById('sportsInfoCard');
+ if(!d){
+  if(st) st.textContent='取得待ち';
+  if(mid) mid.textContent='確認中';
+  if(bot) bot.textContent='—';
+  return;
+ }
+ const sports=Array.isArray(d.sports)?d.sports:[];
+ const carp=sports.find(x=>x.team==='広島東洋カープ')||sports[0]||null;
+ if(!carp){
+  if(st) st.textContent='予定なし';
+  if(mid) mid.textContent='本日の試合なし';
+  if(bot) bot.textContent='更新 '+formatAgo(d.generated_at);
+  return;
+ }
+ const statusMap={none:'予定なし',scheduled:'試合前',live:'試合中',ended:'終了'};
+ if(st) st.textContent=statusMap[carp.status]||'確認中';
+ if(mid) mid.textContent=carp.team==='広島東洋カープ'?'カープ':(carp.team||'スポーツ');
+ if(bot){
+  if(carp.status==='ended'&&carp.end_time) bot.textContent='終了 '+carp.end_time;
+  else if(carp.status==='live') bot.textContent=(carp.score?carp.score+' / ':'')+(carp.venue||'');
+  else if(carp.status==='scheduled') bot.textContent=(carp.start_time?carp.start_time+'〜':'開始時刻確認中')+(carp.venue?' / '+carp.venue:'');
+  else bot.textContent='本日の試合なし';
+ }
+ if(card) card.classList.toggle('state-warn',carp.status==='live'||carp.status==='ended');
+}
+async function loadEventSportsRealtime(force=false){
+ const now=Date.now();
+ if(!force&&eventSportsFetchedAt&&now-eventSportsFetchedAt<30000) return;
+ eventSportsFetchedAt=now;
+ const fetchOne=async(url)=>{
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),7000);
+  try{
+   const r=await fetch(url+'?ts='+now,{cache:'no-store',signal:controller.signal,headers:{'Accept':'application/json'}});
+   if(!r.ok) throw new Error('http '+r.status);
+   return await r.json();
+  }finally{clearTimeout(timer)}
+ };
+ const [events,sports]=await Promise.allSettled([fetchOne(LIVE_EVENTS_URL),fetchOne(SPORTS_URL)]);
+ if(events.status==='fulfilled'&&events.value?.ok) eventRealtimeData=events.value;
+ if(sports.status==='fulfilled'&&sports.value?.ok) sportsRealtimeData=sports.value;
+ renderLiveEvents();
+ renderSportsRealtime();
+}
+
 let busRealtimeData=null;
 let busRealtimeFetchedAt=0;
 
@@ -2909,8 +2993,10 @@ initNoticeSwipe();
 setInterval(checkReservationAutoJob,15000);
 loadBusRealtime(false);
 loadJrProbeSnapshot(false);
+loadEventSportsRealtime(false);
 setInterval(()=>loadBusRealtime(false),60000);
-setInterval(()=>loadJrProbeSnapshot(false),60000);
+setInterval(()=>loadJrProbeSnapshot(false),30000);
+setInterval(()=>loadEventSportsRealtime(false),30000);
 
 async function forceRefreshLiveData(){
  const btn=document.getElementById('forceRefreshButton');
@@ -2921,10 +3007,13 @@ async function forceRefreshLiveData(){
  try{
   await Promise.all([
    loadJrProbeSnapshot(true),
-   loadBusRealtime(true)
+   loadBusRealtime(true),
+   loadEventSportsRealtime(true)
   ]);
   renderJrProbe();
   renderBusRealtime();
+  renderLiveEvents();
+  renderSportsRealtime();
  }finally{
   if(btn){
    btn.disabled=false;
@@ -2936,6 +3025,7 @@ async function forceRefreshLiveData(){
 function refreshLiveFeedsNow(){
  loadJrProbeSnapshot(true);
  loadBusRealtime(true);
+ loadEventSportsRealtime(true);
 }
 document.addEventListener('visibilitychange',()=>{
  if(document.visibilityState==='visible') refreshLiveFeedsNow();
