@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-FULL-AUDIT-1 -->
+<!-- BUILD:2026-10-03-BUS-TIME-CLARIFY-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1586,7 +1586,8 @@ function renderNotificationSettings(){
   ? '<div class="settings-list">'+candidates.map(d=>{
       const row=busCatalogDestinationRow(stop,d);
       const t=row?.last_bus?.scheduled_time?String(row.last_bus.scheduled_time).slice(0,5):'';
-      const sub=t?('本日の終バス '+escapeHtml(t)):'本日運行なし';
+      const at=row?.last_bus?.terminal_arrival_time?String(row.last_bus.terminal_arrival_time).slice(0,5):'';
+      const sub=t?('通過 '+escapeHtml(t)+(at&&at!==t?' → 終点 '+escapeHtml(at):'')):'本日運行なし';
       return '<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong><small>'+sub+'</small></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>';
     }).join('')+'</div>'
   : '<div class="settings-note" style="margin-top:7px">'+(busDestinationCatalogLoaded?'このバス停の行き先データを確認できません。':'行き先データを取得中…')+'</div>';
