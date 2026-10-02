@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-02-BUS-LIVE-WORKER-1 -->
+<!-- BUILD:2026-10-02-NAV-CALENDAR-SHELL-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -81,7 +81,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .primary.danger{background:#7f5555}
 .nav{
  display:grid;
- grid-template-columns:repeat(5,minmax(0,1fr));
+ grid-template-columns:repeat(4,minmax(0,1fr));
  grid-template-rows:1fr;
  height:var(--nav);
  min-height:var(--nav);
@@ -310,6 +310,42 @@ main{position:relative;min-height:0;overflow:hidden}
  border-color:#8d3438;background:linear-gradient(180deg,#2d1719,#191214)
 }
 .info-card.state-alert .info-top{color:#ffb0b0}
+
+/* monthly work-planning calendar */
+.calendar-head{
+ display:flex;align-items:center;justify-content:space-between;gap:10px
+}
+.calendar-title{font-size:22px;font-weight:900}
+.calendar-move{
+ width:44px;height:40px;border-radius:12px;border:1px solid #2b3d4b;
+ background:#10202c;color:#fff;font-size:22px;font-weight:900
+}
+.calendar-weekdays,.calendar-grid{
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px
+}
+.calendar-weekdays div{
+ text-align:center;font-size:11px;color:var(--muted);font-weight:800;padding:2px 0
+}
+.calendar-day{
+ min-height:66px;border:1px solid #22313d;border-radius:12px;background:#0c1721;
+ padding:6px 5px;overflow:hidden
+}
+.calendar-day.out{opacity:.28}
+.calendar-day.today{border-color:#2f86ff}
+.calendar-day .d{font-size:12px;font-weight:900;margin-bottom:5px}
+.calendar-day .marks{display:flex;flex-direction:column;gap:3px}
+.calendar-mark{
+ font-size:10px;font-weight:800;line-height:1.15;white-space:nowrap;
+ overflow:hidden;text-overflow:clip;padding:2px 4px;border-radius:6px;background:#12283a
+}
+.calendar-mark.res{background:#2b2410;color:#ffe08b}
+.calendar-mark.event{background:#102d22;color:#a7e2bf}
+.calendar-mark.sports{background:#2d1719;color:#ffb0b0}
+.calendar-summary{
+ display:flex;align-items:center;justify-content:space-between;gap:8px
+}
+.calendar-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.calendar-actions .primary{min-height:56px;font-size:18px}
 
 /* reservation work screen: comes from bottom, closes downward */
 .reservation-job-layer{
@@ -1089,6 +1125,33 @@ html,body{
  <div class="action"><button class="primary secondary" onclick="show('today')">戻る</button></div>
 </section>
 
+<section id="calendar" class="screen">
+ <div class="content">
+  <div class="card">
+   <div class="calendar-head">
+    <button class="calendar-move" type="button" onclick="moveCalendarMonth(-1)">‹</button>
+    <div id="calendarTitle" class="calendar-title">----</div>
+    <button class="calendar-move" type="button" onclick="moveCalendarMonth(1)">›</button>
+   </div>
+  </div>
+  <div class="calendar-weekdays">
+   <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
+  </div>
+  <div id="calendarGrid" class="calendar-grid"></div>
+  <div class="card calendar-summary">
+   <div>
+    <div class="label">この画面の役割</div>
+    <strong>仕事に出る日を考える</strong>
+   </div>
+   <span class="badge">予定一覧</span>
+  </div>
+ </div>
+ <div class="action calendar-actions">
+  <button class="primary secondary" onclick="show('schedule')">予約一覧</button>
+  <button class="primary" onclick="openReservationEditor()">＋ 予約</button>
+ </div>
+</section>
+
 <section id="sales" class="screen">
  <div class="content">
   <div class="segment"><button>日別</button><button class="active">10日間</button><button>グラフ</button></div>
@@ -1131,8 +1194,9 @@ html,body{
  <div class="content">
   <div class="card"><h2>メニュー</h2>
    <div class="menuitem" onclick="show('home')">⌂ ホーム</div>
-   <div class="menuitem" onclick="show('schedule')">▣ 予約</div>
-   <div class="menuitem" onclick="show('today')">＋ 本日の情報</div>
+   <div class="menuitem" onclick="show('calendar')">□ カレンダー</div>
+   <div class="menuitem" onclick="show('schedule')">▣ 予約一覧</div>
+   <div class="menuitem" onclick="show('today')">＋ 本日の営業情報</div>
    <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
    <div class="menuitem" onclick="show('verify')">◎ 位置・警告検証</div>
@@ -1146,9 +1210,8 @@ html,body{
 
 <nav class="nav">
  <button class="active" data-target="home" onclick="show('home')"><b>⌂</b>ホーム</button>
- <button data-target="schedule" onclick="show('schedule')"><b>▣</b>予約</button>
- <button data-target="today" onclick="openInfo(getDutyState().active?'vacant':'home')"><b>＋</b>情報</button>
- <button data-target="sales" onclick="show('sales')"><b>▥</b>売上</button>
+ <button data-target="calendar" onclick="show('calendar')"><b>□</b>カレンダー</button>
+ <button data-target="sales" onclick="show('sales')"><b>▥</b>実績</button>
  <button data-target="menu" onclick="show('menu')"><b>☰</b>メニュー</button>
 </nav>
 </div>
@@ -1161,7 +1224,7 @@ function preventIosPinchZoom(){
 }
 preventIosPinchZoom();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',sales:'売上・10日間実績',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・分析',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -1191,10 +1254,67 @@ function show(id){
  if(id==='today'||id==='home') loadEventSportsRealtime(false);
  if(id==='today'||id==='vacant'||id==='home') loadJrProbeSnapshot(false);
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
+ if(id==='calendar') renderCalendar();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
  renderDutyUI();
 }
+let calendarCursor=new Date(new Date().getFullYear(),new Date().getMonth(),1);
+
+function calendarDateKey(d){
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function moveCalendarMonth(delta){
+ calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+Number(delta||0),1);
+ renderCalendar();
+}
+function calendarEntriesForDate(key){
+ const out=[];
+ for(const r of getReservations()){
+  if(r.date===key && r.shareStatus!=='cancelled'){
+   out.push({type:'res',text:(r.timed&&r.time?r.time+' ':'')+'予約'});
+  }
+ }
+ const today=localDateValue(new Date());
+ if(key===today){
+  const events=Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[];
+  for(const e of events.slice(0,3)){
+   out.push({type:'event',text:(e.start_time?e.start_time+' ':'')+(e.name||'ライブ')});
+  }
+  const sports=Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[];
+  for(const s of sports.slice(0,2)){
+   if(s.status&&s.status!=='none'){
+    out.push({type:'sports',text:(s.start_time?s.start_time+' ':'')+(s.venue||s.team||'スポーツ')});
+   }
+  }
+ }
+ return out;
+}
+function renderCalendar(){
+ const grid=document.getElementById('calendarGrid');
+ const title=document.getElementById('calendarTitle');
+ if(!grid||!title) return;
+ const y=calendarCursor.getFullYear(),m=calendarCursor.getMonth();
+ title.textContent=y+'年'+(m+1)+'月';
+ const first=new Date(y,m,1);
+ const start=new Date(y,m,1-first.getDay());
+ const todayKey=localDateValue(new Date());
+ let html='';
+ for(let i=0;i<42;i++){
+  const d=new Date(start.getFullYear(),start.getMonth(),start.getDate()+i);
+  const key=calendarDateKey(d);
+  const entries=calendarEntriesForDate(key);
+  const cls=['calendar-day'];
+  if(d.getMonth()!==m) cls.push('out');
+  if(key===todayKey) cls.push('today');
+  html+='<div class="'+cls.join(' ')+'"><div class="d">'+d.getDate()+'</div><div class="marks">'+
+   entries.slice(0,3).map(x=>'<div class="calendar-mark '+x.type+'">'+escapeHtml(x.text)+'</div>').join('')+
+   (entries.length>3?'<div class="calendar-mark">+'+(entries.length-3)+'</div>':'')+
+   '</div></div>';
+ }
+ grid.innerHTML=html;
+}
+
 let reservationTimed=true;
 let selectedReservationShareId=null;
 function getReservations(){
