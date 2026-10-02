@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-LAST-BUS-LIVE-1 -->
+<!-- BUILD:2026-10-03-BUS-SELECT-FIX-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -187,6 +187,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .setting-choice small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
 .setting-choice .check{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid #40515d;display:flex;align-items:center;justify-content:center;color:transparent}
 .setting-choice.on{border-color:#3976ad;background:#10263a}
+.setting-choice.active-stop{outline:2px solid #5ca8ff;outline-offset:1px}
 .setting-choice.on .check{background:#2f86ff;border-color:#2f86ff;color:#fff}
 .settings-subhead{font-size:13px;font-weight:900;color:#c8d5dd;margin-top:3px}
 .settings-empty{padding:13px 5px;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
@@ -1449,12 +1450,18 @@ function toggleBusStopSetting(stop){
  saveBusNotifySettings(cfg);
  renderNotificationSettings();
 }
-async function openBusDestinationSetting(stop){
+function openBusDestinationSetting(stop){
  const cfg=getBusNotifySettings();
- if(!cfg.stops[stop]){cfg.stops[stop]=true;saveBusNotifySettings(cfg)}
+ if(!cfg.stops[stop]){
+  cfg.stops[stop]=true;
+  saveBusNotifySettings(cfg);
+ }
  busSettingsActiveStop=stop;
- await loadBusDestinationCatalog(false);
+ // まず即時描画。通信待ちで「押しても反応しない」状態を作らない。
  renderNotificationSettings();
+ if(!busDestinationCatalogLoaded){
+  loadBusDestinationCatalog(false).then(()=>renderNotificationSettings());
+ }
 }
 function destinationCandidatesForStop(stop){
  const out=[];
@@ -1502,8 +1509,10 @@ function toggleBusDestination(stop,dest){
  saveBusNotifySettings(cfg);
  renderNotificationSettings();
 }
-async function renderNotificationSettings(){
- if(!busDestinationCatalogLoaded) await loadBusDestinationCatalog(false);
+function renderNotificationSettings(){
+ if(!busDestinationCatalogLoaded){
+  loadBusDestinationCatalog(false).then(()=>renderNotificationSettings());
+ }
  BUS_WARDS.forEach(w=>{
   const b=document.getElementById('busWard'+w);
   if(b) b.classList.toggle('active',w===busSettingsWard);
@@ -1515,8 +1524,9 @@ async function renderNotificationSettings(){
   list.innerHTML=stops.map(stop=>{
    const on=!!cfg.stops[stop];
    const count=Array.isArray(cfg.destinations[stop])?cfg.destinations[stop].length:0;
-   return '<button type="button" class="setting-choice '+(on?'on':'')+'" onclick="openBusDestinationSetting(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\')">'+
-    '<div><strong>'+escapeHtml(stop)+'</strong><small>'+(count?('行き先 '+count+'件選択'):'タップして行き先を選択')+'</small></div>'+
+   const active=busSettingsActiveStop===stop;
+   return '<button type="button" class="setting-choice '+(on?'on ':'')+(active?'active-stop':'')+'" onclick="openBusDestinationSetting(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\')">'+
+    '<div><strong>'+escapeHtml(stop)+'</strong><small>'+(count?('行き先 '+count+'件選択'):(on?'選択済み・行き先を選択':'タップして選択'))+'</small></div>'+
     '<span class="check">'+(on?'✓':'')+'</span></button>';
   }).join('')||'<div class="settings-empty">バス停データなし</div>';
  }
