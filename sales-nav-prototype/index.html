@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-CALENDAR-BANDS-1 -->
+<!-- BUILD:2026-10-03-SETTINGS-BUS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -174,6 +174,27 @@ main{position:relative;min-height:0;overflow:hidden}
 .share-summary{background:#0c1721;border:1px solid #22313d;border-radius:16px;padding:14px}
 .share-summary strong{font-size:20px;display:block}
 .share-summary .sub{margin-top:5px}
+.settings-wrap{display:flex;flex-direction:column;gap:10px;overflow:auto;padding-bottom:6px}
+.settings-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
+.settings-title{font-size:18px;font-weight:900;margin-bottom:4px}
+.settings-note{font-size:12px;line-height:1.45;color:var(--muted)}
+.settings-tabs{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-top:9px}
+.settings-tabs button{min-height:42px;border:1px solid #30404d;border-radius:11px;background:#101c26;color:#95a5b1;font-weight:800}
+.settings-tabs button.active{background:#163a5c;border-color:#398cff;color:#fff}
+.settings-list{display:flex;flex-direction:column;gap:7px;margin-top:9px}
+.setting-choice{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;min-height:48px;padding:9px 11px;border:1px solid #293944;border-radius:12px;background:#0d1923;color:#fff;text-align:left}
+.setting-choice strong{font-size:15px}
+.setting-choice small{display:block;margin-top:3px;color:var(--muted);font-size:10px}
+.setting-choice .check{flex:0 0 auto;width:24px;height:24px;border-radius:50%;border:1px solid #40515d;display:flex;align-items:center;justify-content:center;color:transparent}
+.setting-choice.on{border-color:#3976ad;background:#10263a}
+.setting-choice.on .check{background:#2f86ff;border-color:#2f86ff;color:#fff}
+.settings-subhead{font-size:13px;font-weight:900;color:#c8d5dd;margin-top:3px}
+.settings-empty{padding:13px 5px;text-align:center;color:var(--muted);font-size:12px;line-height:1.5}
+.settings-inputrow{display:flex;gap:7px;margin-top:8px}
+.settings-inputrow input{flex:1;min-width:0;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 11px;font-size:14px}
+.settings-inputrow button{border:1px solid #315f8a;background:#10253a;color:#dcebff;border-radius:10px;padding:0 12px;font-weight:900}
+.settings-chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.settings-chip{border:1px solid #315f8a;background:#10253a;color:#dcebff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
 .reservation-form{display:flex;flex-direction:column;gap:11px;overflow:auto;padding-bottom:4px}
 .form-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
 .form-label{font-size:13px;color:var(--muted);font-weight:800;margin-bottom:7px}
@@ -348,14 +369,14 @@ main{position:relative;min-height:0;overflow:hidden}
  min-width:22px;height:22px;padding:0 5px;border-radius:999px;background:#2f86ff;color:#fff
 }
 .calendar-day .d{
- font-size:12px;font-weight:900;margin:0 auto 4px;text-align:center;width:max-content
+ font-size:14px;font-weight:900;margin:0 auto 4px;text-align:center;width:max-content
 }
 .calendar-day:nth-child(7n+1) .d{color:#ff7777}
 .calendar-day:nth-child(7n) .d{color:#77aaff}
 .calendar-day.today:nth-child(7n+1) .d,.calendar-day.today:nth-child(7n) .d{color:#fff}
 .calendar-day .marks{display:flex;flex-direction:column;gap:3px}
 .calendar-mark{
- font-size:9px;font-weight:800;line-height:1.2;white-space:nowrap;
+ font-size:11px;font-weight:800;line-height:1.18;white-space:nowrap;
  overflow:hidden;text-overflow:clip;padding:3px 4px;border-radius:3px;
  color:#fff;background:#42515d
 }
@@ -1183,7 +1204,7 @@ html,body{
 <section id="busDetail" class="screen">
  <div class="content">
   <div class="card">
-   <div class="row"><div><div class="label">広島県バス協会 GTFS</div><h2 style="margin:3px 0 0">バス運行状況</h2></div><span id="busUpdated" class="badge">更新待ち</span></div>
+   <div class="row"><div><div class="label">GTFS / 選択した終バス</div><h2 style="margin:3px 0 0">バス営業情報</h2></div><span id="busUpdated" class="badge">更新待ち</span></div>
   </div>
   <div id="busDetailList" class="list"></div>
  </div>
@@ -1246,6 +1267,35 @@ html,body{
  <div class="action"><button class="primary secondary" onclick="show('home')">ホームへ戻る</button></div>
 </section>
 
+<section id="settings" class="screen">
+ <div class="content settings-wrap">
+  <div class="settings-card">
+   <div class="settings-title">通知設定</div>
+   <div class="settings-note">必要な通知だけ選びます。JR通知は見せ方が固まるまで保留です。</div>
+  </div>
+
+  <div class="settings-card">
+   <div class="settings-title">バス終バス通知</div>
+   <div class="settings-note">区 → バス停 → 行き先の順で選択。選んだ組み合わせだけ「終バス約15分前」と「終バス通過」を通知します。</div>
+   <div class="settings-tabs">
+    <button id="busWard中区" type="button" onclick="selectBusWard('中区')">中区</button>
+    <button id="busWard西区" type="button" onclick="selectBusWard('西区')">西区</button>
+    <button id="busWard南区" type="button" onclick="selectBusWard('南区')">南区</button>
+   </div>
+   <div class="settings-subhead" style="margin-top:11px">バス停</div>
+   <div id="busStopSettingsList" class="settings-list"></div>
+   <div class="settings-subhead" style="margin-top:12px">選択中バス停の行き先</div>
+   <div id="busDestinationSettings"></div>
+  </div>
+
+  <div class="settings-card">
+   <div class="settings-title">ライブ通知</div>
+   <div class="settings-note">会場ごとの通知選択は次の実装でここに追加します。</div>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
+</section>
+
 <section id="menu" class="screen">
  <div class="content">
   <div class="card"><h2>メニュー</h2>
@@ -1256,7 +1306,7 @@ html,body{
    <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
    <div class="menuitem" onclick="show('verify')">◎ 位置・警告検証</div>
-   <div class="menuitem">⚙ 設定</div>
+   <div class="menuitem" onclick="show('settings')">⚙ 設定</div>
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()">■ 乗務終了</div>
   </div>
  </div>
@@ -1291,7 +1341,7 @@ preventIosPinchZoom();
  document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 })();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -1325,10 +1375,145 @@ function show(id){
  if(id==='jrDetail') setTimeout(renderJrDetail,0);
  if(id==='eventDetail') setTimeout(renderEventDetail,0);
  if(id==='calendar') renderCalendar();
+ if(id==='settings') renderNotificationSettings();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
  renderDutyUI();
 }
+const BUS_NOTIFY_SETTINGS_KEY='taxi_bus_notify_settings_v1';
+const BUS_WARDS=['中区','西区','南区'];
+const BUS_STOP_FALLBACK={
+ '中区':['広島バスセンター','県庁前','紙屋町','八丁堀','本通り','合同庁舎','中電前','胡町','三川町'],
+ '西区':['横川駅前','西広島駅','己斐'],
+ '南区':['広島駅','広島駅新幹線口']
+};
+let busSettingsWard='中区';
+let busSettingsActiveStop='';
+function getBusNotifySettings(){
+ try{
+  const v=JSON.parse(localStorage.getItem(BUS_NOTIFY_SETTINGS_KEY)||'null');
+  if(v&&typeof v==='object') return {stops:v.stops||{},destinations:v.destinations||{}};
+ }catch(e){}
+ return {stops:{},destinations:{}};
+}
+function saveBusNotifySettings(v){
+ try{localStorage.setItem(BUS_NOTIFY_SETTINGS_KEY,JSON.stringify(v))}catch(e){}
+}
+function getBusStopCatalog(ward){
+ const rows=[];
+ const seen=new Set();
+ const liveStops=Array.isArray(busRealtimeData?.stops)?busRealtimeData.stops:[];
+ for(const s of liveStops){
+  const w=s.ward||s.city_ward||'';
+  const name=s.name||s.stop_name||'';
+  if(w===ward&&name&&!seen.has(name)){seen.add(name);rows.push(name)}
+ }
+ for(const name of (BUS_STOP_FALLBACK[ward]||[])){
+  if(!seen.has(name)){seen.add(name);rows.push(name)}
+ }
+ if(ward==='中区'){
+  const i=rows.indexOf('広島バスセンター');
+  if(i>0){rows.splice(i,1);rows.unshift('広島バスセンター')}
+ }
+ return rows;
+}
+function selectBusWard(ward){
+ if(!BUS_WARDS.includes(ward)) return;
+ busSettingsWard=ward;
+ busSettingsActiveStop='';
+ renderNotificationSettings();
+}
+function toggleBusStopSetting(stop){
+ const cfg=getBusNotifySettings();
+ cfg.stops[stop]=!cfg.stops[stop];
+ if(cfg.stops[stop]) busSettingsActiveStop=stop;
+ else{
+  delete cfg.destinations[stop];
+  if(busSettingsActiveStop===stop) busSettingsActiveStop='';
+ }
+ saveBusNotifySettings(cfg);
+ renderNotificationSettings();
+}
+function openBusDestinationSetting(stop){
+ const cfg=getBusNotifySettings();
+ if(!cfg.stops[stop]){cfg.stops[stop]=true;saveBusNotifySettings(cfg)}
+ busSettingsActiveStop=stop;
+ renderNotificationSettings();
+}
+function destinationCandidatesForStop(stop){
+ const out=[];
+ const seen=new Set();
+ const liveStops=Array.isArray(busRealtimeData?.stops)?busRealtimeData.stops:[];
+ for(const s of liveStops){
+  const name=s.name||s.stop_name||'';
+  if(name!==stop) continue;
+  const ds=Array.isArray(s.destinations)?s.destinations:[];
+  for(const d of ds){
+   const v=typeof d==='string'?d:(d.name||d.headsign||'');
+   if(v&&!seen.has(v)){seen.add(v);out.push(v)}
+  }
+ }
+ return out;
+}
+function addManualBusDestination(){
+ const stop=busSettingsActiveStop;
+ const input=document.getElementById('busDestinationInput');
+ if(!stop||!input) return;
+ const name=input.value.trim();
+ if(!name) return;
+ const cfg=getBusNotifySettings();
+ if(!Array.isArray(cfg.destinations[stop])) cfg.destinations[stop]=[];
+ if(!cfg.destinations[stop].includes(name)) cfg.destinations[stop].push(name);
+ saveBusNotifySettings(cfg);
+ input.value='';
+ renderNotificationSettings();
+}
+function toggleBusDestination(stop,dest){
+ const cfg=getBusNotifySettings();
+ const arr=Array.isArray(cfg.destinations[stop])?[...cfg.destinations[stop]]:[];
+ const i=arr.indexOf(dest);
+ if(i>=0) arr.splice(i,1); else arr.push(dest);
+ cfg.destinations[stop]=arr;
+ cfg.stops[stop]=true;
+ saveBusNotifySettings(cfg);
+ renderNotificationSettings();
+}
+function renderNotificationSettings(){
+ BUS_WARDS.forEach(w=>{
+  const b=document.getElementById('busWard'+w);
+  if(b) b.classList.toggle('active',w===busSettingsWard);
+ });
+ const cfg=getBusNotifySettings();
+ const list=document.getElementById('busStopSettingsList');
+ if(list){
+  const stops=getBusStopCatalog(busSettingsWard);
+  list.innerHTML=stops.map(stop=>{
+   const on=!!cfg.stops[stop];
+   const count=Array.isArray(cfg.destinations[stop])?cfg.destinations[stop].length:0;
+   return '<button type="button" class="setting-choice '+(on?'on':'')+'" onclick="openBusDestinationSetting(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\')">'+
+    '<div><strong>'+escapeHtml(stop)+'</strong><small>'+(count?('行き先 '+count+'件選択'):'タップして行き先を選択')+'</small></div>'+
+    '<span class="check">'+(on?'✓':'')+'</span></button>';
+  }).join('')||'<div class="settings-empty">バス停データなし</div>';
+ }
+ const box=document.getElementById('busDestinationSettings');
+ if(!box) return;
+ const stop=busSettingsActiveStop;
+ if(!stop){
+  box.innerHTML='<div class="settings-empty">上のバス停を選ぶと、行き先設定を表示します。</div>';
+  return;
+ }
+ const candidates=destinationCandidatesForStop(stop);
+ const selected=Array.isArray(cfg.destinations[stop])?cfg.destinations[stop]:[];
+ const candidateHtml=candidates.length
+  ? '<div class="settings-list">'+candidates.map(d=>'<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>').join('')+'</div>'
+  : '<div class="settings-note" style="margin-top:7px">現在のGTFSリアルタイムには行き先一覧が入っていないため、暫定で手入力できます。本番はGTFS時刻表から選択式にします。</div>';
+ const chips=selected.length?'<div class="settings-chiprow">'+selected.map(d=>'<button class="settings-chip" type="button" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')">'+escapeHtml(d)+' ×</button>').join('')+'</div>':'';
+ box.innerHTML='<div class="settings-note" style="margin-top:7px"><strong style="color:#fff">'+escapeHtml(stop)+'</strong></div>'+
+  candidateHtml+
+  (candidates.length?'':'<div class="settings-inputrow"><input id="busDestinationInput" type="text" placeholder="例：○○方面 / ○○行き"><button type="button" onclick="addManualBusDestination()">追加</button></div>')+
+  chips;
+}
+
 let calendarCursor=new Date(new Date().getFullYear(),new Date().getMonth(),1);
 
 function calendarDateKey(d){
@@ -2050,10 +2235,10 @@ function renderSportsRealtime(){
  if(st) st.textContent=statusMap[status]||'確認中';
  if(mid) mid.textContent=carp.team==='広島東洋カープ'?'カープ':(carp.team||'スポーツ');
  if(bot){
-  if(carp.status==='ended'&&carp.end_time) bot.textContent='終了 '+carp.end_time;
-  else if(carp.status==='live') bot.textContent=(carp.score?carp.score+' / ':'')+(carp.venue||'');
-  else if(carp.status==='scheduled') bot.textContent=(carp.start_time?carp.start_time+'〜':'開始時刻確認中')+(carp.venue?' / '+carp.venue:'');
-  else bot.textContent='本日の試合なし';
+  if(carp.status&&carp.status!=='none'){
+   const t=carp.start_time?carp.start_time+'〜':'開始時刻確認中';
+   bot.textContent=t+(carp.venue?' / '+carp.venue:'');
+  }else bot.textContent='本日の試合なし';
  }
  if(card) card.classList.toggle('state-warn',carp.status==='live'||carp.status==='ended');
  renderHomeEventSummary();
@@ -2160,8 +2345,10 @@ function renderBusRealtime(){
    return '<div class="verify-card"><div class="verify-head"><strong>'+escapeHtml(op.name)+'</strong><span class="badge">'+Number(op.vehicle_count||0)+'台</span></div><div>'+detail+'</div>'+extra+'</div>';
   }).join('')||'<div class="verify-empty">データなし</div>';
  }
- maybeNotifyBusFacts(d);
+ // 会社単位の一括通知はタクシー営業判断に使いにくいため停止。
+ // 新しい終バス通知は、設定した「バス停 × 行き先」だけを対象にする。
 }
+
 async function loadBusRealtime(force=false){
  const now=Date.now();
  if(!force&&busRealtimeFetchedAt&&now-busRealtimeFetchedAt<30000) return;
