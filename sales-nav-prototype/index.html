@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-DESTINATION-CATALOG-1 -->
+<!-- BUILD:2026-10-03-LAST-BUS-LIVE-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2325,29 +2325,108 @@ function selectedBusNotifyPairs(){
  }
  return out;
 }
+function busCatalogDestinationRow(stop,destination){
+ const rows=Array.isArray(busDestinationCatalog?.stops?.[stop]?.destinations)
+  ?busDestinationCatalog.stops[stop].destinations:[];
+ return rows.find(x=>(typeof x==='string'?x:x?.name)===destination)||null;
+}
+function gtfsScheduledEpoch(lastBus){
+ if(!lastBus?.service_date||!lastBus?.scheduled_time) return null;
+ const p=String(lastBus.scheduled_time).split(':').map(Number);
+ if(p.length<2||p.some(x=>!Number.isFinite(x))) return null;
+ const base=new Date(lastBus.service_date+'T00:00:00');
+ base.setHours(0,0,0,0);
+ return base.getTime()+((p[0]*3600+p[1]*60+(p[2]||0))*1000);
+}
+function realtimeStopFact(lastBus){
+ if(!lastBus||!busRealtimeData) return null;
+ const op=(Array.isArray(busRealtimeData.operators)?busRealtimeData.operators:[])
+  .find(x=>Number(x.id)===Number(lastBus.operator_id));
+ if(!op) return null;
+ const tu=(Array.isArray(op.trip_updates)?op.trip_updates:[])
+  .find(x=>String(x.trip_id||'')===String(lastBus.trip_id||''));
+ if(!tu) return null;
+ const stu=(Array.isArray(tu.stop_updates)?tu.stop_updates:[])
+  .find(x=>String(x.stop_id||'')===String(lastBus.stop_id||''));
+ if(!stu) return null;
+ const epoch=(Number(stu.departure_time)||Number(stu.arrival_time)||0)*1000;
+ if(!epoch) return null;
+ const mins=Math.round((epoch-Date.now())/60000);
+ return {
+  realtime:true,
+  passed:epoch<=Date.now(),
+  minutes_to_departure:mins,
+  epoch,
+  delay_sec:Number(stu.departure_delay??stu.arrival_delay??tu.delay_sec??0)||0
+ };
+}
 function busLastBusFact(stop,destination){
- const pools=[
-  ...(Array.isArray(busRealtimeData?.last_buses)?busRealtimeData.last_buses:[]),
-  ...(Array.isArray(busRealtimeData?.stop_last_buses)?busRealtimeData.stop_last_buses:[])
- ];
- return pools.find(x=>{
-  const st=x.stop||x.stop_name||'';
-  const ds=x.destination||x.headsign||x.trip_headsign||'';
-  return st===stop&&ds===destination;
- })||null;
+ const row=busCatalogDestinationRow(stop,destination);
+ const last=row&&typeof row==='object'?row.last_bus:null;
+ if(!last) return null;
+ const live=realtimeStopFact(last);
+ if(live){
+  return {
+   ...live,
+   scheduled_time:last.scheduled_time,
+   service_date:last.service_date,
+   operator:last.operator,
+   trip_id:last.trip_id
+  };
+ }
+ const epoch=gtfsScheduledEpoch(last);
+ if(!epoch) return {scheduled_time:last.scheduled_time,service_date:last.service_date};
+ const mins=Math.round((epoch-Date.now())/60000);
+ return {
+  realtime:false,
+  scheduled_elapsed:epoch<Date.now(),
+  minutes_to_departure:mins,
+  epoch,
+  scheduled_time:last.scheduled_time,
+  service_date:last.service_date,
+  operator:last.operator,
+  trip_id:last.trip_id
+ };
 }
 function busLastBusStatusText(fact){
- if(!fact) return '時刻表連携待ち';
- const status=String(fact.status||'').toLowerCase();
- if(status==='passed'||fact.passed===true) return '終バス通過';
+ if(!fact) return '本日の終バスなし';
+ if(fact.realtime&&fact.passed) return '終バス通過';
  const mins=Number(fact.minutes_to_departure);
+ if(fact.scheduled_elapsed&&!fact.realtime) return '終バス時刻経過';
  if(Number.isFinite(mins)){
-  if(mins<=0) return '終バスまもなく';
+  if(mins<=0) return fact.realtime?'終バスまもなく':'終バス時刻経過';
   if(mins<=15) return '終バスまで約'+Math.max(1,Math.round(mins))+'分';
   return '終バス '+Math.round(mins)+'分後';
  }
- const t=fact.time||fact.departure_time||fact.scheduled_time||'';
- return t?('終バス '+t):'終バス確認中';
+ const t=fact.scheduled_time||'';
+ return t?('終バス '+t.slice(0,5)):'終バス確認中';
+}
+function maybeNotifySelectedLastBuses(facts){
+ if(!Array.isArray(facts)||!facts.length) return;
+ const today=localDateValue(new Date());
+ for(const row of facts){
+  const f=row.fact;
+  if(!f) continue;
+  const keyBase=today+'|'+row.stop+'|'+row.destination;
+  if(f.realtime&&f.passed){
+   notifyFact('bus-last-passed',{
+    level:'info',icon:'!',title:'終バス通過',
+    body:row.stop+' / '+row.destination,
+    key:keyBase+'|passed',sourceTs:busRealtimeData?.generated_at||Math.floor(Date.now()/1000),
+    maxAgeSec:600,minIntervalMs:12*60*60*1000
+   });
+   continue;
+  }
+  const mins=Number(f.minutes_to_departure);
+  if(Number.isFinite(mins)&&mins>0&&mins<=15){
+   notifyFact('bus-last-15',{
+    level:'warn',icon:'!',title:'終バスまで約'+Math.max(1,Math.round(mins))+'分',
+    body:row.stop+' / '+row.destination,
+    key:keyBase+'|15',sourceTs:Math.floor(Date.now()/1000),
+    maxAgeSec:120,minIntervalMs:12*60*60*1000
+   });
+  }
+ }
 }
 function renderBusRealtime(){
  const card=document.getElementById('busInfoCard');
@@ -2367,11 +2446,12 @@ function renderBusRealtime(){
  const d=busRealtimeData;
  const generated=d?.generated_at||0;
  const facts=pairs.map(p=>({...p,fact:busLastBusFact(p.stop,p.destination)}));
+ maybeNotifySelectedLastBuses(facts);
  const urgent=facts.find(x=>{
   if(!x.fact) return false;
-  if(String(x.fact.status||'').toLowerCase()==='passed'||x.fact.passed===true) return true;
+  if(x.fact.realtime&&x.fact.passed===true) return true;
   const m=Number(x.fact.minutes_to_departure);
-  return Number.isFinite(m)&&m<=15;
+  return Number.isFinite(m)&&m>0&&m<=15;
  });
 
  if(card) card.classList.toggle('state-warn',!!urgent);
