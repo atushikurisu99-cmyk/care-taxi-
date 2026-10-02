@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-DIRECTION-DEST-PREVIEW-1 -->
+<!-- BUILD:2026-10-03-BUS-DIRECTION-PREVIEW-RANK-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1596,7 +1596,8 @@ function renderNotificationSettings(){
       const t=row?.last_bus?.scheduled_time?String(row.last_bus.scheduled_time).slice(0,5):'';
       const terminal=row?.last_bus?.terminal||'';
       const dests=Array.isArray(row?.destinations)?row.destinations.filter(Boolean):[];
-      const preview=dests.slice(0,6).join('、')+(dests.length>6?' など':'');
+      const ordered=terminal?[terminal,...dests.filter(x=>x!==terminal)]:dests;
+      const preview=ordered.slice(0,6).join('、')+(ordered.length>6?' など':'');
       const timeLine=t?('方面最終 '+escapeHtml(t)+(terminal?' / 最終便 '+escapeHtml(terminal)+'行':'') ):'本日運行なし';
       const sub=preview?('<span>'+escapeHtml(preview)+'</span><br><span>'+timeLine+'</span>'):timeLine;
       return '<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong><small>'+sub+'</small></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>';
