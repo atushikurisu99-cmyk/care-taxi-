@@ -1,3 +1,5 @@
+import GtfsRealtimeBindings from "gtfs-realtime-bindings";
+
 const BASE = "https://www.train-guide.westjr.co.jp/api/v3";
 const LINES = [
   ["geibi1","芸備線"],
@@ -8,6 +10,15 @@ const LINES = [
   ["yamaguchi","山口線"],
 ];
 const APP_ORIGIN = "https://atushikurisu99-cmyk.github.io";
+const BUS_BASE = "https://ajt-mobusta-gtfs.mcapps.jp";
+const BUS_OPERATORS = [
+  [8,"広島電鉄"],
+  [9,"広島バス"],
+  [10,"広島交通"],
+  [11,"芸陽バス"],
+  [15,"JRバス中国"],
+  [13,"ボンバス"],
+];
 
 function corsHeaders(origin="") {
   const allow = origin === APP_ORIGIN ? origin : APP_ORIGIN;
@@ -254,6 +265,126 @@ async function buildHiroshimaEvents(ctx) {
   };
 }
 
+
+async function fetchProtoCached(url, ttl, ctx) {
+  const cache = caches.default;
+  const key = new Request(url, {method:"GET"});
+  const hit = await cache.match(key);
+  if (hit) return new Uint8Array(await hit.arrayBuffer());
+  const r = await fetch(url, {
+    headers: {
+      "accept":"application/x-protobuf,application/octet-stream,*/*",
+      "user-agent":"taxi-sales-nav-validation/0.1",
+    },
+  });
+  if (!r.ok) throw new Error(`upstream ${r.status}: ${url}`);
+  const bytes = new Uint8Array(await r.arrayBuffer());
+  const stored = new Response(bytes, {
+    headers: {
+      "content-type":"application/x-protobuf",
+      "cache-control":`public, max-age=${ttl}`,
+    },
+  });
+  ctx.waitUntil(cache.put(key, stored.clone()));
+  return bytes;
+}
+function pbNum(v) {
+  if (v == null) return 0;
+  if (typeof v === "number") return v;
+  if (typeof v === "bigint") return Number(v);
+  if (typeof v === "object" && typeof v.toNumber === "function") return v.toNumber();
+  return Number(v) || 0;
+}
+function localizedPbText(obj) {
+  const xs = Array.isArray(obj?.translation) ? obj.translation : [];
+  const ja = xs.find(x=>["ja","ja-JP",""].includes(String(x?.language||"")) && x?.text);
+  return String((ja||xs.find(x=>x?.text))?.text||"");
+}
+function activeAlertNow(alert, now) {
+  const periods = Array.isArray(alert?.activePeriod) ? alert.activePeriod : [];
+  if (!periods.length) return true;
+  return periods.some(p=>{
+    const start=pbNum(p?.start), end=pbNum(p?.end);
+    return (!start||now>=start)&&(!end||now<=end);
+  });
+}
+async function summarizeBusOperator(id, name, ctx) {
+  const now=Math.floor(Date.now()/1000);
+  const [tripBytes, alertBytes, vehicleBytes] = await Promise.all([
+    fetchProtoCached(`${BUS_BASE}/realtime/${id}/trip_updates.bin`,20,ctx),
+    fetchProtoCached(`${BUS_BASE}/realtime/${id}/alerts.bin`,30,ctx),
+    fetchProtoCached(`${BUS_BASE}/realtime/${id}/vehicle_position.bin`,20,ctx),
+  ]);
+  const trips=GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(tripBytes);
+  const alertsFeed=GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(alertBytes);
+  const vehicles=GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(vehicleBytes);
+
+  let delayedTrips=0, maxDelaySec=0;
+  for(const ent of (trips.entity||[])){
+    const tu=ent.tripUpdate;
+    if(!tu) continue;
+    const delays=[];
+    if(tu.delay!=null) delays.push(pbNum(tu.delay));
+    const times=[];
+    for(const stu of (tu.stopTimeUpdate||[])){
+      if(stu.arrival?.delay!=null) delays.push(pbNum(stu.arrival.delay));
+      if(stu.departure?.delay!=null) delays.push(pbNum(stu.departure.delay));
+      const et=pbNum(stu.departure?.time)||pbNum(stu.arrival?.time);
+      if(et) times.push(et);
+    }
+    const active=times.some(t=>t>=now-900&&t<=now+7200);
+    const d=Math.max(0,...delays.filter(x=>x>0));
+    if(active&&d>=180){
+      delayedTrips++;
+      maxDelaySec=Math.max(maxDelaySec,d);
+    }
+  }
+
+  const alerts=[];
+  const seen=new Set();
+  for(const ent of (alertsFeed.entity||[])){
+    const a=ent.alert;
+    if(!a||!activeAlertNow(a,now)) continue;
+    const title=localizedPbText(a.headerText)||"運行情報あり";
+    const description=localizedPbText(a.descriptionText);
+    const routes=[...new Set((a.informedEntity||[]).map(x=>String(x?.routeId||"")).filter(Boolean))];
+    const key=[title,description,routes.join(",")].join("|");
+    if(seen.has(key)) continue;
+    seen.add(key);
+    alerts.push({title,description,routes});
+  }
+
+  const vehicleCount=(vehicles.entity||[]).filter(x=>x.vehicle).length;
+  return {
+    id,name,
+    alerts:alerts.slice(0,10),
+    alert_count:alerts.length,
+    delayed_trips:delayedTrips,
+    max_delay_sec:maxDelaySec,
+    route_delays:[],
+    vehicle_count:vehicleCount,
+    stop_updates:[],
+    vehicle_positions:[],
+  };
+}
+async function buildHiroshimaBus(ctx) {
+  const operators=await Promise.all(BUS_OPERATORS.map(([id,name])=>summarizeBusOperator(id,name,ctx)));
+  return {
+    ok:true,
+    source:"広島県バス協会 GTFS-RT",
+    source_url:"https://www.bus-kyo.or.jp/gtfs-open-data",
+    generated_at:Math.floor(Date.now()/1000),
+    cache_seconds:20,
+    summary:{
+      operators:operators.length,
+      alerts:operators.reduce((n,x)=>n+Number(x.alert_count||0),0),
+      delayed_trips:operators.reduce((n,x)=>n+Number(x.delayed_trips||0),0),
+      max_delay_sec:Math.max(0,...operators.map(x=>Number(x.max_delay_sec||0))),
+    },
+    operators,
+  };
+}
+
 async function buildHiroshima(ctx) {
   const lines = await Promise.all(LINES.map(async ([code,name])=>{
     const [stationsPayload, positionPayload] = await Promise.all([
@@ -296,6 +427,7 @@ export default {
       if (url.pathname === "/api/jr/hiroshima") return json(await buildHiroshima(ctx),200,origin);
       if (url.pathname === "/api/sports/hiroshima") return json(await buildHiroshimaSports(ctx),200,origin);
       if (url.pathname === "/api/events/hiroshima") return json(await buildHiroshimaEvents(ctx),200,origin);
+      if (url.pathname === "/api/bus/hiroshima") return json(await buildHiroshimaBus(ctx),200,origin);
       return json({ok:false,error:"not_found"},404,origin);
     } catch (e) {
       return json({ok:false,error:"upstream_fetch_failed",detail:String(e?.message||e)},502,origin);
