@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-LIVE-END-REFERENCE-1 -->
+<!-- BUILD:2026-10-03-LIVE-END-GUIDE-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1294,7 +1294,7 @@ html,body{
    <div class="settings-note">通知したい会場だけ選択します。選んだ会場のライブ情報だけ通知対象にします。</div>
    <div class="settings-subhead" style="margin-top:11px">会場</div>
    <div id="liveVenueSettingsList" class="settings-list"></div>
-   <div class="settings-note" style="margin-top:10px">終演時刻は営業判断の参考情報として扱い、確定した「終演」とは表現しません。</div>
+   <div class="settings-note" style="margin-top:10px">終演時刻は営業判断の目安として表示します。実際の終演を確認できない限り、終演したとは言い切りません。</div>
   </div>
  </div>
  <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
@@ -1614,16 +1614,16 @@ function maybeNotifySelectedLiveEvents(d){
   const diff=Math.round((end.getTime()-Date.now())/60000);
   const key=liveEventKey(e);
   if(diff>0&&diff<=30){
-   notifyFact('live-end-reference',{
-    level:'warn',icon:'!',title:'ライブ 終演見込み '+String(e.end_time).slice(0,5)+'頃',
-    body:(e.name||'ライブ')+' / '+e.venue,
-    key:key+'|reference',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
+   notifyFact('live-end-guide',{
+    level:'warn',icon:'!',title:'ライブ 終演目安 '+String(e.end_time).slice(0,5)+'頃',
+    body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は前後する場合あり',
+    key:key+'|guide',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
   }else if(diff<=0&&diff>=-10){
-   notifyFact('live-end-reference-passed',{
-    level:'info',icon:'!',title:'ライブ 終演見込み時刻を経過',
-    body:(e.name||'ライブ')+' / '+e.venue,
-    key:key+'|reference-passed',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
+   notifyFact('live-end-guide-time',{
+    level:'info',icon:'!',title:'ライブ 終演目安 '+String(e.end_time).slice(0,5)+'頃',
+    body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は未確認',
+    key:key+'|guide-time',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
   }
  }
