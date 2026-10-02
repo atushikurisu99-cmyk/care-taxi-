@@ -61,19 +61,33 @@ def main():
             for r in trips:
                 trip_id = r.get("trip_id","")
                 rid = r.get("route_id","")
-                headsign = (r.get("trip_headsign") or "").strip()
-                if not headsign:
-                    headsign = route_name.get(rid,"")
-                trip_meta[trip_id] = (headsign, rid)
+                trip_meta[trip_id] = {"route_id": rid}
+
+            # 「行き先」はGTFSのtrip_headsignではなく、その便の実際の終点停留所を使う。
+            # 事業者によってtrip_headsignに「○号線」「○○経由」等が入るため、
+            # タクシードライバー向け設定では終点名の方が直感的で不整合が少ない。
+            final_stop_by_trip = {}
+            final_seq_by_trip = {}
+            for row in stop_times:
+                trip_id = row.get("trip_id","")
+                try:
+                    seq = int(row.get("stop_sequence") or 0)
+                except ValueError:
+                    seq = 0
+                if trip_id not in final_seq_by_trip or seq >= final_seq_by_trip[trip_id]:
+                    final_seq_by_trip[trip_id] = seq
+                    final_stop_by_trip[trip_id] = stop_name_by_id.get(row.get("stop_id",""), "").strip()
 
             for row in stop_times:
-                stop_name = stop_name_by_id.get(row.get("stop_id",""), "")
+                stop_name = stop_name_by_id.get(row.get("stop_id",""), "").strip()
                 if stop_name not in TARGET_STOPS:
                     continue
-                headsign, rid = trip_meta.get(row.get("trip_id",""), ("",""))
-                if not headsign:
+                trip_id = row.get("trip_id","")
+                destination = final_stop_by_trip.get(trip_id, "").strip()
+                if not destination or destination == stop_name:
                     continue
-                item = catalog[stop_name]["destinations"][headsign]
+                rid = trip_meta.get(trip_id, {}).get("route_id","")
+                item = catalog[stop_name]["destinations"][destination]
                 item["operators"].add(operator_name)
                 if rid:
                     item["route_ids"].add(rid)
