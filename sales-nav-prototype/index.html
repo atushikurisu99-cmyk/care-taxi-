@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-HOME-CALENDAR-1 -->
+<!-- BUILD:2026-10-03-CALENDAR-BANDS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -337,24 +337,34 @@ main{position:relative;min-height:0;overflow:hidden}
 }
 .calendar-grid{
  flex:1;min-height:0;grid-template-rows:repeat(6,minmax(0,1fr));
- border-left:1px solid #21303c;border-top:1px solid #21303c
 }
 .calendar-day{
- min-height:0;border:0;border-right:1px solid #21303c;border-bottom:1px solid #21303c;
- border-radius:0;background:transparent;padding:4px 3px;overflow:hidden;
- touch-action:manipulation
+ min-height:0;border:0;border-radius:0;background:transparent;
+ padding:5px 3px;overflow:hidden;touch-action:manipulation
 }
-.calendar-day.out{opacity:.3}
-.calendar-day.today{box-shadow:inset 0 0 0 2px #2f86ff}
-.calendar-day .d{font-size:12px;font-weight:900;margin-bottom:3px}
-.calendar-day .marks{display:flex;flex-direction:column;gap:2px}
+.calendar-day.out{opacity:.28}
+.calendar-day.today .d{
+ display:inline-flex;align-items:center;justify-content:center;
+ min-width:22px;height:22px;padding:0 5px;border-radius:999px;background:#2f86ff;color:#fff
+}
+.calendar-day .d{
+ font-size:12px;font-weight:900;margin:0 auto 4px;text-align:center;width:max-content
+}
+.calendar-day:nth-child(7n+1) .d{color:#ff7777}
+.calendar-day:nth-child(7n) .d{color:#77aaff}
+.calendar-day.today:nth-child(7n+1) .d,.calendar-day.today:nth-child(7n) .d{color:#fff}
+.calendar-day .marks{display:flex;flex-direction:column;gap:3px}
 .calendar-mark{
- font-size:9px;font-weight:800;line-height:1.15;white-space:nowrap;
- overflow:hidden;text-overflow:clip;padding:2px 3px;border-radius:3px;background:#12283a
+ font-size:9px;font-weight:800;line-height:1.2;white-space:nowrap;
+ overflow:hidden;text-overflow:clip;padding:3px 4px;border-radius:3px;
+ color:#fff;background:#42515d
 }
-.calendar-mark.res{background:#2b2410;color:#ffe08b}
-.calendar-mark.event{background:#102d22;color:#a7e2bf}
-.calendar-mark.sports{background:#2d1719;color:#ffb0b0}
+.calendar-mark.res{background:#9a7822;color:#fff6c6}
+.calendar-mark.live{background:#2f8f5b;color:#edfff4}
+.calendar-mark.baseball{background:#b84343;color:#fff2f2}
+.calendar-mark.soccer{background:#7750b7;color:#f6f0ff}
+.calendar-mark.court{background:#3378b8;color:#eef7ff}
+.calendar-mark.sports{background:#51677c;color:#f2f7fb}
 .calendar-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
 .calendar-actions .primary{min-height:52px;font-size:17px}
 
@@ -1328,6 +1338,14 @@ function moveCalendarMonth(delta){
  calendarCursor=new Date(calendarCursor.getFullYear(),calendarCursor.getMonth()+Number(delta||0),1);
  renderCalendar();
 }
+function calendarSportType(s){
+ const raw=[s?.sport,s?.category,s?.league,s?.team,s?.venue,s?.name].filter(Boolean).join(' ').toLowerCase();
+ if(raw.includes('カープ')||raw.includes('野球')||raw.includes('baseball')) return 'baseball';
+ if(raw.includes('サッカー')||raw.includes('soccer')||raw.includes('football')||raw.includes('サンフレ')) return 'soccer';
+ if(raw.includes('バスケ')||raw.includes('basketball')||raw.includes('ドラゴンフライズ')||
+    raw.includes('バレー')||raw.includes('volleyball')||raw.includes('サンダーズ')) return 'court';
+ return 'sports';
+}
 function calendarEntriesForDate(key){
  const out=[];
  for(const r of getReservations()){
@@ -1339,12 +1357,12 @@ function calendarEntriesForDate(key){
  if(key===today){
   const events=Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[];
   for(const e of events.slice(0,3)){
-   out.push({type:'event',text:(e.start_time?e.start_time+' ':'')+(e.name||'ライブ')});
+   out.push({type:'live',text:(e.start_time?e.start_time+' ':'')+(e.name||'ライブ')});
   }
   const sports=Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[];
-  for(const s of sports.slice(0,2)){
+  for(const s of sports.slice(0,3)){
    if(s.status&&s.status!=='none'){
-    out.push({type:'sports',text:(s.start_time?s.start_time+' ':'')+(s.venue||s.team||'スポーツ')});
+    out.push({type:calendarSportType(s),text:(s.start_time?s.start_time+' ':'')+(s.venue||s.team||'スポーツ')});
    }
   }
  }
