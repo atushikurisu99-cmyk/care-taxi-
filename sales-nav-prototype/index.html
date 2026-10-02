@@ -928,7 +928,7 @@ html,body{
    <div id="homeEventSub" class="sub">ライブ・スポーツを確認中</div>
   </div>
 
-  <button class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
+  <button class="force-refresh-btn" type="button" onclick="forceAppRefresh()">↻ 強制更新</button>
  </div>
  <div class="action home-actions">
   <button id="dutyMainButton" class="primary" onclick="handleDutyMain()">乗務開始</button>
@@ -3334,6 +3334,36 @@ loadEventSportsRealtime(false);
 setInterval(()=>loadBusRealtime(false),60000);
 setInterval(()=>loadJrProbeSnapshot(false),30000);
 setInterval(()=>loadEventSportsRealtime(false),30000);
+
+async function forceAppRefresh(){
+ const btn=event?.currentTarget||null;
+ if(btn){
+  btn.disabled=true;
+  btn.textContent='↻ 再読込中…';
+ }
+ try{
+  // 予約・乗務記録などlocalStorageの利用者データは消さない。
+  // Cache Storage / Service Workerだけを整理し、URLへ一時パラメータを付けて
+  // 最新のHTMLをサーバーから取り直す。
+  if('caches' in window){
+   try{
+    const keys=await caches.keys();
+    await Promise.all(keys.map(k=>caches.delete(k)));
+   }catch(e){}
+  }
+  if('serviceWorker' in navigator){
+   try{
+    const regs=await navigator.serviceWorker.getRegistrations();
+    await Promise.all(regs.map(r=>r.unregister()));
+   }catch(e){}
+  }
+  const u=new URL(location.href);
+  u.searchParams.set('_refresh',Date.now().toString());
+  location.replace(u.toString());
+ }catch(e){
+  location.reload();
+ }
+}
 
 async function forceRefreshLiveData(){
  const btn=document.getElementById('forceRefreshButton');
