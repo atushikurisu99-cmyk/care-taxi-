@@ -67,7 +67,7 @@ def active_services(calendar_rows, exception_rows, service_date):
 
 def main():
     catalog = defaultdict(lambda: {"destinations": defaultdict(lambda: {
-        "operators": set(), "route_ids": set(), "last_bus": None
+        "operators": set(), "route_ids": set(), "last_bus": None, "last_buses_by_date": {}
     })})
     errors = []
     # GitHub Actions はUTC。広島の営業日判定はJSTで固定。
@@ -83,7 +83,12 @@ def main():
             routes = read_csv(zf, "routes.txt")
             calendar_rows = read_csv(zf, "calendar.txt") if "calendar.txt" in zf.namelist() else []
             exception_rows = read_csv(zf, "calendar_dates.txt") if "calendar_dates.txt" in zf.namelist() else []
-            active_service_ids = active_services(calendar_rows, exception_rows, service_date)
+            service_dates = [service_date + timedelta(days=i) for i in range(8)]
+            active_service_ids_by_date = {
+                d.isoformat(): active_services(calendar_rows, exception_rows, d)
+                for d in service_dates
+            }
+            active_service_ids = active_service_ids_by_date[service_date.isoformat()]
 
             stop_name_by_id = {r.get("stop_id",""): r.get("stop_name","").strip() for r in stops}
             route_name = {}
@@ -144,14 +149,31 @@ def main():
                 if rid:
                     item["route_ids"].add(rid)
 
-                # 今日の運行サービスだけで、そのバス停を通る「終バス」を求める。
-                if meta.get("service_id") in active_service_ids:
-                    dep = (row.get("departure_time") or row.get("arrival_time") or "").strip()
-                    sec = parse_gtfs_time(dep)
-                    if sec is not None:
+                dep = (row.get("departure_time") or row.get("arrival_time") or "").strip()
+                sec = parse_gtfs_time(dep)
+                if sec is not None:
+                    # 今日の終バス
+                    if meta.get("service_id") in active_service_ids:
                         current = item.get("last_bus")
                         if current is None or sec > current["seconds"]:
                             item["last_bus"] = {
+                                "operator_id": operator_id,
+                                "operator": operator_name,
+                                "trip_id": trip_id,
+                                "route_id": rid,
+                                "stop_id": row.get("stop_id",""),
+                                "scheduled_time": dep,
+                                "terminal_arrival_time": final_time_by_trip.get(trip_id, ""),
+                                "seconds": sec,
+                            }
+
+                    # 曜日差・直近のダイヤ改正を見落とさないため、今後8日分も保存。
+                    for date_key, active_ids in active_service_ids_by_date.items():
+                        if meta.get("service_id") not in active_ids:
+                            continue
+                        current = item["last_buses_by_date"].get(date_key)
+                        if current is None or sec > current["seconds"]:
+                            item["last_buses_by_date"][date_key] = {
                                 "operator_id": operator_id,
                                 "operator": operator_name,
                                 "trip_id": trip_id,
@@ -178,6 +200,14 @@ def main():
                 last.pop("seconds", None)
                 last["service_date"] = service_date.isoformat()
                 row["last_bus"] = last
+            if meta.get("last_buses_by_date"):
+                day_map = {}
+                for date_key, fact in sorted(meta["last_buses_by_date"].items()):
+                    v = dict(fact)
+                    v.pop("seconds", None)
+                    v["service_date"] = date_key
+                    day_map[date_key] = v
+                row["last_buses_by_date"] = day_map
             dests.append(row)
         # 設定候補は今日運行する便だけに限定しない。
         # 平日限定・土休日限定の終点も常に残し、後から見つからない状態を防ぐ。
@@ -198,6 +228,7 @@ def main():
         "service_date": service_date.isoformat(),
         "operators": list(OPERATORS.values()),
         "missing_target_stops": missing_target_stops,
+        "schedule_horizon_days": 8,
         "stops": out_stops,
         "errors": errors,
     }
