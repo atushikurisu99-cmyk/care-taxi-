@@ -2,6 +2,12 @@ name: Deploy JR Worker proxy
 
 on:
   workflow_dispatch:
+  push:
+    branches:
+      - main
+    paths:
+      - "workers/jr-higashima-proxy/**"
+      - ".github/workflows/deploy-jr-worker.yml"
 
 jobs:
   deploy:
