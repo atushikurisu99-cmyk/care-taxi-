@@ -26,6 +26,7 @@ TARGET_STOPS = {
 }
 
 OUT = Path("sales-nav-prototype/data/bus-destination-catalog.json")
+DIRECTION_AUDIT_OUT = Path("sales-nav-prototype/data/bus-direction-audit.json")
 
 def download_zip(operator_id: int) -> zipfile.ZipFile:
     url = f"https://ajt-mobusta-gtfs.mcapps.jp/static/{operator_id}/current_data.zip"
@@ -69,6 +70,10 @@ def main():
     catalog = defaultdict(lambda: {"destinations": defaultdict(lambda: {
         "operators": set(), "route_ids": set(), "last_bus": None, "last_buses_by_date": {}
     })})
+    directions = defaultdict(lambda: defaultdict(lambda: {
+        "operators": set(), "route_ids": set(), "destinations": set(),
+        "last_bus": None, "last_buses_by_date": {}
+    }))
     errors = []
     # GitHub Actions はUTC。広島の営業日判定はJSTで固定。
     jst = timezone(timedelta(hours=9))
@@ -123,6 +128,24 @@ def main():
                     final_stop_by_trip[trip_id] = stop_name_by_id.get(row.get("stop_id",""), "").strip()
                     final_time_by_trip[trip_id] = (row.get("arrival_time") or row.get("departure_time") or "").strip()
 
+            # 各便の「次の停留所」を確定。これをユーザー向けの方面グループに使う。
+            trip_rows = defaultdict(list)
+            for st in stop_times:
+                trip_id = st.get("trip_id","")
+                try:
+                    seq = int(st.get("stop_sequence") or 0)
+                except ValueError:
+                    seq = 0
+                trip_rows[trip_id].append((seq, st))
+            next_stop_by_trip_seq = {}
+            for trip_id, rows in trip_rows.items():
+                rows.sort(key=lambda x: x[0])
+                for i, (seq, st) in enumerate(rows[:-1]):
+                    nxt = rows[i + 1][1]
+                    next_name = stop_name_by_id.get(nxt.get("stop_id",""), "").strip()
+                    if next_name:
+                        next_stop_by_trip_seq[(trip_id, seq)] = next_name
+
             for row in stop_times:
                 stop_name = stop_name_by_id.get(row.get("stop_id",""), "").strip()
                 if stop_name not in TARGET_STOPS:
@@ -148,6 +171,15 @@ def main():
                 item["operators"].add(operator_name)
                 if rid:
                     item["route_ids"].add(rid)
+
+                next_stop = next_stop_by_trip_seq.get((trip_id, current_seq), "").strip()
+                direction_item = None
+                if next_stop:
+                    direction_item = directions[stop_name][next_stop]
+                    direction_item["operators"].add(operator_name)
+                    direction_item["destinations"].add(destination)
+                    if rid:
+                        direction_item["route_ids"].add(rid)
 
                 dep = (row.get("departure_time") or row.get("arrival_time") or "").strip()
                 sec = parse_gtfs_time(dep)
@@ -183,6 +215,39 @@ def main():
                                 "terminal_arrival_time": final_time_by_trip.get(trip_id, ""),
                                 "seconds": sec,
                             }
+
+                    # 方面（次停留所）単位でも同じ終バス判定を保持。
+                    if direction_item is not None:
+                        if meta.get("service_id") in active_service_ids:
+                            current = direction_item.get("last_bus")
+                            if current is None or sec > current["seconds"]:
+                                direction_item["last_bus"] = {
+                                    "operator_id": operator_id,
+                                    "operator": operator_name,
+                                    "trip_id": trip_id,
+                                    "route_id": rid,
+                                    "stop_id": row.get("stop_id",""),
+                                    "scheduled_time": dep,
+                                    "terminal_arrival_time": final_time_by_trip.get(trip_id, ""),
+                                    "terminal": destination,
+                                    "seconds": sec,
+                                }
+                        for date_key, active_ids in active_service_ids_by_date.items():
+                            if meta.get("service_id") not in active_ids:
+                                continue
+                            current = direction_item["last_buses_by_date"].get(date_key)
+                            if current is None or sec > current["seconds"]:
+                                direction_item["last_buses_by_date"][date_key] = {
+                                    "operator_id": operator_id,
+                                    "operator": operator_name,
+                                    "trip_id": trip_id,
+                                    "route_id": rid,
+                                    "stop_id": row.get("stop_id",""),
+                                    "scheduled_time": dep,
+                                    "terminal_arrival_time": final_time_by_trip.get(trip_id, ""),
+                                    "terminal": destination,
+                                    "seconds": sec,
+                                }
         except Exception as e:
             errors.append({"operator_id":operator_id,"operator":operator_name,"error":str(e)})
 
@@ -220,6 +285,40 @@ def main():
         inactive.sort(key=lambda x: x["name"])
         out_stops[stop_name] = {"destinations": active + inactive}
 
+    # 方面（次停留所）をコンパクトに出力。終点一覧は内部データとして残す。
+    for stop_name in sorted(directions):
+        direction_rows = []
+        for next_stop, meta in directions[stop_name].items():
+            row = {
+                "name": f"{next_stop}方面",
+                "next_stop": next_stop,
+                "operators": sorted(meta["operators"]),
+                "route_ids": sorted(meta["route_ids"]),
+                "destinations": sorted(meta["destinations"]),
+            }
+            if meta.get("last_bus"):
+                last = dict(meta["last_bus"])
+                last.pop("seconds", None)
+                last["service_date"] = service_date.isoformat()
+                row["last_bus"] = last
+            if meta.get("last_buses_by_date"):
+                day_map = {}
+                for date_key, fact in sorted(meta["last_buses_by_date"].items()):
+                    v = dict(fact)
+                    v.pop("seconds", None)
+                    v["service_date"] = date_key
+                    day_map[date_key] = v
+                row["last_buses_by_date"] = day_map
+            direction_rows.append(row)
+        direction_rows.sort(
+            key=lambda x: (
+                parse_gtfs_time((x.get("last_bus") or {}).get("scheduled_time","")) or -1,
+                x["name"]
+            ),
+            reverse=True
+        )
+        out_stops.setdefault(stop_name, {"destinations": []})["directions"] = direction_rows
+
     missing_target_stops = sorted(TARGET_STOPS - set(out_stops.keys()))
     payload = {
         "source": "広島県バス協会 GTFS-JP current data",
@@ -234,6 +333,26 @@ def main():
     }
     OUT.parent.mkdir(parents=True, exist_ok=True)
     OUT.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+    audit = {
+        "generated_at": payload["generated_at"],
+        "service_date": payload["service_date"],
+        "stops": {
+            stop: [
+                {
+                    "name": d["name"],
+                    "next_stop": d["next_stop"],
+                    "destinations_count": len(d["destinations"]),
+                    "destinations": d["destinations"][:8],
+                    "last_bus": (d.get("last_bus") or {}).get("scheduled_time"),
+                    "last_terminal": (d.get("last_bus") or {}).get("terminal"),
+                }
+                for d in meta.get("directions", [])
+            ]
+            for stop, meta in out_stops.items()
+        }
+    }
+    DIRECTION_AUDIT_OUT.write_text(json.dumps(audit, ensure_ascii=False, indent=2), encoding="utf-8")
     print(f"wrote {OUT} stops={len(out_stops)} errors={len(errors)}")
 
 if __name__ == "__main__":
