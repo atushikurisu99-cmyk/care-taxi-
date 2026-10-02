@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-EBISU-HATCHOBORI-FIX-1 -->
+<!-- BUILD:2026-10-03-BUS-FULL-AUDIT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1384,7 +1384,7 @@ function show(id){
 const BUS_NOTIFY_SETTINGS_KEY='taxi_bus_notify_settings_v1';
 const BUS_WARDS=['中区','西区','南区'];
 const BUS_STOP_FALLBACK={
- '中区':['広島バスセンター','県庁前','紙屋町','八丁堀','本通り','合同庁舎','中電前','新天地'],
+ '中区':['広島バスセンター','県庁前','紙屋町','八丁堀','本通り','合同庁舎前','中電前','新天地'],
  '西区':['横川駅前','西広島駅','己斐'],
  '南区':['広島駅','広島駅新幹線口']
 };
@@ -1419,6 +1419,16 @@ function getBusNotifySettings(){
    }
    delete out.stops['三川町'];
    delete out.destinations['三川町'];
+   // 旧UIの「合同庁舎」はGTFS正式停留所名「合同庁舎前」へ移行。
+   if(out.stops['合同庁舎']){
+    out.stops['合同庁舎前']=true;
+    if(Array.isArray(out.destinations['合同庁舎'])&&!out.destinations['合同庁舎前']){
+     out.destinations['合同庁舎前']=out.destinations['合同庁舎'];
+    }
+   }
+   delete out.stops['合同庁舎'];
+   delete out.destinations['合同庁舎'];
+
    // 旧UIの「胡町」は、写真で確認した実際のバス停名「八丁堀」へ移行。
    if(out.stops['胡町']){
     out.stops['八丁堀']=true;
@@ -1576,7 +1586,8 @@ function renderNotificationSettings(){
   ? '<div class="settings-list">'+candidates.map(d=>{
       const row=busCatalogDestinationRow(stop,d);
       const t=row?.last_bus?.scheduled_time?String(row.last_bus.scheduled_time).slice(0,5):'';
-      return '<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong><small>'+(t?('本日の終バス '+escapeHtml(t)):'終点')+'</small></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>';
+      const sub=t?('本日の終バス '+escapeHtml(t)):'本日運行なし';
+      return '<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong><small>'+sub+'</small></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>';
     }).join('')+'</div>'
   : '<div class="settings-note" style="margin-top:7px">'+(busDestinationCatalogLoaded?'このバス停の行き先データを確認できません。':'行き先データを取得中…')+'</div>';
  const chips=selected.length?'<div class="settings-chiprow">'+selected.map(d=>'<button class="settings-chip" type="button" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')">'+escapeHtml(d)+' ×</button>').join('')+'</div>':'';
