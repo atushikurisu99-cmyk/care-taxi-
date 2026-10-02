@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-02-NOTIFY-QUALITY-2 -->
+<!-- BUILD:2026-10-02-BUS-LIVE-WORKER-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1906,16 +1906,28 @@ function renderBusRealtime(){
 }
 async function loadBusRealtime(force=false){
  const now=Date.now();
- if(!force&&busRealtimeFetchedAt&&now-busRealtimeFetchedAt<60000) return;
+ if(!force&&busRealtimeFetchedAt&&now-busRealtimeFetchedAt<30000) return;
  busRealtimeFetchedAt=now;
+ const busWorkerUrl=JR_WORKER_URL.replace('/api/jr/hiroshima','/api/bus/hiroshima')+'?ts='+now;
+ let source='worker';
  try{
-  const r=await fetch('./data/bus-realtime.json?ts='+now,{cache:'no-store'});
-  if(!r.ok) throw new Error('http '+r.status);
-  busRealtimeData=await r.json();
-  logAnalyticsEvent('feed_loaded',{feed:'bus',source:'snapshot',generatedAt:busRealtimeData?.generated_at||0,alerts:Number(busRealtimeData?.summary?.alerts||0),delayed:Number(busRealtimeData?.summary?.delayed_trips||0)});
- }catch(e){
-  logAnalyticsEvent('feed_error',{feed:'bus',message:String(e?.message||e)});
-  // 前回値があれば残す
+  let r=await fetch(busWorkerUrl,{cache:'no-store',headers:{'Accept':'application/json'}});
+  if(!r.ok) throw new Error('worker http '+r.status);
+  let next=await r.json();
+  if(!next?.ok||!next?.generated_at||!next?.summary) throw new Error('worker invalid payload');
+  busRealtimeData=next;
+ }catch(workerErr){
+  source='snapshot';
+  try{
+   const r=await fetch('./data/bus-realtime.json?ts='+now,{cache:'no-store'});
+   if(!r.ok) throw new Error('snapshot http '+r.status);
+   busRealtimeData=await r.json();
+  }catch(snapshotErr){
+   logAnalyticsEvent('feed_error',{feed:'bus',message:'worker='+String(workerErr?.message||workerErr)+' / snapshot='+String(snapshotErr?.message||snapshotErr)});
+  }
+ }
+ if(busRealtimeData){
+  logAnalyticsEvent('feed_loaded',{feed:'bus',source,generatedAt:busRealtimeData?.generated_at||0,alerts:Number(busRealtimeData?.summary?.alerts||0),delayed:Number(busRealtimeData?.summary?.delayed_trips||0)});
  }
  renderBusRealtime();
 }
