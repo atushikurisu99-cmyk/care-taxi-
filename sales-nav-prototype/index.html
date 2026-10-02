@@ -28,10 +28,12 @@ header h1{font-size:21px;margin:0}
 header.state-only{justify-content:flex-end}
 header.state-only h1{display:none}
 .badge{font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;background:#0f2431;border:1px solid #274052}
+.header-state{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0}
 header .badge{
  font-size:17px;font-weight:800;padding:9px 16px;min-width:76px;text-align:center;
  border-radius:999px;line-height:1.1
 }
+.header-duty-meta{font-size:10px;font-weight:700;color:var(--muted);line-height:1.1;white-space:nowrap;padding-right:2px}
 .map-control{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;background:#0c1721;border:1px solid #22313d;border-radius:15px}
 .map-control .left{display:flex;align-items:center;gap:9px}
 .location-status{min-height:62px;display:flex;align-items:center;justify-content:space-between;gap:10px;background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:10px 13px}
@@ -185,27 +187,28 @@ main{position:relative;min-height:0;overflow:hidden}
 .form-actions{display:grid;grid-template-columns:.8fr 1.2fr;gap:8px}
 .form-actions .primary{min-height:58px;font-size:20px}
 .hidden{display:none!important}
+.home-top-grid,.home-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
+.home-top-grid{align-items:stretch}
 .home-weather{
- min-height:72px;display:flex;align-items:center;gap:12px;
- padding:12px 16px;border-radius:16px;
+ min-height:110px;display:flex;align-items:center;gap:10px;
+ padding:13px 12px;border-radius:16px;
  background:linear-gradient(180deg,var(--panel2),var(--panel));
- border:1px solid var(--line)
+ border:1px solid var(--line);min-width:0
 }
-.home-weather .weather-icon{font-size:27px;line-height:1;flex:0 0 auto}
+.home-weather .weather-icon{font-size:26px;line-height:1;flex:0 0 auto}
 .home-weather .weather-text{
- font-size:18px;font-weight:700;line-height:1.2;
- white-space:nowrap;overflow:hidden;text-overflow:clip
+ font-size:17px;font-weight:700;line-height:1.2;
+ white-space:normal;overflow:hidden;text-overflow:clip
 }
-.home-summary{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.home-summary .card{min-height:92px}
-.home-summary .label{font-size:15px}
-.home-summary .value{font-size:24px;font-weight:800;line-height:1.08;margin-top:5px}
-.home-summary .sub{font-size:14px;line-height:1.3;margin-top:4px}
-.home-summary .reservation-summary{grid-column:1 / -1}
-.home-summary .reservation-summary .value{font-size:24px}
-.shift-card .label{font-size:15px}
-.shift-card .sub{font-size:14px}
-.shift-card .shift-time{font-size:20px;font-weight:800}
+.home-top-grid .reservation-summary{
+ min-height:110px;display:flex;flex-direction:column;justify-content:center
+}
+.home-summary .card{min-height:96px}
+.home-summary .label,.home-top-grid .label,.home-events-wide .label{font-size:15px}
+.home-summary .value,.home-top-grid .value,.home-events-wide .value{font-size:22px;font-weight:800;line-height:1.08;margin-top:5px}
+.home-summary .sub,.home-top-grid .sub,.home-events-wide .sub{font-size:13px;line-height:1.3;margin-top:4px}
+.home-events-wide{min-height:104px;cursor:pointer}
+.home-events-wide .value{font-size:24px}
 .home-actions{display:block;height:100%}
 .home-actions .primary{width:100%;height:100%}
 .vacant-center{flex:1;display:flex;flex-direction:column;justify-content:flex-start;padding-top:20px}
@@ -819,7 +822,7 @@ html,body{
 </head>
 <body>
 <div class="app">
-<header><h1 id="title">タクシー営業ナビ</h1><span class="badge" id="badge">空車</span></header>
+<header><h1 id="title">タクシー営業ナビ</h1><div id="homeHeaderState" class="header-state"><span class="badge" id="badge">空車</span><span id="headerDutyMeta" class="header-duty-meta">乗務開始前</span></div></header>
 <main>
 <div id="notice" class="notice normal"><div class="icon" id="nicon">i</div><div><strong id="ntitle">通知</strong><span id="nbody">お知らせ</span></div></div>
 <div id="safety" class="safety">
@@ -862,27 +865,31 @@ html,body{
 
 <section id="home" class="screen active">
  <div class="content">
-  <div class="card">
-   <div class="row"><div><div class="label">今日の概要</div><h2 style="margin:3px 0 0">営業前チェック</h2></div><span id="homeDutyBadge" class="badge">未乗務</span></div>
-  </div>
-
-  <div class="home-weather">
-   <span id="weatherIcon" class="weather-icon" aria-hidden="true">--</span>
-   <div style="min-width:0">
-    <div id="weatherNow" class="weather-text">天気を取得中…</div>
-    <div id="weatherNext" class="sub">現在地から更新</div>
+  <div class="home-top-grid">
+   <div class="home-weather">
+    <span id="weatherIcon" class="weather-icon" aria-hidden="true">--</span>
+    <div style="min-width:0">
+     <div class="label">天気</div>
+     <div id="weatherNow" class="weather-text">天気を取得中…</div>
+     <div id="weatherNext" class="sub">現在地から更新</div>
+    </div>
+   </div>
+   <div class="card reservation-summary" onclick="show('schedule')">
+    <div class="label">次の予約</div>
+    <div id="homeReservationValue" class="value">なし</div>
+    <div id="homeReservationSub" class="sub">タップして予約を確認</div>
    </div>
   </div>
 
   <div class="home-summary">
-   <div class="card"><div class="label">JR</div><div id="homeJrValue" class="value">取得待ち</div><div id="homeJrSub" class="sub">データ確認中</div></div>
-   <div class="card"><div class="label">イベント</div><div id="homeEventValue" class="value">取得待ち</div><div id="homeEventSub" class="sub">データ確認中</div></div>
-   <div class="card reservation-summary" onclick="show('schedule')"><div class="label">次の予約</div><div id="homeReservationValue" class="value">なし</div><div id="homeReservationSub" class="sub">タップして予約を登録</div></div>
+   <div class="card" onclick="openInfo('home')"><div class="label">JR</div><div id="homeJrValue" class="value">取得待ち</div><div id="homeJrSub" class="sub">データ確認中</div></div>
+   <div class="card" onclick="openInfo('home')"><div class="label">バス</div><div id="homeBusValue" class="value">取得待ち</div><div id="homeBusSub" class="sub">データ確認中</div></div>
   </div>
 
-  <div class="card shift-card">
-   <div><div class="label">乗務時間</div><div id="homeShiftStatus" class="sub">まだ開始していません</div></div>
-   <div id="homeShiftClock" class="shift-time">--:--</div>
+  <div class="card home-events-wide" onclick="openInfo('home')">
+   <div class="label">各種イベント</div>
+   <div id="homeEventValue" class="value">取得待ち</div>
+   <div id="homeEventSub" class="sub">ライブ・スポーツを確認中</div>
   </div>
  </div>
  <div class="action home-actions">
@@ -1169,11 +1176,13 @@ function show(id){
  const header=document.querySelector('header');
  const title=document.getElementById('title');
  const badge=document.getElementById('badge');
+ const headerState=document.getElementById('homeHeaderState');
  const isHome=id==='home';
  header.classList.remove('state-only');
  document.querySelector('.app')?.classList.remove('header-collapsed');
  title.textContent=isHome?'タクシー営業ナビ':(titles[id]||'タクシー営業ナビ');
- badge.style.display=isHome?'':'none';
+ if(headerState) headerState.style.display=isHome?'':'none';
+ badge.style.display='';
  if(isHome) badge.textContent=stateLabelFor(id);
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id || (id==='vacant'&&b.dataset.target==='home')));
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
@@ -1739,20 +1748,45 @@ let eventSportsFetchedAt=0;
 const LIVE_EVENTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima';
 const SPORTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/sports/hiroshima';
 
+function renderHomeEventSummary(){
+ const hv=document.getElementById('homeEventValue');
+ const hs=document.getElementById('homeEventSub');
+ if(!hv||!hs) return;
+ if(!eventRealtimeData&&!sportsRealtimeData){
+  hv.textContent='取得待ち';
+  hs.textContent='ライブ・スポーツを確認中';
+  return;
+ }
+ const events=Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[];
+ const sports=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[]).filter(x=>x&&x.status&&x.status!=='none');
+ const total=events.length+sports.length;
+ hv.textContent=total?total+'件':'なし';
+ const liveNow=sports.find(x=>x.status==='live');
+ const nextEvent=events[0]||sports.find(x=>x.status==='scheduled')||liveNow||sports[0]||null;
+ if(!nextEvent){
+  hs.textContent=(eventRealtimeData?.coverage==='partial')?'一部会場を確認中':'本日の登録なし';
+  return;
+ }
+ if(events.includes(nextEvent)){
+  const t=nextEvent.start_time?nextEvent.start_time+'〜 ':'';
+  hs.textContent=t+(nextEvent.name||nextEvent.venue||'イベント');
+ }else{
+  const prefix=nextEvent.status==='live'?'試合中 ':nextEvent.status==='ended'?'終了 ':'';
+  const t=nextEvent.start_time&&nextEvent.status==='scheduled'?nextEvent.start_time+'〜 ':'';
+  hs.textContent=prefix+t+(nextEvent.venue||nextEvent.team||'スポーツ');
+ }
+}
 function renderLiveEvents(){
  const d=eventRealtimeData;
  const st=document.getElementById('liveInfoStatus');
  const mid=document.getElementById('liveInfoMiddle');
  const bot=document.getElementById('liveInfoBottom');
  const card=document.getElementById('liveInfoCard');
- const hv=document.getElementById('homeEventValue');
- const hs=document.getElementById('homeEventSub');
  if(!d){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='確認中';
   if(bot) bot.textContent='—';
-  if(hv) hv.textContent='取得待ち';
-  if(hs) hs.textContent='データ確認中';
+  renderHomeEventSummary();
   return;
  }
  const events=Array.isArray(d.events)?d.events:[];
@@ -1768,15 +1802,7 @@ function renderLiveEvents(){
    bot.textContent=d.coverage==='partial'?'一部会場を確認中':'更新 '+formatAgo(d.generated_at);
   }
  }
- if(hv) hv.textContent=events.length?events.length+'件':'なし';
- if(hs){
-  if(e){
-   const t=e.start_time?e.start_time+'〜 ':'';
-   hs.textContent=t+(e.name||'イベント');
-  }else{
-   hs.textContent=d.coverage==='partial'?'一部会場を確認中':'本日の登録なし';
-  }
- }
+ renderHomeEventSummary();
 }
 function renderSportsRealtime(){
  const d=sportsRealtimeData;
@@ -1788,6 +1814,7 @@ function renderSportsRealtime(){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='確認中';
   if(bot) bot.textContent='—';
+  renderHomeEventSummary();
   return;
  }
  const sports=Array.isArray(d.sports)?d.sports:[];
@@ -1796,6 +1823,7 @@ function renderSportsRealtime(){
   if(st) st.textContent='予定なし';
   if(mid) mid.textContent='本日の試合なし';
   if(bot) bot.textContent='更新 '+formatAgo(d.generated_at);
+  renderHomeEventSummary();
   return;
  }
  const statusMap={none:'予定なし',scheduled:'試合前',live:'試合中',ended:'終了'};
@@ -1810,6 +1838,7 @@ function renderSportsRealtime(){
   else bot.textContent='本日の試合なし';
  }
  if(card) card.classList.toggle('state-warn',carp.status==='live'||carp.status==='ended');
+ renderHomeEventSummary();
  maybeNotifySportsFacts(d);
 }
 async function loadEventSportsRealtime(force=false){
@@ -1861,12 +1890,16 @@ function renderBusRealtime(){
  const bot=document.getElementById('busInfoBottom');
  const upd=document.getElementById('busUpdated');
  const list=document.getElementById('busDetailList');
+ const hv=document.getElementById('homeBusValue');
+ const hs=document.getElementById('homeBusSub');
  const d=busRealtimeData;
  if(!d){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='GTFSリアルタイムを確認中';
   if(bot) bot.textContent='—';
   if(upd) upd.textContent='更新待ち';
+  if(hv) hv.textContent='取得待ち';
+  if(hs) hs.textContent='データ確認中';
   if(list) list.innerHTML='<div class="verify-empty">データ更新を待っています。</div>';
   return;
  }
@@ -1885,6 +1918,13 @@ function renderBusRealtime(){
  }
  if(bot) bot.textContent=stale?formatAgo(d.generated_at):('更新 '+formatAgo(d.generated_at));
  if(upd) upd.textContent=formatAgo(d.generated_at);
+ if(hv) hv.textContent=stale?'更新待ち':((s.alerts||0)>0?'運行情報':((s.delayed_trips||0)>0?'遅れあり':'平常'));
+ if(hs){
+  if(stale) hs.textContent='データ更新待ち';
+  else if((s.delayed_trips||0)>0) hs.textContent='遅延 '+s.delayed_trips+'便・最大'+Math.round((s.max_delay_sec||0)/60)+'分';
+  else if((s.alerts||0)>0) hs.textContent='運行情報 '+s.alerts+'件';
+  else hs.textContent='目立つ遅延なし';
+ }
  if(list){
   const ops=Array.isArray(d.operators)?d.operators:[];
   list.innerHTML=ops.map(op=>{
@@ -2028,15 +2068,15 @@ function formatDuration(ms){
 }
 function renderDutyUI(){
  const d=getDutyState();
- const hb=document.getElementById('homeDutyBadge');
- const hs=document.getElementById('homeShiftStatus');
- const hc=document.getElementById('homeShiftClock');
  const mb=document.getElementById('dutyMainButton');
  const vs=document.getElementById('vacantShiftTime');
  const me=document.getElementById('menuDutyEnd');
- if(hb) hb.textContent=d.active?'乗務中':'未乗務';
- if(hs) hs.textContent=d.active?'乗務開始 '+new Date(d.start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'まだ開始していません';
- if(hc) hc.textContent=d.active?formatDuration(Date.now()-d.start):'--:--';
+ const dutyMeta=document.getElementById('headerDutyMeta');
+ if(dutyMeta){
+  dutyMeta.textContent=d.active
+   ? new Date(d.start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'開始 · '+formatDuration(Date.now()-d.start)
+   : '乗務開始前';
+ }
  if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
  if(vs) vs.textContent=d.active?formatDuration(Date.now()-d.start):'未乗務';
  if(me) me.style.display=d.active?'block':'none';
