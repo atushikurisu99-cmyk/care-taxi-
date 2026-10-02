@@ -52,6 +52,31 @@ def read_routes(op_id: int) -> dict[str, str]:
             return out
 
 
+def read_stops(op_id: int) -> dict[str, dict]:
+    url = f"{BASE}/static/{op_id}/current_data.zip"
+    raw = fetch(url, 60)
+    with zipfile.ZipFile(io.BytesIO(raw)) as z:
+        with z.open("stops.txt") as f:
+            text = io.TextIOWrapper(f, encoding="utf-8-sig", errors="replace", newline="")
+            rows = csv.DictReader(text)
+            out = {}
+            for r in rows:
+                sid = (r.get("stop_id") or "").strip()
+                if not sid:
+                    continue
+                try:
+                    lat = float(r.get("stop_lat") or 0)
+                    lon = float(r.get("stop_lon") or 0)
+                except Exception:
+                    lat, lon = 0.0, 0.0
+                out[sid] = {
+                    "name": (r.get("stop_name") or sid).strip(),
+                    "lat": lat,
+                    "lon": lon,
+                }
+            return out
+
+
 def decode_feed(url: str) -> gtfs_realtime_pb2.FeedMessage:
     msg = gtfs_realtime_pb2.FeedMessage()
     msg.ParseFromString(fetch(url, 30))
@@ -70,10 +95,15 @@ def localized_text(obj) -> str:
 def summarize_operator(op: dict) -> dict:
     op_id = op["id"]
     routes = {}
+    stops = {}
     try:
         routes = read_routes(op_id)
     except Exception:
         routes = {}
+    try:
+        stops = read_stops(op_id)
+    except Exception:
+        stops = {}
 
     alert_items = []
     try:
@@ -119,8 +149,10 @@ def summarize_operator(op: dict) -> dict:
     delayed_trips = 0
     max_delay_sec = 0
     delay_routes = {}
+    stop_updates = []
     try:
         feed = decode_feed(f"{BASE}/realtime/{op_id}/trip_updates.bin")
+        now = int(time.time())
         for ent in feed.entity:
             if not ent.HasField("trip_update"):
                 continue
@@ -142,13 +174,63 @@ def summarize_operator(op: dict) -> dict:
                 if rid:
                     rn = routes.get(rid, rid)
                     delay_routes[rn] = max(delay_routes.get(rn, 0), d)
+
+            rid = tu.trip.route_id if tu.trip.route_id else ""
+            route_name = routes.get(rid, rid)
+            direction_id = int(tu.trip.direction_id) if tu.trip.HasField("direction_id") else None
+            for stu in tu.stop_time_update:
+                sid = stu.stop_id if stu.stop_id else ""
+                if not sid:
+                    continue
+                event_time = 0
+                delay_sec = 0
+                if stu.departure.HasField("time"):
+                    event_time = int(stu.departure.time)
+                elif stu.arrival.HasField("time"):
+                    event_time = int(stu.arrival.time)
+                if stu.departure.HasField("delay"):
+                    delay_sec = int(stu.departure.delay)
+                elif stu.arrival.HasField("delay"):
+                    delay_sec = int(stu.arrival.delay)
+                if not event_time or event_time < now - 900 or event_time > now + 7200:
+                    continue
+                meta = stops.get(sid, {})
+                stop_updates.append({
+                    "stop_id": sid,
+                    "stop_name": meta.get("name", sid),
+                    "lat": meta.get("lat", 0),
+                    "lon": meta.get("lon", 0),
+                    "route": route_name,
+                    "direction_id": direction_id,
+                    "event_time": event_time,
+                    "delay_sec": delay_sec,
+                })
     except Exception:
         pass
 
     vehicle_count = 0
+    vehicle_positions = []
     try:
         feed = decode_feed(f"{BASE}/realtime/{op_id}/vehicle_position.bin")
-        vehicle_count = sum(1 for e in feed.entity if e.HasField("vehicle"))
+        for ent in feed.entity:
+            if not ent.HasField("vehicle"):
+                continue
+            v = ent.vehicle
+            vehicle_count += 1
+            sid = v.stop_id if v.stop_id else ""
+            meta = stops.get(sid, {})
+            rid = v.trip.route_id if v.trip.route_id else ""
+            lat = float(v.position.latitude) if v.HasField("position") else 0.0
+            lon = float(v.position.longitude) if v.HasField("position") else 0.0
+            vehicle_positions.append({
+                "route": routes.get(rid, rid),
+                "lat": lat,
+                "lon": lon,
+                "stop_id": sid,
+                "stop_name": meta.get("name", sid),
+                "timestamp": int(v.timestamp) if v.timestamp else 0,
+                "current_status": int(v.current_status) if v.HasField("current_status") else None,
+            })
     except Exception:
         pass
 
@@ -165,6 +247,8 @@ def summarize_operator(op: dict) -> dict:
         "max_delay_sec": max_delay_sec,
         "route_delays": route_delays,
         "vehicle_count": vehicle_count,
+        "stop_updates": sorted(stop_updates, key=lambda x: x["event_time"])[:300],
+        "vehicle_positions": vehicle_positions[:300],
     }
 
 
