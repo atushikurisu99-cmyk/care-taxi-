@@ -1,0 +1,46 @@
+name: Test sales-nav app contract
+
+on:
+  push:
+    paths:
+      - "sales-nav-prototype/index.html"
+      - ".github/workflows/test-sales-nav.yml"
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Extract inline JavaScript
+        run: |
+          python - <<'PY'
+          from pathlib import Path
+          import re
+          html=Path("sales-nav-prototype/index.html").read_text(encoding="utf-8")
+          scripts=re.findall(r"<script>([\s\S]*?)</script>",html)
+          assert scripts, "inline script not found"
+          Path("/tmp/sales-nav-inline.js").write_text(scripts[-1],encoding="utf-8")
+          required=[
+            "function notifyFact(kind",
+            "function maybeNotifyJrFacts",
+            "function maybeNotifyBusFacts",
+            "function maybeNotifySportsFacts",
+            "function runNotificationSelfTest",
+            "JR_WORKER_URL",
+            "LIVE_EVENTS_URL",
+            "SPORTS_URL",
+            'id="jrInfoStatus"',
+            'id="busInfoStatus"',
+            'id="liveInfoStatus"',
+            'id="sportsInfoStatus"',
+          ]
+          missing=[x for x in required if x not in html]
+          assert not missing, "missing contract: "+", ".join(missing)
+          print("contract OK")
+          PY
+      - name: JavaScript syntax check
+        run: node --check /tmp/sales-nav-inline.js
