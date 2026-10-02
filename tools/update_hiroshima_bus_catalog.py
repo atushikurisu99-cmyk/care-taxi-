@@ -99,11 +99,11 @@ def main():
                 trip_meta[trip_id] = {
                     "route_id": rid,
                     "service_id": r.get("service_id",""),
+                    "trip_headsign": (r.get("trip_headsign") or "").strip(),
                 }
 
-            # 「行き先」はGTFSのtrip_headsignではなく、その便の実際の終点停留所を使う。
-            # 事業者によってtrip_headsignに「○号線」「○○経由」等が入るため、
-            # タクシードライバー向け設定では終点名の方が直感的で不整合が少ない。
+            # 各便の本当の終点を確定する。
+            # 途中停留所は候補に出さず、最大stop_sequenceの停留所だけを終点として扱う。
             final_stop_by_trip = {}
             final_seq_by_trip = {}
             for row in stop_times:
@@ -112,7 +112,7 @@ def main():
                     seq = int(row.get("stop_sequence") or 0)
                 except ValueError:
                     seq = 0
-                if trip_id not in final_seq_by_trip or seq >= final_seq_by_trip[trip_id]:
+                if trip_id not in final_seq_by_trip or seq > final_seq_by_trip[trip_id]:
                     final_seq_by_trip[trip_id] = seq
                     final_stop_by_trip[trip_id] = stop_name_by_id.get(row.get("stop_id",""), "").strip()
 
@@ -126,6 +126,17 @@ def main():
                     continue
                 meta = trip_meta.get(trip_id, {})
                 rid = meta.get("route_id","")
+
+                # 選択した停留所より後ろに終点が実在する便だけ採用する。
+                # これで途中停留所を「行き先候補」として並べない。
+                try:
+                    current_seq = int(row.get("stop_sequence") or 0)
+                except ValueError:
+                    current_seq = 0
+                final_seq = final_seq_by_trip.get(trip_id, 0)
+                if final_seq <= current_seq:
+                    continue
+
                 item = catalog[stop_name]["destinations"][destination]
                 item["operators"].add(operator_name)
                 if rid:
@@ -165,7 +176,10 @@ def main():
                 last["service_date"] = service_date.isoformat()
                 row["last_bus"] = last
             dests.append(row)
-        dests.sort(key=lambda x: x["name"])
+        # 終バス用途なので、今日実際に終バスが存在する終点を先に表示。
+        # 本日の便がない終点は設定候補から外す。
+        dests = [x for x in dests if x.get("last_bus")]
+        dests.sort(key=lambda x: (x["last_bus"]["scheduled_time"], x["name"]))
         out_stops[stop_name] = {"destinations": dests}
 
     payload = {
