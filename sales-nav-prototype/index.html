@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-02-NOTIFY-QUALITY-1 -->
+<!-- BUILD:2026-10-02-NOTIFY-QUALITY-2 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2634,7 +2634,7 @@ function notifyFact(kind,{level='info',icon='!',title='',body='',key='',sourceTs
  all[kind]={key,at:now,sourceTs:Number(sourceTs||0),title,body};
  saveNoticeState(all);
  logAnalyticsEvent('notice_candidate_sent',{kind,key,sourceTs,title,body});
- showNotice(level,icon,title,body,7000);
+ showNotice(level,icon,title,body,7000,kind);
  return true;
 }
 function normalizeJrLivePayload(d){
@@ -2673,32 +2673,19 @@ function maybeNotifyBusFacts(d){
    alerts.push({operator:op.name||'',title:title||'運行情報',desc,routes});
   }
  }
- if(alerts.length){
-  const a=alerts[0];
-  const shortDesc=(a.desc||'').slice(0,44);
-  const body=[a.operator,a.routes.slice(0,2).join('・'),a.title,shortDesc].filter(Boolean).join(' / ');
-  const key='alert|'+alerts.map(x=>[x.operator,x.title,x.desc,x.routes.join(',')].join(':')).sort().join('|');
-  notifyFact('bus',{
-   level:'warn',icon:'!',title:'バス 運行情報',body,key,
-   sourceTs:d.generated_at,maxAgeSec:600,minIntervalMs:15*60*1000
-  });
-  return;
- }
+ if(!alerts.length) return;
 
- // 単純なGTFS遅延はノイズが出やすいので、複数便かつ15分以上の時だけ通知。
- const delayedOps=ops
-  .map(op=>({name:op.name||'',count:Number(op.delayed_trips||0),max:Math.round(Number(op.max_delay_sec||0)/60),route:op.route_delays?.[0]?.route||''}))
-  .filter(x=>x.count>=3&&x.max>=15)
-  .sort((a,b)=>b.max-a.max);
- if(delayedOps.length){
-  const x=delayedOps[0];
-  const body=[x.name,x.route,'遅延 '+x.count+'便','最大 '+x.max+'分'].filter(Boolean).join(' / ');
-  const key='delay|'+delayedOps.map(v=>[v.name,v.count,v.max,v.route].join(':')).join('|');
-  notifyFact('bus',{
-   level:'warn',icon:'!',title:'バス 遅延',body,key,
-   sourceTs:d.generated_at,maxAgeSec:600,minIntervalMs:15*60*1000
-  });
- }
+ // バスは全体の「何便遅れ」だけでは営業判断に粗すぎるため、
+ // 自動通知は公式アラートのうち運休・見合わせ等の事実情報に限定。
+ // 停留所直前/直後の通知はGPS連動が完成してから別ロジックで出す。
+ const a=alerts[0];
+ const shortDesc=(a.desc||'').slice(0,44);
+ const body=[a.operator,a.routes.slice(0,2).join('・'),a.title,shortDesc].filter(Boolean).join(' / ');
+ const key='alert|'+alerts.map(x=>[x.operator,x.title,x.desc,x.routes.join(',')].join(':')).sort().join('|');
+ notifyFact('bus',{
+  level:'warn',icon:'!',title:'バス 運行情報',body,key,
+  sourceTs:d.generated_at,maxAgeSec:600,minIntervalMs:15*60*1000
+ });
 }
 function maybeNotifySportsFacts(d){
  if(!d||!canUseFreshSource(d.generated_at,180)) return;
@@ -2713,13 +2700,43 @@ function maybeNotifySportsFacts(d){
  });
 }
 
-function showNotice(level,icon,title,body,duration=5500){
- logAnalyticsEvent('notice_shown',{level,icon,title,body});
- const n=document.getElementById('notice');n.className='notice show '+level;
- n.querySelector('#nicon').textContent=icon;n.querySelector('#ntitle').textContent=title;n.querySelector('#nbody').textContent=body;
- clearTimeout(nt);nt=setTimeout(hideNotice,duration);
+let noticeQueue=[];
+let noticeActive=false;
+
+function showNotice(level,icon,title,body,duration=5500,kind=''){
+ const item={level,icon,title,body,duration,kind};
+ // 同じ種類が待機中なら最新内容へ置き換え、異種通知は順番に表示。
+ if(kind){
+  const idx=noticeQueue.findIndex(x=>x.kind===kind);
+  if(idx>=0) noticeQueue[idx]=item;
+  else noticeQueue.push(item);
+ }else{
+  noticeQueue.push(item);
+ }
+ if(noticeQueue.length>8) noticeQueue=noticeQueue.slice(-8);
+ showNextNotice();
 }
-function hideNotice(){document.getElementById('notice').className='notice normal';clearTimeout(nt)}
+function showNextNotice(){
+ if(noticeActive||!noticeQueue.length) return;
+ const item=noticeQueue.shift();
+ const n=document.getElementById('notice');
+ if(!n) return;
+ noticeActive=true;
+ logAnalyticsEvent('notice_shown',{kind:item.kind,level:item.level,icon:item.icon,title:item.title,body:item.body});
+ n.className='notice show '+item.level;
+ n.querySelector('#nicon').textContent=item.icon;
+ n.querySelector('#ntitle').textContent=item.title;
+ n.querySelector('#nbody').textContent=item.body;
+ clearTimeout(nt);
+ nt=setTimeout(hideNotice,item.duration);
+}
+function hideNotice(){
+ const n=document.getElementById('notice');
+ if(n) n.className='notice normal';
+ clearTimeout(nt);
+ noticeActive=false;
+ if(noticeQueue.length) setTimeout(showNextNotice,180);
+}
 function showSafety(duration=5200){
  const s=document.getElementById('safety');
  const note=document.querySelector('.drive-note');
