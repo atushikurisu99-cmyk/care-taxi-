@@ -166,8 +166,18 @@ def summarize_operator(op: dict) -> dict:
                 if stu.departure.HasField("delay"):
                     trip_delays.append(int(stu.departure.delay))
             # 早着(負値)は遅延扱いしない。
+            # ただし古い/遠い便を数えると「遅延便数」が異常に膨らむため、
+            # 現在から15分前〜2時間先に停車予定がある便だけを対象にする。
+            relevant_times = []
+            for stu in tu.stop_time_update:
+                if stu.departure.HasField("time"):
+                    relevant_times.append(int(stu.departure.time))
+                elif stu.arrival.HasField("time"):
+                    relevant_times.append(int(stu.arrival.time))
+            active_trip = any(now - 900 <= t <= now + 7200 for t in relevant_times)
+
             d = max([x for x in trip_delays if x > 0], default=0)
-            if d >= 180:
+            if active_trip and d >= 180:
                 delayed_trips += 1
                 max_delay_sec = max(max_delay_sec, d)
                 rid = tu.trip.route_id if tu.trip.route_id else ""
