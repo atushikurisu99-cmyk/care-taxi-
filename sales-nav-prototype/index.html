@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-02-NAV-CALENDAR-SHELL-1 -->
+<!-- BUILD:2026-10-02-NAV-ANALYSIS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1211,7 +1211,7 @@ html,body{
 <nav class="nav">
  <button class="active" data-target="home" onclick="show('home')"><b>⌂</b>ホーム</button>
  <button data-target="calendar" onclick="show('calendar')"><b>□</b>カレンダー</button>
- <button data-target="sales" onclick="show('sales')"><b>▥</b>実績</button>
+ <button data-target="analysis" onclick="show('analysis')"><b>⌁</b>分析</button>
  <button data-target="menu" onclick="show('menu')"><b>☰</b>メニュー</button>
 </nav>
 </div>
@@ -1224,7 +1224,7 @@ function preventIosPinchZoom(){
 }
 preventIosPinchZoom();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・分析',analysis:'営業分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
