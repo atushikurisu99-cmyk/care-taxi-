@@ -179,7 +179,11 @@ def main():
         # 終バス用途なので、今日実際に終バスが存在する終点を先に表示。
         # 本日の便がない終点は設定候補から外す。
         dests = [x for x in dests if x.get("last_bus")]
-        dests.sort(key=lambda x: (x["last_bus"]["scheduled_time"], x["name"]))
+        # 終バス設定なので、遅い終バスを上に出す。22時以降・深夜便を探しやすくする。
+        dests.sort(
+            key=lambda x: (parse_gtfs_time(x["last_bus"]["scheduled_time"]) or -1, x["name"]),
+            reverse=True
+        )
         out_stops[stop_name] = {"destinations": dests}
 
     payload = {
