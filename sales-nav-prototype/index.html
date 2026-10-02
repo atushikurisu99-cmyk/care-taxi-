@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-SELECTED-UI-1 -->
+<!-- BUILD:2026-10-03-HOME-STATE-REFINE-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2053,9 +2053,13 @@ function renderJrProbe(){
  let label='平常';
  let detail='目立つ遅れなし';
  let level='';
+ const totalTrains=Number(s.total_trains||0);
  if(stale){
   label='更新待ち';
   detail='データ更新待ち';
+ }else if(totalTrains===0){
+  label='対象列車なし';
+  detail='旅客列車の運行時間外';
  }else if(severe>0){
   label='大きな遅れ';
   detail='15分以上 '+severe+'本 / 全体 '+delayed+'本';
@@ -2081,6 +2085,7 @@ function renderJrProbe(){
  if(hs){
   if(stale) hs.textContent='データ更新待ち';
   else if(top&&Number(top.delayed_trains||0)>0) hs.textContent=(top.station||'駅周辺')+' 最大'+Number(top.max_delay||0)+'分';
+  else if(totalTrains===0) hs.textContent='旅客列車の運行時間外';
   else hs.textContent='目立つ遅れなし';
  }
 
@@ -2333,6 +2338,9 @@ function renderBusRealtime(){
 
  const pairs=selectedBusNotifyPairs();
  const count=pairs.length;
+ const busCfg=getBusNotifySettings();
+ const selectedStopCount=Object.values(busCfg.stops||{}).filter(Boolean).length;
+ const hasStops=selectedStopCount>0;
  const d=busRealtimeData;
  const generated=d?.generated_at||0;
  const facts=pairs.map(p=>({...p,fact:busLastBusFact(p.stop,p.destination)}));
@@ -2345,21 +2353,21 @@ function renderBusRealtime(){
 
  if(card) card.classList.toggle('state-warn',!!urgent);
 
- if(hv) hv.textContent=count?count+'件設定':'未設定';
+ if(hv) hv.textContent=count?count+'件設定':(hasStops?'行き先未設定':'未設定');
  if(hs){
-  if(!count) hs.textContent='設定からバス停・行き先を選択';
+  if(!count) hs.textContent=hasStops?'選んだバス停の行き先を設定':'設定からバス停・行き先を選択';
   else if(urgent) hs.textContent=busLastBusStatusText(urgent.fact)+' / '+urgent.stop;
   else hs.textContent='終バス15分前・通過を通知';
  }
 
- if(st) st.textContent=count?'終バス':'未設定';
+ if(st) st.textContent=count?'終バス':(hasStops?'行き先未設定':'未設定');
  if(mid){
-  if(!count) mid.textContent='バス停・行き先を選択';
+  if(!count) mid.textContent=hasStops?'選んだバス停の行き先を設定':'バス停・行き先を選択';
   else if(urgent) mid.textContent=urgent.stop+' / '+urgent.destination;
   else mid.textContent=count+'件を通知対象に設定';
  }
  if(bot){
-  if(!count) bot.textContent='設定画面から選択';
+  if(!count) bot.textContent=hasStops?'行き先を選択してください':'設定画面から選択';
   else if(urgent) bot.textContent=busLastBusStatusText(urgent.fact);
   else bot.textContent='15分前・通過時のみ通知';
  }
@@ -2367,7 +2375,8 @@ function renderBusRealtime(){
 
  if(list){
   if(!count){
-   list.innerHTML='<div class="verify-empty" onclick="show(\'settings\')" style="cursor:pointer">設定画面で<br><strong style="color:#fff">バス停と行き先を選んでください</strong><br><span style="display:inline-block;margin-top:8px;color:#8ec0ff">設定を開く ›</span></div>';
+   const msg=hasStops?'選んだバス停の行き先を選んでください':'バス停と行き先を選んでください';
+   list.innerHTML='<div class="verify-empty" onclick="show(\'settings\')" style="cursor:pointer">設定画面で<br><strong style="color:#fff">'+msg+'</strong><br><span style="display:inline-block;margin-top:8px;color:#8ec0ff">設定を開く ›</span></div>';
   }else{
    const grouped={};
    for(const row of facts){
