@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-SELECT-FIX-1 -->
+<!-- BUILD:2026-10-03-BUS-DESELECT-FIX-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1452,11 +1452,23 @@ function toggleBusStopSetting(stop){
 }
 function openBusDestinationSetting(stop){
  const cfg=getBusNotifySettings();
+
+ // 同じ選択済みバス停をもう一度押したら選択解除。
+ if(cfg.stops[stop] && busSettingsActiveStop===stop){
+  cfg.stops[stop]=false;
+  delete cfg.destinations[stop];
+  saveBusNotifySettings(cfg);
+  busSettingsActiveStop='';
+  renderNotificationSettings();
+  return;
+ }
+
  if(!cfg.stops[stop]){
   cfg.stops[stop]=true;
   saveBusNotifySettings(cfg);
  }
  busSettingsActiveStop=stop;
+
  // まず即時描画。通信待ちで「押しても反応しない」状態を作らない。
  renderNotificationSettings();
  if(!busDestinationCatalogLoaded){
