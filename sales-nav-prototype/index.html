@@ -1179,7 +1179,7 @@ function show(id){
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
  if(id==='today'||id==='busDetail') loadBusRealtime(id==='busDetail');
- if(id==='today') loadEventSportsRealtime(false);
+ if(id==='today'||id==='home') loadEventSportsRealtime(false);
  if(id==='today'||id==='vacant'||id==='home') loadJrProbeSnapshot(false);
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
@@ -1745,10 +1745,14 @@ function renderLiveEvents(){
  const mid=document.getElementById('liveInfoMiddle');
  const bot=document.getElementById('liveInfoBottom');
  const card=document.getElementById('liveInfoCard');
+ const hv=document.getElementById('homeEventValue');
+ const hs=document.getElementById('homeEventSub');
  if(!d){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='確認中';
   if(bot) bot.textContent='—';
+  if(hv) hv.textContent='取得待ち';
+  if(hs) hs.textContent='データ確認中';
   return;
  }
  const events=Array.isArray(d.events)?d.events:[];
@@ -1762,6 +1766,15 @@ function renderLiveEvents(){
    bot.textContent=t+(e.venue?' / '+e.venue:'');
   }else{
    bot.textContent=d.coverage==='partial'?'一部会場を確認中':'更新 '+formatAgo(d.generated_at);
+  }
+ }
+ if(hv) hv.textContent=events.length?events.length+'件':'なし';
+ if(hs){
+  if(e){
+   const t=e.start_time?e.start_time+'〜 ':'';
+   hs.textContent=t+(e.name||'イベント');
+  }else{
+   hs.textContent=d.coverage==='partial'?'一部会場を確認中':'本日の登録なし';
   }
  }
 }
