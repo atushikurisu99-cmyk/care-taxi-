@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-TERMINAL-ONLY-1 -->
+<!-- BUILD:2026-10-03-BUS-ACTUAL-STOPS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1384,7 +1384,7 @@ function show(id){
 const BUS_NOTIFY_SETTINGS_KEY='taxi_bus_notify_settings_v1';
 const BUS_WARDS=['中区','西区','南区'];
 const BUS_STOP_FALLBACK={
- '中区':['広島バスセンター','県庁前','紙屋町','八丁堀','本通り','合同庁舎','中電前','胡町','三川町'],
+ '中区':['広島バスセンター','県庁前','紙屋町','八丁堀','本通り','合同庁舎','中電前','新天地'],
  '西区':['横川駅前','西広島駅','己斐'],
  '南区':['広島駅','広島駅新幹線口']
 };
@@ -1408,7 +1408,22 @@ async function loadBusDestinationCatalog(force=false){
 function getBusNotifySettings(){
  try{
   const v=JSON.parse(localStorage.getItem(BUS_NOTIFY_SETTINGS_KEY)||'null');
-  if(v&&typeof v==='object') return {stops:v.stops||{},destinations:v.destinations||{}};
+  if(v&&typeof v==='object'){
+   const out={stops:v.stops||{},destinations:v.destinations||{}};
+   // 旧UIの「三川町」は実GTFS停留所名「新天地」へ移行。
+   if(out.stops['三川町']){
+    out.stops['新天地']=true;
+    if(Array.isArray(out.destinations['三川町'])&&!out.destinations['新天地']){
+     out.destinations['新天地']=out.destinations['三川町'];
+    }
+   }
+   delete out.stops['三川町'];
+   delete out.destinations['三川町'];
+   // 「胡町」は路線バス停ではないため旧選択を除外。
+   delete out.stops['胡町'];
+   delete out.destinations['胡町'];
+   return out;
+  }
  }catch(e){}
  return {stops:{},destinations:{}};
 }
