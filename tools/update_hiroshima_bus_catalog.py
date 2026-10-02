@@ -87,7 +87,7 @@ def main():
         "operators": set(), "route_ids": set(), "last_bus": None, "last_buses_by_date": {}
     })})
     directions = defaultdict(lambda: defaultdict(lambda: {
-        "operators": set(), "route_ids": set(), "destinations": set(), "next_stops": set(),
+        "operators": set(), "route_ids": set(), "destinations": set(), "destination_counts": defaultdict(int), "next_stops": set(),
         "last_bus": None, "last_buses_by_date": {}
     }))
     errors = []
@@ -201,6 +201,7 @@ def main():
                     direction_item = directions[stop_name][direction_name]
                     direction_item["operators"].add(operator_name)
                     direction_item["destinations"].add(destination)
+                    direction_item["destination_counts"][destination] += 1
                     direction_item["next_stops"].add(next_stop)
                     if rid:
                         direction_item["route_ids"].add(rid)
@@ -314,13 +315,18 @@ def main():
         direction_rows = []
         for direction_name, meta in directions[stop_name].items():
             next_stops = sorted(meta["next_stops"])
+            destination_counts = meta.get("destination_counts", {})
+            destinations = sorted(
+                meta["destinations"],
+                key=lambda x: (-destination_counts.get(x, 0), x)
+            )
             row = {
                 "name": direction_name,
                 "next_stop": next_stops[0] if len(next_stops) == 1 else "",
                 "next_stops": next_stops,
                 "operators": sorted(meta["operators"]),
                 "route_ids": sorted(meta["route_ids"]),
-                "destinations": sorted(meta["destinations"]),
+                "destinations": destinations,
             }
             if meta.get("last_bus"):
                 last = dict(meta["last_bus"])
