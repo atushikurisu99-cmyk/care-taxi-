@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-02-LIVE-SPORTS-1 -->
+<!-- BUILD:2026-10-02-NOTIFY-QUALITY-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1560,35 +1560,41 @@ function jrFactsForDriver(d){
  return {top,trend,lines};
 }
 function maybeNotifyJrFacts(d){
- const age=Math.max(0,Math.floor(Date.now()/1000-Number(d?.generated_at||0)));
- if(age>900) return;
- const s=d?.summary||{};
+ if(!d||!canUseFreshSource(d.generated_at,180)) return;
+ const s=d.summary||{};
  const delayed=Number(s.delayed_trains||0);
  const severe=Number((s.delay_buckets||{})['15_plus']||0);
  const moderate=Number((s.delay_buckets||{})['10_14']||0);
  const f=jrFactsForDriver(d);
  const top=f.top;
- // 通知は事実情報の変化だけ。行動指示や需要断定はしない。
- const material=severe>0 || moderate>=2 || (delayed>=3 && f.trend==='悪化中');
+
+ // 行動指示や需要断定はせず、鉄道の事実だけ通知。
+ // ライブWorkerでは駅間位置を駅周辺候補としてまとめる。
+ const material=severe>0 || moderate>=2 || delayed>=4;
  if(!material) return;
- const screen=currentScreenId();
- if(screen==='ride'||screen==='payment') return;
- const key=[top?.station||'',delayed,severe,moderate,f.trend,f.lines].join('|');
- const lastKey=localStorage.getItem('taxi_jr_last_fact_key')||'';
- const lastAt=Number(localStorage.getItem('taxi_jr_last_fact_at')||0);
- const now=Date.now();
- if(key===lastKey && now-lastAt<20*60*1000) return;
- localStorage.setItem('taxi_jr_last_fact_key',key);
- localStorage.setItem('taxi_jr_last_fact_at',String(now));
- const title='JR 状況変化';
+
  const body=[
   top?.station?top.station+'周辺':'',
   delayed?'遅延 '+delayed+'本':'',
   top?.max_delay?'最大 '+top.max_delay+'分':'',
-  f.trend,
   f.lines
  ].filter(Boolean).join(' / ');
- showNotice(severe>0?'critical':'warn','!',title,body,7000);
+ if(!body) return;
+
+ const key=[
+  top?.station||'',delayed,severe,moderate,top?.max_delay||0,f.lines||''
+ ].join('|');
+
+ notifyFact('jr',{
+  level:severe>0?'critical':'warn',
+  icon:'!',
+  title:'JR 状況変化',
+  body,
+  key,
+  sourceTs:d.generated_at,
+  maxAgeSec:180,
+  minIntervalMs:8*60*1000
+ });
 }
 
 function renderJrProbe(){
@@ -1708,8 +1714,9 @@ async function loadJrProbeSnapshot(force=false){
    if(!r.ok) throw new Error('worker http '+r.status);
    const live=await r.json();
    if(!live||live.ok!==true||!live.summary||!Array.isArray(live.lines)) throw new Error('worker payload invalid');
-   jrProbeData=live;
+   jrProbeData=normalizeJrLivePayload(live);
    jrProbeSource='worker';
+   logAnalyticsEvent('feed_loaded',{feed:'jr',source:'worker',generatedAt:live.generated_at,delayed:Number(live.summary?.delayed_trains||0)});
   }finally{
    clearTimeout(timer);
   }
@@ -1717,8 +1724,9 @@ async function loadJrProbeSnapshot(force=false){
   try{
    const r=await fetch('./data/jrwest-higashima-probe.json?ts='+now,{cache:'no-store'});
    if(!r.ok) throw new Error('snapshot http '+r.status);
-   jrProbeData=await r.json();
+   jrProbeData=normalizeJrLivePayload(await r.json());
    jrProbeSource='snapshot';
+   logAnalyticsEvent('feed_loaded',{feed:'jr',source:'snapshot',generatedAt:jrProbeData?.generated_at||0,delayed:Number(jrProbeData?.summary?.delayed_trains||0)});
   }catch(fallbackError){
    jrProbeSource='error';
   }
@@ -1787,6 +1795,7 @@ function renderSportsRealtime(){
   else bot.textContent='本日の試合なし';
  }
  if(card) card.classList.toggle('state-warn',carp.status==='live'||carp.status==='ended');
+ maybeNotifySportsFacts(d);
 }
 async function loadEventSportsRealtime(force=false){
  const now=Date.now();
@@ -1802,8 +1811,18 @@ async function loadEventSportsRealtime(force=false){
   }finally{clearTimeout(timer)}
  };
  const [events,sports]=await Promise.allSettled([fetchOne(LIVE_EVENTS_URL),fetchOne(SPORTS_URL)]);
- if(events.status==='fulfilled'&&events.value?.ok) eventRealtimeData=events.value;
- if(sports.status==='fulfilled'&&sports.value?.ok) sportsRealtimeData=sports.value;
+ if(events.status==='fulfilled'&&events.value?.ok){
+  eventRealtimeData=events.value;
+  logAnalyticsEvent('feed_loaded',{feed:'events',source:'worker',generatedAt:events.value.generated_at,count:Array.isArray(events.value.events)?events.value.events.length:0});
+ }else{
+  logAnalyticsEvent('feed_error',{feed:'events',message:String(events.reason||'invalid payload')});
+ }
+ if(sports.status==='fulfilled'&&sports.value?.ok){
+  sportsRealtimeData=sports.value;
+  logAnalyticsEvent('feed_loaded',{feed:'sports',source:'worker',generatedAt:sports.value.generated_at,count:Array.isArray(sports.value.sports)?sports.value.sports.length:0});
+ }else{
+  logAnalyticsEvent('feed_error',{feed:'sports',message:String(sports.reason||'invalid payload')});
+ }
  renderLiveEvents();
  renderSportsRealtime();
 }
@@ -1868,6 +1887,7 @@ function renderBusRealtime(){
    return '<div class="verify-card"><div class="verify-head"><strong>'+escapeHtml(op.name)+'</strong><span class="badge">'+Number(op.vehicle_count||0)+'台</span></div><div>'+detail+'</div>'+extra+'</div>';
   }).join('')||'<div class="verify-empty">データなし</div>';
  }
+ maybeNotifyBusFacts(d);
 }
 async function loadBusRealtime(force=false){
  const now=Date.now();
@@ -1877,7 +1897,9 @@ async function loadBusRealtime(force=false){
   const r=await fetch('./data/bus-realtime.json?ts='+now,{cache:'no-store'});
   if(!r.ok) throw new Error('http '+r.status);
   busRealtimeData=await r.json();
+  logAnalyticsEvent('feed_loaded',{feed:'bus',source:'snapshot',generatedAt:busRealtimeData?.generated_at||0,alerts:Number(busRealtimeData?.summary?.alerts||0),delayed:Number(busRealtimeData?.summary?.delayed_trips||0)});
  }catch(e){
+  logAnalyticsEvent('feed_error',{feed:'bus',message:String(e?.message||e)});
   // 前回値があれば残す
  }
  renderBusRealtime();
@@ -2582,6 +2604,109 @@ function initNoticeSwipe(){
   dy=0;
  },{passive:true});
 }
+const NOTICE_STATE_KEY='taxi_notice_state_v1';
+
+function getNoticeState(){
+ try{
+  const v=JSON.parse(localStorage.getItem(NOTICE_STATE_KEY)||'{}');
+  return v&&typeof v==='object'?v:{};
+ }catch(e){return{}}
+}
+function saveNoticeState(v){
+ try{localStorage.setItem(NOTICE_STATE_KEY,JSON.stringify(v))}catch(e){}
+}
+function sourceAgeSeconds(ts){
+ return Math.max(0,Math.floor(Date.now()/1000-Number(ts||0)));
+}
+function canUseFreshSource(ts,maxAgeSec=600){
+ return Number(ts)>0 && sourceAgeSeconds(ts)<=maxAgeSec;
+}
+function notifyFact(kind,{level='info',icon='!',title='',body='',key='',sourceTs=0,maxAgeSec=600,minIntervalMs=120000}={}){
+ if(!getDutyState().active) return false;
+ if(sourceTs && !canUseFreshSource(sourceTs,maxAgeSec)) return false;
+ if(!title||!body||!key) return false;
+
+ const now=Date.now();
+ const all=getNoticeState();
+ const prev=all[kind]||{};
+ if(prev.key===key && now-Number(prev.at||0)<minIntervalMs) return false;
+
+ all[kind]={key,at:now,sourceTs:Number(sourceTs||0),title,body};
+ saveNoticeState(all);
+ logAnalyticsEvent('notice_candidate_sent',{kind,key,sourceTs,title,body});
+ showNotice(level,icon,title,body,7000);
+ return true;
+}
+function normalizeJrLivePayload(d){
+ if(!d||!Array.isArray(d.lines)) return d;
+ const impacts=new Map();
+ for(const line of d.lines){
+  for(const tr of (Array.isArray(line.trains)?line.trains:[])){
+   const delay=Number(tr.delayMinutes||0);
+   if(delay<=0) continue;
+   const station=String(tr.positionText||'').trim();
+   if(!station) continue;
+   const cur=impacts.get(station)||{station,delayed_trains:0,max_delay:0,lines:[]};
+   cur.delayed_trains+=1;
+   cur.max_delay=Math.max(cur.max_delay,delay);
+   if(line.name&&!cur.lines.includes(line.name)) cur.lines.push(line.name);
+   impacts.set(station,cur);
+  }
+ }
+ d.station_impacts=[...impacts.values()].sort((a,b)=>
+   (b.max_delay-a.max_delay)||(b.delayed_trains-a.delayed_trains)
+ );
+ return d;
+}
+function maybeNotifyBusFacts(d){
+ if(!d||!canUseFreshSource(d.generated_at,600)) return;
+ const ops=Array.isArray(d.operators)?d.operators:[];
+ const alerts=[];
+ for(const op of ops){
+  for(const a of (Array.isArray(op.alerts)?op.alerts:[])){
+   if(!a) continue;
+   const title=String(a.title||'運行情報あり').trim();
+   const routes=Array.isArray(a.routes)?a.routes.filter(Boolean):[];
+   alerts.push({operator:op.name||'',title,routes});
+  }
+ }
+ if(alerts.length){
+  const a=alerts[0];
+  const body=[a.operator,a.routes.slice(0,2).join('・'),a.title].filter(Boolean).join(' / ');
+  const key='alert|'+alerts.map(x=>[x.operator,x.title,x.routes.join(',')].join(':')).sort().join('|');
+  notifyFact('bus',{
+   level:'warn',icon:'!',title:'バス 運行情報',body,key,
+   sourceTs:d.generated_at,maxAgeSec:600,minIntervalMs:15*60*1000
+  });
+  return;
+ }
+ const delayedOps=ops
+  .map(op=>({name:op.name||'',count:Number(op.delayed_trips||0),max:Math.round(Number(op.max_delay_sec||0)/60),route:op.route_delays?.[0]?.route||''}))
+  .filter(x=>x.count>=3&&x.max>=15)
+  .sort((a,b)=>b.max-a.max);
+ if(delayedOps.length){
+  const x=delayedOps[0];
+  const body=[x.name,x.route,'遅延 '+x.count+'便','最大 '+x.max+'分'].filter(Boolean).join(' / ');
+  const key='delay|'+delayedOps.map(v=>[v.name,v.count,v.max,v.route].join(':')).join('|');
+  notifyFact('bus',{
+   level:'warn',icon:'!',title:'バス 遅延',body,key,
+   sourceTs:d.generated_at,maxAgeSec:600,minIntervalMs:15*60*1000
+  });
+ }
+}
+function maybeNotifySportsFacts(d){
+ if(!d||!canUseFreshSource(d.generated_at,180)) return;
+ const sports=Array.isArray(d.sports)?d.sports:[];
+ const carp=sports.find(x=>x.team==='広島東洋カープ');
+ if(!carp||carp.status!=='ended'||!carp.end_time) return;
+ const key=[new Date().toLocaleDateString('ja-JP'),carp.team,carp.end_time].join('|');
+ notifyFact('sports',{
+  level:'info',icon:'!',title:'カープ 試合終了',
+  body:'試合終了 '+carp.end_time,
+  key,sourceTs:d.generated_at,maxAgeSec:180,minIntervalMs:12*60*60*1000
+ });
+}
+
 function showNotice(level,icon,title,body,duration=5500){
  logAnalyticsEvent('notice_shown',{level,icon,title,body});
  const n=document.getElementById('notice');n.className='notice show '+level;
@@ -3020,6 +3145,41 @@ async function forceRefreshLiveData(){
    btn.textContent='↻ 強制更新';
   }
  }
+}
+
+function runNotificationSelfTest(){
+ const results=[];
+ const assert=(name,ok)=>results.push({name,ok:!!ok});
+ const fresh=Math.floor(Date.now()/1000);
+
+ const jr=normalizeJrLivePayload({
+  generated_at:fresh,
+  summary:{delayed_trains:4,delay_buckets:{'10_14':2,'15_plus':0}},
+  lines:[{name:'山陽線',trains:[
+   {delayMinutes:12,positionText:'広島〜天神川'},
+   {delayMinutes:11,positionText:'広島〜天神川'}
+  ]}]
+ });
+ assert('jr_station_impact',jr.station_impacts?.[0]?.max_delay===12);
+ assert('jr_station_count',jr.station_impacts?.[0]?.delayed_trains===2);
+ assert('fresh_source',canUseFreshSource(fresh,180)===true);
+ assert('stale_source',canUseFreshSource(fresh-1000,180)===false);
+
+ const before=getNoticeState();
+ try{
+  localStorage.setItem('taxi_duty_active','1');
+  localStorage.setItem('taxi_duty_start',String(Date.now()-60000));
+  const key='selftest-'+Date.now();
+  const first=notifyFact('selftest',{title:'TEST',body:'TEST',key,sourceTs:fresh,minIntervalMs:60000});
+  const second=notifyFact('selftest',{title:'TEST',body:'TEST',key,sourceTs:fresh,minIntervalMs:60000});
+  assert('dedupe_first',first===true);
+  assert('dedupe_second',second===false);
+ }finally{
+  saveNoticeState(before);
+ }
+ const ok=results.every(x=>x.ok);
+ logAnalyticsEvent('notification_self_test',{ok,results});
+ return {ok,results};
 }
 
 function refreshLiveFeedsNow(){
