@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-01-ANALYTICS-1 -->
+<!-- BUILD:2026-10-02-JR-LIVE-WORKER-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1474,6 +1474,8 @@ function checkReservationAutoJob(){
 }
 let jrProbeData=null;
 let jrProbeFetchedAt=0;
+let jrProbeSource='none';
+const JR_WORKER_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/jr/hiroshima';
 
 function getJrHistory(){
  try{
@@ -1688,13 +1690,38 @@ function renderJrProbe(){
 }
 async function loadJrProbeSnapshot(force=false){
  const now=Date.now();
- if(!force&&jrProbeFetchedAt&&now-jrProbeFetchedAt<60000) return;
+ if(!force&&jrProbeFetchedAt&&now-jrProbeFetchedAt<25000) return;
  jrProbeFetchedAt=now;
+
+ // 本番はCloudflare Workerのライブ取得を優先。
+ // Worker障害時だけ、直近のGitHub静的スナップショットへフォールバックする。
  try{
-  const r=await fetch('./data/jrwest-higashima-probe.json?ts='+now,{cache:'no-store'});
-  if(!r.ok) throw new Error('http '+r.status);
-  jrProbeData=await r.json();
- }catch(e){}
+  const controller=new AbortController();
+  const timer=setTimeout(()=>controller.abort(),7000);
+  try{
+   const r=await fetch(JR_WORKER_URL+'?ts='+now,{
+    cache:'no-store',
+    signal:controller.signal,
+    headers:{'Accept':'application/json'}
+   });
+   if(!r.ok) throw new Error('worker http '+r.status);
+   const live=await r.json();
+   if(!live||live.ok!==true||!live.summary||!Array.isArray(live.lines)) throw new Error('worker payload invalid');
+   jrProbeData=live;
+   jrProbeSource='worker';
+  }finally{
+   clearTimeout(timer);
+  }
+ }catch(e){
+  try{
+   const r=await fetch('./data/jrwest-higashima-probe.json?ts='+now,{cache:'no-store'});
+   if(!r.ok) throw new Error('snapshot http '+r.status);
+   jrProbeData=await r.json();
+   jrProbeSource='snapshot';
+  }catch(fallbackError){
+   jrProbeSource='error';
+  }
+ }
  renderJrProbe();
 }
 let busRealtimeData=null;
