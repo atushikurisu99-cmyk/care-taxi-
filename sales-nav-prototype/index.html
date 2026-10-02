@@ -1799,7 +1799,9 @@ function renderSportsRealtime(){
   return;
  }
  const statusMap={none:'予定なし',scheduled:'試合前',live:'試合中',ended:'終了'};
- if(st) st.textContent=statusMap[carp.status]||'確認中';
+ let status=carp.status;
+ if(status==='scheduled'&&carp.start_time){const n=new Date(),p=String(carp.start_time).split(':');const s=new Date(n);s.setHours(Number(p[0]||0),Number(p[1]||0),0,0);if(n>=s)status='live'}
+ if(st) st.textContent=statusMap[status]||'確認中';
  if(mid) mid.textContent=carp.team==='広島東洋カープ'?'カープ':(carp.team||'スポーツ');
  if(bot){
   if(carp.status==='ended'&&carp.end_time) bot.textContent='終了 '+carp.end_time;
