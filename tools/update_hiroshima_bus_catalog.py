@@ -105,6 +105,7 @@ def main():
             # 各便の本当の終点を確定する。
             # 途中停留所は候補に出さず、最大stop_sequenceの停留所だけを終点として扱う。
             final_stop_by_trip = {}
+            final_time_by_trip = {}
             final_seq_by_trip = {}
             for row in stop_times:
                 trip_id = row.get("trip_id","")
@@ -115,6 +116,7 @@ def main():
                 if trip_id not in final_seq_by_trip or seq > final_seq_by_trip[trip_id]:
                     final_seq_by_trip[trip_id] = seq
                     final_stop_by_trip[trip_id] = stop_name_by_id.get(row.get("stop_id",""), "").strip()
+                    final_time_by_trip[trip_id] = (row.get("arrival_time") or row.get("departure_time") or "").strip()
 
             for row in stop_times:
                 stop_name = stop_name_by_id.get(row.get("stop_id",""), "").strip()
@@ -156,6 +158,7 @@ def main():
                                 "route_id": rid,
                                 "stop_id": row.get("stop_id",""),
                                 "scheduled_time": dep,
+                                "terminal_arrival_time": final_time_by_trip.get(trip_id, ""),
                                 "seconds": sec,
                             }
         except Exception as e:
