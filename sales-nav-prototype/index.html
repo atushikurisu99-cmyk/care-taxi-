@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-LIVE-NOTIFY-SETTINGS-1 -->
+<!-- BUILD:2026-10-03-LIVE-END-REFERENCE-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1294,7 +1294,7 @@ html,body{
    <div class="settings-note">通知したい会場だけ選択します。選んだ会場のライブ情報だけ通知対象にします。</div>
    <div class="settings-subhead" style="margin-top:11px">会場</div>
    <div id="liveVenueSettingsList" class="settings-list"></div>
-   <div class="settings-note" style="margin-top:10px">終演時刻を確認できない公演は、推測で「終演」と通知しません。</div>
+   <div class="settings-note" style="margin-top:10px">終演時刻は営業判断の参考情報として扱い、確定した「終演」とは表現しません。</div>
   </div>
  </div>
  <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
@@ -1614,16 +1614,16 @@ function maybeNotifySelectedLiveEvents(d){
   const diff=Math.round((end.getTime()-Date.now())/60000);
   const key=liveEventKey(e);
   if(diff>0&&diff<=30){
-   notifyFact('live-end-30',{
-    level:'warn',icon:'!',title:'ライブ 終演まで約'+Math.max(1,diff)+'分',
+   notifyFact('live-end-reference',{
+    level:'warn',icon:'!',title:'ライブ 終演見込み '+String(e.end_time).slice(0,5)+'頃',
     body:(e.name||'ライブ')+' / '+e.venue,
-    key:key+'|30',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
+    key:key+'|reference',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
   }else if(diff<=0&&diff>=-10){
-   notifyFact('live-ended',{
-    level:'info',icon:'!',title:'ライブ 終演',
+   notifyFact('live-end-reference-passed',{
+    level:'info',icon:'!',title:'ライブ 終演見込み時刻を経過',
     body:(e.name||'ライブ')+' / '+e.venue,
-    key:key+'|ended',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
+    key:key+'|reference-passed',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
   }
  }
