@@ -34,3 +34,15 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+      - name: Validate live endpoints
+        run: |
+          python - <<'PY'
+          import json, time, urllib.request
+          base = "https://taxi-jr-higashima-proxy.atushi-works.workers.dev"
+          time.sleep(2)
+          for path in ["/health", "/api/jr/hiroshima", "/api/events/hiroshima", "/api/sports/hiroshima"]:
+              with urllib.request.urlopen(base + path, timeout=20) as r:
+                  data = json.load(r)
+              assert data.get("ok") is True, (path, data)
+              print(path, "OK")
+          PY
