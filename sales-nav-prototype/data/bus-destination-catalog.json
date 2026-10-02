@@ -1,7 +1,7 @@
 {
   "source": "広島県バス協会 GTFS-JP current data",
   "source_url": "https://www.bus-kyo.or.jp/gtfs-open-data",
-  "generated_at": "2026-10-02T22:42:28.128190+00:00",
+  "generated_at": "2026-10-02T22:53:06.745406+00:00",
   "service_date": "2026-10-03",
   "operators": [
     "広島電鉄",
@@ -3769,6 +3769,9 @@
         {
           "name": "市役所前方面",
           "next_stop": "市役所前",
+          "next_stops": [
+            "市役所前"
+          ],
           "operators": [
             "JRバス中国",
             "広島バス",
@@ -3953,6 +3956,9 @@
         {
           "name": "本通り方面",
           "next_stop": "本通り",
+          "next_stops": [
+            "本通り"
+          ],
           "operators": [
             "JRバス中国",
             "広島バス",
@@ -4100,6 +4106,9 @@
         {
           "name": "西広島駅・己斐方面",
           "next_stop": "西広島駅・己斐",
+          "next_stops": [
+            "西広島駅・己斐"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -10919,44 +10928,117 @@
       ],
       "directions": [
         {
-          "name": "立町方面",
-          "next_stop": "立町",
+          "name": "紙屋町・西／北西方面",
+          "next_stop": "",
+          "next_stops": [
+            "広島バスセンター",
+            "県庁前",
+            "立町",
+            "紙屋町"
+          ],
           "operators": [
-            "広島交通"
+            "JRバス中国",
+            "ボンバス",
+            "広島バス",
+            "広島交通",
+            "広島電鉄",
+            "芸陽バス"
           ],
           "route_ids": [
+            "1004470243",
+            "1024075922",
+            "103994292",
             "1114500517",
             "1170335453",
             "1247387644",
             "1252202389",
+            "1261605731",
             "1428165821",
+            "1741539600",
             "1884837000",
             "1955103154",
+            "2011374392",
+            "201880385",
+            "2136956995",
+            "2165965154",
+            "2300128744",
+            "231509758",
+            "2338192195",
+            "2355023358",
+            "2355929270",
+            "2358295606",
             "2364478564",
+            "2510403939",
+            "272614101",
+            "3066612267",
+            "3070848961",
+            "3175822612",
             "3175988806",
+            "3192303700",
+            "3335955451",
+            "3532276990",
+            "3581531211",
+            "3594359697",
             "3606006069",
+            "360868713",
+            "3672136958",
             "3695385859",
             "3757219496",
+            "3757505330",
+            "3785643277",
+            "3838942938",
+            "398456689",
+            "4024663739",
+            "4082276246",
             "4087742961",
+            "409958912",
+            "413714663",
             "4272290227",
             "4273500598",
-            "583094637"
+            "444086881",
+            "550332996",
+            "583094637",
+            "599831850"
           ],
           "destinations": [
+            "エディオンピースウイング広島",
+            "グランドプリンスホテル広島",
+            "ジ アウトレット 広島",
             "七軒茶屋",
+            "三滝観音",
+            "五月が丘団地",
+            "井口車庫",
+            "免許センター",
+            "共立ハイツ",
             "勝木",
             "勝木台上",
+            "吉島営業所",
+            "吉島病院",
             "大林車庫",
             "大町駅",
+            "大迫団地",
             "山本東亜ハイツ",
+            "市役所前",
+            "市立広島特別支援学校",
             "広島バスセンター",
             "広島文化学園",
+            "広島港桟橋",
+            "広島港湾振興事務所",
+            "広島駅",
+            "広電己斐団地",
             "春日野",
             "桐陽台駐車場",
+            "横川駅前",
+            "県庁前",
             "矢口駅前",
             "祇園が丘",
+            "紙屋町",
             "経済大学正門前",
-            "高陽車庫"
+            "緑ヶ丘入口",
+            "観音マリーナホップ",
+            "観音新町三丁目",
+            "高陽車庫",
+            "高須台五丁目"
           ],
           "last_bus": {
             "operator_id": 10,
@@ -10982,14 +11064,14 @@
               "service_date": "2026-10-03"
             },
             "2026-10-04": {
-              "operator_id": 10,
-              "operator": "広島交通",
-              "trip_id": "35b51096-88b2-481c-900b-7962f7a1981c",
-              "route_id": "1247387644",
-              "stop_id": "1042 2",
-              "scheduled_time": "21:52:00",
-              "terminal_arrival_time": "22:47:00",
-              "terminal": "桐陽台駐車場",
+              "operator_id": 8,
+              "operator": "広島電鉄",
+              "trip_id": "b07cd774-ac08-420a-85af-3a26bddf7316",
+              "route_id": "360868713",
+              "stop_id": "50030 13",
+              "scheduled_time": "22:37:00",
+              "terminal_arrival_time": "23:04:00",
+              "terminal": "観音新町三丁目",
               "service_date": "2026-10-04"
             },
             "2026-10-05": {
@@ -11061,8 +11143,12 @@
           }
         },
         {
-          "name": "広島駅方面",
-          "next_stop": "広島駅",
+          "name": "広島駅・東方面",
+          "next_stop": "",
+          "next_stops": [
+            "広島駅",
+            "銀山町"
+          ],
           "operators": [
             "JRバス中国",
             "広島バス",
@@ -11071,24 +11157,39 @@
             "芸陽バス"
           ],
           "route_ids": [
+            "101622323",
+            "103994292",
+            "1143711054",
             "1261976881",
             "1471646934",
+            "1644555863",
             "1730496772",
             "1741539600",
+            "1757472590",
             "1843881801",
             "1955125506",
             "2011374392",
+            "201880385",
+            "2290197968",
+            "2300128744",
             "2340586350",
+            "2355023358",
             "2510403939",
             "2628369949",
             "272614101",
             "2750042284",
+            "2930765513",
             "3192303700",
             "3399147472",
             "3453118499",
             "3532276990",
+            "3594359697",
+            "360868713",
+            "3672136958",
             "3824547192",
+            "3863994541",
             "3896232832",
+            "3968526772",
             "4082276246",
             "409958912",
             "550332996",
@@ -11100,17 +11201,27 @@
             "さいわい保育所前",
             "三迫二丁目",
             "中野東七丁目",
+            "仁保車庫前",
+            "向洋大原",
+            "向洋新町二丁目",
+            "向洋新町車庫",
             "国信橋",
             "宮の前",
             "小河原車庫",
             "広島駅",
+            "府中ニュータウン",
+            "府中山田",
+            "府中永田転回場",
             "忠海駅前",
+            "戸坂東浄団地",
             "桐陽台駐車場",
             "海上側",
             "深川台",
+            "温品四丁目",
             "研創前",
             "竹原フェリー",
             "西条駅",
+            "邇保姫神社入口",
             "高陽台",
             "高陽車庫"
           ],
@@ -11138,14 +11249,14 @@
               "service_date": "2026-10-03"
             },
             "2026-10-04": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "fe581985-6421-4d4b-b8af-14bc2041f117",
-              "route_id": "550332996",
-              "stop_id": "50030 2",
-              "scheduled_time": "22:06:00",
-              "terminal_arrival_time": "22:53:00",
-              "terminal": "小河原車庫",
+              "operator_id": 8,
+              "operator": "広島電鉄",
+              "trip_id": "f98ce07f-00ad-4ecc-8b73-82c335df143f",
+              "route_id": "360868713",
+              "stop_id": "50030 5",
+              "scheduled_time": "22:15:00",
+              "terminal_arrival_time": "22:23:00",
+              "terminal": "広島駅",
               "service_date": "2026-10-04"
             },
             "2026-10-05": {
@@ -11217,326 +11328,35 @@
           }
         },
         {
-          "name": "紙屋町方面",
-          "next_stop": "紙屋町",
-          "operators": [
-            "ボンバス",
-            "広島バス",
-            "広島電鉄"
+          "name": "牛田・北東方面",
+          "next_stop": "",
+          "next_stops": [
+            "京口門",
+            "女学院前"
           ],
-          "route_ids": [
-            "1004470243",
-            "1024075922",
-            "103994292",
-            "1261605731",
-            "201880385",
-            "2136956995",
-            "2165965154",
-            "2300128744",
-            "231509758",
-            "2338192195",
-            "2355023358",
-            "2355929270",
-            "2358295606",
-            "3070848961",
-            "3175822612",
-            "3192303700",
-            "3335955451",
-            "3581531211",
-            "3594359697",
-            "360868713",
-            "3757505330",
-            "3785643277",
-            "3838942938",
-            "398456689",
-            "4024663739",
-            "409958912",
-            "413714663",
-            "444086881"
-          ],
-          "destinations": [
-            "エディオンピースウイング広島",
-            "グランドプリンスホテル広島",
-            "ジ アウトレット 広島",
-            "三滝観音",
-            "五月が丘団地",
-            "井口車庫",
-            "免許センター",
-            "共立ハイツ",
-            "吉島営業所",
-            "吉島病院",
-            "大迫団地",
-            "市役所前",
-            "市立広島特別支援学校",
-            "広島港桟橋",
-            "広島港湾振興事務所",
-            "広島駅",
-            "広電己斐団地",
-            "横川駅前",
-            "紙屋町",
-            "緑ヶ丘入口",
-            "観音マリーナホップ",
-            "観音新町三丁目",
-            "高須台五丁目"
-          ],
-          "last_bus": {
-            "operator_id": 8,
-            "operator": "広島電鉄",
-            "trip_id": "0e16539c-ed1b-4ee6-a02e-67337441c8aa",
-            "route_id": "360868713",
-            "stop_id": "50030 13",
-            "scheduled_time": "22:37:00",
-            "terminal_arrival_time": "23:04:00",
-            "terminal": "観音新町三丁目",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "0e16539c-ed1b-4ee6-a02e-67337441c8aa",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:37:00",
-              "terminal_arrival_time": "23:04:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "b07cd774-ac08-420a-85af-3a26bddf7316",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:37:00",
-              "terminal_arrival_time": "23:04:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "a6dca927-ccf1-4564-bd67-bc15430bbe14",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:51:00",
-              "terminal_arrival_time": "23:18:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "a6dca927-ccf1-4564-bd67-bc15430bbe14",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:51:00",
-              "terminal_arrival_time": "23:18:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "a6dca927-ccf1-4564-bd67-bc15430bbe14",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:51:00",
-              "terminal_arrival_time": "23:18:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "a6dca927-ccf1-4564-bd67-bc15430bbe14",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:51:00",
-              "terminal_arrival_time": "23:18:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "a6dca927-ccf1-4564-bd67-bc15430bbe14",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:51:00",
-              "terminal_arrival_time": "23:18:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "0e16539c-ed1b-4ee6-a02e-67337441c8aa",
-              "route_id": "360868713",
-              "stop_id": "50030 13",
-              "scheduled_time": "22:37:00",
-              "terminal_arrival_time": "23:04:00",
-              "terminal": "観音新町三丁目",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
-          "name": "銀山町方面",
-          "next_stop": "銀山町",
           "operators": [
             "広島バス",
-            "広島電鉄"
-          ],
-          "route_ids": [
-            "101622323",
-            "103994292",
-            "1143711054",
-            "1644555863",
-            "1757472590",
-            "201880385",
-            "2290197968",
-            "2300128744",
-            "2355023358",
-            "2930765513",
-            "3594359697",
-            "360868713",
-            "3672136958",
-            "3863994541",
-            "3968526772",
-            "409958912"
-          ],
-          "destinations": [
-            "仁保車庫前",
-            "向洋大原",
-            "向洋新町二丁目",
-            "向洋新町車庫",
-            "広島駅",
-            "府中ニュータウン",
-            "府中山田",
-            "府中永田転回場",
-            "戸坂東浄団地",
-            "温品四丁目",
-            "邇保姫神社入口"
-          ],
-          "last_bus": {
-            "operator_id": 8,
-            "operator": "広島電鉄",
-            "trip_id": "a9cd3c2f-9f71-46d2-850a-5ef130e1f5fa",
-            "route_id": "360868713",
-            "stop_id": "50030 5",
-            "scheduled_time": "22:15:00",
-            "terminal_arrival_time": "22:23:00",
-            "terminal": "広島駅",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "a9cd3c2f-9f71-46d2-850a-5ef130e1f5fa",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:15:00",
-              "terminal_arrival_time": "22:23:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "f98ce07f-00ad-4ecc-8b73-82c335df143f",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:15:00",
-              "terminal_arrival_time": "22:23:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "4a9768c3-6c9e-4d90-9a4c-c41802ce37dd",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:28:00",
-              "terminal_arrival_time": "22:36:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "4a9768c3-6c9e-4d90-9a4c-c41802ce37dd",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:28:00",
-              "terminal_arrival_time": "22:36:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "4a9768c3-6c9e-4d90-9a4c-c41802ce37dd",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:28:00",
-              "terminal_arrival_time": "22:36:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "4a9768c3-6c9e-4d90-9a4c-c41802ce37dd",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:28:00",
-              "terminal_arrival_time": "22:36:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "4a9768c3-6c9e-4d90-9a4c-c41802ce37dd",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:28:00",
-              "terminal_arrival_time": "22:36:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "a9cd3c2f-9f71-46d2-850a-5ef130e1f5fa",
-              "route_id": "360868713",
-              "stop_id": "50030 5",
-              "scheduled_time": "22:15:00",
-              "terminal_arrival_time": "22:23:00",
-              "terminal": "広島駅",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
-          "name": "京口門方面",
-          "next_stop": "京口門",
-          "operators": [
+            "広島交通",
             "広島電鉄"
           ],
           "route_ids": [
             "1078678910",
+            "208731032",
+            "2122499709",
+            "2162292534",
             "2363577824",
             "2506384167",
             "3468996025",
             "3611386970",
+            "3640816612",
+            "4035891693",
             "40807719",
             "468411588"
           ],
           "destinations": [
+            "広島駅",
+            "広島駅新幹線口",
+            "東浄小学校前",
             "牛田早稲田団地",
             "牛田旭"
           ],
@@ -11643,8 +11463,11 @@
           }
         },
         {
-          "name": "新天地方面",
+          "name": "富士見町・南方面",
           "next_stop": "新天地",
+          "next_stops": [
+            "新天地"
+          ],
           "operators": [
             "広島バス",
             "広島交通",
@@ -11772,255 +11595,11 @@
           }
         },
         {
-          "name": "女学院前方面",
-          "next_stop": "女学院前",
-          "operators": [
-            "広島バス",
-            "広島交通",
-            "広島電鉄"
-          ],
-          "route_ids": [
-            "208731032",
-            "2122499709",
-            "2162292534",
-            "3640816612",
-            "4035891693"
-          ],
-          "destinations": [
-            "広島駅",
-            "広島駅新幹線口",
-            "東浄小学校前"
-          ],
-          "last_bus": {
-            "operator_id": 8,
-            "operator": "広島電鉄",
-            "trip_id": "03432115-f601-4b39-ab20-95e4eb0940f1",
-            "route_id": "4035891693",
-            "stop_id": "50030 4",
-            "scheduled_time": "21:47:00",
-            "terminal_arrival_time": "22:23:00",
-            "terminal": "東浄小学校前",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "03432115-f601-4b39-ab20-95e4eb0940f1",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "21:47:00",
-              "terminal_arrival_time": "22:23:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "79c432a2-014f-4104-81ed-fb2fd55e0ed6",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "21:48:00",
-              "terminal_arrival_time": "22:21:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "22:08:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "22:08:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "22:08:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "22:08:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "22:08:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "03432115-f601-4b39-ab20-95e4eb0940f1",
-              "route_id": "4035891693",
-              "stop_id": "50030 4",
-              "scheduled_time": "21:47:00",
-              "terminal_arrival_time": "22:23:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
-          "name": "八丁堀方面",
-          "next_stop": "八丁堀",
-          "operators": [
-            "広島バス",
-            "広島交通",
-            "広島電鉄"
-          ],
-          "route_ids": [
-            "208731032",
-            "2122499709",
-            "2162292534",
-            "3175822612",
-            "3640816612",
-            "3838942938",
-            "4035891693"
-          ],
-          "destinations": [
-            "広島駅",
-            "広島駅新幹線口",
-            "東浄小学校前",
-            "横川駅前"
-          ],
-          "last_bus": {
-            "operator_id": 8,
-            "operator": "広島電鉄",
-            "trip_id": "03432115-f601-4b39-ab20-95e4eb0940f1",
-            "route_id": "4035891693",
-            "stop_id": "50030 12",
-            "scheduled_time": "21:44:00",
-            "terminal_arrival_time": "22:23:00",
-            "terminal": "東浄小学校前",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "03432115-f601-4b39-ab20-95e4eb0940f1",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "21:44:00",
-              "terminal_arrival_time": "22:23:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "79c432a2-014f-4104-81ed-fb2fd55e0ed6",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "21:47:00",
-              "terminal_arrival_time": "22:21:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "22:06:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "22:06:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "22:06:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "22:06:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "1ba072f6-2f66-44a3-937c-8076225886cb",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "22:06:00",
-              "terminal_arrival_time": "22:41:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "03432115-f601-4b39-ab20-95e4eb0940f1",
-              "route_id": "4035891693",
-              "stop_id": "50030 12",
-              "scheduled_time": "21:44:00",
-              "terminal_arrival_time": "22:23:00",
-              "terminal": "東浄小学校前",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
-          "name": "本通り方面",
+          "name": "本通・南西方面",
           "next_stop": "本通り",
+          "next_stops": [
+            "本通り"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -12136,245 +11715,6 @@
               "scheduled_time": "21:43:00",
               "terminal_arrival_time": "22:16:00",
               "terminal": "江波営業所",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
-          "name": "県庁前方面",
-          "next_stop": "県庁前",
-          "operators": [
-            "広島電鉄"
-          ],
-          "route_ids": [
-            "2136956995",
-            "3672136958"
-          ],
-          "destinations": [
-            "県庁前"
-          ],
-          "last_bus": {
-            "operator_id": 8,
-            "operator": "広島電鉄",
-            "trip_id": "7eb645a1-1ecb-40c6-927f-13743fd3f8e1",
-            "route_id": "2136956995",
-            "stop_id": "50030 14",
-            "scheduled_time": "21:38:00",
-            "terminal_arrival_time": "21:44:00",
-            "terminal": "県庁前",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "7eb645a1-1ecb-40c6-927f-13743fd3f8e1",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "21:38:00",
-              "terminal_arrival_time": "21:44:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "5d041d66-2be7-43fa-8bba-76ce58495cf2",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "21:38:00",
-              "terminal_arrival_time": "21:44:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "99821f8e-41f3-47a1-b959-8767346ad4a4",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "22:02:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "99821f8e-41f3-47a1-b959-8767346ad4a4",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "22:02:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "99821f8e-41f3-47a1-b959-8767346ad4a4",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "22:02:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "99821f8e-41f3-47a1-b959-8767346ad4a4",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "22:02:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "99821f8e-41f3-47a1-b959-8767346ad4a4",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "22:02:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "7eb645a1-1ecb-40c6-927f-13743fd3f8e1",
-              "route_id": "2136956995",
-              "stop_id": "50030 14",
-              "scheduled_time": "21:38:00",
-              "terminal_arrival_time": "21:44:00",
-              "terminal": "県庁前",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
-          "name": "広島バスセンター方面",
-          "next_stop": "広島バスセンター",
-          "operators": [
-            "JRバス中国",
-            "広島バス",
-            "芸陽バス"
-          ],
-          "route_ids": [
-            "1741539600",
-            "2011374392",
-            "2510403939",
-            "272614101",
-            "3066612267",
-            "3532276990",
-            "4082276246",
-            "550332996",
-            "599831850"
-          ],
-          "destinations": [
-            "広島バスセンター"
-          ],
-          "last_bus": {
-            "operator_id": 9,
-            "operator": "広島バス",
-            "trip_id": "4198a84b-3a3c-4b13-8126-ae5331ef7b61",
-            "route_id": "550332996",
-            "stop_id": "50030 3",
-            "scheduled_time": "21:31:00",
-            "terminal_arrival_time": "21:44:00",
-            "terminal": "広島バスセンター",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "4198a84b-3a3c-4b13-8126-ae5331ef7b61",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:31:00",
-              "terminal_arrival_time": "21:44:00",
-              "terminal": "広島バスセンター",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "e65a9533-5157-4985-b5ab-6759f89c4b57",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:31:00",
-              "terminal_arrival_time": "21:44:00",
-              "terminal": "広島バスセンター",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "7050f1a3-98d3-436f-80d4-efb42508b5a1",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:56:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "広島バスセンター",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "7050f1a3-98d3-436f-80d4-efb42508b5a1",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:56:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "広島バスセンター",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "7050f1a3-98d3-436f-80d4-efb42508b5a1",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:56:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "広島バスセンター",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "7050f1a3-98d3-436f-80d4-efb42508b5a1",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:56:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "広島バスセンター",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "7050f1a3-98d3-436f-80d4-efb42508b5a1",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:56:00",
-              "terminal_arrival_time": "22:09:00",
-              "terminal": "広島バスセンター",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 9,
-              "operator": "広島バス",
-              "trip_id": "4198a84b-3a3c-4b13-8126-ae5331ef7b61",
-              "route_id": "550332996",
-              "stop_id": "50030 3",
-              "scheduled_time": "21:31:00",
-              "terminal_arrival_time": "21:44:00",
-              "terminal": "広島バスセンター",
               "service_date": "2026-10-10"
             }
           }
@@ -13713,6 +13053,9 @@
         {
           "name": "広島バスセンター方面",
           "next_stop": "広島バスセンター",
+          "next_stops": [
+            "広島バスセンター"
+          ],
           "operators": [
             "JRバス中国",
             "広島交通"
@@ -13856,6 +13199,9 @@
         {
           "name": "女学院前方面",
           "next_stop": "女学院前",
+          "next_stops": [
+            "女学院前"
+          ],
           "operators": [
             "JRバス中国",
             "広島バス",
@@ -14498,6 +13844,9 @@
         {
           "name": "己斐本町二丁目方面",
           "next_stop": "己斐本町二丁目",
+          "next_stops": [
+            "己斐本町二丁目"
+          ],
           "operators": [
             "ボンバス"
           ],
@@ -14616,6 +13965,9 @@
         {
           "name": "西区役所前方面",
           "next_stop": "西区役所前",
+          "next_stops": [
+            "西区役所前"
+          ],
           "operators": [
             "ボンバス"
           ],
@@ -14730,6 +14082,9 @@
         {
           "name": "西広島駅方面",
           "next_stop": "西広島駅",
+          "next_stops": [
+            "西広島駅"
+          ],
           "operators": [
             "ボンバス"
           ],
@@ -20504,6 +19859,9 @@
         {
           "name": "基町方面",
           "next_stop": "基町",
+          "next_stops": [
+            "基町"
+          ],
           "operators": [
             "JRバス中国",
             "広島交通"
@@ -20633,6 +19991,9 @@
         {
           "name": "横川駅前方面",
           "next_stop": "横川駅前",
+          "next_stops": [
+            "横川駅前"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -20762,6 +20123,9 @@
         {
           "name": "広瀬町方面",
           "next_stop": "広瀬町",
+          "next_stops": [
+            "広瀬町"
+          ],
           "operators": [
             "広島交通",
             "広島電鉄"
@@ -20911,6 +20275,9 @@
         {
           "name": "紙屋町方面",
           "next_stop": "紙屋町",
+          "next_stops": [
+            "紙屋町"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -21027,6 +20394,9 @@
         {
           "name": "十日市方面",
           "next_stop": "十日市",
+          "next_stops": [
+            "十日市"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -21145,6 +20515,9 @@
         {
           "name": "八丁堀方面",
           "next_stop": "八丁堀",
+          "next_stops": [
+            "八丁堀"
+          ],
           "operators": [
             "JRバス中国",
             "広島バス",
@@ -21280,6 +20653,9 @@
         {
           "name": "本通り方面",
           "next_stop": "本通り",
+          "next_stops": [
+            "本通り"
+          ],
           "operators": [
             "JRバス中国",
             "広島電鉄",
@@ -21427,6 +20803,9 @@
         {
           "name": "中広町方面",
           "next_stop": "中広町",
+          "next_stops": [
+            "中広町"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -21549,6 +20928,9 @@
         {
           "name": "合同庁舎前方面",
           "next_stop": "合同庁舎前",
+          "next_stops": [
+            "合同庁舎前"
+          ],
           "operators": [
             "JRバス中国",
             "広島交通",
@@ -21678,6 +21060,9 @@
         {
           "name": "立町方面",
           "next_stop": "立町",
+          "next_stops": [
+            "立町"
+          ],
           "operators": [
             "広島交通"
           ],
@@ -21798,6 +21183,9 @@
         {
           "name": "新白島駅方面",
           "next_stop": "新白島駅",
+          "next_stops": [
+            "新白島駅"
+          ],
           "operators": [
             "JRバス中国",
             "広島交通"
@@ -27769,6 +27157,9 @@
         {
           "name": "八丁堀方面",
           "next_stop": "八丁堀",
+          "next_stops": [
+            "八丁堀"
+          ],
           "operators": [
             "JRバス中国",
             "広島バス",
@@ -27923,6 +27314,9 @@
         {
           "name": "稲荷町方面",
           "next_stop": "稲荷町",
+          "next_stops": [
+            "稲荷町"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄"
@@ -28064,6 +27458,9 @@
         {
           "name": "女学院前方面",
           "next_stop": "女学院前",
+          "next_stops": [
+            "女学院前"
+          ],
           "operators": [
             "JRバス中国",
             "広島交通"
@@ -28207,6 +27604,9 @@
         {
           "name": "大須賀町方面",
           "next_stop": "大須賀町",
+          "next_stops": [
+            "大須賀町"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -28323,6 +27723,9 @@
         {
           "name": "東区役所前方面",
           "next_stop": "東区役所前",
+          "next_stops": [
+            "東区役所前"
+          ],
           "operators": [
             "広島電鉄",
             "芸陽バス"
@@ -28448,6 +27851,9 @@
         {
           "name": "荒神町方面",
           "next_stop": "荒神町",
+          "next_stops": [
+            "荒神町"
+          ],
           "operators": [
             "芸陽バス"
           ],
@@ -28574,6 +27980,9 @@
         {
           "name": "的場町方面",
           "next_stop": "的場町",
+          "next_stops": [
+            "的場町"
+          ],
           "operators": [
             "広島バス",
             "広島交通",
@@ -28703,6 +28112,9 @@
         {
           "name": "猿候橋通り方面",
           "next_stop": "猿候橋通り",
+          "next_stops": [
+            "猿候橋通り"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -28819,6 +28231,9 @@
         {
           "name": "幟町中学校前方面",
           "next_stop": "幟町中学校前",
+          "next_stops": [
+            "幟町中学校前"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -28933,6 +28348,9 @@
         {
           "name": "大須賀町・常盤橋東方面",
           "next_stop": "大須賀町・常盤橋東",
+          "next_stops": [
+            "大須賀町・常盤橋東"
+          ],
           "operators": [
             "JRバス中国",
             "広島交通"
@@ -29928,6 +29346,9 @@
         {
           "name": "愛宕町方面",
           "next_stop": "愛宕町",
+          "next_stops": [
+            "愛宕町"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄"
@@ -30047,6 +29468,9 @@
         {
           "name": "東照宮入口方面",
           "next_stop": "東照宮入口",
+          "next_stops": [
+            "東照宮入口"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄"
@@ -30166,6 +29590,9 @@
         {
           "name": "イオンモール広島府中方面",
           "next_stop": "イオンモール広島府中",
+          "next_stops": [
+            "イオンモール広島府中"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -30278,127 +29705,11 @@
           }
         },
         {
-          "name": "広島駅新幹線口方面",
-          "next_stop": "広島駅新幹線口",
-          "operators": [
-            "広島バス",
-            "広島電鉄"
-          ],
-          "route_ids": [
-            "1337705145",
-            "2956810196",
-            "550332996"
-          ],
-          "destinations": [
-            "広島バスセンター",
-            "広電曙営業所前",
-            "牛田早稲田団地"
-          ],
-          "last_bus": {
-            "operator_id": 8,
-            "operator": "広島電鉄",
-            "trip_id": "37141a62-e3bc-4e49-91e7-f897ef4e232d",
-            "route_id": "1337705145",
-            "stop_id": "50860 1",
-            "scheduled_time": "19:12:00",
-            "terminal_arrival_time": "19:21:00",
-            "terminal": "広電曙営業所前",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "37141a62-e3bc-4e49-91e7-f897ef4e232d",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "19:12:00",
-              "terminal_arrival_time": "19:21:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "b542d7cd-34f0-49dc-bbe5-904f382a7cde",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "19:12:00",
-              "terminal_arrival_time": "19:21:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "8c639442-10f0-48e3-b903-de03cf9f764d",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "20:19:00",
-              "terminal_arrival_time": "20:27:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "8c639442-10f0-48e3-b903-de03cf9f764d",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "20:19:00",
-              "terminal_arrival_time": "20:27:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "8c639442-10f0-48e3-b903-de03cf9f764d",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "20:19:00",
-              "terminal_arrival_time": "20:27:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "8c639442-10f0-48e3-b903-de03cf9f764d",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "20:19:00",
-              "terminal_arrival_time": "20:27:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "8c639442-10f0-48e3-b903-de03cf9f764d",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "20:19:00",
-              "terminal_arrival_time": "20:27:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 8,
-              "operator": "広島電鉄",
-              "trip_id": "37141a62-e3bc-4e49-91e7-f897ef4e232d",
-              "route_id": "1337705145",
-              "stop_id": "50860 1",
-              "scheduled_time": "19:12:00",
-              "terminal_arrival_time": "19:21:00",
-              "terminal": "広電曙営業所前",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
           "name": "女学院前方面",
           "next_stop": "女学院前",
+          "next_stops": [
+            "女学院前"
+          ],
           "operators": [
             "広島バス",
             "広島交通",
@@ -30517,6 +29828,9 @@
         {
           "name": "広域公園前駅方面",
           "next_stop": "広域公園前駅",
+          "next_stops": [
+            "広域公園前駅"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -31363,6 +30677,9 @@
         {
           "name": "富士見町方面",
           "next_stop": "富士見町",
+          "next_stops": [
+            "富士見町"
+          ],
           "operators": [
             "広島バス",
             "広島交通",
@@ -31488,6 +30805,9 @@
         {
           "name": "八丁堀方面",
           "next_stop": "八丁堀",
+          "next_stops": [
+            "八丁堀"
+          ],
           "operators": [
             "広島バス",
             "広島交通",
@@ -31613,6 +30933,9 @@
         {
           "name": "田中町方面",
           "next_stop": "田中町",
+          "next_stops": [
+            "田中町"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄"
@@ -31730,6 +31053,9 @@
         {
           "name": "県立美術館前方面",
           "next_stop": "県立美術館前",
+          "next_stops": [
+            "県立美術館前"
+          ],
           "operators": [
             "JRバス中国"
           ],
@@ -35717,6 +35043,9 @@
         {
           "name": "袋町方面",
           "next_stop": "袋町",
+          "next_stops": [
+            "袋町"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄",
@@ -35893,6 +35222,9 @@
         {
           "name": "紙屋町方面",
           "next_stop": "紙屋町",
+          "next_stops": [
+            "紙屋町"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄"
@@ -36033,6 +35365,9 @@
         {
           "name": "放送会館前方面",
           "next_stop": "放送会館前",
+          "next_stops": [
+            "放送会館前"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -36150,6 +35485,9 @@
         {
           "name": "中電前方面",
           "next_stop": "中電前",
+          "next_stops": [
+            "中電前"
+          ],
           "operators": [
             "JRバス中国",
             "広島電鉄"
@@ -36268,6 +35606,9 @@
         {
           "name": "広島バスセンター方面",
           "next_stop": "広島バスセンター",
+          "next_stops": [
+            "広島バスセンター"
+          ],
           "operators": [
             "JRバス中国",
             "広島電鉄",
@@ -36388,6 +35729,9 @@
         {
           "name": "新白島駅方面",
           "next_stop": "新白島駅",
+          "next_stops": [
+            "新白島駅"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -40435,6 +39779,9 @@
         {
           "name": "三篠金星街方面",
           "next_stop": "三篠金星街",
+          "next_stops": [
+            "三篠金星街"
+          ],
           "operators": [
             "広島交通"
           ],
@@ -40561,6 +39908,9 @@
         {
           "name": "三篠町一丁目方面",
           "next_stop": "三篠町一丁目",
+          "next_stops": [
+            "三篠町一丁目"
+          ],
           "operators": [
             "広島交通",
             "広島電鉄"
@@ -40718,6 +40068,9 @@
         {
           "name": "広瀬町方面",
           "next_stop": "広瀬町",
+          "next_stops": [
+            "広瀬町"
+          ],
           "operators": [
             "広島交通",
             "広島電鉄"
@@ -40860,6 +40213,9 @@
         {
           "name": "横川新町方面",
           "next_stop": "横川新町",
+          "next_stops": [
+            "横川新町"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -40996,6 +40352,9 @@
         {
           "name": "広島バスセンター方面",
           "next_stop": "広島バスセンター",
+          "next_stops": [
+            "広島バスセンター"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -41113,6 +40472,9 @@
         {
           "name": "楠木町方面",
           "next_stop": "楠木町",
+          "next_stops": [
+            "楠木町"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -41228,6 +40590,9 @@
         {
           "name": "別院前方面",
           "next_stop": "別院前",
+          "next_stops": [
+            "別院前"
+          ],
           "operators": [
             "JRバス中国"
           ],
@@ -42061,6 +41426,9 @@
         {
           "name": "立町方面",
           "next_stop": "立町",
+          "next_stops": [
+            "立町"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -42189,6 +41557,9 @@
         {
           "name": "本通り方面",
           "next_stop": "本通り",
+          "next_stops": [
+            "本通り"
+          ],
           "operators": [
             "広島電鉄"
           ],
@@ -46509,6 +45880,9 @@
         {
           "name": "本川町方面",
           "next_stop": "本川町",
+          "next_stops": [
+            "本川町"
+          ],
           "operators": [
             "広島交通",
             "広島電鉄"
@@ -46642,6 +46016,9 @@
         {
           "name": "十日市方面",
           "next_stop": "十日市",
+          "next_stops": [
+            "十日市"
+          ],
           "operators": [
             "ボンバス",
             "広島交通"
@@ -46786,6 +46163,9 @@
         {
           "name": "立町方面",
           "next_stop": "立町",
+          "next_stops": [
+            "立町"
+          ],
           "operators": [
             "広島バス",
             "広島交通",
@@ -46916,6 +46296,9 @@
         {
           "name": "本通り方面",
           "next_stop": "本通り",
+          "next_stops": [
+            "本通り"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄"
@@ -47056,6 +46439,9 @@
         {
           "name": "八丁堀方面",
           "next_stop": "八丁堀",
+          "next_stops": [
+            "八丁堀"
+          ],
           "operators": [
             "ボンバス",
             "広島バス",
@@ -47199,137 +46585,11 @@
           }
         },
         {
-          "name": "紙屋町方面",
-          "next_stop": "紙屋町",
-          "operators": [
-            "ボンバス",
-            "広島バス"
-          ],
-          "route_ids": [
-            "2300128744",
-            "2355023358",
-            "2452594165",
-            "2613312916",
-            "4024663739",
-            "4055129472",
-            "409958912",
-            "4239665032",
-            "563486651",
-            "661077681"
-          ],
-          "destinations": [
-            "三滝観音",
-            "井口車庫",
-            "八丁堀",
-            "向洋大原",
-            "向洋新町二丁目",
-            "広島駅"
-          ],
-          "last_bus": {
-            "operator_id": 13,
-            "operator": "ボンバス",
-            "trip_id": "e8f42244-6698-45e1-a446-2acc14d2b3c3",
-            "route_id": "563486651",
-            "stop_id": "71140 27",
-            "scheduled_time": "21:12:00",
-            "terminal_arrival_time": "21:18:00",
-            "terminal": "八丁堀",
-            "service_date": "2026-10-03"
-          },
-          "last_buses_by_date": {
-            "2026-10-03": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "e8f42244-6698-45e1-a446-2acc14d2b3c3",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:12:00",
-              "terminal_arrival_time": "21:18:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-03"
-            },
-            "2026-10-04": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "18344eb4-1f6e-415c-9e44-d38219909441",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:12:00",
-              "terminal_arrival_time": "21:18:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-04"
-            },
-            "2026-10-05": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "e0ec3fc8-10ee-47b7-850a-d0da5a998dea",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:28:00",
-              "terminal_arrival_time": "21:34:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-05"
-            },
-            "2026-10-06": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "e0ec3fc8-10ee-47b7-850a-d0da5a998dea",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:28:00",
-              "terminal_arrival_time": "21:34:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-06"
-            },
-            "2026-10-07": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "e0ec3fc8-10ee-47b7-850a-d0da5a998dea",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:28:00",
-              "terminal_arrival_time": "21:34:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-07"
-            },
-            "2026-10-08": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "e0ec3fc8-10ee-47b7-850a-d0da5a998dea",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:28:00",
-              "terminal_arrival_time": "21:34:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-08"
-            },
-            "2026-10-09": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "e0ec3fc8-10ee-47b7-850a-d0da5a998dea",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:28:00",
-              "terminal_arrival_time": "21:34:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-09"
-            },
-            "2026-10-10": {
-              "operator_id": 13,
-              "operator": "ボンバス",
-              "trip_id": "e8f42244-6698-45e1-a446-2acc14d2b3c3",
-              "route_id": "563486651",
-              "stop_id": "71140 27",
-              "scheduled_time": "21:12:00",
-              "terminal_arrival_time": "21:18:00",
-              "terminal": "八丁堀",
-              "service_date": "2026-10-10"
-            }
-          }
-        },
-        {
           "name": "基町小学校前方面",
           "next_stop": "基町小学校前",
+          "next_stops": [
+            "基町小学校前"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -47445,6 +46705,9 @@
         {
           "name": "エディオンピースウイング広島方面",
           "next_stop": "エディオンピースウイング広島",
+          "next_stops": [
+            "エディオンピースウイング広島"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -47559,6 +46822,9 @@
         {
           "name": "原爆ドーム前方面",
           "next_stop": "原爆ドーム前",
+          "next_stops": [
+            "原爆ドーム前"
+          ],
           "operators": [
             "広島バス",
             "広島電鉄"
@@ -47679,6 +46945,9 @@
         {
           "name": "合同庁舎前方面",
           "next_stop": "合同庁舎前",
+          "next_stops": [
+            "合同庁舎前"
+          ],
           "operators": [
             "広島バス"
           ],
@@ -48806,6 +48075,9 @@
         {
           "name": "己斐中二丁目方面",
           "next_stop": "己斐中二丁目",
+          "next_stops": [
+            "己斐中二丁目"
+          ],
           "operators": [
             "ボンバス"
           ],
@@ -48932,6 +48204,9 @@
         {
           "name": "己斐方面",
           "next_stop": "己斐",
+          "next_stops": [
+            "己斐"
+          ],
           "operators": [
             "ボンバス"
           ],
@@ -49050,6 +48325,9 @@
         {
           "name": "イトーピア入口方面",
           "next_stop": "イトーピア入口",
+          "next_stops": [
+            "イトーピア入口"
+          ],
           "operators": [
             "ボンバス"
           ],
@@ -49168,6 +48446,9 @@
         {
           "name": "西区役所前方面",
           "next_stop": "西区役所前",
+          "next_stops": [
+            "西区役所前"
+          ],
           "operators": [
             "ボンバス"
           ],
@@ -49287,6 +48568,9 @@
         {
           "name": "学院東門前方面",
           "next_stop": "学院東門前",
+          "next_stops": [
+            "学院東門前"
+          ],
           "operators": [
             "ボンバス"
           ],
