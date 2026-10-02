@@ -21,7 +21,7 @@ OPERATORS = {
 # 現在UIで選択対象にしている停留所。
 # GTFSの実データから、この停留所を通る行き先候補を抽出する。
 TARGET_STOPS = {
-    "広島バスセンター","県庁前","紙屋町","八丁堀","本通り","合同庁舎","中電前","新天地",
+    "広島バスセンター","県庁前","紙屋町","八丁堀","本通り","合同庁舎前","中電前","新天地",
     "横川駅前","西広島駅","己斐","広島駅","広島駅新幹線口",
 }
 
@@ -176,22 +176,25 @@ def main():
                 last["service_date"] = service_date.isoformat()
                 row["last_bus"] = last
             dests.append(row)
-        # 終バス用途なので、今日実際に終バスが存在する終点を先に表示。
-        # 本日の便がない終点は設定候補から外す。
-        dests = [x for x in dests if x.get("last_bus")]
-        # 終バス設定なので、遅い終バスを上に出す。22時以降・深夜便を探しやすくする。
-        dests.sort(
+        # 設定候補は今日運行する便だけに限定しない。
+        # 平日限定・土休日限定の終点も常に残し、後から見つからない状態を防ぐ。
+        active = [x for x in dests if x.get("last_bus")]
+        inactive = [x for x in dests if not x.get("last_bus")]
+        active.sort(
             key=lambda x: (parse_gtfs_time(x["last_bus"]["scheduled_time"]) or -1, x["name"]),
             reverse=True
         )
-        out_stops[stop_name] = {"destinations": dests}
+        inactive.sort(key=lambda x: x["name"])
+        out_stops[stop_name] = {"destinations": active + inactive}
 
+    missing_target_stops = sorted(TARGET_STOPS - set(out_stops.keys()))
     payload = {
         "source": "広島県バス協会 GTFS-JP current data",
         "source_url": "https://www.bus-kyo.or.jp/gtfs-open-data",
         "generated_at": datetime.now(timezone.utc).isoformat(),
         "service_date": service_date.isoformat(),
         "operators": list(OPERATORS.values()),
+        "missing_target_stops": missing_target_stops,
         "stops": out_stops,
         "errors": errors,
     }
