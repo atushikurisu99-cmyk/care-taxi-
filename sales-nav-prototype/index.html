@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-HOME-STATE-REFINE-1 -->
+<!-- BUILD:2026-10-03-BUS-DESTINATION-CATALOG-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1389,6 +1389,21 @@ const BUS_STOP_FALLBACK={
 };
 let busSettingsWard='中区';
 let busSettingsActiveStop='';
+let busDestinationCatalog=null;
+let busDestinationCatalogLoaded=false;
+async function loadBusDestinationCatalog(force=false){
+ if(busDestinationCatalogLoaded&&!force) return busDestinationCatalog;
+ try{
+  const r=await fetch('./data/bus-destination-catalog.json?ts='+(force?Date.now():'1'),{cache:'no-store'});
+  if(!r.ok) throw new Error('catalog http '+r.status);
+  const d=await r.json();
+  busDestinationCatalog=d&&d.stops?d:null;
+ }catch(e){
+  busDestinationCatalog=null;
+ }
+ busDestinationCatalogLoaded=true;
+ return busDestinationCatalog;
+}
 function getBusNotifySettings(){
  try{
   const v=JSON.parse(localStorage.getItem(BUS_NOTIFY_SETTINGS_KEY)||'null');
@@ -1434,15 +1449,24 @@ function toggleBusStopSetting(stop){
  saveBusNotifySettings(cfg);
  renderNotificationSettings();
 }
-function openBusDestinationSetting(stop){
+async function openBusDestinationSetting(stop){
  const cfg=getBusNotifySettings();
  if(!cfg.stops[stop]){cfg.stops[stop]=true;saveBusNotifySettings(cfg)}
  busSettingsActiveStop=stop;
+ await loadBusDestinationCatalog(false);
  renderNotificationSettings();
 }
 function destinationCandidatesForStop(stop){
  const out=[];
  const seen=new Set();
+
+ const staticRows=Array.isArray(busDestinationCatalog?.stops?.[stop]?.destinations)
+  ?busDestinationCatalog.stops[stop].destinations:[];
+ for(const d of staticRows){
+  const v=typeof d==='string'?d:(d.name||'');
+  if(v&&!seen.has(v)){seen.add(v);out.push(v)}
+ }
+
  const liveStops=Array.isArray(busRealtimeData?.stops)?busRealtimeData.stops:[];
  for(const s of liveStops){
   const name=s.name||s.stop_name||'';
@@ -1478,7 +1502,8 @@ function toggleBusDestination(stop,dest){
  saveBusNotifySettings(cfg);
  renderNotificationSettings();
 }
-function renderNotificationSettings(){
+async function renderNotificationSettings(){
+ if(!busDestinationCatalogLoaded) await loadBusDestinationCatalog(false);
  BUS_WARDS.forEach(w=>{
   const b=document.getElementById('busWard'+w);
   if(b) b.classList.toggle('active',w===busSettingsWard);
@@ -1506,12 +1531,10 @@ function renderNotificationSettings(){
  const selected=Array.isArray(cfg.destinations[stop])?cfg.destinations[stop]:[];
  const candidateHtml=candidates.length
   ? '<div class="settings-list">'+candidates.map(d=>'<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>').join('')+'</div>'
-  : '<div class="settings-note" style="margin-top:7px">現在のGTFSリアルタイムには行き先一覧が入っていないため、暫定で手入力できます。本番はGTFS時刻表から選択式にします。</div>';
+  : '<div class="settings-note" style="margin-top:7px">'+(busDestinationCatalogLoaded?'このバス停の行き先データを確認できません。':'行き先データを取得中…')+'</div>';
  const chips=selected.length?'<div class="settings-chiprow">'+selected.map(d=>'<button class="settings-chip" type="button" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')">'+escapeHtml(d)+' ×</button>').join('')+'</div>':'';
  box.innerHTML='<div class="settings-note" style="margin-top:7px"><strong style="color:#fff">'+escapeHtml(stop)+'</strong></div>'+
-  candidateHtml+
-  (candidates.length?'':'<div class="settings-inputrow"><input id="busDestinationInput" type="text" placeholder="例：○○方面 / ○○行き"><button type="button" onclick="addManualBusDestination()">追加</button></div>')+
-  chips;
+  candidateHtml+chips;
 }
 
 let calendarCursor=new Date(new Date().getFullYear(),new Date().getMonth(),1);
@@ -3685,6 +3708,7 @@ renderWeatherData(readWeatherCache());
 initReservationJobGestures();
 initNoticeSwipe();
 setInterval(checkReservationAutoJob,15000);
+loadBusDestinationCatalog(false);
 loadBusRealtime(false);
 loadJrProbeSnapshot(false);
 loadEventSportsRealtime(false);
