@@ -15,6 +15,9 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
+      - name: Install Worker dependencies
+        working-directory: workers/jr-higashima-proxy
+        run: npm install
       - name: Syntax check
         run: node --check workers/jr-higashima-proxy/index.mjs
       - name: Unit test
