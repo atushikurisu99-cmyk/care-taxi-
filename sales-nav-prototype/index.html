@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-02-NAV-ANALYSIS-1 -->
+<!-- BUILD:2026-10-03-HOME-CALENDAR-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -190,15 +190,17 @@ main{position:relative;min-height:0;overflow:hidden}
 .home-top-grid,.home-summary{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:9px}
 .home-top-grid{align-items:stretch}
 .home-weather{
- min-height:110px;display:flex;align-items:center;gap:10px;
- padding:13px 12px;border-radius:16px;
+ min-height:110px;display:flex;align-items:center;
+ padding:13px 14px;border-radius:16px;
  background:linear-gradient(180deg,var(--panel2),var(--panel));
- border:1px solid var(--line);min-width:0
+ border:1px solid var(--line);min-width:0;cursor:pointer
 }
-.home-weather .weather-icon{font-size:26px;line-height:1;flex:0 0 auto}
+.home-weather-inner{min-width:0;width:100%}
+.home-weather-main{display:flex;align-items:center;gap:8px;margin-top:5px}
+.home-weather .weather-icon{font-size:24px;line-height:1;flex:0 0 auto}
 .home-weather .weather-text{
- font-size:17px;font-weight:700;line-height:1.2;
- white-space:normal;overflow:hidden;text-overflow:clip
+ font-size:22px;font-weight:800;line-height:1.08;
+ white-space:nowrap;overflow:hidden;text-overflow:clip
 }
 .home-top-grid .reservation-summary{
  min-height:110px;display:flex;flex-direction:column;justify-content:center
@@ -311,41 +313,50 @@ main{position:relative;min-height:0;overflow:hidden}
 }
 .info-card.state-alert .info-top{color:#ffb0b0}
 
-/* monthly work-planning calendar */
+/* monthly calendar: one-screen, TimeTree-like layout */
+#calendar{padding:6px 8px;grid-template-rows:minmax(0,1fr) 58px;gap:6px}
+#calendar .content{gap:0;overflow:hidden}
 .calendar-head{
- display:flex;align-items:center;justify-content:space-between;gap:10px
+ height:50px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+ padding:0 4px;border-bottom:1px solid #21303c
 }
-.calendar-title{font-size:22px;font-weight:900}
+.calendar-title{font-size:20px;font-weight:900}
 .calendar-move{
- width:44px;height:40px;border-radius:12px;border:1px solid #2b3d4b;
- background:#10202c;color:#fff;font-size:22px;font-weight:900
+ width:42px;height:38px;border:0;background:transparent;color:#fff;
+ font-size:26px;font-weight:900;border-radius:10px;touch-action:manipulation
 }
 .calendar-weekdays,.calendar-grid{
- display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px
+ display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0
+}
+.calendar-weekdays{
+ height:26px;border-bottom:1px solid #21303c
 }
 .calendar-weekdays div{
- text-align:center;font-size:11px;color:var(--muted);font-weight:800;padding:2px 0
+ text-align:center;font-size:11px;color:var(--muted);font-weight:800;
+ display:flex;align-items:center;justify-content:center
+}
+.calendar-grid{
+ flex:1;min-height:0;grid-template-rows:repeat(6,minmax(0,1fr));
+ border-left:1px solid #21303c;border-top:1px solid #21303c
 }
 .calendar-day{
- min-height:66px;border:1px solid #22313d;border-radius:12px;background:#0c1721;
- padding:6px 5px;overflow:hidden
+ min-height:0;border:0;border-right:1px solid #21303c;border-bottom:1px solid #21303c;
+ border-radius:0;background:transparent;padding:4px 3px;overflow:hidden;
+ touch-action:manipulation
 }
-.calendar-day.out{opacity:.28}
-.calendar-day.today{border-color:#2f86ff}
-.calendar-day .d{font-size:12px;font-weight:900;margin-bottom:5px}
-.calendar-day .marks{display:flex;flex-direction:column;gap:3px}
+.calendar-day.out{opacity:.3}
+.calendar-day.today{box-shadow:inset 0 0 0 2px #2f86ff}
+.calendar-day .d{font-size:12px;font-weight:900;margin-bottom:3px}
+.calendar-day .marks{display:flex;flex-direction:column;gap:2px}
 .calendar-mark{
- font-size:10px;font-weight:800;line-height:1.15;white-space:nowrap;
- overflow:hidden;text-overflow:clip;padding:2px 4px;border-radius:6px;background:#12283a
+ font-size:9px;font-weight:800;line-height:1.15;white-space:nowrap;
+ overflow:hidden;text-overflow:clip;padding:2px 3px;border-radius:3px;background:#12283a
 }
 .calendar-mark.res{background:#2b2410;color:#ffe08b}
 .calendar-mark.event{background:#102d22;color:#a7e2bf}
 .calendar-mark.sports{background:#2d1719;color:#ffb0b0}
-.calendar-summary{
- display:flex;align-items:center;justify-content:space-between;gap:8px
-}
 .calendar-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.calendar-actions .primary{min-height:56px;font-size:18px}
+.calendar-actions .primary{min-height:52px;font-size:17px}
 
 /* reservation work screen: comes from bottom, closes downward */
 .reservation-job-layer{
@@ -902,27 +913,29 @@ html,body{
 <section id="home" class="screen active">
  <div class="content">
   <div class="home-top-grid">
-   <div class="home-weather">
-    <span id="weatherIcon" class="weather-icon" aria-hidden="true">--</span>
-    <div style="min-width:0">
+   <div class="home-weather" onclick="show('weatherDetail')">
+    <div class="home-weather-inner">
      <div class="label">天気</div>
-     <div id="weatherNow" class="weather-text">天気を取得中…</div>
+     <div class="home-weather-main">
+      <div id="weatherNow" class="weather-text">取得中…</div>
+      <span id="weatherIcon" class="weather-icon" aria-hidden="true">--</span>
+     </div>
      <div id="weatherNext" class="sub">現在地から更新</div>
     </div>
    </div>
-   <div class="card reservation-summary" onclick="show('schedule')">
+   <div class="card reservation-summary" onclick="openTodayDutyReservations()">
     <div class="label">次の予約</div>
-    <div id="homeReservationValue" class="value">なし</div>
+    <div id="homeReservationValue" class="value">---</div>
     <div id="homeReservationSub" class="sub">タップして予約を確認</div>
    </div>
   </div>
 
   <div class="home-summary">
-   <div class="card" onclick="openInfo('home')"><div class="label">JR</div><div id="homeJrValue" class="value">取得待ち</div><div id="homeJrSub" class="sub">データ確認中</div></div>
-   <div class="card" onclick="openInfo('home')"><div class="label">バス</div><div id="homeBusValue" class="value">取得待ち</div><div id="homeBusSub" class="sub">データ確認中</div></div>
+   <div class="card" onclick="show('jrDetail')"><div class="label">JR</div><div id="homeJrValue" class="value">取得待ち</div><div id="homeJrSub" class="sub">データ確認中</div></div>
+   <div class="card" onclick="show('busDetail')"><div class="label">バス</div><div id="homeBusValue" class="value">取得待ち</div><div id="homeBusSub" class="sub">データ確認中</div></div>
   </div>
 
-  <div class="card home-events-wide" onclick="openInfo('home')">
+  <div class="card home-events-wide" onclick="show('eventDetail')">
    <div class="label">各種イベント</div>
    <div id="homeEventValue" class="value">取得待ち</div>
    <div id="homeEventSub" class="sub">ライブ・スポーツを確認中</div>
@@ -965,7 +978,7 @@ html,body{
     </div>
     <div class="vacant-summary-row reservation-row" onclick="show('schedule')">
      <span class="k">次の予約</span>
-     <span id="vacantReservationValue" class="v">なし</span>
+     <span id="vacantReservationValue" class="v">---</span>
     </div>
    </div>
    <div class="vacant-quiet-note">必要な情報だけ表示</div>
@@ -1083,6 +1096,46 @@ html,body{
  <div class="action"><button class="primary secondary" onclick="show('schedule')">戻る</button></div>
 </section>
 
+<section id="weatherDetail" class="screen">
+ <div class="content">
+  <div class="card">
+   <div class="label">現在地の天気</div>
+   <div class="home-weather-main"><div id="weatherDetailNow" class="value">取得中…</div><span id="weatherDetailIcon" class="weather-icon">--</span></div>
+   <div id="weatherDetailNext" class="sub" style="margin-top:10px">現在地から更新</div>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('home')">戻る</button></div>
+</section>
+
+<section id="jrDetail" class="screen">
+ <div class="content">
+  <div class="card">
+   <div class="row"><div><div class="label">JR</div><h2 style="margin:3px 0 0">運行状況</h2></div><span id="jrDetailStatus" class="badge">取得待ち</span></div>
+   <div id="jrDetailMiddle" class="value" style="font-size:20px;margin-top:12px">確認中</div>
+   <div id="jrDetailBottom" class="sub" style="margin-top:8px">更新待ち</div>
+   <div id="jrDetailImpact" class="sub" style="margin-top:8px"></div>
+   <div id="jrDetailFacts" class="sub" style="margin-top:6px"></div>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('home')">戻る</button></div>
+</section>
+
+<section id="eventDetail" class="screen">
+ <div class="content">
+  <div class="card">
+   <div class="label">ライブ</div>
+   <div id="eventDetailLive" class="value" style="font-size:20px">確認中</div>
+   <div id="eventDetailLiveSub" class="sub" style="margin-top:7px">—</div>
+  </div>
+  <div class="card">
+   <div class="label">スポーツ</div>
+   <div id="eventDetailSports" class="value" style="font-size:20px">確認中</div>
+   <div id="eventDetailSportsSub" class="sub" style="margin-top:7px">—</div>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('home')">戻る</button></div>
+</section>
+
 <section id="today" class="screen">
  <div class="content today-content">
   <button id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
@@ -1129,27 +1182,18 @@ html,body{
 
 <section id="calendar" class="screen">
  <div class="content">
-  <div class="card">
-   <div class="calendar-head">
-    <button class="calendar-move" type="button" onclick="moveCalendarMonth(-1)">‹</button>
-    <div id="calendarTitle" class="calendar-title">----</div>
-    <button class="calendar-move" type="button" onclick="moveCalendarMonth(1)">›</button>
-   </div>
+  <div class="calendar-head">
+   <button class="calendar-move" type="button" onclick="moveCalendarMonth(-1)">‹</button>
+   <div id="calendarTitle" class="calendar-title">----</div>
+   <button class="calendar-move" type="button" onclick="moveCalendarMonth(1)">›</button>
   </div>
   <div class="calendar-weekdays">
    <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
   </div>
   <div id="calendarGrid" class="calendar-grid"></div>
-  <div class="card calendar-summary">
-   <div>
-    <div class="label">この画面の役割</div>
-    <strong>仕事に出る日を考える</strong>
-   </div>
-   <span class="badge">予定一覧</span>
-  </div>
  </div>
  <div class="action calendar-actions">
-  <button class="primary secondary" onclick="show('schedule')">予約一覧</button>
+  <button class="primary secondary" onclick="openAllReservations()">予約一覧</button>
   <button class="primary" onclick="openReservationEditor()">＋ 予約</button>
  </div>
 </section>
@@ -1197,7 +1241,7 @@ html,body{
   <div class="card"><h2>メニュー</h2>
    <div class="menuitem" onclick="show('home')">⌂ ホーム</div>
    <div class="menuitem" onclick="show('calendar')">□ カレンダー</div>
-   <div class="menuitem" onclick="show('schedule')">▣ 予約一覧</div>
+   <div class="menuitem" onclick="openAllReservations()">▣ 予約一覧</div>
    <div class="menuitem" onclick="show('today')">＋ 本日の営業情報</div>
    <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
@@ -1225,8 +1269,19 @@ function preventIosPinchZoom(){
  });
 }
 preventIosPinchZoom();
+(function preventDoubleTapZoom(){
+ let lastTouchEnd=0;
+ document.addEventListener('touchend',e=>{
+  const t=e.target;
+  if(t && (t.matches?.('input,textarea,select') || t.closest?.('input,textarea,select'))) return;
+  const now=Date.now();
+  if(now-lastTouchEnd<=300) e.preventDefault();
+  lastTouchEnd=now;
+ },{passive:false});
+ document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
+})();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -1253,9 +1308,12 @@ function show(id){
  if(id==='home'||id==='vacant'||id==='ride') startLocation();
  if(id==='verify') renderVerify();
  if(id==='today'||id==='busDetail') loadBusRealtime(id==='busDetail');
- if(id==='today'||id==='home') loadEventSportsRealtime(false);
- if(id==='today'||id==='vacant'||id==='home') loadJrProbeSnapshot(false);
+ if(id==='today'||id==='home'||id==='eventDetail') loadEventSportsRealtime(false);
+ if(id==='today'||id==='vacant'||id==='home'||id==='jrDetail') loadJrProbeSnapshot(false);
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
+ if(id==='weatherDetail') renderWeatherDetail();
+ if(id==='jrDetail') setTimeout(renderJrDetail,0);
+ if(id==='eventDetail') setTimeout(renderEventDetail,0);
  if(id==='calendar') renderCalendar();
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
@@ -1361,8 +1419,23 @@ function nextReservation(){
 function escapeHtml(v){
  return String(v??'').replace(/[&<>"']/g,ch=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[ch]));
 }
+let reservationListMode='all';
+function openTodayDutyReservations(){
+ reservationListMode='today';
+ show('schedule');
+}
+function openAllReservations(){
+ reservationListMode='all';
+ show('schedule');
+}
 function renderReservations(){
- const all=getReservations().sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+ const base=getReservations().sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+ const today=localDateValue();
+ const all=reservationListMode==='today'?base.filter(r=>r.date===today):base;
+ const title=document.getElementById('title');
+ if(document.getElementById('schedule')?.classList.contains('active') && title){
+  title.textContent=reservationListMode==='today'?'今日の乗務予約':'予約一覧';
+ }
  const list=document.getElementById('reservationList');
  const empty=document.getElementById('reservationEmpty');
  if(list){
@@ -1386,16 +1459,21 @@ function renderReservations(){
     '</div></div></div>';
   }).join('');
  }
- if(empty) empty.style.display=all.length?'none':'flex';
+ if(empty){
+  empty.style.display=all.length?'none':'flex';
+  empty.innerHTML=reservationListMode==='today'
+   ?'今日の予約はありません。<br>下のボタンから登録できます。'
+   :'予約はまだありません。<br>下のボタンから登録できます。';
+ }
 
  const n=nextReservation();
  const hv=document.getElementById('homeReservationValue');
  const hs=document.getElementById('homeReservationSub');
- if(hv) hv.textContent=n?(n.timed&&n.time?n.time:'時間なし'):'なし';
+ if(hv) hv.textContent=n?(n.timed&&n.time?n.time:'時間なし'):'---';
  if(hs) hs.textContent=n?n.pickup:'タップして予約を登録';
 
  const vv=document.getElementById('vacantReservationValue');
- if(vv) vv.textContent=n?((n.timed&&n.time?n.time+'　':'')+n.pickup):'なし';
+ if(vv) vv.textContent=n?((n.timed&&n.time?n.time+'　':'')+n.pickup):'---';
 
  const ride=document.getElementById('rideReservationCard');
  const rideSub=document.getElementById('rideReservationSub');
@@ -2643,8 +2721,37 @@ function renderWeatherData(data){
  if(!icon||!nowEl||!nextEl||!data) return;
  const [ic,label]=weatherLabel(data.code);
  icon.textContent=ic;
- nowEl.textContent=Math.round(data.temp)+'℃・'+label;
+ nowEl.textContent=Math.round(data.temp)+'℃';
  nextEl.textContent=data.next||'向こう12時間に目立つ雨予報なし';
+ renderWeatherDetail();
+}
+function renderWeatherDetail(){
+ const d=readWeatherCache();
+ const now=document.getElementById('weatherDetailNow');
+ const ic=document.getElementById('weatherDetailIcon');
+ const next=document.getElementById('weatherDetailNext');
+ if(!now||!ic||!next) return;
+ if(!d){now.textContent='取得中…';ic.textContent='--';next.textContent='現在地から更新';return}
+ const [icon]=weatherLabel(d.code);
+ now.textContent=Math.round(d.temp)+'℃';
+ ic.textContent=icon;
+ next.textContent=d.next||'向こう12時間に目立つ雨予報なし';
+}
+function renderJrDetail(){
+ const map=[['jrInfoStatus','jrDetailStatus'],['jrInfoMiddle','jrDetailMiddle'],['jrInfoBottom','jrDetailBottom'],['jrInfoImpact','jrDetailImpact'],['jrInfoFacts','jrDetailFacts']];
+ map.forEach(([src,dst])=>{const s=document.getElementById(src),d=document.getElementById(dst);if(s&&d)d.textContent=s.textContent||''});
+}
+function renderEventDetail(){
+ const live=document.getElementById('eventDetailLive');
+ const liveSub=document.getElementById('eventDetailLiveSub');
+ const sports=document.getElementById('eventDetailSports');
+ const sportsSub=document.getElementById('eventDetailSportsSub');
+ const lm=document.getElementById('liveInfoMiddle'),lb=document.getElementById('liveInfoBottom');
+ const sm=document.getElementById('sportsInfoMiddle'),sb=document.getElementById('sportsInfoBottom');
+ if(live&&lm) live.textContent=lm.textContent||'—';
+ if(liveSub&&lb) liveSub.textContent=lb.textContent||'—';
+ if(sports&&sm) sports.textContent=sm.textContent||'—';
+ if(sportsSub&&sb) sportsSub.textContent=sb.textContent||'—';
 }
 function readWeatherCache(){
  try{return JSON.parse(localStorage.getItem('taxi_weather_cache')||'null')}catch(e){return null}
@@ -3381,6 +3488,8 @@ async function forceRefreshLiveData(){
   renderBusRealtime();
   renderLiveEvents();
   renderSportsRealtime();
+  renderJrDetail();
+  renderEventDetail();
  }finally{
   if(btn){
    btn.disabled=false;
