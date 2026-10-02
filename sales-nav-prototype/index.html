@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-SETTINGS-BUS-1 -->
+<!-- BUILD:2026-10-03-BUS-SELECTED-UI-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1341,7 +1341,7 @@ preventIosPinchZoom();
  document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 })();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス運行状況',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -2286,6 +2286,41 @@ function formatAgo(ts){
  if(sec<3600) return Math.floor(sec/60)+'分前';
  return Math.floor(sec/3600)+'時間前';
 }
+function selectedBusNotifyPairs(){
+ const cfg=getBusNotifySettings();
+ const out=[];
+ for(const [stop,dests] of Object.entries(cfg.destinations||{})){
+  if(!cfg.stops?.[stop]||!Array.isArray(dests)) continue;
+  for(const dest of dests){
+   if(dest) out.push({stop,destination:dest});
+  }
+ }
+ return out;
+}
+function busLastBusFact(stop,destination){
+ const pools=[
+  ...(Array.isArray(busRealtimeData?.last_buses)?busRealtimeData.last_buses:[]),
+  ...(Array.isArray(busRealtimeData?.stop_last_buses)?busRealtimeData.stop_last_buses:[])
+ ];
+ return pools.find(x=>{
+  const st=x.stop||x.stop_name||'';
+  const ds=x.destination||x.headsign||x.trip_headsign||'';
+  return st===stop&&ds===destination;
+ })||null;
+}
+function busLastBusStatusText(fact){
+ if(!fact) return '時刻表連携待ち';
+ const status=String(fact.status||'').toLowerCase();
+ if(status==='passed'||fact.passed===true) return '終バス通過';
+ const mins=Number(fact.minutes_to_departure);
+ if(Number.isFinite(mins)){
+  if(mins<=0) return '終バスまもなく';
+  if(mins<=15) return '終バスまで約'+Math.max(1,Math.round(mins))+'分';
+  return '終バス '+Math.round(mins)+'分後';
+ }
+ const t=fact.time||fact.departure_time||fact.scheduled_time||'';
+ return t?('終バス '+t):'終バス確認中';
+}
 function renderBusRealtime(){
  const card=document.getElementById('busInfoCard');
  const st=document.getElementById('busInfoStatus');
@@ -2295,60 +2330,61 @@ function renderBusRealtime(){
  const list=document.getElementById('busDetailList');
  const hv=document.getElementById('homeBusValue');
  const hs=document.getElementById('homeBusSub');
- const d=busRealtimeData;
- if(!d){
-  if(st) st.textContent='取得待ち';
-  if(mid) mid.textContent='GTFSリアルタイムを確認中';
-  if(bot) bot.textContent='—';
-  if(upd) upd.textContent='更新待ち';
-  if(hv) hv.textContent='取得待ち';
-  if(hs) hs.textContent='データ確認中';
-  if(list) list.innerHTML='<div class="verify-empty">データ更新を待っています。</div>';
-  return;
- }
- const age=Math.max(0,Math.floor(Date.now()/1000-(d.generated_at||0)));
- const stale=age>900;
- const s=d.summary||{};
- if(card){
-  card.classList.toggle('state-warn',!stale&&((s.alerts||0)>0||(s.delayed_trips||0)>0));
- }
- if(st) st.textContent=stale?'更新待ち':((s.alerts||0)>0?'運行情報あり':((s.delayed_trips||0)>0?'遅れあり':'平常'));
- if(mid){
-  if(stale) mid.textContent='データ更新待ち';
-  else if((s.delayed_trips||0)>0) mid.textContent='遅延 '+s.delayed_trips+'便 / 最大 '+Math.round((s.max_delay_sec||0)/60)+'分';
-  else if((s.alerts||0)>0) mid.textContent='運行情報 '+s.alerts+'件';
-  else mid.textContent='主要6社で目立つ遅延なし';
- }
- if(bot) bot.textContent=stale?formatAgo(d.generated_at):('更新 '+formatAgo(d.generated_at));
- if(upd) upd.textContent=formatAgo(d.generated_at);
- if(hv) hv.textContent=stale?'更新待ち':((s.alerts||0)>0?'運行情報':((s.delayed_trips||0)>0?'遅れあり':'平常'));
- if(hs){
-  if(stale) hs.textContent='データ更新待ち';
-  else if((s.delayed_trips||0)>0) hs.textContent='遅延 '+s.delayed_trips+'便・最大'+Math.round((s.max_delay_sec||0)/60)+'分';
-  else if((s.alerts||0)>0) hs.textContent='運行情報 '+s.alerts+'件';
-  else hs.textContent='目立つ遅延なし';
- }
- if(list){
-  const ops=Array.isArray(d.operators)?d.operators:[];
-  list.innerHTML=ops.map(op=>{
-   const delayed=Number(op.delayed_trips||0);
-   const alerts=Number(op.alert_count||0);
-   const maxMin=Math.round(Number(op.max_delay_sec||0)/60);
-   const route=(op.route_delays&&op.route_delays[0])?op.route_delays[0]:null;
-   const alert=(op.alerts&&op.alerts[0])?op.alerts[0]:null;
-   let detail='目立つ遅延なし';
-   if(delayed>0) detail='遅延 '+delayed+'便'+(maxMin?' / 最大 '+maxMin+'分':'');
-   if(alerts>0) detail=(detail==='目立つ遅延なし'?'':detail+' / ')+'運行情報 '+alerts+'件';
-   let extra='';
-   if(route) extra='<div class="sub" style="margin-top:5px">'+escapeHtml(route.route)+'　約'+Math.round(route.delay_sec/60)+'分</div>';
-   if(alert&&alert.title) extra+='<div class="sub" style="margin-top:5px">'+escapeHtml(alert.title)+'</div>';
-   return '<div class="verify-card"><div class="verify-head"><strong>'+escapeHtml(op.name)+'</strong><span class="badge">'+Number(op.vehicle_count||0)+'台</span></div><div>'+detail+'</div>'+extra+'</div>';
-  }).join('')||'<div class="verify-empty">データなし</div>';
- }
- // 会社単位の一括通知はタクシー営業判断に使いにくいため停止。
- // 新しい終バス通知は、設定した「バス停 × 行き先」だけを対象にする。
-}
 
+ const pairs=selectedBusNotifyPairs();
+ const count=pairs.length;
+ const d=busRealtimeData;
+ const generated=d?.generated_at||0;
+ const facts=pairs.map(p=>({...p,fact:busLastBusFact(p.stop,p.destination)}));
+ const urgent=facts.find(x=>{
+  if(!x.fact) return false;
+  if(String(x.fact.status||'').toLowerCase()==='passed'||x.fact.passed===true) return true;
+  const m=Number(x.fact.minutes_to_departure);
+  return Number.isFinite(m)&&m<=15;
+ });
+
+ if(card) card.classList.toggle('state-warn',!!urgent);
+
+ if(hv) hv.textContent=count?count+'件設定':'未設定';
+ if(hs){
+  if(!count) hs.textContent='設定からバス停・行き先を選択';
+  else if(urgent) hs.textContent=busLastBusStatusText(urgent.fact)+' / '+urgent.stop;
+  else hs.textContent='終バス15分前・通過を通知';
+ }
+
+ if(st) st.textContent=count?'終バス':'未設定';
+ if(mid){
+  if(!count) mid.textContent='バス停・行き先を選択';
+  else if(urgent) mid.textContent=urgent.stop+' / '+urgent.destination;
+  else mid.textContent=count+'件を通知対象に設定';
+ }
+ if(bot){
+  if(!count) bot.textContent='設定画面から選択';
+  else if(urgent) bot.textContent=busLastBusStatusText(urgent.fact);
+  else bot.textContent='15分前・通過時のみ通知';
+ }
+ if(upd) upd.textContent=generated?formatAgo(generated):'設定済み';
+
+ if(list){
+  if(!count){
+   list.innerHTML='<div class="verify-empty" onclick="show(\'settings\')" style="cursor:pointer">設定画面で<br><strong style="color:#fff">バス停と行き先を選んでください</strong><br><span style="display:inline-block;margin-top:8px;color:#8ec0ff">設定を開く ›</span></div>';
+  }else{
+   const grouped={};
+   for(const row of facts){
+    (grouped[row.stop]||(grouped[row.stop]=[])).push(row);
+   }
+   list.innerHTML=Object.entries(grouped).map(([stop,rows])=>
+    '<div class="verify-card">'+
+     '<div class="verify-head"><strong>'+escapeHtml(stop)+'</strong><span class="badge">'+rows.length+'件</span></div>'+
+     rows.map(row=>{
+      const status=busLastBusStatusText(row.fact);
+      return '<div class="verify-row"><span>'+escapeHtml(row.destination)+'</span><strong>'+escapeHtml(status)+'</strong></div>';
+     }).join('')+
+    '</div>'
+   ).join('');
+  }
+ }
+}
 async function loadBusRealtime(force=false){
  const now=Date.now();
  if(!force&&busRealtimeFetchedAt&&now-busRealtimeFetchedAt<30000) return;
