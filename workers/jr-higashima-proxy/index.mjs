@@ -320,23 +320,44 @@ async function summarizeBusOperator(id, name, ctx) {
   const vehicles=GtfsRealtimeBindings.transit_realtime.FeedMessage.decode(vehicleBytes);
 
   let delayedTrips=0, maxDelaySec=0;
+  const liveTripUpdates=[];
   for(const ent of (trips.entity||[])){
     const tu=ent.tripUpdate;
     if(!tu) continue;
     const delays=[];
     if(tu.delay!=null) delays.push(pbNum(tu.delay));
     const times=[];
+    const stopUpdates=[];
     for(const stu of (tu.stopTimeUpdate||[])){
       if(stu.arrival?.delay!=null) delays.push(pbNum(stu.arrival.delay));
       if(stu.departure?.delay!=null) delays.push(pbNum(stu.departure.delay));
-      const et=pbNum(stu.departure?.time)||pbNum(stu.arrival?.time);
+      const arrivalTime=pbNum(stu.arrival?.time)||0;
+      const departureTime=pbNum(stu.departure?.time)||0;
+      const et=departureTime||arrivalTime;
       if(et) times.push(et);
+      stopUpdates.push({
+        stop_id:String(stu.stopId||""),
+        stop_sequence:pbNum(stu.stopSequence)||null,
+        arrival_time:arrivalTime||null,
+        departure_time:departureTime||null,
+        arrival_delay:stu.arrival?.delay!=null?pbNum(stu.arrival.delay):null,
+        departure_delay:stu.departure?.delay!=null?pbNum(stu.departure.delay):null,
+      });
     }
-    const active=times.some(t=>t>=now-900&&t<=now+7200);
+    const active=times.some(t=>t>=now-7200&&t<=now+21600);
     const d=Math.max(0,...delays.filter(x=>x>0));
     if(active&&d>=180){
       delayedTrips++;
       maxDelaySec=Math.max(maxDelaySec,d);
+    }
+    if(active){
+      liveTripUpdates.push({
+        trip_id:String(tu.trip?.tripId||""),
+        route_id:String(tu.trip?.routeId||""),
+        start_date:String(tu.trip?.startDate||""),
+        delay_sec:d,
+        stop_updates:stopUpdates,
+      });
     }
   }
 
@@ -363,6 +384,7 @@ async function summarizeBusOperator(id, name, ctx) {
     max_delay_sec:maxDelaySec,
     route_delays:[],
     vehicle_count:vehicleCount,
+    trip_updates:liveTripUpdates.slice(0,300),
     stop_updates:[],
     vehicle_positions:[],
   };
