@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-BUS-DESELECT-FIX-1 -->
+<!-- BUILD:2026-10-03-BUS-TERMINAL-ONLY-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1285,7 +1285,7 @@ html,body{
    </div>
    <div class="settings-subhead" style="margin-top:11px">バス停</div>
    <div id="busStopSettingsList" class="settings-list"></div>
-   <div class="settings-subhead" style="margin-top:12px">選択中バス停の行き先</div>
+   <div class="settings-subhead" style="margin-top:12px">選択中バス停から行ける終点</div>
    <div id="busDestinationSettings"></div>
   </div>
 
@@ -1552,7 +1552,11 @@ function renderNotificationSettings(){
  const candidates=destinationCandidatesForStop(stop);
  const selected=Array.isArray(cfg.destinations[stop])?cfg.destinations[stop]:[];
  const candidateHtml=candidates.length
-  ? '<div class="settings-list">'+candidates.map(d=>'<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>').join('')+'</div>'
+  ? '<div class="settings-list">'+candidates.map(d=>{
+      const row=busCatalogDestinationRow(stop,d);
+      const t=row?.last_bus?.scheduled_time?String(row.last_bus.scheduled_time).slice(0,5):'';
+      return '<button type="button" class="setting-choice '+(selected.includes(d)?'on':'')+'" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')"><div><strong>'+escapeHtml(d)+'</strong><small>'+(t?('本日の終バス '+escapeHtml(t)):'終点')+'</small></div><span class="check">'+(selected.includes(d)?'✓':'')+'</span></button>';
+    }).join('')+'</div>'
   : '<div class="settings-note" style="margin-top:7px">'+(busDestinationCatalogLoaded?'このバス停の行き先データを確認できません。':'行き先データを取得中…')+'</div>';
  const chips=selected.length?'<div class="settings-chiprow">'+selected.map(d=>'<button class="settings-chip" type="button" onclick="toggleBusDestination(\''+escapeHtml(stop).replace(/'/g,"\\'")+'\',\''+escapeHtml(d).replace(/'/g,"\\'")+'\')">'+escapeHtml(d)+' ×</button>').join('')+'</div>':'';
  box.innerHTML='<div class="settings-note" style="margin-top:7px"><strong style="color:#fff">'+escapeHtml(stop)+'</strong></div>'+
