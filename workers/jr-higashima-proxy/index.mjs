@@ -689,6 +689,36 @@ async function makeOfficialVenueEvent({name,title,venue,start_time,open_time,ven
     source_url:venueUrl
   };
 }
+
+async function buildHbgHallEvents(t,ctx){
+  const slug=encodeURIComponent(t.year+"年"+t.month+"月");
+  const url="https://h-bkk.jp/hall_schedule/"+slug+"/";
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const d=String(t.day);
+  const startRe=new RegExp("(?:^|\\\\s)0?"+d+"\\\\s*\\\\((?:日|月|火|水|木|金|土)\\\\)","i");
+  const nextRe=/(?:^|\s)0?[1-3]?\d\s*\((?:日|月|火|水|木|金|土)\)/;
+  const seg=daySegmentByRegex(text,startRe,nextRe);
+  if(!seg||!looksLikeMusicEvent(seg)) return [];
+  const tm=seg.match(/開場\s*([0-2][0-9]:[0-5][0-9])\s*開演\s*([0-2][0-9]:[0-5][0-9])/)
+    || seg.match(/開場\s*([0-2][0-9]:[0-5][0-9])[\s\S]{0,30}?開演\s*([0-2][0-9]:[0-5][0-9])/);
+  const openTime=tm?.[1]||null,startTime=tm?.[2]||extractStartTime(seg);
+  let name=(tm?seg.slice(tm.index+tm[0].length):seg).split(/売切れ|SOLD OUT|全席|自由席|指定席|夢番地|キャンディープロモーション|TEL/i)[0].trim();
+  if(!name){
+    name=seg.replace(/開場[\s\S]*?開演\s*[0-2][0-9]:[0-5][0-9]/,"").trim();
+  }
+  name=name.replace(/\s+/g," ").trim();
+  if(name.length>120) name=name.slice(0,120).trim();
+  if(!name) return [];
+  const event=await makeOfficialVenueEvent({
+    name,title:name,venue:"広島文化学園HBGホール",
+    start_time:startTime,open_time:openTime,
+    venueText:seg,venueUrl:url,t,ctx
+  });
+  return event?[event]:[];
+}
+
 async function buildBlueLiveEvents(t,ctx){
   const url="https://bluelive.jp/schedule";
   let html="";
@@ -734,6 +764,7 @@ async function buildVanquishEvents(t,ctx){
 }
 async function buildDirectVenueLiveEvents(t,ctx){
   const groups=await Promise.all([
+    buildHbgHallEvents(t,ctx),
     buildBlueLiveEvents(t,ctx),
     buildVanquishEvents(t,ctx)
   ]);
