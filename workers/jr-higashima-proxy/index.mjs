@@ -253,17 +253,23 @@ function median(xs){
   const i=Math.floor(a.length/2);
   return a.length%2?a[i]:(a[i-1]+a[i])/2;
 }
-function fallbackLiveEndGuide(start_time, venue=""){
+function fallbackLiveEndGuide(start_time, venue="", title="", artist=""){
   const start=hhmmToMinutes(start_time);
   if(start==null) return {time:null,range_start:null,range_end:null,basis:null};
-  const v=String(venue||"");
-  let minutes=120, margin=30, basis="ライブ公演の一般参考幅";
-  if(/グリーンアリーナ|アリーナ|ドーム|スタジアム/i.test(v)){
+  const text=[venue,title,artist].filter(Boolean).join(" ");
+  let minutes=120, margin=35, basis="ライブ公演の一般参考幅";
+  if(/弾き語り|アコースティック|acoustic/i.test(text)){
+    minutes=100; margin=25; basis="弾き語り・アコースティック公演の参考幅";
+  }else if(/FAN.?CLUB|ファンミ|生誕祭|トーク|ソロイベント/i.test(text)){
+    minutes=90; margin=30; basis="ファンイベント・短時間公演の参考幅";
+  }else if(/FES|FEST|フェス|SUPER ROCK CITY|対バン|w\/|with |GUEST|ゲスト/i.test(text)){
+    minutes=180; margin=60; basis="複数出演・イベント公演の参考幅";
+  }else if(/グリーンアリーナ|アリーナ|ドーム|スタジアム/i.test(text)){
     minutes=150; margin=45; basis="アリーナ公演の参考幅";
-  }else if(/HBG|ホール|アステール|文化会館|県民文化センター/i.test(v)){
+  }else if(/HBG|ホール|アステール|文化会館|県民文化センター/i.test(text)){
     minutes=130; margin=30; basis="ホール公演の参考幅";
-  }else if(/QUATTRO|クアトロ|VANQUISH|BLUE LIVE|SECOND|セカンド|Live|ライブ/i.test(v)){
-    minutes=120; margin=30; basis="ライブハウス公演の参考幅";
+  }else if(/QUATTRO|クアトロ|VANQUISH|BLUE LIVE|SECOND|セカンド|Cave-Be|4\.14|SIX ONE|Yise|Live House|ライブ/i.test(text)){
+    minutes=115; margin=30; basis="ライブハウス公演の参考幅";
   }
   return {
     time:minutesToHHMM(start+minutes),
@@ -272,7 +278,7 @@ function fallbackLiveEndGuide(start_time, venue=""){
     basis
   };
 }
-function estimateLiveEndTime({start_time,evidence=[],venue=""}={}){
+function estimateLiveEndTime({start_time,evidence=[],venue="",title="",artist=""}={}){
   const start=hhmmToMinutes(start_time);
   const channels=LIVE_END_CHANNELS.map(([id,label,weight])=>({
     id,label,weight,
@@ -311,7 +317,7 @@ function estimateLiveEndTime({start_time,evidence=[],venue=""}={}){
   }
 
   if(!usable.length){
-    const ref=fallbackLiveEndGuide(start_time,venue);
+    const ref=fallbackLiveEndGuide(start_time,venue,title,artist);
     return {
       end_time_estimate:null,
       end_time_reference:ref.time,
@@ -352,7 +358,7 @@ function estimateLiveEndTime({start_time,evidence=[],venue=""}={}){
   // 直接情報なしで1件だけの推定は表示しない。
   const publishable=directs.length>=1 || pool.length>=2;
 
-  const ref=publishable?{time:null,range_start:null,range_end:null,basis:null}:fallbackLiveEndGuide(start_time,venue);
+  const ref=publishable?{time:null,range_start:null,range_end:null,basis:null}:fallbackLiveEndGuide(start_time,venue,title,artist);
   return {
     end_time_estimate:publishable?minutesToHHMM(rounded):null,
     end_time_reference:publishable?null:ref.time,
@@ -368,25 +374,27 @@ function estimateLiveEndTime({start_time,evidence=[],venue=""}={}){
 }
 
 const LIVE_END_VALIDATION_CASES = [
-  {artist:"ONE OK ROCK",start_time:"21:15",duration_minutes:110,channel:"same_tour_recent",context:"通常ツアー"},
-  {artist:"Official HIGE DANdism",start_time:"19:05",duration_minutes:125,channel:"same_tour_recent",context:"通常ツアー"},
-  {artist:"Ado",start_time:"18:00",duration_minutes:158,channel:"same_tour_recent",context:"スタジアム"},
-  {artist:"Kodaline",start_time:"19:30",duration_minutes:90,channel:"artist_history",context:"単独公演"},
-  {artist:"The Warning",start_time:"14:10",duration_minutes:40,channel:"artist_history",context:"フェス"},
-  {artist:"Beyoncé",start_time:"20:35",duration_minutes:170,channel:"same_tour_recent",context:"スタジアム"},
-  {artist:"Rina Katahira",start_time:"20:00",duration_minutes:80,channel:"artist_history",context:"ライブハウス"},
-  {artist:"Kendrick Lamar & SZA",start_time:"20:10",duration_minutes:160,channel:"same_tour_recent",context:"スタジアム"},
-  {artist:"L",start_time:"18:00",duration_minutes:130,channel:"artist_history",context:"ホール"},
-  {artist:"betcover!!",start_time:"18:10",duration_minutes:95,channel:"artist_history",context:"ライブハウス"},
+  {artist:"おいしくるメロンパン",title:"avenue tour - sleepwalk -",start_time:"17:00",venue:"広島クラブクアトロ"},
+  {artist:"milet",title:"LIVE",start_time:"17:00",venue:"広島文化学園HBGホール"},
+  {artist:"3markets[ ]",title:"LIVE",start_time:"18:00",venue:"広島 SIX ONE Live STAR"},
+  {artist:"Suspended 4th",title:"LIVE",start_time:"19:00",venue:"広島セカンド・クラッチ"},
+  {artist:"堂島孝平",title:"LIVE",start_time:"14:30",venue:"Live House YAOYOROZ"},
+  {artist:"yosugala",title:"LIVE",start_time:"15:00",venue:"広島 LIVE VANQUISH"},
+  {artist:"eastern youth",title:"LIVE",start_time:"17:00",venue:"広島セカンド・クラッチ"},
+  {artist:"絢香",title:"LIVE",start_time:"17:00",venue:"呉信用金庫ホール"},
+  {artist:"Sunny Girl",title:"遠くの街で磨く",start_time:"17:30",venue:"広島4.14"},
+  {artist:"小山田壮平",title:"弾き語りツアー2026",start_time:"18:00",venue:"広島クラブクアトロ"},
 ];
 function validateHistoricalDurationCases(){
   return LIVE_END_VALIDATION_CASES.map(c=>{
-    const start=hhmmToMinutes(c.start_time);
-    const ref=start==null?null:minutesToHHMM(start+c.duration_minutes);
+    const r=fallbackLiveEndGuide(c.start_time,c.venue,c.title,c.artist);
     return {
-      artist:c.artist,context:c.context,start_time:c.start_time,
-      reference_end_time:ref,duration_minutes:c.duration_minutes,
-      display:ref?("終演参考 "+ref+"頃"):"参考時間なし",
+      artist:c.artist,title:c.title,venue:c.venue,start_time:c.start_time,
+      reference_end_time:r.time,
+      range_start:r.range_start,
+      range_end:r.range_end,
+      basis:r.basis,
+      display:r.time?("終演参考 "+r.time+"頃"):"参考時間なし",
       confidence:"reference"
     };
   });
@@ -530,7 +538,13 @@ async function buildHiroshimaEvents(ctx) {
         t,
         ctx
       });
-      const estimate=estimateLiveEndTime({start_time:startTime,evidence,venue:"広島クラブクアトロ"});
+      const estimate=estimateLiveEndTime({
+        start_time:startTime,
+        evidence,
+        venue:"広島クラブクアトロ",
+        title:name,
+        artist:name
+      });
       events.push({
         kind:"live",
         name,
