@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-04-GPS-DIAGNOSTICS-2 -->
+<!-- BUILD:2026-10-04-GPS-150-LIGHT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -3263,16 +3263,27 @@ let safetyZoneActive=false;
 const gsiRoadTileCache=new Map();
 let roadStructureEvalSeq=0;
 window.__roadDecision={state:'未判定'};
-const GPS_LOG_MAX_SAMPLES=3500;
+const GPS_LOG_MAX_SAMPLES=1800;
 const GPS_GAP_EVENT_THRESHOLD_SEC=20;
 const GPS_INTERRUPTION_KEY='taxi_gps_interruption_log_v2';
 const GPS_STATE_EVENT_KEY='taxi_gps_state_event_log_v2';
 const GPS_ROAD_EVENT_KEY='taxi_gps_road_event_log_v1';
 const GPS_PERF_EVENT_KEY='taxi_gps_perf_event_log_v1';
+const GPS_DB_NAME='taxi-sales-nav-gps-v1';
+const GPS_DB_VERSION=1;
+const GPS_TILE_CACHE_MAX=36;
 let lastLocationErrorState=null;
-let lastMatchedRoadKey=null;
-let lastRoadSwitchAt=0;
 let recentMotionPoints=[];
+let gpsQualityMemory=null;
+let gpsSnapshotDirty=0;
+let gpsAnalysisQueue=[];
+let gpsAnalysisBusy=false;
+let gpsDbPromise=null;
+let gpsDbWriteQueue=[];
+let gpsDbFlushTimer=null;
+let matchedRoadState={key:null,match:null,confidence:'none',pendingKey:null,pendingCount:0,lastSwitchAt:0};
+let matchedRoadHistory=[];
+let safetyMatchState={key:null,pendingOn:0,pendingOff:0,active:false};
 
 async function loadJarticSpeedData(){
  try{
@@ -3384,7 +3395,17 @@ function nearestRoadDirection(f,lon,lat){
 }
 function roadKey(f){
  const p=(f&&f.properties)||{};
- return String(f&&f.id||p.id||p.fid||p.linkId||p.rdID||p.name||p.rdNm||'unknown');
+ const direct=f&&f.id||p.id||p.fid||p.linkId||p.rdID;
+ if(direct!==undefined&&direct!==null&&String(direct)!=='') return String(direct);
+ const named=p.name||p.rdNm||p.roadName||p.道路名;
+ if(named) return 'name:'+String(named);
+ const lines=roadFeatureLines(f);
+ const pts=lines&&lines[0];
+ if(pts&&pts.length){
+  const a=pts[0],b=pts[pts.length-1];
+  return 'geom:'+Number(a[0]).toFixed(5)+','+Number(a[1]).toFixed(5)+'>'+Number(b[0]).toFixed(5)+','+Number(b[1]).toFixed(5);
+ }
+ return 'unknown:'+JSON.stringify(p).slice(0,80);
 }
 function pushCappedLog(key,item,max=800){
  try{
@@ -3395,6 +3416,131 @@ function pushCappedLog(key,item,max=800){
 }
 function getCappedLog(key){
  try{return JSON.parse(localStorage.getItem(key)||'[]')}catch(e){return[]}
+}
+function openGpsDb(){
+ if(gpsDbPromise) return gpsDbPromise;
+ if(!('indexedDB' in window)) return Promise.resolve(null);
+ gpsDbPromise=new Promise(resolve=>{
+  try{
+   const req=indexedDB.open(GPS_DB_NAME,GPS_DB_VERSION);
+   req.onupgradeneeded=()=>{
+    const db=req.result;
+    if(!db.objectStoreNames.contains('raw')) db.createObjectStore('raw',{keyPath:'id'});
+    if(!db.objectStoreNames.contains('analysis')) db.createObjectStore('analysis',{keyPath:'id'});
+   };
+   req.onsuccess=()=>resolve(req.result);
+   req.onerror=()=>resolve(null);
+  }catch(e){resolve(null)}
+ });
+ return gpsDbPromise;
+}
+function queueGpsDbWrite(store,value){
+ if(!value||!value.id) return;
+ gpsDbWriteQueue.push({store,value});
+ if(gpsDbWriteQueue.length>=20) flushGpsDbWrites();
+ else if(!gpsDbFlushTimer) gpsDbFlushTimer=setTimeout(flushGpsDbWrites,1200);
+}
+async function flushGpsDbWrites(){
+ if(gpsDbFlushTimer){clearTimeout(gpsDbFlushTimer);gpsDbFlushTimer=null}
+ const batch=gpsDbWriteQueue.splice(0,80);
+ if(!batch.length) return;
+ const db=await openGpsDb();
+ if(!db) return;
+ try{
+  const stores=[...new Set(batch.map(x=>x.store))];
+  const tx=db.transaction(stores,'readwrite');
+  for(const x of batch) tx.objectStore(x.store).put(x.value);
+ }catch(e){}
+ if(gpsDbWriteQueue.length) gpsDbFlushTimer=setTimeout(flushGpsDbWrites,100);
+}
+async function clearGpsDb(){
+ const db=await openGpsDb();
+ if(!db) return;
+ try{
+  const tx=db.transaction(['raw','analysis'],'readwrite');
+  tx.objectStore('raw').clear();
+  tx.objectStore('analysis').clear();
+ }catch(e){}
+}
+async function readGpsDbStore(store){
+ const db=await openGpsDb();
+ if(!db) return [];
+ return await new Promise(resolve=>{
+  try{
+   const tx=db.transaction(store,'readonly');
+   const req=tx.objectStore(store).getAll();
+   req.onsuccess=()=>resolve(Array.isArray(req.result)?req.result:[]);
+   req.onerror=()=>resolve([]);
+  }catch(e){resolve([])}
+ });
+}
+function axisBearingDiff(a,b){
+ const d=bearingDiff(a,b);
+ if(d===null) return null;
+ return Math.min(d,Math.abs(180-d));
+}
+function scoreRoadCandidate(candidate,{accuracyM,speedKmh,posHeading,motionHeading,currentKey}){
+ const d=candidate.point.distanceM;
+ const roadBearing=nearestRoadDirection(candidate.f,candidate.point.rawLon,candidate.point.rawLat);
+ const headingRef=Number(speedKmh)>=7?(motionHeading??posHeading):motionHeading;
+ const hd=axisBearingDiff(roadBearing,headingRef);
+ const distanceScore=Math.max(0,60-Math.min(60,d*2.4));
+ const headingScore=hd===null?8:Math.max(0,22-(hd/90)*22);
+ const continuityScore=currentKey&&roadKey(candidate.f)===currentKey?22:0;
+ const accuracyPenalty=Math.max(0,Math.min(15,(Number(accuracyM)||0)-10))*0.7;
+ const score=Math.round((distanceScore+headingScore+continuityScore-accuracyPenalty)*10)/10;
+ return {score,roadBearing,headingDiff:hd};
+}
+function confidenceForCandidates(candidates,accuracyM){
+ if(!candidates.length) return 'none';
+ const a=candidates[0],b=candidates[1];
+ const margin=b?a.score-b.score:a.score;
+ if(a.point.distanceM>Math.max(18,Number(accuracyM)+6)) return 'low';
+ if(a.score>=72&&margin>=10&&accuracyM<=18) return 'high';
+ if(a.score>=54&&margin>=4&&accuracyM<=28) return 'medium';
+ return 'low';
+}
+function chooseMatchedRoad(scored,accuracyM,speedKmh,ambiguous){
+ const top=scored[0]||null;
+ if(!top) return {accepted:null,confidence:'none',reason:'no_candidate'};
+ const confidence=confidenceForCandidates(scored,accuracyM);
+ const current=matchedRoadState.key;
+ const topKey=roadKey(top.f);
+ const currentCandidate=current?scored.find(x=>roadKey(x.f)===current):null;
+ if(!current){
+  if(confidence==='low') return {accepted:null,confidence,reason:'initial_low_confidence'};
+  matchedRoadState={key:topKey,match:top,confidence,pendingKey:null,pendingCount:0,lastSwitchAt:Date.now()};
+  return {accepted:top,confidence,reason:'initial_acquire'};
+ }
+ if(topKey===current){
+  matchedRoadState.match=top;
+  matchedRoadState.confidence=confidence;
+  matchedRoadState.pendingKey=null;
+  matchedRoadState.pendingCount=0;
+  return {accepted:top,confidence,reason:'continued'};
+ }
+ const holdCurrent=!!currentCandidate&&(ambiguous||confidence==='low'||Number(speedKmh)<5);
+ if(holdCurrent){
+  matchedRoadState.match=currentCandidate;
+  matchedRoadState.confidence=confidence==='low'?'low':'medium';
+  matchedRoadState.pendingKey=null;
+  matchedRoadState.pendingCount=0;
+  return {accepted:currentCandidate,confidence:matchedRoadState.confidence,reason:'hysteresis_hold'};
+ }
+ if(matchedRoadState.pendingKey===topKey) matchedRoadState.pendingCount++;
+ else {matchedRoadState.pendingKey=topKey;matchedRoadState.pendingCount=1}
+ const need=ambiguous||Number(speedKmh)<8?3:2;
+ if(matchedRoadState.pendingCount<need&&currentCandidate){
+  return {accepted:currentCandidate,confidence:'medium',reason:'switch_pending'};
+ }
+ const old=current;
+ matchedRoadState={key:topKey,match:top,confidence,pendingKey:null,pendingCount:0,lastSwitchAt:Date.now()};
+ pushCappedLog(GPS_ROAD_EVENT_KEY,{
+  id:'switch_'+Date.now()+'_'+Math.random().toString(36).slice(2,6),
+  t:Date.now(),iso:new Date().toISOString(),type:'road_switch_confirmed',
+  from:old,to:topKey,confidence,confirmations:need
+ },800);
+ return {accepted:top,confidence,reason:'switch_confirmed'};
 }
 function motionBearingFromRecent(){
  if(recentMotionPoints.length<2) return null;
@@ -3436,12 +3582,21 @@ function lonLatToTile(lon,lat,z=16){
 }
 async function fetchGsiRoadTile(z,x,y){
  const key=z+'/'+x+'/'+y;
- if(gsiRoadTileCache.has(key)) return gsiRoadTileCache.get(key);
+ if(gsiRoadTileCache.has(key)){
+  const v=gsiRoadTileCache.get(key);
+  gsiRoadTileCache.delete(key);
+  gsiRoadTileCache.set(key,v);
+  return v;
+ }
  const p=fetch('https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/'+key+'.geojson',{cache:'force-cache'})
   .then(r=>r.ok?r.json():null)
   .then(d=>d&&Array.isArray(d.features)?d.features:[])
   .catch(()=>[]);
  gsiRoadTileCache.set(key,p);
+ while(gsiRoadTileCache.size>GPS_TILE_CACHE_MAX){
+  const oldest=gsiRoadTileCache.keys().next().value;
+  gsiRoadTileCache.delete(oldest);
+ }
  return p;
 }
 async function loadNearbyGsiRoads(lon,lat){
@@ -3702,10 +3857,18 @@ function updateDutyDistance(pos){
  renderDutyDistance();
 }
 function getGpsQualityLog(){
- try{return JSON.parse(localStorage.getItem('taxi_gps_quality_log')||'[]')}catch(e){return[]}
+ if(gpsQualityMemory) return gpsQualityMemory;
+ try{gpsQualityMemory=JSON.parse(localStorage.getItem('taxi_gps_quality_log')||'[]')}catch(e){gpsQualityMemory=[]}
+ if(!Array.isArray(gpsQualityMemory)) gpsQualityMemory=[];
+ return gpsQualityMemory;
 }
-function saveGpsQualityLog(log){
- localStorage.setItem('taxi_gps_quality_log',JSON.stringify(log.slice(-GPS_LOG_MAX_SAMPLES)));
+function saveGpsQualityLog(log,force=false){
+ gpsQualityMemory=Array.isArray(log)?log.slice(-GPS_LOG_MAX_SAMPLES):[];
+ gpsSnapshotDirty++;
+ if(force||gpsSnapshotDirty>=6){
+  gpsSnapshotDirty=0;
+  try{localStorage.setItem('taxi_gps_quality_log',JSON.stringify(gpsQualityMemory))}catch(e){}
+ }
 }
 function getGpsInterruptionLog(){
  try{return JSON.parse(localStorage.getItem(GPS_INTERRUPTION_KEY)||'[]')}catch(e){return[]}
@@ -3786,6 +3949,7 @@ function recordGpsQuality(pos){
  recentMotionPoints=recentMotionPoints.filter(x=>measuredAt-x.t<=12000).slice(-12);
  log.push(rec);
  saveGpsQualityLog(log);
+ queueGpsDbWrite('raw',{...rec,roadSnap:undefined,speedEvidence:undefined,roadDecision:undefined,diagnostics:undefined,processing:undefined});
 
  if(prev&&gap>=GPS_GAP_EVENT_THRESHOLD_SEC){
   const interruptions=getGpsInterruptionLog();
@@ -3814,6 +3978,7 @@ function updateGpsSample(id,patch){
  if(idx<0) return;
  log[idx]={...log[idx],...patch};
  saveGpsQualityLog(log);
+ queueGpsDbWrite('analysis',{id,t:log[idx].t,measuredAt:log[idx].measuredAt,...patch});
 }
 function nearestPointOnGsiRoadFeature(f,lon,lat){
  return closestPointOnLineSet(roadFeatureLines(f),lon,lat);
@@ -3822,121 +3987,224 @@ function nearestPointOnSpeedFeature(f,lon,lat){
  const pts=Array.isArray(f&&f.coords)?f.coords:[];
  return closestPointOnLineSet(pts.length?[pts]:[],lon,lat);
 }
-async function enrichGpsSampleWithRoadSnap(pos,sampleId,safetyResult={}){
- if(!sampleId) return;
+function nearestSpeedEvidenceForMatch(match){
+ if(!match||!match.snapped||!jarticSpeedData||!Array.isArray(jarticSpeedData.features)) return null;
+ const lon=match.snapped.lon,lat=match.snapped.lat;
+ let best=null;
+ for(const f of jarticSpeedData.features){
+  const p=nearestPointOnSpeedFeature(f,lon,lat);
+  const speed=Number(f.speed);
+  if(!p||!Number.isFinite(speed)||p.distanceM>16) continue;
+  let hd=null;
+  if(Array.isArray(f.coords)&&f.coords.length>=2){
+   let segBest=null;
+   for(let i=1;i<f.coords.length;i++){
+    const cp=closestPointOnSegment(lon,lat,f.coords[i-1],f.coords[i]);
+    if(!segBest||cp.distanceM<segBest.distanceM) segBest={...cp,bearing:bearingBetween(f.coords[i-1][1],f.coords[i-1][0],f.coords[i][1],f.coords[i][0])};
+   }
+   hd=segBest?axisBearingDiff(match.roadBearing,segBest.bearing):null;
+  }
+  const rank=p.distanceM+(hd===null?0:hd*0.08);
+  if(!best||rank<best.rank) best={f,p,speed,rank,headingDiff:hd};
+ }
+ if(!best) return null;
+ return {
+  source:'JARTIC',
+  snapped:{lat:best.p.lat,lon:best.p.lon},
+  distanceM:Math.round(best.p.distanceM*10)/10,
+  headingDiff:best.headingDiff===null?null:Math.round(best.headingDiff),
+  speed:best.speed,
+  zone30:!!best.f.zone30,
+  code:best.f.code||null,
+  accepted:best.p.distanceM<=14&&(best.headingDiff===null||best.headingDiff<=45)
+ };
+}
+function applyMatchedSafety(pos,match,speedEvidence,confidence){
+ if(currentScreenId()!=='ride'){
+  safetyMatchState={key:null,pendingOn:0,pendingOff:0,active:false};
+  safetyZoneActive=false;
+  setSpeedLimitUI(null);
+  return {warningTriggered:false,state:'inactive'};
+ }
+ const eligible=match&&confidence!=='low'&&speedEvidence&&speedEvidence.accepted;
+ const shouldWarn=!!(eligible&&(speedEvidence.speed===30||speedEvidence.zone30));
+ if(shouldWarn){
+  const key=(speedEvidence.code||'speed30')+'|'+match.roadKey;
+  if(safetyMatchState.key===key) safetyMatchState.pendingOn++;
+  else {safetyMatchState.key=key;safetyMatchState.pendingOn=1}
+  safetyMatchState.pendingOff=0;
+  if(!safetyMatchState.active&&safetyMatchState.pendingOn>=3){
+   safetyMatchState.active=true;
+   safetyZoneActive=true;
+   setSpeedLimitUI(30);
+   showSafety(5200);
+   recordSafetyWarning(pos,{
+    source:'MATCHED_JARTIC',
+    speed:speedEvidence.speed,
+    zone30:speedEvidence.zone30,
+    distance:speedEvidence.distanceM,
+    headingDiff:speedEvidence.headingDiff,
+    code:speedEvidence.code,
+    roadKey:match.roadKey,
+    matchConfidence:confidence,
+    confirmations:safetyMatchState.pendingOn
+   });
+   return {warningTriggered:true,state:'confirmed_on'};
+  }
+  return {warningTriggered:false,state:safetyMatchState.active?'active':'pending_on'};
+ }
+ safetyMatchState.pendingOn=0;
+ safetyMatchState.pendingOff++;
+ if(safetyMatchState.active&&safetyMatchState.pendingOff>=2){
+  safetyMatchState.active=false;
+  safetyZoneActive=false;
+  safetyMatchState.key=null;
+  setSpeedLimitUI(null);
+  return {warningTriggered:false,state:'confirmed_off'};
+ }
+ return {warningTriggered:false,state:safetyMatchState.active?'active_hold':'off'};
+}
+async function analyzeGpsSample(pos,sampleId,queuedAtPerf){
  const perfStart=performance.now();
  const lon=pos.coords.longitude,lat=pos.coords.latitude;
  const acc=Number(pos.coords.accuracy||9999);
+ const speedMps=Number.isFinite(pos.coords.speed)?Math.max(0,pos.coords.speed):null;
+ const speedKmh=speedMps===null?0:speedMps*3.6;
  const posHeading=normBearing(pos.coords.heading);
  const motionHeading=motionBearingFromRecent();
- let roadSnap=null,speedEvidence=null,diagnostics=null;
+ let diagnostics={};
+ let roadSnap=null;
+ let speedEvidence=null;
+ let decision={state:'判定保留',reason:'道路未確定'};
  try{
-  const roadLoadStart=performance.now();
+  const loadStart=performance.now();
   const roads=await loadNearbyGsiRoads(lon,lat);
-  const roadLoadMs=Math.round((performance.now()-roadLoadStart)*10)/10;
-  const all=[];
+  const roadLoadMs=Math.round((performance.now()-loadStart)*10)/10;
+  const raw=[];
+  const seen=new Map();
   for(const f of roads){
-   const p=nearestPointOnGsiRoadFeature(f,lon,lat);
-   if(p) all.push({f,point:{...p,rawLon:lon,rawLat:lat}});
+   const point=nearestPointOnGsiRoadFeature(f,lon,lat);
+   if(!point||point.distanceM>Math.max(45,acc+25)) continue;
+   const k=roadKey(f);
+   const prev=seen.get(k);
+   if(!prev||point.distanceM<prev.point.distanceM) seen.set(k,{f,point:{...point,rawLon:lon,rawLat:lat}});
   }
-  all.sort((a,b)=>a.point.distanceM-b.point.distanceM);
-  const within30=all.filter(x=>x.point.distanceM<=30);
+  raw.push(...seen.values());
+  raw.sort((a,b)=>a.point.distanceM-b.point.distanceM);
+  const within30=raw.filter(x=>x.point.distanceM<=30);
   const adaptiveCount=Math.max(3,Math.min(8,within30.length||3));
-  const candidates=all.slice(0,adaptiveCount);
-  const compact=candidates.map(x=>candidateDiagnostic(x.f,x.point,posHeading,motionHeading));
-  const nearest=candidates[0]||null,second=candidates[1]||null;
-  const marginM=nearest&&second?Math.round((second.point.distanceM-nearest.point.distanceM)*10)/10:null;
-  const ambiguous=!!(nearest&&second&&(marginM<=4||acc>Math.max(6,marginM*2)));
-  if(nearest){
-   const props=nearest.f.properties||{},meta=compactRoadProps(props);
+  const candidates=raw.slice(0,adaptiveCount).map(x=>{
+   const sc=scoreRoadCandidate(x,{accuracyM:acc,speedKmh,posHeading,motionHeading,currentKey:matchedRoadState.key});
+   return {...x,...sc};
+  }).sort((a,b)=>b.score-a.score);
+  const first=candidates[0],second=candidates[1];
+  const scoreMargin=first&&second?Math.round((first.score-second.score)*10)/10:null;
+  const distanceMargin=first&&second?Math.round((second.point.distanceM-first.point.distanceM)*10)/10:null;
+  const ambiguous=!!(first&&second&&(scoreMargin<7||distanceMargin<4||acc>Math.max(8,distanceMargin*2)));
+  const chosen=chooseMatchedRoad(candidates,acc,speedKmh,ambiguous);
+  const accepted=chosen.accepted;
+  if(accepted){
+   const props=accepted.f.properties||{},meta=compactRoadProps(props);
+   const snapped={lat:accepted.point.lat,lon:accepted.point.lon};
    roadSnap={
     source:'GSI experimental_rdcl',
-    raw:{lat,lon},
-    snapped:{lat:nearest.point.lat,lon:nearest.point.lon},
-    distanceM:Math.round(nearest.point.distanceM*10)/10,
+    raw:{lat,lon},snapped,
+    distanceM:Math.round(accepted.point.distanceM*10)/10,
     gpsAccuracyM:Math.round(acc*10)/10,
-    confidence:roadSnapConfidence(nearest.point.distanceM,acc),
+    confidence:chosen.confidence,
     roadName:meta.name,
-    roadId:nearest.f.id??meta.id??null,
-    roadKey:roadKey(nearest.f),
+    roadId:accepted.f.id??meta.id??null,
+    roadKey:roadKey(accepted.f),
     roadCategory:meta.category,
     roadWidth:roadWidthEvidence(props)||meta.width||null,
     route:meta.route,
-    accepted:nearest.point.distanceM<=Math.max(8,acc+3)
+    roadBearing:accepted.roadBearing===null?null:Math.round(accepted.roadBearing),
+    accepted:chosen.confidence!=='low',
+    matcherReason:chosen.reason
    };
+   speedEvidence=nearestSpeedEvidenceForMatch(roadSnap);
+   if(speedEvidence&&speedEvidence.accepted){
+    decision={state:'指定速度',speed:speedEvidence.speed,zone30:!!speedEvidence.zone30,distance:speedEvidence.distanceM,roadKey:roadSnap.roadKey};
+   }else{
+    decision={state:'道路確定・速度未確定',roadKey:roadSnap.roadKey,confidence:chosen.confidence};
+   }
+   matchedRoadHistory.push({t:Number(pos.timestamp)||Date.now(),key:roadSnap.roadKey,lat:snapped.lat,lon:snapped.lon,confidence:chosen.confidence});
+   matchedRoadHistory=matchedRoadHistory.filter(x=>(Number(pos.timestamp)||Date.now())-x.t<=15000).slice(-20);
   }
+  const safety=applyMatchedSafety(pos,roadSnap,speedEvidence,roadSnap?roadSnap.confidence:'none');
   diagnostics={
    nearbyRoadCount30m:within30.length,
    candidateLimit:adaptiveCount,
-   candidates:compact,
-   nearestVsSecondMarginM:marginM,
+   candidates:candidates.map(x=>{
+    const meta=candidateDiagnostic(x.f,x.point,posHeading,motionHeading);
+    return {...meta,score:x.score};
+   }),
+   scoreMargin,
+   nearestVsSecondMarginM:distanceMargin,
    ambiguous,
    gpsHeading:posHeading,
    motionHeading:motionHeading===null?null:Math.round(motionHeading),
-   roadLoadMs
+   matcherReason:roadSnap?roadSnap.matcherReason:chosen.reason,
+   roadLoadMs,
+   safetyState:safety.state,
+   queueDelayMs:Math.round((perfStart-queuedAtPerf)*10)/10
   };
+  window.__roadDecision=decision;
+  const totalMs=Math.round((performance.now()-perfStart)*10)/10;
+  diagnostics.totalRoadEvalMs=totalMs;
+  if(ambiguous){
+   pushCappedLog(GPS_ROAD_EVENT_KEY,{
+    id:'amb_'+Date.now()+'_'+sampleId,
+    t:Date.now(),iso:new Date().toISOString(),type:'ambiguous_match',
+    currentRoadKey:roadSnap&&roadSnap.roadKey,
+    raw:{lat,lon,accuracyM:Math.round(acc*10)/10},
+    candidates:diagnostics.candidates.slice(0,8),
+    scoreMargin,nearestVsSecondMarginM:distanceMargin
+   },800);
+  }
+  if(totalMs>=80||diagnostics.queueDelayMs>=100){
+   pushCappedLog(GPS_PERF_EVENT_KEY,{
+    id:'perf_'+Date.now()+'_'+sampleId,
+    t:Date.now(),iso:new Date().toISOString(),type:'slow_gps_analysis',
+    totalMs,queueDelayMs:diagnostics.queueDelayMs,roadLoadMs,
+    raw:{lat,lon,accuracyM:Math.round(acc*10)/10}
+   },500);
+  }
+  updateGpsSample(sampleId,{
+   roadSnap,speedEvidence,diagnostics,roadDecision:decision,
+   warningTriggered:!!safety.warningTriggered,
+   evaluatedAt:Date.now(),evaluatedIso:new Date().toISOString()
+  });
  }catch(e){
-  roadSnap={source:'GSI experimental_rdcl',error:String(e&&e.message||e),raw:{lat,lon}};
-  diagnostics={error:String(e&&e.message||e)};
+  updateGpsSample(sampleId,{
+   roadSnap:null,speedEvidence:null,
+   diagnostics:{error:String(e&&e.message||e),queueDelayMs:Math.round((performance.now()-queuedAtPerf)*10)/10},
+   roadDecision:{state:'判定保留',reason:'解析エラー'}
+  });
  }
- const speedStart=performance.now();
- if(jarticSpeedData&&Array.isArray(jarticSpeedData.features)){
-  let nearestSpeed=null;
-  for(const f of jarticSpeedData.features){
-   const p=nearestPointOnSpeedFeature(f,lon,lat);
-   if(p&&(!nearestSpeed||p.distanceM<nearestSpeed.point.distanceM)) nearestSpeed={f,point:p};
-  }
-  if(nearestSpeed){
-   speedEvidence={
-    source:'JARTIC',
-    snapped:{lat:nearestSpeed.point.lat,lon:nearestSpeed.point.lon},
-    distanceM:Math.round(nearestSpeed.point.distanceM*10)/10,
-    speed:Number.isFinite(Number(nearestSpeed.f.speed))?Number(nearestSpeed.f.speed):null,
-    zone30:!!nearestSpeed.f.zone30,
-    code:nearestSpeed.f.code||null,
-    accepted:nearestSpeed.point.distanceM<=14
-   };
-  }
- }
- const speedEvalMs=Math.round((performance.now()-speedStart)*10)/10;
- const totalMs=Math.round((performance.now()-perfStart)*10)/10;
- if(diagnostics){diagnostics.speedEvalMs=speedEvalMs;diagnostics.totalRoadEvalMs=totalMs;}
- const previousRoadKey=lastMatchedRoadKey;
- const currentRoadKey=roadSnap&&roadSnap.accepted?roadSnap.roadKey:null;
- if(currentRoadKey&&currentRoadKey!==previousRoadKey){
-  const now=Date.now();
-  pushCappedLog(GPS_ROAD_EVENT_KEY,{
-   t:now,iso:new Date(now).toISOString(),type:previousRoadKey?'road_switch':'road_acquire',
-   from:previousRoadKey,to:currentRoadKey,
-   raw:{lat,lon,accuracyM:Math.round(acc*10)/10},snapped:roadSnap.snapped,distanceM:roadSnap.distanceM,
-   ambiguous:!!(diagnostics&&diagnostics.ambiguous),
-   candidates:diagnostics&&diagnostics.candidates?diagnostics.candidates.slice(0,8):[],
-   gpsHeading:posHeading,motionHeading:motionHeading===null?null:Math.round(motionHeading),
-   secondsSincePreviousSwitch:lastRoadSwitchAt?Math.round((now-lastRoadSwitchAt)/100)/10:null
-  },800);
-  lastMatchedRoadKey=currentRoadKey;
-  lastRoadSwitchAt=now;
- }
- if(diagnostics&&diagnostics.ambiguous){
-  pushCappedLog(GPS_ROAD_EVENT_KEY,{
-   t:Date.now(),iso:new Date().toISOString(),type:'ambiguous_match',currentRoadKey,
-   raw:{lat,lon,accuracyM:Math.round(acc*10)/10},
-   candidates:diagnostics.candidates.slice(0,8),nearestVsSecondMarginM:diagnostics.nearestVsSecondMarginM
-  },800);
- }
- if(totalMs>=80){
+}
+function enqueueGpsAnalysis(pos,sampleId){
+ if(!sampleId) return;
+ gpsAnalysisQueue.push({pos,sampleId,queuedAtPerf:performance.now()});
+ if(gpsAnalysisQueue.length>3){
+  const newest=gpsAnalysisQueue[gpsAnalysisQueue.length-1];
+  const dropped=gpsAnalysisQueue.splice(0,gpsAnalysisQueue.length-2);
   pushCappedLog(GPS_PERF_EVENT_KEY,{
-   t:Date.now(),iso:new Date().toISOString(),type:'slow_road_eval',
-   totalMs,roadLoadMs:diagnostics&&diagnostics.roadLoadMs,speedEvalMs,
-   raw:{lat,lon,accuracyM:Math.round(acc*10)/10}
+   id:'drop_'+Date.now(),t:Date.now(),iso:new Date().toISOString(),
+   type:'analysis_backpressure',dropped:dropped.length,remaining:gpsAnalysisQueue.length
   },500);
  }
- updateGpsSample(sampleId,{
-  roadSnap,speedEvidence,diagnostics,
-  roadDecision:safetyResult&&safetyResult.decision?{...safetyResult.decision}:window.__roadDecision,
-  warningTriggered:!!(safetyResult&&safetyResult.warningTriggered),
-  evaluatedAt:Date.now(),evaluatedIso:new Date().toISOString()
- });
+ pumpGpsAnalysis();
+}
+async function pumpGpsAnalysis(){
+ if(gpsAnalysisBusy) return;
+ gpsAnalysisBusy=true;
+ try{
+  while(gpsAnalysisQueue.length){
+   const job=gpsAnalysisQueue.shift();
+   await analyzeGpsSample(job.pos,job.sampleId,job.queuedAtPerf);
+  }
+ }finally{gpsAnalysisBusy=false}
 }
 function resetGpsQualityLog(){
  localStorage.removeItem('taxi_gps_quality_log');
@@ -3945,9 +4213,14 @@ function resetGpsQualityLog(){
  localStorage.removeItem(GPS_ROAD_EVENT_KEY);
  localStorage.removeItem(GPS_PERF_EVENT_KEY);
  lastLocationErrorState=null;
- lastMatchedRoadKey=null;
- lastRoadSwitchAt=0;
  recentMotionPoints=[];
+ gpsQualityMemory=[];
+ gpsSnapshotDirty=0;
+ gpsAnalysisQueue=[];
+ matchedRoadState={key:null,match:null,confidence:'none',pendingKey:null,pendingCount:0,lastSwitchAt:0};
+ matchedRoadHistory=[];
+ safetyMatchState={key:null,pendingOn:0,pendingOff:0,active:false};
+ clearGpsDb();
 }
 function gpsQualitySummary(){
  const log=getGpsQualityLog();
@@ -4174,7 +4447,7 @@ async function updateWeather(pos,force=false){
   updateWeeklyWeather(pos,force)
  ]);
 }
-async function handlePosition(pos){
+function handlePosition(pos){
  const cycleStart=performance.now();
  latestPosition=pos;
  const a=Math.round(pos.coords.accuracy||9999);
@@ -4184,23 +4457,13 @@ async function handlePosition(pos){
  updateVacantArea(pos);
  updateDutyDistance(pos);
  const sampleId=recordGpsQuality(pos);
- updateCurrentWeather(pos,false);
- updateWeeklyWeather(pos,false);
- loadJrLastTrains(false);
- maybeNotifyJrLastTrain();
- const safetyStart=performance.now();
- const safetyResult=await evaluateSafetyZone(pos);
- const safetyMs=Math.round((performance.now()-safetyStart)*10)/10;
- const enrichStart=performance.now();
- if(sampleId) await enrichGpsSampleWithRoadSnap(pos,sampleId,safetyResult);
- const enrichMs=Math.round((performance.now()-enrichStart)*10)/10;
- const totalCycleMs=Math.round((performance.now()-cycleStart)*10)/10;
- if(sampleId) updateGpsSample(sampleId,{processing:{safetyMs,enrichMs,totalCycleMs}});
- if(totalCycleMs>=120){
+ enqueueGpsAnalysis(pos,sampleId);
+ const acquisitionMs=Math.round((performance.now()-cycleStart)*10)/10;
+ if(acquisitionMs>=25){
   pushCappedLog(GPS_PERF_EVENT_KEY,{
-   t:Date.now(),iso:new Date().toISOString(),type:'slow_gps_cycle',
-   totalCycleMs,safetyMs,enrichMs,
-   raw:{lat:pos.coords.latitude,lon:pos.coords.longitude,accuracyM:a}
+   id:'acq_'+Date.now()+'_'+(sampleId||'none'),
+   t:Date.now(),iso:new Date().toISOString(),type:'slow_gps_acquisition',
+   acquisitionMs,raw:{lat:pos.coords.latitude,lon:pos.coords.longitude,accuracyM:a}
   },500);
  }
 }
@@ -4261,6 +4524,14 @@ function requestLocation(){
   recordGpsStateEvent('watch_restart');
  }
  startLocation();
+}
+function refreshLocationDependentFeeds(){
+ if(latestPosition){
+  updateCurrentWeather(latestPosition,false);
+  updateWeeklyWeather(latestPosition,false);
+ }
+ loadJrLastTrains(false);
+ maybeNotifyJrLastTrain();
 }
 
 let mapEnabled=false;
@@ -4783,9 +5054,9 @@ function buildValidationExport(){
  const gps=getGpsQualityLog();
  const verify=getVerifyLog();
  return {
-  schema:'taxi-sales-nav-validation-v3',
+  schema:'taxi-sales-nav-validation-v4',
   exportedAt:new Date().toISOString(),
-  build:'2026-10-04-GPS-DIAGNOSTICS-2',
+  build:'2026-10-04-GPS-150-LIGHT-1',
   duty:{
    active:!!duty.active,
    start:duty.start||null
@@ -4805,7 +5076,7 @@ function buildValidationExport(){
   analyticsSchema:ANALYTICS_SCHEMA,
   analyticsEvents:getAnalyticsEvents(),
   tripRecords:getTripRecords(),
-  note:'検証用。GPS測位/受信時刻、生座標、選択/非選択候補道路、曖昧判定、道路切替、処理時間、道路補正、速度判定、30km/h警告、GPS途切れまで追跡する実走データ。'
+  note:'150点軽量GPS検証。取得処理と解析を分離し、IndexedDBへ生GPSを保存。時系列道路マッチング、3〜8候補、方向・継続性・ヒステリシス、確信度、確定道路後の30km/h連続確認、GPS途切れと処理負荷を追跡。'
  };
 }
 function validationSummaryText(){
@@ -4824,7 +5095,9 @@ function validationSummaryText(){
   '途切れ記録: '+(data.gpsInterruptions||[]).length+'件',
   '道路補正済み: '+(data.gpsSamples||[]).filter(x=>x.roadSnap&&x.roadSnap.snapped).length+'件',
   '曖昧判定: '+(data.gpsSamples||[]).filter(x=>x.diagnostics&&x.diagnostics.ambiguous).length+'件',
-  '道路切替: '+(data.gpsRoadEvents||[]).filter(x=>x.type==='road_switch').length+'件',
+  '高確信道路: '+(data.gpsSamples||[]).filter(x=>x.roadSnap&&x.roadSnap.confidence==='high').length+'件',
+  '判定不能/低確信: '+(data.gpsSamples||[]).filter(x=>!x.roadSnap||x.roadSnap.confidence==='low').length+'件',
+  '道路切替: '+(data.gpsRoadEvents||[]).filter(x=>String(x.type||'').includes('road_switch')).length+'件',
   '重いGPS処理: '+(data.gpsPerformanceEvents||[]).length+'件',
   '記録時間: '+(s.durationMin||0)+'分',
   '30km/h警告: '+warnings.length+'回'
@@ -4846,7 +5119,13 @@ async function copyValidationSummary(){
  }
 }
 async function shareValidationData(){
+ await flushGpsDbWrites();
  const data=buildValidationExport();
+ const rawFull=await readGpsDbStore('raw');
+ const analysisFull=await readGpsDbStore('analysis');
+ data.gpsRawFull=rawFull;
+ data.gpsAnalysisFull=analysisFull;
+ data.storage={engine:'IndexedDB+memory-ring',rawCount:rawFull.length,analysisCount:analysisFull.length};
  const d=new Date();
  const pad=n=>String(n).padStart(2,'0');
  const name='taxi-nav-validation_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+'.json';
@@ -4918,6 +5197,9 @@ loadEventSportsRealtime(false);
 setInterval(()=>loadBusRealtime(false),60000);
 setInterval(()=>loadJrProbeSnapshot(false),30000);
 setInterval(()=>loadEventSportsRealtime(false),30000);
+refreshLocationDependentFeeds();
+setInterval(refreshLocationDependentFeeds,60000);
+setInterval(flushGpsDbWrites,5000);
 
 async function forceAppRefresh(){
  const btn=event?.currentTarget||null;
@@ -5017,7 +5299,14 @@ function refreshLiveFeedsNow(){
 }
 document.addEventListener('visibilitychange',()=>{
  recordGpsStateEvent('visibility_change',{state:document.visibilityState});
- if(document.visibilityState==='visible') refreshLiveFeedsNow();
+ if(document.visibilityState==='hidden'){
+  saveGpsQualityLog(getGpsQualityLog(),true);
+  flushGpsDbWrites();
+ }
+ if(document.visibilityState==='visible'){
+  refreshLiveFeedsNow();
+  refreshLocationDependentFeeds();
+ }
 });
 window.addEventListener('pageshow',refreshLiveFeedsNow);
 window.addEventListener('focus',refreshLiveFeedsNow);
