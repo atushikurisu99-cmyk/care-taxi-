@@ -690,6 +690,57 @@ async function makeOfficialVenueEvent({name,title,venue,start_time,open_time,ven
   };
 }
 
+
+async function buildGreenArenaEvents(t,ctx){
+  const url="https://h-jigyoudan.or.jp/sports-center/center-events/";
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const dateForms=[
+    t.year+"年"+t.month+"月"+t.day+"日",
+    t.year+"年"+String(t.month).padStart(2,"0")+"月"+String(t.day).padStart(2,"0")+"日",
+    t.month+"月"+t.day+"日"
+  ];
+  const hit=dateForms.map(x=>text.indexOf(x)).find(x=>x>=0);
+  if(hit==null||hit<0) return [];
+  const snippet=text.slice(Math.max(0,hit-260),Math.min(text.length,hit+420)).replace(/\s+/g," ").trim();
+  if(!looksLikeMusicEvent(snippet)) return [];
+  const startTime=extractStartTime(snippet);
+  let name=snippet.split(/開催日[:：]?/i)[0].trim();
+  if(name.length>120) name=name.slice(-120).trim();
+  if(!name||/年間・月間予定|イベント・行事/i.test(name)) return [];
+  const event=await makeOfficialVenueEvent({
+    name,title:name,venue:"広島グリーンアリーナ",
+    start_time:startTime,open_time:null,
+    venueText:snippet,venueUrl:url,t,ctx
+  });
+  return event?[event]:[];
+}
+async function buildAsterPlazaEvents(t,ctx){
+  const url="https://artscouncil-hiroshima.jp/event/?md="+t.year+"-"+String(t.month).padStart(2,"0");
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const block=todayBlockFromCultureText(text,t);
+  if(!block) return [];
+  const marker="JMSアステールプラザ";
+  const idx=block.indexOf(marker);
+  if(idx<0) return [];
+  const snippet=block.slice(Math.max(0,idx-260),Math.min(block.length,idx+360)).replace(/\s+/g," ").trim();
+  if(!looksLikeMusicEvent(snippet)) return [];
+  const startTime=extractStartTime(snippet);
+  let name=snippet.slice(0,Math.max(0,snippet.indexOf(marker))).trim();
+  name=name.replace(/^.*?(?:\||　)/,"").trim();
+  if(name.length>110) name=name.slice(-110).trim();
+  if(!name) name="ライブ";
+  const event=await makeOfficialVenueEvent({
+    name,title:name,venue:"JMSアステールプラザ",
+    start_time:startTime,open_time:null,
+    venueText:snippet,venueUrl:url,t,ctx
+  });
+  return event?[event]:[];
+}
+
 async function buildHbgHallEvents(t,ctx){
   const slug=encodeURIComponent(t.year+"年"+t.month+"月");
   const url="https://h-bkk.jp/hall_schedule/"+slug+"/";
@@ -764,6 +815,8 @@ async function buildVanquishEvents(t,ctx){
 }
 async function buildDirectVenueLiveEvents(t,ctx){
   const groups=await Promise.all([
+    buildGreenArenaEvents(t,ctx),
+    buildAsterPlazaEvents(t,ctx),
     buildHbgHallEvents(t,ctx),
     buildBlueLiveEvents(t,ctx),
     buildVanquishEvents(t,ctx)
