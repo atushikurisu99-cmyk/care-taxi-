@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-CALENDAR-DAY-DETAIL-1 -->
+<!-- BUILD:2026-10-03-LIVE-SELECTED-VENUES-ONLY-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1354,7 +1354,7 @@ html,body{
 
   <div class="settings-card">
    <div class="settings-title">ライブ通知</div>
-   <div class="settings-note">通知したい会場だけ選択します。選んだ会場のライブ情報だけ通知対象にします。</div>
+   <div class="settings-note">表示・通知したい会場だけ選択します。選んだ会場のライブだけアプリに表示・通知します。</div>
    <div class="settings-subhead" style="margin-top:11px">会場</div>
    <div id="liveVenueSettingsList" class="settings-list"></div>
    <div class="settings-note" style="margin-top:10px">公式情報がない場合は、過去公演の実績を参考情報として表示します。実際の終演を確認できない限り、終演したとは言い切りません。</div>
@@ -1657,6 +1657,12 @@ function selectedLiveVenues(){
  const cfg=getLiveNotifySettings();
  return LIVE_VENUES.filter(v=>!!cfg.venues[v]);
 }
+function selectedLiveEvents(source=eventRealtimeData){
+ const selected=new Set(selectedLiveVenues());
+ const events=Array.isArray(source?.events)?source.events:[];
+ if(!selected.size) return [];
+ return events.filter(e=>e&&selected.has(e.venue));
+}
 function liveEventKey(e){
  return [localDateValue(new Date()),e?.venue||'',e?.name||'',e?.start_time||''].join('|');
 }
@@ -1681,13 +1687,13 @@ function maybeNotifySelectedLiveEvents(d){
   if(diff>0&&diff<=30){
    notifyFact('live-end-guide',{
     level:'warn',icon:'!',title:'ライブ '+endLabel+' '+String(endGuide).slice(0,5)+'頃',
-    body:(e.name||'ライブ')+' / '+e.venue+(e.end_time_confidence==='reference'&&e.end_time_range_start&&e.end_time_range_end?(' / 参考幅 '+e.end_time_range_start+'〜'+e.end_time_range_end):'')+' / 実際の終演は前後する場合あり',
+    body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は前後する場合あり',
     key:key+'|guide',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
   }else if(diff<=0&&diff>=-10){
    notifyFact('live-end-guide-time',{
     level:'info',icon:'!',title:'ライブ '+endLabel+' '+String(endGuide).slice(0,5)+'頃',
-    body:(e.name||'ライブ')+' / '+e.venue+(e.end_time_confidence==='reference'&&e.end_time_range_start&&e.end_time_range_end?(' / 参考幅 '+e.end_time_range_start+'〜'+e.end_time_range_end):'')+' / 実際の終演は未確認',
+    body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は未確認',
     key:key+'|guide-time',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
   }
@@ -1786,7 +1792,7 @@ function calendarEntriesForDate(key){
  }
  const today=localDateValue(new Date());
  if(key===today){
-  const events=Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[];
+  const events=selectedLiveEvents();
   for(const e of events){
    const ref=e.end_time_estimate||e.end_time_reference||'';
    out.push({
@@ -2464,14 +2470,14 @@ function renderHomeEventSummary(){
   hs.textContent='ライブ・スポーツを確認中';
   return;
  }
- const events=Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[];
+ const events=selectedLiveEvents();
  const sports=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[]).filter(x=>x&&x.status&&x.status!=='none');
  const total=events.length+sports.length;
  hv.textContent=total?total+'件':'なし';
  const liveNow=sports.find(x=>x.status==='live');
  const nextEvent=events[0]||sports.find(x=>x.status==='scheduled')||liveNow||sports[0]||null;
  if(!nextEvent){
-  hs.textContent=(eventRealtimeData?.coverage==='partial')?'一部会場を確認中':'本日の登録なし';
+  hs.textContent=selectedLiveVenues().length?'選択会場のライブ・スポーツなし':'ライブ会場を設定';
   return;
  }
  if(events.includes(nextEvent)){
@@ -2496,11 +2502,11 @@ function renderLiveEvents(){
   renderHomeEventSummary();
   return;
  }
- const events=Array.isArray(d.events)?d.events:[];
+ const events=selectedLiveEvents(d);
  const e=events[0]||null;
  if(card) card.classList.toggle('state-warn',events.length>0);
- if(st) st.textContent=events.length?events.length+'件':(d.coverage==='partial'?'確認中':'0件');
- if(mid) mid.textContent=e?.name||'本日の登録なし';
+ if(st) st.textContent=events.length?events.length+'件':(selectedLiveVenues().length?'0件':'未設定');
+ if(mid) mid.textContent=e?.name||(selectedLiveVenues().length?'選択会場のライブなし':'会場未選択');
  if(bot){
   if(e){
    const t=e.start_time?e.start_time+'〜':'時刻確認中';
@@ -2508,7 +2514,7 @@ function renderLiveEvents(){
    const label=(e.end_time_estimate||e.end_time_reference)?'過去公演参考':'';
    bot.textContent=t+(end?(' / '+label+' '+String(end).slice(0,5)+'頃'):'')+(e.venue?' / '+e.venue:'');
   }else{
-   bot.textContent=d.coverage==='partial'?'一部会場を確認中':'更新 '+formatAgo(d.generated_at);
+   bot.textContent=selectedLiveVenues().length?'選択した会場だけ表示':'設定で会場を選択';
   }
  }
  renderHomeEventSummary();
