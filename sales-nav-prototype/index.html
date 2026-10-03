@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-NOTIFICATION-SOUND-DEMO-1 -->
+<!-- BUILD:2026-10-03-JR-LAST-TRAIN-NOTICE-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1418,13 +1418,19 @@ html,body{
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
    <div class="settings-card">
    <div class="settings-title">通知設定</div>
-   <div class="settings-note">必要な通知だけ選びます。JR通知は見せ方が固まるまで保留です。</div>
+   <div class="settings-note">必要な通知だけ選びます。JRの遅延通知は見せ方を調整中。終電通知は現在地に応じて自動で判定します。</div>
    <div class="settings-subhead" style="margin-top:12px">通知音デモ</div>
    <div class="settings-demo-grid" style="margin-top:8px">
     <button type="button" class="smallbtn" onclick="demoNoticeSound()">ポン♪</button>
     <button type="button" class="smallbtn" onclick="demoSafetySound()">ピロリン♪</button>
    </div>
    <div class="settings-note" style="margin-top:8px">iPhoneは最初のタップで音声を有効化します。</div>
+  </div>
+
+  <div class="settings-card">
+   <div class="settings-title">JR終電通知</div>
+   <div class="settings-note">現在地の近くにある対象駅について、終電の約15分前と終電時刻の直後だけ自動通知します。進行方向では絞りません。</div>
+   <div class="settings-note" style="margin-top:8px">時刻表を基準にするため、遅延時は実際の列車通過とずれる場合があります。</div>
   </div>
 
   <div class="settings-card">
@@ -1527,7 +1533,7 @@ function show(id){
  if(id==='verify') renderVerify();
  if(id==='today'||id==='busDetail') loadBusRealtime(id==='busDetail');
  if(id==='today'||id==='home'||id==='eventDetail') loadEventSportsRealtime(false);
- if(id==='today'||id==='vacant'||id==='home'||id==='jrDetail') loadJrProbeSnapshot(false);
+ if(id==='today'||id==='vacant'||id==='home'||id==='jrDetail'){ loadJrProbeSnapshot(false); loadJrLastTrains(false); }
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
  if(id==='weatherDetail'){
   renderWeatherDetail();
@@ -2397,6 +2403,81 @@ let jrProbeData=null;
 let jrProbeFetchedAt=0;
 let jrProbeSource='none';
 const JR_WORKER_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/jr/hiroshima';
+const JR_LAST_TRAIN_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/jr/last-trains/hiroshima';
+let jrLastTrainData=null;
+let jrLastTrainFetchedAt=0;
+
+
+function haversineKm(aLat,aLon,bLat,bLon){
+ const R=6371,toRad=x=>Number(x)*Math.PI/180;
+ const dLat=toRad(Number(bLat)-Number(aLat)),dLon=toRad(Number(bLon)-Number(aLon));
+ const a=Math.sin(dLat/2)**2+Math.cos(toRad(aLat))*Math.cos(toRad(bLat))*Math.sin(dLon/2)**2;
+ return 2*R*Math.asin(Math.min(1,Math.sqrt(a)));
+}
+function tokyoLocalDateKey(d=new Date()){
+ const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
+ return ''+y+m+day;
+}
+function clockToServiceMinutes(hm){
+ const m=String(hm||'').match(/^(\d{1,2}):(\d{2})$/);
+ if(!m) return null;
+ const h=Number(m[1]),min=Number(m[2]);
+ return (h<4?h+24:h)*60+min;
+}
+function nowServiceMinutes(d=new Date()){
+ const h=d.getHours(),min=d.getMinutes();
+ return (h<4?h+24:h)*60+min;
+}
+async function loadJrLastTrains(force=false){
+ const now=Date.now();
+ if(!force&&jrLastTrainData&&now-jrLastTrainFetchedAt<30*60*1000){
+  maybeNotifyJrLastTrain();
+  return;
+ }
+ jrLastTrainFetchedAt=now;
+ try{
+  const r=await fetch(JR_LAST_TRAIN_URL+'?date='+tokyoLocalDateKey()+'&ts='+now,{cache:'no-store'});
+  if(!r.ok) throw new Error('jr last train http '+r.status);
+  const d=await r.json();
+  if(!d?.ok||!Array.isArray(d.stations)) throw new Error('jr last train payload invalid');
+  jrLastTrainData=d;
+  maybeNotifyJrLastTrain();
+ }catch(e){}
+}
+function maybeNotifyJrLastTrain(){
+ if(!getDutyState().active||!latestPosition||!jrLastTrainData) return;
+ const lat=latestPosition.coords.latitude,lon=latestPosition.coords.longitude;
+ const rows=(jrLastTrainData.stations||[])
+  .filter(x=>x&&x.last_train&&Number.isFinite(Number(x.lat))&&Number.isFinite(Number(x.lon)))
+  .map(x=>({...x,distance_km:haversineKm(lat,lon,x.lat,x.lon)}))
+  .filter(x=>x.distance_km<=Number(x.radius_km||5))
+  .sort((a,b)=>a.distance_km-b.distance_km);
+ if(!rows.length) return;
+ const st=rows[0];
+ const last=clockToServiceMinutes(st.last_train);
+ if(last==null) return;
+ const cur=nowServiceMinutes();
+ const diff=last-cur;
+ const day=tokyoLocalDateKey();
+
+ if(diff>=0&&diff<=15){
+  notifyFact('jr_last_train',{
+   level:'warn',icon:'!',title:'JR終電まで約'+diff+'分',
+   body:st.name+' → '+st.toward,
+   key:'before|'+day+'|'+st.id+'|'+st.last_train,
+   sourceTs:jrLastTrainData.generated_at,maxAgeSec:12*60*60,minIntervalMs:12*60*60*1000
+  });
+  return;
+ }
+ if(diff<0&&diff>=-45){
+  notifyFact('jr_last_train',{
+   level:'warn',icon:'!',title:'JR終電時刻 経過',
+   body:st.name+' → '+st.toward+' / '+st.last_train,
+   key:'after|'+day+'|'+st.id+'|'+st.last_train,
+   sourceTs:jrLastTrainData.generated_at,maxAgeSec:12*60*60,minIntervalMs:12*60*60*1000
+  });
+ }
+}
 
 function getJrHistory(){
  try{
@@ -3758,6 +3839,8 @@ function handlePosition(pos){
  recordGpsQuality(pos);
  updateCurrentWeather(pos,false);
  updateWeeklyWeather(pos,false);
+ loadJrLastTrains(false);
+ maybeNotifyJrLastTrain();
  evaluateSafetyZone(pos);
 }
 
