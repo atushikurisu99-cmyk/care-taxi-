@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-NOTICE-PON-SOUND-1 -->
+<!-- BUILD:2026-10-03-SAFETY-PIRO SOUND-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -4000,7 +4000,36 @@ function hideNotice(){
  noticeActive=false;
  if(noticeQueue.length) setTimeout(showNextNotice,180);
 }
+function playSafetyPiro(){
+ try{
+  if(!noticeAudioUnlocked||!noticeAudioCtx) return;
+  const ctx=noticeAudioCtx;
+  if(ctx.state==='suspended') ctx.resume();
+  const now=ctx.currentTime;
+  const tones=[
+   {t:0.00,f:920,d:0.14},
+   {t:0.18,f:1160,d:0.14},
+   {t:0.42,f:920,d:0.14},
+   {t:0.60,f:1160,d:0.14}
+  ];
+  for(const x of tones){
+   const g=ctx.createGain();
+   g.gain.setValueAtTime(0.0001,now+x.t);
+   g.gain.exponentialRampToValueAtTime(0.08,now+x.t+0.008);
+   g.gain.exponentialRampToValueAtTime(0.0001,now+x.t+x.d);
+   g.connect(ctx.destination);
+   const o=ctx.createOscillator();
+   o.type='sine';
+   o.frequency.setValueAtTime(x.f,now+x.t);
+   o.connect(g);
+   o.start(now+x.t);
+   o.stop(now+x.t+x.d+0.02);
+  }
+ }catch(e){}
+}
+
 function showSafety(duration=5200){
+ playSafetyPiro();
  const s=document.getElementById('safety');
  const note=document.querySelector('.drive-note');
  s.classList.add('show');
