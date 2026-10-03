@@ -355,8 +355,9 @@ function estimateLiveEndTime({start_time,evidence=[],venue="",title="",artist=""
   let confidence="low";
   if(directs.length>=2 && spread<=20) confidence="high";
   else if(directs.length>=1) confidence="medium";
-  else if(pool.some(x=>x.channel==="same_tour_recent"&&x.sample_count>=3)&&spread<=25) confidence="medium";
-  else if(new Set(pool.map(x=>x.source_group)).size>=2&&spread<=25) confidence="medium";
+  else if(pool.some(x=>x.channel==="same_tour_recent"&&x.sample_count>=2)&&spread<=30) confidence="medium";
+  else if(pool.some(x=>x.channel==="artist_history"&&x.sample_count>=3)&&spread<=35) confidence="medium";
+  else if(new Set(pool.map(x=>x.source_group)).size>=2&&spread<=30) confidence="medium";
 
   // 「経路数」ではなく独立した根拠で判定する。
   // 同一サイトから作った同ツアー中央値と過去平均を、別ソース2件とは数えない。
@@ -364,7 +365,7 @@ function estimateLiveEndTime({start_time,evidence=[],venue="",title="",artist=""
   const historicalStrong=pool.some(x=>
     x.channel==="same_tour_recent" && x.sample_count>=2
   ) || pool.some(x=>
-    x.channel==="artist_history" && x.sample_count>=3 && spread<=35
+    x.channel==="artist_history" && x.sample_count>=2 && spread<=45
   );
   const publishable=directs.length>=1 || independentGroups.size>=2 || historicalStrong;
 
@@ -877,7 +878,9 @@ async function buildHiroshimaEvents(ctx) {
     end_time_logic:{
       channel_count:LIVE_END_CHANNELS.length,
       channels:LIVE_END_CHANNELS.map(([id,label,weight])=>({id,label,weight})),
-      rule:"公式の直接終演時刻を最優先。直接情報がない場合は独立した2系統以上が一致した時だけ終演目安を公開。45分超の外れ値は除外。"
+      operational_goal:"営業判断で体感8割程度の有用性を目標。分単位の的中ではなく、概ね±30分以内を実用範囲として扱う。",
+      acceptable_error_minutes:30,
+      rule:"公式の直接終演時刻を最優先。同ツアー2公演以上、または同一アーティスト過去2公演以上で幅45分以内なら終演目安へ昇格。弱い根拠は終演参考として表示。45分超の外れ値は除外。"
     },
     venues_covered:HIROSHIMA_LIVE_VENUES,
     events:mergedEvents,
