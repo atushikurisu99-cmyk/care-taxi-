@@ -292,7 +292,7 @@ function estimateLiveEndTime({start_time,evidence=[],venue="",title="",artist=""
   for(const ev of evidence){
     const ch=byId.get(ev?.channel);
     if(!ch) continue;
-    if(ev?.checked && !ev?.end_time){
+    if(ev?.checked && !ev?.end_time && !Number.isFinite(Number(ev?.duration_minutes))){
       ch.status="checked_no_end_time";
       ch.note=String(ev?.note||"");
       continue;
