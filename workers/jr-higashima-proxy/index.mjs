@@ -899,99 +899,90 @@ function mergeLiveEvents(rows){
   const seen=new Set();
   for(const e of rows){
     if(!e) continue;
-    const key=[e.venue||"",e.start_time||"",String(e.name||"").toLowerCase().replace(/\s+/g,"")].join("|");
+    const key=[e.date||"",e.venue||"",e.start_time||"",String(e.name||"").toLowerCase().replace(/\s+/g,"")].join("|");
     if(seen.has(key)) continue;
     seen.add(key); out.push(e);
   }
   return out;
 }
+async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
+  const ym=t.year+String(t.month).padStart(2,"0");
+  const url="https://www.club-quattro.com/hiroshima/schedule/?ym="+ym;
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const day=String(t.day).padStart(2,"0");
+  const dayRe=new RegExp("(?:^|\\s)"+day+"\\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)\\.\\s+([\\s\\S]{0,500}?)(?=\\s+[0-3][0-9]\\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)\\.|$)","i");
+  const m=text.match(dayRe);
+  if(!m) return [];
+  const seg=m[1].replace(/SOLD OUT|NEW|QUATTRO WEB 先行/gi," ").replace(/\s+/g," ").trim();
+  const tm=seg.match(/開場\/開演\s*([0-2][0-9]:[0-5][0-9])\s*\/\s*([0-2][0-9]:[0-5][0-9])/);
+  let name=seg.split(/開場\/開演|料金|お問い合わせ先/)[0].trim();
+  const words=name.split(" ");
+  if(words.length>=2){
+    const half=Math.floor(words.length/2);
+    if(words.length%2===0&&words.slice(0,half).join(" ")===words.slice(half).join(" ")) name=words.slice(0,half).join(" ");
+  }
+  if(!name) return [];
+  const startTime=tm?tm[2]:null;
+  let estimate={
+    end_time_estimate:null,end_time_reference:null,end_time_range_start:null,end_time_range_end:null,
+    reference_basis:null,confidence:"none",evidence_count:0,direct_count:0,spread_minutes:null,channels:[]
+  };
+  if(enrichEnd){
+    const evidence=await collectLiveEndEvidence({
+      name,venue:"広島クラブクアトロ",start_time:startTime,title:name,venueText:seg,venueUrl:url,t,ctx
+    });
+    estimate=estimateLiveEndTime({
+      start_time:startTime,evidence,venue:"広島クラブクアトロ",title:name,artist:name
+    });
+  }
+  return [{
+    kind:"live",date:liveDateKey(t),name,venue:"広島クラブクアトロ",
+    open_time:tm?tm[1]:null,start_time:startTime,end_time:null,
+    end_time_estimate:estimate.end_time_estimate,end_time_reference:estimate.end_time_reference,
+    end_time_range_start:estimate.end_time_range_start,end_time_range_end:estimate.end_time_range_end,
+    end_time_reference_basis:estimate.reference_basis,end_time_confidence:estimate.confidence,
+    end_time_evidence_count:estimate.evidence_count,end_time_direct_count:estimate.direct_count,
+    end_time_spread_minutes:estimate.spread_minutes,end_time_channels:estimate.channels,
+    source:"HIROSHIMA CLUB QUATTRO",source_url:url
+  }];
+}
 
 async function buildHiroshimaEvents(ctx) {
-  const t = tokyoParts();
-  const ym = `${t.year}${String(t.month).padStart(2,"0")}`;
-  const url = `https://www.club-quattro.com/hiroshima/schedule/?ym=${ym}`;
-  const html = await fetchTextCached(url, 300, ctx);
-  const text = stripHtml(html);
-  const day = String(t.day).padStart(2,"0");
-  const dayRe = new RegExp(`(?:^|\\s)${day}\\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)\\.\\s+([\\s\\S]{0,500}?)(?=\\s+[0-3][0-9]\\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)\\.|$)`,"i");
-  const m = text.match(dayRe);
-  const events = [];
-  if (m) {
-    const seg = m[1].replace(/SOLD OUT|NEW|QUATTRO WEB 先行/gi," ").replace(/\s+/g," ").trim();
-    const time = seg.match(/開場\/開演\s*([0-2][0-9]:[0-5][0-9])\s*\/\s*([0-2][0-9]:[0-5][0-9])/);
-    let name = seg.split(/開場\/開演|料金|お問い合わせ先/)[0].trim();
-    // Repeated artist name is common on the source page; collapse exact duplicated halves.
-    const words = name.split(" ");
-    if (words.length>=2) {
-      const half=Math.floor(words.length/2);
-      if (words.length%2===0 && words.slice(0,half).join(" ")===words.slice(half).join(" ")) {
-        name=words.slice(0,half).join(" ");
-      }
-    }
-    if (name) {
-      const startTime=time?time[2]:null;
-      const evidence=await collectLiveEndEvidence({
-        name,
-        venue:"広島クラブクアトロ",
-        start_time:startTime,
-        title:name,
-        venueText:seg,
-        venueUrl:url,
-        t,
-        ctx
-      });
-      const estimate=estimateLiveEndTime({
-        start_time:startTime,
-        evidence,
-        venue:"広島クラブクアトロ",
-        title:name,
-        artist:name
-      });
-      events.push({
-        kind:"live",
-        name,
-        venue:"広島クラブクアトロ",
-        open_time:time?time[1]:null,
-        start_time:startTime,
-        end_time:null,
-        end_time_estimate:estimate.end_time_estimate,
-        end_time_reference:estimate.end_time_reference,
-        end_time_range_start:estimate.end_time_range_start,
-        end_time_range_end:estimate.end_time_range_end,
-        end_time_reference_basis:estimate.reference_basis,
-        end_time_confidence:estimate.confidence,
-        end_time_evidence_count:estimate.evidence_count,
-        end_time_direct_count:estimate.direct_count,
-        end_time_spread_minutes:estimate.spread_minutes,
-        end_time_channels:estimate.channels,
-        source:"HIROSHIMA CLUB QUATTRO",
-        source_url:url,
-      });
-    }
+  const today=tokyoParts();
+  const days=futureTokyoDays(60);
+  const all=[];
+  for(const t of days){
+    const enrichEnd=liveDateKey(t)===liveDateKey(today);
+    const [quattro,direct,culture]=await Promise.all([
+      buildQuattroEventsForDay(t,ctx,enrichEnd),
+      buildDirectVenueLiveEvents(t,ctx,enrichEnd),
+      buildCultureHiroshimaLiveEvents(t,ctx,enrichEnd)
+    ]);
+    all.push(...quattro,...direct,...culture);
   }
-  const [directVenueEvents,cultureEvents]=await Promise.all([
-    buildDirectVenueLiveEvents(t,ctx),
-    buildCultureHiroshimaLiveEvents(t,ctx)
-  ]);
-  // 専用会場公式を先に置き、同じ公演の補完情報より優先する。
-  const mergedEvents=mergeLiveEvents([...events,...directVenueEvents,...cultureEvents]);
+  const mergedEvents=mergeLiveEvents(all).sort((a,b)=>
+    String(a.date||"").localeCompare(String(b.date||""))||
+    String(a.start_time||"99:99").localeCompare(String(b.start_time||"99:99"))
+  );
   return {
     ok:true,
     area:"hiroshima",
     generated_at:Math.floor(Date.now()/1000),
-    coverage:"expanded",
+    coverage:"upcoming_60_days",
+    range_days:60,
     end_time_logic:{
       channel_count:LIVE_END_CHANNELS.length,
       channels:LIVE_END_CHANNELS.map(([id,label,weight])=>({id,label,weight})),
       operational_goal:"営業判断で体感8割程度の有用性を目標。ユーザーには誤差幅や根拠の強弱を表示せず、終演時間の案内はすべて『過去公演参考』に統一する。",
       acceptable_error_minutes:30,
-      rule:"内部では公式情報・同ツアー実績・過去公演実績の強弱を判定するが、ユーザー表示はすべて『過去公演参考』に統一。45分超の外れ値は除外。"
+      rule:"当日の公演は終演参考まで取得。将来公演は日付・開演・会場を先に広く収集し、当日になったら終演参考を補完する。"
     },
     venues_covered:HIROSHIMA_LIVE_VENUES,
     events:mergedEvents,
   };
 }
-
 
 async function fetchProtoCached(url, ttl, ctx) {
   const cache = caches.default;
