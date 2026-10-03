@@ -358,7 +358,20 @@ function estimateLiveEndTime({start_time,evidence=[],venue="",title="",artist=""
   // 直接情報なしで1件だけの推定は表示しない。
   const publishable=directs.length>=1 || pool.length>=2;
 
-  const ref=publishable?{time:null,range_start:null,range_end:null,basis:null}:fallbackLiveEndGuide(start_time,venue,title,artist);
+  let ref={time:null,range_start:null,range_end:null,basis:null};
+  if(!publishable){
+    if(pool.length===1){
+      const actual=pool[0].endMin;
+      ref={
+        time:minutesToHHMM(actual),
+        range_start:minutesToHHMM(actual-30),
+        range_end:minutesToHHMM(actual+30),
+        basis:pool[0].label+"の単独実績"
+      };
+    }else{
+      ref=fallbackLiveEndGuide(start_time,venue,title,artist);
+    }
+  }
   return {
     end_time_estimate:publishable?minutesToHHMM(rounded):null,
     end_time_reference:publishable?null:ref.time,
@@ -484,7 +497,78 @@ async function collectTicketEvidence(name,venue,t,ctx){
     checkTicketSearchSource(channel,label,url,name,venue,t,ctx)
   ));
 }
-async function collectLiveEndEvidence({name,venue,start_time,venueText,venueUrl,t,ctx}){
+
+function parse12hClock(h,m,ampm){
+  let hour=Number(h), minute=Number(m);
+  if(!Number.isFinite(hour)||!Number.isFinite(minute)) return null;
+  const ap=String(ampm||"").toUpperCase();
+  if(ap==="PM"&&hour<12) hour+=12;
+  if(ap==="AM"&&hour===12) hour=0;
+  return hour*60+minute;
+}
+function setlistDurationMinutes(text=""){
+  const t=String(text||"").replace(/\s+/g," ");
+  const m=t.match(/Start time:\s*(\d{1,2}):(\d{2})\s*(AM|PM)[\s\S]{0,220}?End:\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i)
+    || t.match(/Show:\s*(\d{1,2}):(\d{2})\s*(AM|PM)\s*[–—-]\s*(\d{1,2}):(\d{2})\s*(AM|PM)/i);
+  if(!m) return null;
+  let a=parse12hClock(m[1],m[2],m[3]), b=parse12hClock(m[4],m[5],m[6]);
+  if(a==null||b==null) return null;
+  if(b<a) b+=1440;
+  const d=b-a;
+  return d>=20&&d<=300?d:null;
+}
+async function collectSetlistHistoryEvidence(name,start_time,title,ctx){
+  const out=[];
+  if(!name||!start_time) return out;
+  const searchUrl="https://www.setlist.fm/search?query="+encodeURIComponent(name);
+  let html="";
+  try{html=await fetchTextCached(searchUrl,900,ctx)}catch{
+    return [{channel:"artist_history",checked:true,note:"setlist.fm検索の取得に失敗"}];
+  }
+  const links=linksFromHtml(html,searchUrl)
+    .filter(x=>/\/setlist\/[^/]+\/\d{4}\/[^?#]+\.html(?:$|[?#])/.test(x.url));
+  const unique=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,8);
+  if(!unique.length) return [{channel:"artist_history",checked:true,note:"setlist.fmで過去公演を特定できず"}];
+
+  const pages=await Promise.all(unique.map(async x=>{
+    try{
+      const page=await fetchTextCached(x.url,900,ctx);
+      const text=stripHtml(page);
+      if(!sameLooseText(text,name)) return null;
+      const duration=setlistDurationMinutes(text);
+      if(!duration) return null;
+      const tour=(text.match(/Tour:\s*([^#]{2,90}?)(?:Venue:|Set Times:|Doors:|Scheduled:|Start time:)/i)||[])[1]?.trim()||"";
+      return {duration,tour,url:x.url,text};
+    }catch{return null}
+  }));
+  const rows=pages.filter(Boolean);
+  if(!rows.length) return [{channel:"artist_history",checked:true,note:"setlist.fmに開始・終了の両時刻がある実績なし"}];
+
+  const sameTour=rows.filter(r=>title&&r.tour&&sameLooseText(r.tour,title));
+  if(sameTour.length>=2){
+    const ds=sameTour.map(x=>x.duration).sort((a,b)=>a-b);
+    const med=median(ds);
+    out.push({
+      channel:"same_tour_recent",duration_minutes:med,checked:true,
+      note:"setlist.fm同ツアー "+sameTour.length+"公演の中央値 "+Math.round(med)+"分"
+    });
+  }else{
+    out.push({channel:"same_tour_recent",checked:true,note:"同ツアー実績は2公演未満"});
+  }
+
+  const durations=rows.map(x=>x.duration).sort((a,b)=>a-b);
+  const med=median(durations);
+  const spread=durations.length>1?durations[durations.length-1]-durations[0]:0;
+  out.push({
+    channel:"artist_history",
+    duration_minutes:med,
+    checked:true,
+    note:"setlist.fm過去 "+rows.length+"公演の中央値 "+Math.round(med)+"分 / 幅 "+spread+"分"
+  });
+  return out;
+}
+
+async function collectLiveEndEvidence({name,venue,start_time,title,venueText,venueUrl,t,ctx}){
   const evidence=[];
   const venueEnd=extractExplicitEndTime(venueText);
   evidence.push({channel:"venue_official",end_time:venueEnd,direct:!!venueEnd,checked:true,note:venueEnd?("会場公式 "+(venueUrl||"")):"会場公式を確認・終演時刻の明記なし"});
@@ -503,6 +587,8 @@ async function collectLiveEndEvidence({name,venue,start_time,venueText,venueUrl,
 
   const ticketEvidence=await collectTicketEvidence(name,venue,t,ctx);
   evidence.push(...ticketEvidence);
+  const historyEvidence=await collectSetlistHistoryEvidence(name,start_time,title,ctx);
+  evidence.push(...historyEvidence);
   return evidence;
 }
 async function buildHiroshimaEvents(ctx) {
@@ -533,6 +619,7 @@ async function buildHiroshimaEvents(ctx) {
         name,
         venue:"広島クラブクアトロ",
         start_time:startTime,
+        title:name,
         venueText:seg,
         venueUrl:url,
         t,
