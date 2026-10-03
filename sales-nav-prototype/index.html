@@ -1387,17 +1387,13 @@ html,body{
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
    <div class="settings-card">
    <div class="settings-title">売上・目標</div>
-   <div class="settings-note">この端末だけに保存します。金額を変更すると自動で保存します。</div>
+   <div class="settings-note">この端末だけに保存します。当日の目標は月目標から自動計算します。</div>
    <div class="money-settings">
     <label class="money-setting-row">
      <span class="money-setting-label">本日の売上</span>
      <span class="money-input-wrap"><input id="settingsTodaySales" type="number" min="0" step="100" inputmode="numeric" placeholder="45,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
     </label>
-    <label class="money-setting-row">
-     <span class="money-setting-label">本日の目標</span>
-     <span class="money-input-wrap"><input id="settingsTodayGoal" type="number" min="0" step="100" inputmode="numeric" placeholder="60,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
-    </label>
-    <label class="money-setting-row">
+     <label class="money-setting-row">
      <span class="money-setting-label">当月の売上</span>
      <span class="money-input-wrap"><input id="settingsMonthSales" type="number" min="0" step="1000" inputmode="numeric" placeholder="420,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
     </label>
@@ -1564,7 +1560,6 @@ function renderSalesGoalSettings(){
  const v=getSalesGoalSettings();
  const map={
   settingsTodaySales:v.todaySales,
-  settingsTodayGoal:v.todayGoal,
   settingsMonthSales:v.monthSales,
   settingsMonthGoal:v.monthGoal
  };
@@ -1575,11 +1570,12 @@ function renderSalesGoalSettings(){
 }
 function saveSalesGoalSettings(showToast=true){
  const n=id=>Math.max(0,Number(document.getElementById(id)?.value)||0);
+ const monthGoal=n('settingsMonthGoal');
  const v={
   todaySales:n('settingsTodaySales'),
-  todayGoal:n('settingsTodayGoal'),
+  todayGoal:monthGoal>0?Math.round(monthGoal/30):0,
   monthSales:n('settingsMonthSales'),
-  monthGoal:n('settingsMonthGoal'),
+  monthGoal,
   savedAt:Date.now()
  };
  try{localStorage.setItem(SALES_GOAL_SETTINGS_KEY,JSON.stringify(v))}catch(e){}
@@ -1599,7 +1595,7 @@ function renderSimpleSalesAnalysis(){
 
  const tr=Math.max(0,v.todayGoal-v.todaySales);
  const mr=Math.max(0,v.monthGoal-v.monthSales);
- set('analysisTodayGoal',v.todayGoal?('目標 '+yen(v.todayGoal)+' / あと '+yen(tr)):'目標未設定');
+ set('analysisTodayGoal',v.todayGoal?('月目標から自動 '+yen(v.todayGoal)+' / あと '+yen(tr)):'目標未設定');
  set('analysisMonthGoal',v.monthGoal?('目標 '+yen(v.monthGoal)+' / あと '+yen(mr)):'目標未設定');
 
  let remaining='設定待ち';
