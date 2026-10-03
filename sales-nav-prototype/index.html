@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-LIVE-END-GUIDE-1 -->
+<!-- BUILD:2026-10-03-LIVE-END-10CHANNEL-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1605,9 +1605,10 @@ function maybeNotifySelectedLiveEvents(d){
  for(const e of events){
   if(!e||!selected.has(e.venue)) continue;
   // 開演前通知は営業判断への寄与が弱いため出さない。
-  // 終演時刻が一次情報として取れた場合だけ終演通知候補にする。
-  if(!e.end_time) continue;
-  const p=String(e.end_time).split(':').map(Number);
+  // Worker側の複数経路判定で公開可能とされた「終演目安」だけ使う。
+  const endGuide=e.end_time_estimate||e.end_time||null;
+  if(!endGuide) continue;
+  const p=String(endGuide).split(':').map(Number);
   if(p.length<2||p.some(x=>!Number.isFinite(x))) continue;
   const end=new Date();
   end.setHours(p[0],p[1],0,0);
@@ -1615,13 +1616,13 @@ function maybeNotifySelectedLiveEvents(d){
   const key=liveEventKey(e);
   if(diff>0&&diff<=30){
    notifyFact('live-end-guide',{
-    level:'warn',icon:'!',title:'ライブ 終演目安 '+String(e.end_time).slice(0,5)+'頃',
+    level:'warn',icon:'!',title:'ライブ 終演目安 '+String(endGuide).slice(0,5)+'頃',
     body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は前後する場合あり',
     key:key+'|guide',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
   }else if(diff<=0&&diff>=-10){
    notifyFact('live-end-guide-time',{
-    level:'info',icon:'!',title:'ライブ 終演目安 '+String(e.end_time).slice(0,5)+'頃',
+    level:'info',icon:'!',title:'ライブ 終演目安 '+String(endGuide).slice(0,5)+'頃',
     body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は未確認',
     key:key+'|guide-time',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
    });
