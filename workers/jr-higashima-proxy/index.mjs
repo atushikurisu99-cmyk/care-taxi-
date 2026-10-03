@@ -383,6 +383,42 @@ function pickArtistOfficialLink(html,base){
   const labeled=external.find(x=>/official|公式/i.test(x.text));
   return (labeled||external[0]||null)?.url||null;
 }
+async function checkTicketSearchSource(channel,label,url,name,venue,t,ctx){
+  try{
+    const html=await fetchTextCached(url,300,ctx);
+    const text=stripHtml(html);
+    const ymd1=t.year+"/"+t.month+"/"+t.day;
+    const ymd2=t.year+"年"+t.month+"月"+t.day+"日";
+    const ymd3=t.year+"/"+String(t.month).padStart(2,"0")+"/"+String(t.day).padStart(2,"0");
+    const matchedName=sameLooseText(text,name);
+    const matchedVenue=!venue || text.includes(venue);
+    const matchedDate=text.includes(ymd1)||text.includes(ymd2)||text.includes(ymd3);
+    if(!(matchedName&&matchedVenue&&matchedDate)){
+      return {channel,checked:true,note:label+"で同一公演を特定できず"};
+    }
+    const end=extractExplicitEndTime(text);
+    return {
+      channel,
+      end_time:end,
+      direct:!!end,
+      checked:true,
+      note:end?(label+"で終演時刻を確認"):(label+"で公演を照合・終演時刻の明記なし")
+    };
+  }catch{
+    return {channel,checked:true,note:label+"の取得に失敗"};
+  }
+}
+async function collectTicketEvidence(name,venue,t,ctx){
+  const q=encodeURIComponent(name);
+  const sources=[
+    ["ticket_eplus","イープラス","https://eplus.jp/sf/search?block=true&keyword="+q],
+    ["ticket_lawson","ローチケ","https://l-tike.com/search/?keyword="+q+"&page=0&size=20"],
+    ["ticket_pia","チケットぴあ","https://t.pia.jp/pia/search_all.do?kw="+q],
+  ];
+  return await Promise.all(sources.map(([channel,label,url])=>
+    checkTicketSearchSource(channel,label,url,name,venue,t,ctx)
+  ));
+}
 async function collectLiveEndEvidence({name,venue,start_time,venueText,venueUrl,t,ctx}){
   const evidence=[];
   const venueEnd=extractExplicitEndTime(venueText);
@@ -399,6 +435,9 @@ async function collectLiveEndEvidence({name,venue,start_time,venueText,venueUrl,
       }catch{ evidence.push({channel:"artist_official",checked:true,note:"アーティスト公式の取得に失敗"}); }
     }else evidence.push({channel:"artist_official",checked:true,note:"アーティスト公式URLを特定できず"});
   }else evidence.push({channel:"promoter_official",checked:true,note:"夢番地で一致する公演を特定できず"});
+
+  const ticketEvidence=await collectTicketEvidence(name,venue,t,ctx);
+  evidence.push(...ticketEvidence);
   return evidence;
 }
 async function buildHiroshimaEvents(ctx) {
