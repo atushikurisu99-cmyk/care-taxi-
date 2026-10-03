@@ -253,7 +253,26 @@ function median(xs){
   const i=Math.floor(a.length/2);
   return a.length%2?a[i]:(a[i-1]+a[i])/2;
 }
-function estimateLiveEndTime({start_time,evidence=[]}={}){
+function fallbackLiveEndGuide(start_time, venue=""){
+  const start=hhmmToMinutes(start_time);
+  if(start==null) return {time:null,range_start:null,range_end:null,basis:null};
+  const v=String(venue||"");
+  let minutes=120, margin=30, basis="ライブ公演の一般参考幅";
+  if(/グリーンアリーナ|アリーナ|ドーム|スタジアム/i.test(v)){
+    minutes=150; margin=45; basis="アリーナ公演の参考幅";
+  }else if(/HBG|ホール|アステール|文化会館|県民文化センター/i.test(v)){
+    minutes=130; margin=30; basis="ホール公演の参考幅";
+  }else if(/QUATTRO|クアトロ|VANQUISH|BLUE LIVE|SECOND|セカンド|Live|ライブ/i.test(v)){
+    minutes=120; margin=30; basis="ライブハウス公演の参考幅";
+  }
+  return {
+    time:minutesToHHMM(start+minutes),
+    range_start:minutesToHHMM(start+minutes-margin),
+    range_end:minutesToHHMM(start+minutes+margin),
+    basis
+  };
+}
+function estimateLiveEndTime({start_time,evidence=[],venue=""}={}){
   const start=hhmmToMinutes(start_time);
   const channels=LIVE_END_CHANNELS.map(([id,label,weight])=>({
     id,label,weight,
@@ -289,9 +308,14 @@ function estimateLiveEndTime({start_time,evidence=[]}={}){
   }
 
   if(!usable.length){
+    const ref=fallbackLiveEndGuide(start_time,venue);
     return {
       end_time_estimate:null,
-      confidence:"none",
+      end_time_reference:ref.time,
+      end_time_range_start:ref.range_start,
+      end_time_range_end:ref.range_end,
+      reference_basis:ref.basis,
+      confidence:ref.time?"reference":"none",
       evidence_count:0,
       direct_count:0,
       spread_minutes:null,
@@ -325,9 +349,14 @@ function estimateLiveEndTime({start_time,evidence=[]}={}){
   // 直接情報なしで1件だけの推定は表示しない。
   const publishable=directs.length>=1 || pool.length>=2;
 
+  const ref=publishable?{time:null,range_start:null,range_end:null,basis:null}:fallbackLiveEndGuide(start_time,venue);
   return {
     end_time_estimate:publishable?minutesToHHMM(rounded):null,
-    confidence:publishable?confidence:"none",
+    end_time_reference:publishable?null:ref.time,
+    end_time_range_start:publishable?null:ref.range_start,
+    end_time_range_end:publishable?null:ref.range_end,
+    reference_basis:publishable?null:ref.basis,
+    confidence:publishable?confidence:(ref.time?"reference":"none"),
     evidence_count:pool.length,
     direct_count:directs.length,
     spread_minutes:pool.length?spread:null,
@@ -473,7 +502,7 @@ async function buildHiroshimaEvents(ctx) {
         t,
         ctx
       });
-      const estimate=estimateLiveEndTime({start_time:startTime,evidence});
+      const estimate=estimateLiveEndTime({start_time:startTime,evidence,venue:"広島クラブクアトロ"});
       events.push({
         kind:"live",
         name,
@@ -482,6 +511,10 @@ async function buildHiroshimaEvents(ctx) {
         start_time:startTime,
         end_time:null,
         end_time_estimate:estimate.end_time_estimate,
+        end_time_reference:estimate.end_time_reference,
+        end_time_range_start:estimate.end_time_range_start,
+        end_time_range_end:estimate.end_time_range_end,
+        end_time_reference_basis:estimate.reference_basis,
         end_time_confidence:estimate.confidence,
         end_time_evidence_count:estimate.evidence_count,
         end_time_direct_count:estimate.direct_count,
