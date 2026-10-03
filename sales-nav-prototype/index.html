@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-SETTINGS-AUTOSAVE-MONEY-1 -->
+<!-- BUILD:2026-10-03-SETTINGS-SPLIT-SECTIONS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -175,6 +175,11 @@ main{position:relative;min-height:0;overflow:hidden}
 .share-summary strong{font-size:20px;display:block}
 .share-summary .sub{margin-top:5px}
 .settings-wrap{display:flex;flex-direction:column;gap:10px;overflow:auto;padding-bottom:6px}
+.settings-category{width:100%;min-height:82px;border:1px solid #22313d;border-radius:15px;background:#0c1721;color:#fff;padding:14px 16px;display:flex;align-items:center;justify-content:space-between;text-align:left}
+.settings-category strong{display:block;font-size:20px}
+.settings-category small{display:block;margin-top:5px;color:var(--muted);font-size:12px}
+.settings-category>span{font-size:34px;color:#8da0ad;line-height:1}
+.settings-backlink{border:0;background:transparent;color:#9cc5ff;font-size:15px;font-weight:800;padding:4px 2px 8px;text-align:left}
 .settings-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
 .settings-title{font-size:18px;font-weight:900;margin-bottom:4px}
 .settings-note{font-size:12px;line-height:1.45;color:var(--muted)}
@@ -1365,7 +1370,22 @@ html,body{
 
 <section id="settings" class="screen">
  <div class="content settings-wrap">
-  <div class="settings-card">
+  <div id="settingsRoot">
+   <div class="settings-card">
+    <div class="settings-title">設定</div>
+    <div class="settings-note">設定する内容を選びます。</div>
+   </div>
+   <button class="settings-category" type="button" onclick="openSettingsSection('personal')">
+    <div><strong>個人設定</strong><small>売上・目標など</small></div><span>›</span>
+   </button>
+   <button class="settings-category" type="button" onclick="openSettingsSection('notifications')">
+    <div><strong>通知設定</strong><small>バス・ライブ通知など</small></div><span>›</span>
+   </button>
+  </div>
+
+  <div id="settingsPersonal" class="hidden">
+   <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
+   <div class="settings-card">
    <div class="settings-title">売上・目標</div>
    <div class="settings-note">この端末だけに保存します。金額を変更すると自動で保存します。</div>
    <div class="money-settings">
@@ -1388,7 +1408,11 @@ html,body{
    </div>
    <div class="settings-autosave-note">自動保存</div>
   </div>
-  <div class="settings-card">
+  </div>
+
+  <div id="settingsNotifications" class="hidden">
+   <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
+   <div class="settings-card">
    <div class="settings-title">通知設定</div>
    <div class="settings-note">必要な通知だけ選びます。JR通知は見せ方が固まるまで保留です。</div>
   </div>
@@ -1413,6 +1437,7 @@ html,body{
    <div class="settings-subhead" style="margin-top:11px">会場</div>
    <div id="liveVenueSettingsList" class="settings-list"></div>
    <div class="settings-note" style="margin-top:10px">公式情報がない場合は、過去公演の実績を参考情報として表示します。実際の終演を確認できない限り、終演したとは言い切りません。</div>
+  </div>
   </div>
  </div>
  <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
@@ -1505,10 +1530,21 @@ function show(id){
  if(id==='eventDetail') setTimeout(renderEventDetail,0);
  if(id==='calendar') renderCalendar();
  if(id==='analysis') renderSimpleSalesAnalysis();
- if(id==='settings'){ renderNotificationSettings(); renderSalesGoalSettings(); }
+ if(id==='settings'){ openSettingsSection('root'); renderNotificationSettings(); renderSalesGoalSettings(); }
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
  renderDutyUI();
+}
+function openSettingsSection(section){
+ const root=document.getElementById('settingsRoot');
+ const personal=document.getElementById('settingsPersonal');
+ const notifications=document.getElementById('settingsNotifications');
+ if(!root||!personal||!notifications) return;
+ root.classList.toggle('hidden',section!=='root');
+ personal.classList.toggle('hidden',section!=='personal');
+ notifications.classList.toggle('hidden',section!=='notifications');
+ if(section==='personal') renderSalesGoalSettings();
+ if(section==='notifications') renderNotificationSettings();
 }
 const SALES_GOAL_SETTINGS_KEY='taxi_sales_goal_settings_v1';
 function getSalesGoalSettings(){
