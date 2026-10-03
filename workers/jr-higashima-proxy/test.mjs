@@ -67,6 +67,7 @@ globalThis.fetch = async (url)=>{
   if(s.includes("npb.jp/scores/")) return new Response(scoreHtml,{status:200});
   if(s.includes("club-quattro.com/hiroshima/schedule")) return new Response(eventHtml,{status:200});
   if(s.includes("artscouncil-hiroshima.jp/event/?md=")) return new Response("<html><body></body></html>",{status:200});
+  if(s.includes("h-bkk.jp/hall_schedule/")) return new Response("<html><body></body></html>",{status:200});
   if(s.includes("bluelive.jp/schedule")) return new Response("<html><body></body></html>",{status:200});
   if(s==="https://live-vanquish.com/") return new Response("<html><body></body></html>",{status:200});
   if(s.includes("setlist.fm/search?query=")) return new Response(setlistSearchHtml,{status:200});
