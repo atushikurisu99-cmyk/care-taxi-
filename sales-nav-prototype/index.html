@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-RESERVATION-CUSTOMER-PRIORITY-1 -->
+<!-- BUILD:2026-10-03-NOTICE-PON-SOUND-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -3926,6 +3926,42 @@ function maybeNotifySportsFacts(d){
  });
 }
 
+let noticeAudioCtx=null;
+let noticeAudioUnlocked=false;
+function unlockNoticeAudio(){
+ try{
+  const AC=window.AudioContext||window.webkitAudioContext;
+  if(!AC) return;
+  if(!noticeAudioCtx) noticeAudioCtx=new AC();
+  if(noticeAudioCtx.state==='suspended') noticeAudioCtx.resume();
+  noticeAudioUnlocked=true;
+ }catch(e){}
+}
+['pointerdown','touchend','keydown'].forEach(type=>{
+ document.addEventListener(type,unlockNoticeAudio,{once:true,passive:true});
+});
+function playNoticePon(){
+ try{
+  if(!noticeAudioUnlocked||!noticeAudioCtx) return;
+  const ctx=noticeAudioCtx;
+  if(ctx.state==='suspended') ctx.resume();
+  const now=ctx.currentTime;
+  const gain=ctx.createGain();
+  gain.gain.setValueAtTime(0.0001,now);
+  gain.gain.exponentialRampToValueAtTime(0.09,now+0.008);
+  gain.gain.exponentialRampToValueAtTime(0.0001,now+0.22);
+  gain.connect(ctx.destination);
+
+  const osc=ctx.createOscillator();
+  osc.type='sine';
+  osc.frequency.setValueAtTime(760,now);
+  osc.frequency.exponentialRampToValueAtTime(980,now+0.09);
+  osc.connect(gain);
+  osc.start(now);
+  osc.stop(now+0.23);
+ }catch(e){}
+}
+
 let noticeQueue=[];
 let noticeActive=false;
 
@@ -3948,6 +3984,7 @@ function showNextNotice(){
  const n=document.getElementById('notice');
  if(!n) return;
  noticeActive=true;
+ playNoticePon();
  logAnalyticsEvent('notice_shown',{kind:item.kind,level:item.level,icon:item.icon,title:item.title,body:item.body});
  n.className='notice show '+item.level;
  n.querySelector('#nicon').textContent=item.icon;
