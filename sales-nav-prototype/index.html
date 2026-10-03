@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-RESERVATION-DATE-PRIMARY-2 -->
+<!-- BUILD:2026-10-03-RESERVATION-CUSTOMER-PRIORITY-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -160,7 +160,8 @@ main{position:relative;min-height:0;overflow:hidden}
 .reservation-item-top{display:flex;align-items:flex-start;justify-content:space-between;gap:10px}
 .reservation-item-date{font-size:24px;font-weight:950;line-height:1.15;color:#fff;margin-bottom:7px}
 .reservation-item-time{font-size:17px;font-weight:800;line-height:1.1;color:#c8d5dd}
-.reservation-item-place{font-size:18px;font-weight:850;margin-top:7px}
+.reservation-item-customer{font-size:18px;font-weight:900;color:#fff;margin-top:7px}
+.reservation-item-place{font-size:15px;font-weight:750;color:#b8c5cf;margin-top:6px}
 .reservation-item-sub{font-size:12px;color:var(--muted);margin-top:5px}
 .reservation-item-actions{display:flex;gap:7px;flex:0 0 auto}
 .reservation-item-actions .smallbtn{white-space:nowrap}
@@ -2151,8 +2152,9 @@ function renderReservations(){
    return '<div class="reservation-item" onclick="openReservationJob(\''+r.id+'\')">'+
     '<div class="reservation-item-top"><div><div class="reservation-item-date">'+escapeHtml(reservationDateLabel(r.date))+'</div>'+
     '<div class="reservation-item-time">'+escapeHtml(t)+'</div>'+
+    '<div class="reservation-item-customer">'+(person||'お名前未入力')+'</div>'+
     '<div class="reservation-item-place">'+escapeHtml(r.pickup)+dest+'</div>'+
-    '<div class="reservation-item-sub">'+(person?person:'')+'</div>'+statusHtml+'</div>'+
+    '<div class="reservation-item-sub"></div>'+statusHtml+'</div>'+
     '<div class="reservation-item-actions">'+
     '<button class="smallbtn" onclick="event.stopPropagation();openReservationShare(\''+r.id+'\')">共有</button>'+
     cancelBtn+
