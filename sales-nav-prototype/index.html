@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-WEATHER-SPLIT-CADENCE-1 -->
+<!-- BUILD:2026-10-03-SIMPLE-SALES-ANALYSIS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1307,11 +1307,33 @@ html,body{
 
 <section id="analysis" class="screen">
  <div class="content">
-  <div class="segment"><button class="active">地図</button><button>分析</button><button>一覧</button></div>
-  <div class="heat"></div>
-  <div class="card"><div class="label">需要が多いエリア</div><div class="row"><strong>広島駅周辺</strong><span>28回</span></div><div class="row"><strong>紙屋町・八丁堀</strong><span>21回</span></div><div class="row"><strong>平和公園周辺</strong><span>13回</span></div></div>
+  <div class="card">
+   <div class="label">本日の売上</div>
+   <div id="analysisTodaySales" class="value">0円</div>
+   <div id="analysisTodayGoal" class="sub" style="margin-top:7px">目標未設定</div>
+  </div>
+  <div class="card">
+   <div class="label">当月の売上</div>
+   <div id="analysisMonthSales" class="value">0円</div>
+   <div id="analysisMonthGoal" class="sub" style="margin-top:7px">目標未設定</div>
+  </div>
+  <div class="grid2">
+   <div class="card">
+    <div class="label">本日 達成率</div>
+    <div id="analysisTodayPct" class="value">--%</div>
+   </div>
+   <div class="card">
+    <div class="label">当月 達成率</div>
+    <div id="analysisMonthPct" class="value">--%</div>
+   </div>
+  </div>
+  <div class="card">
+   <div class="label">目標まで</div>
+   <div id="analysisRemaining" class="value" style="font-size:24px">設定待ち</div>
+   <div class="sub" style="margin-top:7px">この端末に保存した金額だけで表示</div>
+  </div>
  </div>
- <div class="action"><button class="primary secondary">直近10日間</button></div>
+ <div class="action"><button class="primary secondary" onclick="show('settings')">売上・目標を設定</button></div>
 </section>
 
 <section id="verify" class="screen">
@@ -1334,6 +1356,19 @@ html,body{
 
 <section id="settings" class="screen">
  <div class="content settings-wrap">
+  <div class="settings-card">
+   <div class="settings-title">売上・目標</div>
+   <div class="settings-note">この端末だけに保存します。入力した金額を分析画面に表示します。</div>
+   <div class="settings-subhead" style="margin-top:12px">本日の売上</div>
+   <div class="settings-inputrow"><input id="settingsTodaySales" type="number" min="0" step="100" inputmode="numeric" placeholder="例 45000"><span style="align-self:center;color:#aebdca">円</span></div>
+   <div class="settings-subhead" style="margin-top:12px">本日の目標</div>
+   <div class="settings-inputrow"><input id="settingsTodayGoal" type="number" min="0" step="100" inputmode="numeric" placeholder="例 60000"><span style="align-self:center;color:#aebdca">円</span></div>
+   <div class="settings-subhead" style="margin-top:12px">当月の売上</div>
+   <div class="settings-inputrow"><input id="settingsMonthSales" type="number" min="0" step="1000" inputmode="numeric" placeholder="例 420000"><span style="align-self:center;color:#aebdca">円</span></div>
+   <div class="settings-subhead" style="margin-top:12px">当月の目標</div>
+   <div class="settings-inputrow"><input id="settingsMonthGoal" type="number" min="0" step="1000" inputmode="numeric" placeholder="例 650000"><span style="align-self:center;color:#aebdca">円</span></div>
+   <button type="button" class="primary" style="margin-top:12px;min-height:50px" onclick="saveSalesGoalSettings()">保存</button>
+  </div>
   <div class="settings-card">
    <div class="settings-title">通知設定</div>
    <div class="settings-note">必要な通知だけ選びます。JR通知は見せ方が固まるまで保留です。</div>
@@ -1450,11 +1485,74 @@ function show(id){
  if(id==='jrDetail') setTimeout(renderJrDetail,0);
  if(id==='eventDetail') setTimeout(renderEventDetail,0);
  if(id==='calendar') renderCalendar();
- if(id==='settings') renderNotificationSettings();
+ if(id==='analysis') renderSimpleSalesAnalysis();
+ if(id==='settings'){ renderNotificationSettings(); renderSalesGoalSettings(); }
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
  renderDutyUI();
 }
+const SALES_GOAL_SETTINGS_KEY='taxi_sales_goal_settings_v1';
+function getSalesGoalSettings(){
+ try{
+  const v=JSON.parse(localStorage.getItem(SALES_GOAL_SETTINGS_KEY)||'null');
+  if(v&&typeof v==='object') return {
+   todaySales:Math.max(0,Number(v.todaySales)||0),
+   todayGoal:Math.max(0,Number(v.todayGoal)||0),
+   monthSales:Math.max(0,Number(v.monthSales)||0),
+   monthGoal:Math.max(0,Number(v.monthGoal)||0)
+  };
+ }catch(e){}
+ return {todaySales:0,todayGoal:0,monthSales:0,monthGoal:0};
+}
+function yen(v){return Math.round(Number(v)||0).toLocaleString('ja-JP')+'円'}
+function renderSalesGoalSettings(){
+ const v=getSalesGoalSettings();
+ const map={
+  settingsTodaySales:v.todaySales,
+  settingsTodayGoal:v.todayGoal,
+  settingsMonthSales:v.monthSales,
+  settingsMonthGoal:v.monthGoal
+ };
+ for(const [id,val] of Object.entries(map)){
+  const el=document.getElementById(id);
+  if(el) el.value=val?String(val):'';
+ }
+}
+function saveSalesGoalSettings(){
+ const n=id=>Math.max(0,Number(document.getElementById(id)?.value)||0);
+ const v={
+  todaySales:n('settingsTodaySales'),
+  todayGoal:n('settingsTodayGoal'),
+  monthSales:n('settingsMonthSales'),
+  monthGoal:n('settingsMonthGoal'),
+  savedAt:Date.now()
+ };
+ try{localStorage.setItem(SALES_GOAL_SETTINGS_KEY,JSON.stringify(v))}catch(e){}
+ renderSimpleSalesAnalysis();
+ toast('売上・目標を保存しました');
+}
+function renderSimpleSalesAnalysis(){
+ const v=getSalesGoalSettings();
+ const set=(id,text)=>{const el=document.getElementById(id);if(el) el.textContent=text};
+ set('analysisTodaySales',yen(v.todaySales));
+ set('analysisMonthSales',yen(v.monthSales));
+
+ const tp=v.todayGoal>0?Math.round(v.todaySales/v.todayGoal*100):null;
+ const mp=v.monthGoal>0?Math.round(v.monthSales/v.monthGoal*100):null;
+ set('analysisTodayPct',tp==null?'--%':tp+'%');
+ set('analysisMonthPct',mp==null?'--%':mp+'%');
+
+ const tr=Math.max(0,v.todayGoal-v.todaySales);
+ const mr=Math.max(0,v.monthGoal-v.monthSales);
+ set('analysisTodayGoal',v.todayGoal?('目標 '+yen(v.todayGoal)+' / あと '+yen(tr)):'目標未設定');
+ set('analysisMonthGoal',v.monthGoal?('目標 '+yen(v.monthGoal)+' / あと '+yen(mr)):'目標未設定');
+
+ let remaining='設定待ち';
+ if(v.monthGoal>0) remaining='当月あと '+yen(mr);
+ else if(v.todayGoal>0) remaining='本日あと '+yen(tr);
+ set('analysisRemaining',remaining);
+}
+
 const BUS_NOTIFY_SETTINGS_KEY='taxi_bus_notify_settings_v1';
 const BUS_WARDS=['中区','西区','南区'];
 const BUS_STOP_FALLBACK={
