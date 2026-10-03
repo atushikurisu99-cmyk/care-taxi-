@@ -603,6 +603,111 @@ async function collectLiveEndEvidence({name,venue,start_time,title,venueText,ven
   evidence.push(...historyEvidence);
   return evidence;
 }
+
+const HIROSHIMA_LIVE_VENUES = [
+  "広島グリーンアリーナ",
+  "上野学園ホール",
+  "広島文化学園HBGホール",
+  "JMSアステールプラザ",
+  "広島クラブクアトロ",
+  "BLUE LIVE HIROSHIMA",
+  "LIVE VANQUISH",
+  "セカンド・クラッチ"
+];
+function canonicalLiveVenue(text=""){
+  const t=String(text||"");
+  if(/グリーンアリーナ|県立総合体育館.*大アリーナ/i.test(t)) return "広島グリーンアリーナ";
+  if(/上野学園ホール|広島県立文化芸術ホール/i.test(t)) return "上野学園ホール";
+  if(/HBGホール|広島文化学園HBG/i.test(t)) return "広島文化学園HBGホール";
+  if(/JMS\s*アステールプラザ|アステールプラザ/i.test(t)) return "JMSアステールプラザ";
+  if(/クラブクアトロ|CLUB QUATTRO/i.test(t)) return "広島クラブクアトロ";
+  if(/BLUE LIVE HIROSHIMA/i.test(t)) return "BLUE LIVE HIROSHIMA";
+  if(/LIVE VANQUISH/i.test(t)) return "LIVE VANQUISH";
+  if(/セカンド.?クラッチ|SECOND CRUTCH/i.test(t)) return "セカンド・クラッチ";
+  return "";
+}
+function looksLikeMusicEvent(text=""){
+  const t=String(text||"");
+  if(/コンサート|ライブ|LIVE|tour|ツアー|リサイタル|演奏会|音楽|オーケストラ|バンド|歌|シンガー|アーティスト/i.test(t)) return true;
+  if(/ミュージカル|演劇|講演|展示|教室|大会|スポーツ|バレエ|ダンス競技|能楽|文楽|映画|セミナー/i.test(t)) return false;
+  return false;
+}
+function extractStartTime(text=""){
+  const t=String(text||"");
+  const ps=[
+    /(?:開演|START|start)\s*[:：]?\s*([0-2][0-9]:[0-5][0-9])/i,
+    /(?:開場[^0-9]{0,20})?([0-2][0-9]:[0-5][0-9])\s*(?:開演|START)/i,
+    /([0-2][0-9]:[0-5][0-9])\s*(?:～|〜|から)/,
+  ];
+  for(const p of ps){const m=t.match(p);if(m)return m[1]}
+  return null;
+}
+function todayBlockFromCultureText(text,t){
+  const day=String(t.day);
+  const re=new RegExp("(?:^|\\\\s)"+day+"日\\\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)\\\\s+([\\\\s\\\\S]*?)(?=\\\\s+[0-3]?[0-9]日\\\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)|$)");
+  return String(text||"").match(re)?.[1]||"";
+}
+async function buildCultureHiroshimaLiveEvents(t,ctx){
+  const url="https://artscouncil-hiroshima.jp/event/?md="+t.year+"-"+String(t.month).padStart(2,"0");
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const block=todayBlockFromCultureText(text,t);
+  if(!block) return [];
+  const found=[];
+  for(const venue of HIROSHIMA_LIVE_VENUES){
+    const idx=block.indexOf(venue);
+    if(idx<0) continue;
+    const left=Math.max(0,idx-220), right=Math.min(block.length,idx+220);
+    const snippet=block.slice(left,right).replace(/\s+/g," ").trim();
+    if(!looksLikeMusicEvent(snippet)) continue;
+    let name=snippet.slice(0,Math.max(0,snippet.indexOf(venue))).trim();
+    name=name.replace(/^.*?(?:\||　)/,"").trim();
+    if(name.length>100) name=name.slice(-100).trim();
+    if(!name) name="ライブ";
+    const startTime=extractStartTime(snippet);
+    const evidence=await collectLiveEndEvidence({
+      name,venue,start_time:startTime,title:name,
+      venueText:snippet,venueUrl:url,t,ctx
+    });
+    const estimate=estimateLiveEndTime({
+      start_time:startTime,evidence,venue,title:name,artist:name
+    });
+    found.push({
+      kind:"live",
+      name,
+      venue,
+      open_time:null,
+      start_time:startTime,
+      end_time:null,
+      end_time_estimate:estimate.end_time_estimate,
+      end_time_reference:estimate.end_time_reference,
+      end_time_range_start:estimate.end_time_range_start,
+      end_time_range_end:estimate.end_time_range_end,
+      end_time_reference_basis:estimate.reference_basis,
+      end_time_confidence:estimate.confidence,
+      end_time_evidence_count:estimate.evidence_count,
+      end_time_direct_count:estimate.direct_count,
+      end_time_spread_minutes:estimate.spread_minutes,
+      end_time_channels:estimate.channels,
+      source:"カルチャーひろしま",
+      source_url:url
+    });
+  }
+  return found;
+}
+function mergeLiveEvents(rows){
+  const out=[];
+  const seen=new Set();
+  for(const e of rows){
+    if(!e) continue;
+    const key=[e.venue||"",e.start_time||"",String(e.name||"").toLowerCase().replace(/\s+/g,"")].join("|");
+    if(seen.has(key)) continue;
+    seen.add(key); out.push(e);
+  }
+  return out;
+}
+
 async function buildHiroshimaEvents(ctx) {
   const t = tokyoParts();
   const ym = `${t.year}${String(t.month).padStart(2,"0")}`;
@@ -666,17 +771,20 @@ async function buildHiroshimaEvents(ctx) {
       });
     }
   }
+  const cultureEvents=await buildCultureHiroshimaLiveEvents(t,ctx);
+  const mergedEvents=mergeLiveEvents([...events,...cultureEvents]);
   return {
     ok:true,
     area:"hiroshima",
     generated_at:Math.floor(Date.now()/1000),
-    coverage:"partial",
+    coverage:"expanded",
     end_time_logic:{
       channel_count:LIVE_END_CHANNELS.length,
       channels:LIVE_END_CHANNELS.map(([id,label,weight])=>({id,label,weight})),
       rule:"公式の直接終演時刻を最優先。直接情報がない場合は独立した2系統以上が一致した時だけ終演目安を公開。45分超の外れ値は除外。"
     },
-    events,
+    venues_covered:HIROSHIMA_LIVE_VENUES,
+    events:mergedEvents,
   };
 }
 
