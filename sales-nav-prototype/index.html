@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-SIMPLE-SALES-ANALYSIS-1 -->
+<!-- BUILD:2026-10-03-SETTINGS-AUTOSAVE-MONEY-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -194,6 +194,15 @@ main{position:relative;min-height:0;overflow:hidden}
 .settings-inputrow{display:flex;gap:7px;margin-top:8px}
 .settings-inputrow input{flex:1;min-width:0;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 11px;font-size:14px}
 .settings-inputrow button{border:1px solid #315f8a;background:#10253a;color:#dcebff;border-radius:10px;padding:0 12px;font-weight:900}
+.money-settings{display:flex;flex-direction:column;margin-top:10px;border-top:1px solid #22313d}
+.money-setting-row{display:grid;grid-template-columns:1fr minmax(150px,48%);gap:12px;align-items:center;padding:12px 0;border-bottom:1px solid #22313d}
+.money-setting-label{font-size:15px;font-weight:800;color:#d7e1e8}
+.money-input-wrap{display:flex;align-items:center;gap:7px;min-width:0}
+.money-input-wrap input{width:100%;min-width:0;box-sizing:border-box;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:11px;padding:10px 12px;font-size:16px;text-align:right;outline:none}
+.money-input-wrap input:focus{border-color:#4c91ff}
+.money-input-wrap span{flex:0 0 auto;color:#aebdca;font-weight:800}
+.settings-autosave-note{font-size:11px;color:#738694;margin-top:9px;text-align:right}
+@media(max-width:380px){.money-setting-row{grid-template-columns:1fr minmax(135px,46%)}}
 .settings-chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .settings-chip{border:1px solid #315f8a;background:#10253a;color:#dcebff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
 .reservation-form{display:flex;flex-direction:column;gap:11px;overflow:auto;padding-bottom:4px}
@@ -1358,16 +1367,26 @@ html,body{
  <div class="content settings-wrap">
   <div class="settings-card">
    <div class="settings-title">売上・目標</div>
-   <div class="settings-note">この端末だけに保存します。入力した金額を分析画面に表示します。</div>
-   <div class="settings-subhead" style="margin-top:12px">本日の売上</div>
-   <div class="settings-inputrow"><input id="settingsTodaySales" type="number" min="0" step="100" inputmode="numeric" placeholder="例 45000"><span style="align-self:center;color:#aebdca">円</span></div>
-   <div class="settings-subhead" style="margin-top:12px">本日の目標</div>
-   <div class="settings-inputrow"><input id="settingsTodayGoal" type="number" min="0" step="100" inputmode="numeric" placeholder="例 60000"><span style="align-self:center;color:#aebdca">円</span></div>
-   <div class="settings-subhead" style="margin-top:12px">当月の売上</div>
-   <div class="settings-inputrow"><input id="settingsMonthSales" type="number" min="0" step="1000" inputmode="numeric" placeholder="例 420000"><span style="align-self:center;color:#aebdca">円</span></div>
-   <div class="settings-subhead" style="margin-top:12px">当月の目標</div>
-   <div class="settings-inputrow"><input id="settingsMonthGoal" type="number" min="0" step="1000" inputmode="numeric" placeholder="例 650000"><span style="align-self:center;color:#aebdca">円</span></div>
-   <button type="button" class="primary" style="margin-top:12px;min-height:50px" onclick="saveSalesGoalSettings()">保存</button>
+   <div class="settings-note">この端末だけに保存します。金額を変更すると自動で保存します。</div>
+   <div class="money-settings">
+    <label class="money-setting-row">
+     <span class="money-setting-label">本日の売上</span>
+     <span class="money-input-wrap"><input id="settingsTodaySales" type="number" min="0" step="100" inputmode="numeric" placeholder="45,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
+    </label>
+    <label class="money-setting-row">
+     <span class="money-setting-label">本日の目標</span>
+     <span class="money-input-wrap"><input id="settingsTodayGoal" type="number" min="0" step="100" inputmode="numeric" placeholder="60,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
+    </label>
+    <label class="money-setting-row">
+     <span class="money-setting-label">当月の売上</span>
+     <span class="money-input-wrap"><input id="settingsMonthSales" type="number" min="0" step="1000" inputmode="numeric" placeholder="420,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
+    </label>
+    <label class="money-setting-row">
+     <span class="money-setting-label">当月の目標</span>
+     <span class="money-input-wrap"><input id="settingsMonthGoal" type="number" min="0" step="1000" inputmode="numeric" placeholder="650,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
+    </label>
+   </div>
+   <div class="settings-autosave-note">自動保存</div>
   </div>
   <div class="settings-card">
    <div class="settings-title">通知設定</div>
@@ -1518,7 +1537,7 @@ function renderSalesGoalSettings(){
   if(el) el.value=val?String(val):'';
  }
 }
-function saveSalesGoalSettings(){
+function saveSalesGoalSettings(showToast=true){
  const n=id=>Math.max(0,Number(document.getElementById(id)?.value)||0);
  const v={
   todaySales:n('settingsTodaySales'),
@@ -1529,7 +1548,7 @@ function saveSalesGoalSettings(){
  };
  try{localStorage.setItem(SALES_GOAL_SETTINGS_KEY,JSON.stringify(v))}catch(e){}
  renderSimpleSalesAnalysis();
- toast('売上・目標を保存しました');
+ if(showToast) toast('売上・目標を保存しました');
 }
 function renderSimpleSalesAnalysis(){
  const v=getSalesGoalSettings();
