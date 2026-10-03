@@ -291,7 +291,10 @@ function estimateLiveEndTime({start_time,evidence=[],venue=""}={}){
       ch.note=String(ev?.note||"");
       continue;
     }
-    const candidate=hhmmToMinutes(ev?.end_time);
+    let candidate=hhmmToMinutes(ev?.end_time);
+    if(candidate==null && start!=null && Number.isFinite(Number(ev?.duration_minutes))){
+      candidate=start+Number(ev.duration_minutes);
+    }
     if(candidate==null) continue;
     let endMin=candidate;
     if(start!=null && endMin<start) endMin+=1440;
@@ -362,6 +365,31 @@ function estimateLiveEndTime({start_time,evidence=[],venue=""}={}){
     spread_minutes:pool.length?spread:null,
     channels
   };
+}
+
+const LIVE_END_VALIDATION_CASES = [
+  {artist:"ONE OK ROCK",start_time:"21:15",duration_minutes:110,channel:"same_tour_recent",context:"通常ツアー"},
+  {artist:"Official HIGE DANdism",start_time:"19:05",duration_minutes:125,channel:"same_tour_recent",context:"通常ツアー"},
+  {artist:"Ado",start_time:"18:00",duration_minutes:158,channel:"same_tour_recent",context:"スタジアム"},
+  {artist:"Kodaline",start_time:"19:30",duration_minutes:90,channel:"artist_history",context:"単独公演"},
+  {artist:"The Warning",start_time:"14:10",duration_minutes:40,channel:"artist_history",context:"フェス"},
+  {artist:"Beyoncé",start_time:"20:35",duration_minutes:170,channel:"same_tour_recent",context:"スタジアム"},
+  {artist:"Rina Katahira",start_time:"20:00",duration_minutes:80,channel:"artist_history",context:"ライブハウス"},
+  {artist:"Kendrick Lamar & SZA",start_time:"20:10",duration_minutes:160,channel:"same_tour_recent",context:"スタジアム"},
+  {artist:"L",start_time:"18:00",duration_minutes:130,channel:"artist_history",context:"ホール"},
+  {artist:"betcover!!",start_time:"18:10",duration_minutes:95,channel:"artist_history",context:"ライブハウス"},
+];
+function validateHistoricalDurationCases(){
+  return LIVE_END_VALIDATION_CASES.map(c=>{
+    const start=hhmmToMinutes(c.start_time);
+    const ref=start==null?null:minutesToHHMM(start+c.duration_minutes);
+    return {
+      artist:c.artist,context:c.context,start_time:c.start_time,
+      reference_end_time:ref,duration_minutes:c.duration_minutes,
+      display:ref?("終演参考 "+ref+"頃"):"参考時間なし",
+      confidence:"reference"
+    };
+  });
 }
 
 function extractExplicitEndTime(text=""){
@@ -722,6 +750,12 @@ export default {
     try {
       if (url.pathname === "/api/jr/hiroshima") return json(await buildHiroshima(ctx),200,origin);
       if (url.pathname === "/api/sports/hiroshima") return json(await buildHiroshimaSports(ctx),200,origin);
+      if (url.pathname === "/api/events/live-end-validation") return json({
+        ok:true,
+        generated_at:Math.floor(Date.now()/1000),
+        rule:"過去実績1件は断定・予測に使わず参考時間。複数の同ツアー・同形式実績が揃えば中央値とばらつきから終演目安へ昇格。",
+        cases:validateHistoricalDurationCases()
+      },200,origin);
       if (url.pathname === "/api/events/hiroshima") return json(await buildHiroshimaEvents(ctx),200,origin);
       if (url.pathname === "/api/bus/hiroshima") return json(await buildHiroshimaBus(ctx),200,origin);
       return json({ok:false,error:"not_found"},404,origin);
