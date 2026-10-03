@@ -109,15 +109,18 @@ for(const c of validation.cases){
 
 const events=await call("/api/events/hiroshima");
 if(!Array.isArray(events.events)) throw new Error("events array missing");
-if(events.events.length!==1) throw new Error("event count "+events.events.length);
-if(events.events[0].name!=="TEST ARTIST") throw new Error("event name "+events.events[0].name);
-if(events.events[0].start_time!=="19:00") throw new Error("event time "+events.events[0].start_time);
-if(events.events[0].end_time_estimate!=="21:00") throw new Error("event end estimate "+events.events[0].end_time_estimate);
-if(events.events[0].end_time_confidence==="reference") throw new Error("history did not promote to estimate");
+if(!events.events.length) throw new Error("event count 0");
+const todayKey=year+"-"+month+"-"+day;
+const testEvent=events.events.find(x=>x.name==="TEST ARTIST"&&x.date===todayKey);
+if(!testEvent) throw new Error("today TEST ARTIST missing");
+if(testEvent.start_time!=="19:00") throw new Error("event time "+testEvent.start_time);
+if(testEvent.end_time_estimate!=="21:00") throw new Error("event end estimate "+testEvent.end_time_estimate);
+if(testEvent.end_time_confidence==="reference") throw new Error("history did not promote to estimate");
+if(events.range_days!==60) throw new Error("event range "+events.range_days);
 
 console.log(JSON.stringify({
   ok:true,
   jr:jr.summary,
   sports:{status:carp.status,end_time:carp.end_time},
-  event:{name:events.events[0].name,start_time:events.events[0].start_time}
+  event:{name:testEvent.name,start_time:testEvent.start_time,date:testEvent.date,total:events.events.length}
 }));
