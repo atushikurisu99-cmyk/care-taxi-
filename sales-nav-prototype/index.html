@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-SETTINGS-SPLIT-SECTIONS-1 -->
+<!-- BUILD:2026-10-03-MONTH-GOAL-DUTY-DAYS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1333,8 +1333,8 @@ html,body{
   </div>
   <div class="grid2">
    <div class="card">
-    <div class="label">本日 達成率</div>
-    <div id="analysisTodayPct" class="value">--%</div>
+    <div class="label">残り乗務</div>
+    <div id="analysisTodayPct" class="value">--</div>
    </div>
    <div class="card">
     <div class="label">当月 達成率</div>
@@ -1387,7 +1387,7 @@ html,body{
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
    <div class="settings-card">
    <div class="settings-title">売上・目標</div>
-   <div class="settings-note">この端末だけに保存します。当日の目標は月目標から自動計算します。</div>
+   <div class="settings-note">この端末だけに保存します。月目標と予定乗務日数から、1乗務あたり必要額を自動計算します。</div>
    <div class="money-settings">
     <label class="money-setting-row">
      <span class="money-setting-label">本日の売上</span>
@@ -1400,6 +1400,10 @@ html,body{
     <label class="money-setting-row">
      <span class="money-setting-label">当月の目標</span>
      <span class="money-input-wrap"><input id="settingsMonthGoal" type="number" min="0" step="1000" inputmode="numeric" placeholder="650,000" onchange="saveSalesGoalSettings(false)"><span>円</span></span>
+    </label>
+    <label class="money-setting-row">
+     <span class="money-setting-label">今月の予定乗務日数</span>
+     <span class="money-input-wrap"><input id="settingsPlannedDutyDays" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="20" onchange="saveSalesGoalSettings(false)"><span>日</span></span>
     </label>
    </div>
    <div class="settings-autosave-note">自動保存</div>
@@ -1548,12 +1552,13 @@ function getSalesGoalSettings(){
   const v=JSON.parse(localStorage.getItem(SALES_GOAL_SETTINGS_KEY)||'null');
   if(v&&typeof v==='object') return {
    todaySales:Math.max(0,Number(v.todaySales)||0),
-   todayGoal:Math.max(0,Number(v.todayGoal)||0),
+   todayGoal:0,
    monthSales:Math.max(0,Number(v.monthSales)||0),
-   monthGoal:Math.max(0,Number(v.monthGoal)||0)
+   monthGoal:Math.max(0,Number(v.monthGoal)||0),
+   plannedDutyDays:Math.max(0,Math.min(31,Number(v.plannedDutyDays)||0))
   };
  }catch(e){}
- return {todaySales:0,todayGoal:0,monthSales:0,monthGoal:0};
+ return {todaySales:0,todayGoal:0,monthSales:0,monthGoal:0,plannedDutyDays:0};
 }
 function yen(v){return Math.round(Number(v)||0).toLocaleString('ja-JP')+'円'}
 function renderSalesGoalSettings(){
@@ -1561,7 +1566,8 @@ function renderSalesGoalSettings(){
  const map={
   settingsTodaySales:v.todaySales,
   settingsMonthSales:v.monthSales,
-  settingsMonthGoal:v.monthGoal
+  settingsMonthGoal:v.monthGoal,
+  settingsPlannedDutyDays:v.plannedDutyDays
  };
  for(const [id,val] of Object.entries(map)){
   const el=document.getElementById(id);
@@ -1573,14 +1579,26 @@ function saveSalesGoalSettings(showToast=true){
  const monthGoal=n('settingsMonthGoal');
  const v={
   todaySales:n('settingsTodaySales'),
-  todayGoal:monthGoal>0?Math.round(monthGoal/30):0,
+  todayGoal:0,
   monthSales:n('settingsMonthSales'),
   monthGoal,
+  plannedDutyDays:Math.max(0,Math.min(31,n('settingsPlannedDutyDays'))),
   savedAt:Date.now()
  };
  try{localStorage.setItem(SALES_GOAL_SETTINGS_KEY,JSON.stringify(v))}catch(e){}
  renderSimpleSalesAnalysis();
  if(showToast) toast('売上・目標を保存しました');
+}
+function completedDutyDaysThisMonth(){
+ const now=new Date();
+ const y=now.getFullYear(),m=now.getMonth();
+ const days=new Set();
+ for(const ev of getAnalyticsEvents()){
+  if(ev?.type!=='duty_end'||!ev?.t) continue;
+  const d=new Date(Number(ev.t));
+  if(d.getFullYear()===y&&d.getMonth()===m) days.add(d.getDate());
+ }
+ return days.size;
 }
 function renderSimpleSalesAnalysis(){
  const v=getSalesGoalSettings();
@@ -1588,20 +1606,23 @@ function renderSimpleSalesAnalysis(){
  set('analysisTodaySales',yen(v.todaySales));
  set('analysisMonthSales',yen(v.monthSales));
 
- const tp=v.todayGoal>0?Math.round(v.todaySales/v.todayGoal*100):null;
  const mp=v.monthGoal>0?Math.round(v.monthSales/v.monthGoal*100):null;
- set('analysisTodayPct',tp==null?'--%':tp+'%');
+ set('analysisTodayPct','--');
  set('analysisMonthPct',mp==null?'--%':mp+'%');
 
- const tr=Math.max(0,v.todayGoal-v.todaySales);
  const mr=Math.max(0,v.monthGoal-v.monthSales);
- set('analysisTodayGoal',v.todayGoal?('月目標から自動 '+yen(v.todayGoal)+' / あと '+yen(tr)):'目標未設定');
- set('analysisMonthGoal',v.monthGoal?('目標 '+yen(v.monthGoal)+' / あと '+yen(mr)):'目標未設定');
+ const done=completedDutyDaysThisMonth();
+ const remainingDuties=v.plannedDutyDays>0?Math.max(0,v.plannedDutyDays-done):0;
+ const neededPerDuty=(remainingDuties>0&&mr>0)?Math.ceil(mr/remainingDuties/100)*100:0;
+ set('analysisTodayPct',v.plannedDutyDays?remainingDuties+'日':'--');
 
- let remaining='設定待ち';
- if(v.monthGoal>0) remaining='当月あと '+yen(mr);
- else if(v.todayGoal>0) remaining='本日あと '+yen(tr);
- set('analysisRemaining',remaining);
+ set('analysisTodayGoal',
+  v.monthGoal&&v.plannedDutyDays
+   ?('1乗務あたり必要 '+yen(neededPerDuty)+' / 残り '+remainingDuties+'乗務')
+   :'月目標・予定乗務日数を設定'
+ );
+ set('analysisMonthGoal',v.monthGoal?('目標 '+yen(v.monthGoal)+' / あと '+yen(mr)):'目標未設定');
+ set('analysisRemaining',v.monthGoal?('当月あと '+yen(mr)):'設定待ち');
 }
 
 const BUS_NOTIFY_SETTINGS_KEY='taxi_bus_notify_settings_v1';
