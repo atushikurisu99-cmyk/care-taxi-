@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-SAFETY-PIRO SOUND-1 -->
+<!-- BUILD:2026-10-03-NOTIFICATION-SOUND-DEMO-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -210,6 +210,8 @@ main{position:relative;min-height:0;overflow:hidden}
 .money-input-wrap span{flex:0 0 auto;color:#aebdca;font-weight:800}
 .settings-autosave-note{font-size:11px;color:#738694;margin-top:9px;text-align:right}
 @media(max-width:380px){.money-setting-row{grid-template-columns:1fr minmax(135px,46%)}}
+.settings-demo-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.settings-demo-grid .smallbtn{min-height:48px;font-size:15px}
 .settings-chiprow{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
 .settings-chip{border:1px solid #315f8a;background:#10253a;color:#dcebff;border-radius:999px;padding:7px 10px;font-size:12px;font-weight:800}
 .reservation-form{display:flex;flex-direction:column;gap:11px;overflow:auto;padding-bottom:4px}
@@ -1417,6 +1419,12 @@ html,body{
    <div class="settings-card">
    <div class="settings-title">通知設定</div>
    <div class="settings-note">必要な通知だけ選びます。JR通知は見せ方が固まるまで保留です。</div>
+   <div class="settings-subhead" style="margin-top:12px">通知音デモ</div>
+   <div class="settings-demo-grid" style="margin-top:8px">
+    <button type="button" class="smallbtn" onclick="demoNoticeSound()">ポン♪</button>
+    <button type="button" class="smallbtn" onclick="demoSafetySound()">ピロリン♪</button>
+   </div>
+   <div class="settings-note" style="margin-top:8px">iPhoneは最初のタップで音声を有効化します。</div>
   </div>
 
   <div class="settings-card">
@@ -4026,6 +4034,15 @@ function playSafetyPiro(){
    o.stop(now+x.t+x.d+0.02);
   }
  }catch(e){}
+}
+
+function demoNoticeSound(){
+ unlockNoticeAudio();
+ setTimeout(playNoticePon,0);
+}
+function demoSafetySound(){
+ unlockNoticeAudio();
+ setTimeout(playSafetyPiro,0);
 }
 
 function showSafety(duration=5200){
