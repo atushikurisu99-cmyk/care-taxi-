@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-LIVE-UNIFIED-LABEL-1 -->
+<!-- BUILD:2026-10-03-WEEKLY-WEATHER-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -897,6 +897,19 @@ html,body{
  -webkit-tap-highlight-color:transparent;
  touch-action:manipulation;
 }
+
+.weather-week-card{margin-top:12px;padding:14px 12px 12px}
+.weather-week-title{font-size:14px;font-weight:800;color:#c7d3dd;margin:0 4px 10px}
+.weather-week{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:4px}
+.weather-day{min-width:0;text-align:center;padding:8px 2px;border-radius:12px;background:rgba(255,255,255,.025)}
+.weather-day.today{background:rgba(71,151,255,.12);outline:1px solid rgba(90,163,255,.35)}
+.weather-day .wd{font-size:11px;font-weight:800;color:#cbd7e0;white-space:nowrap}
+.weather-day .wi{font-size:22px;line-height:1.2;margin:5px 0}
+.weather-day .temps{font-size:11px;white-space:nowrap}
+.weather-day .hi{color:#ff8585;font-weight:800}
+.weather-day .lo{color:#79aefe;font-weight:800}
+.weather-day .pop{font-size:10px;color:#aab8c4;margin-top:5px}
+@media(max-width:380px){.weather-week{gap:2px}.weather-day{padding:7px 1px}.weather-day .wi{font-size:20px}.weather-day .temps{font-size:10px}}
 </style>
 </head>
 <body>
@@ -1134,6 +1147,10 @@ html,body{
    <div class="label">現在地の天気</div>
    <div class="home-weather-main"><div id="weatherDetailNow" class="value">取得中…</div><span id="weatherDetailIcon" class="weather-icon">--</span></div>
    <div id="weatherDetailNext" class="sub" style="margin-top:10px">現在地から更新</div>
+  </div>
+  <div class="card weather-week-card">
+   <div class="weather-week-title">週間天気</div>
+   <div id="weatherWeek" class="weather-week"><div class="sub">週間予報を取得中…</div></div>
   </div>
  </div>
  <div class="action"><button class="primary secondary" onclick="show('home')">戻る</button></div>
@@ -3239,12 +3256,36 @@ function renderWeatherDetail(){
  const now=document.getElementById('weatherDetailNow');
  const ic=document.getElementById('weatherDetailIcon');
  const next=document.getElementById('weatherDetailNext');
+ const week=document.getElementById('weatherWeek');
  if(!now||!ic||!next) return;
- if(!d){now.textContent='取得中…';ic.textContent='--';next.textContent='現在地から更新';return}
+ if(!d){
+  now.textContent='取得中…';ic.textContent='--';next.textContent='現在地から更新';
+  if(week) week.innerHTML='<div class="sub">週間予報を取得中…</div>';
+  return;
+ }
  const [icon]=weatherLabel(d.code);
  now.textContent=Math.round(d.temp)+'℃';
  ic.textContent=icon;
  next.textContent=d.next||'向こう12時間に目立つ雨予報なし';
+ if(week){
+  const daily=Array.isArray(d.daily)?d.daily:[];
+  if(!daily.length){
+   week.innerHTML='<div class="sub">週間予報を取得中…</div>';
+  }else{
+   const wds=['日','月','火','水','木','金','土'];
+   const today=localDateValue(new Date());
+   week.innerHTML=daily.slice(0,7).map(x=>{
+    const dt=new Date(x.date+'T00:00:00');
+    const [wi]=weatherLabel(x.code);
+    return '<div class="weather-day '+(x.date===today?'today':'')+'">'+
+      '<div class="wd">'+(dt.getMonth()+1)+'/'+dt.getDate()+'('+wds[dt.getDay()]+')</div>'+
+      '<div class="wi">'+wi+'</div>'+
+      '<div class="temps"><span class="hi">'+Math.round(x.max)+'°</span> <span class="lo">'+Math.round(x.min)+'°</span></div>'+
+      '<div class="pop">'+Math.round(Number(x.pop)||0)+'%</div>'+
+    '</div>';
+   }).join('');
+  }
+ }
 }
 function renderJrDetail(){
  const map=[['jrInfoStatus','jrDetailStatus'],['jrInfoMiddle','jrDetailMiddle'],['jrInfoBottom','jrDetailBottom'],['jrInfoImpact','jrDetailImpact'],['jrInfoFacts','jrDetailFacts']];
@@ -3281,7 +3322,8 @@ async function updateWeather(pos,force=false){
  const url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+
   '&longitude='+encodeURIComponent(lon)+
   '&current=temperature_2m,weather_code,precipitation,rain,wind_speed_10m'+
-  '&hourly=precipitation_probability,precipitation&forecast_hours=12&timezone=Asia%2FTokyo';
+  '&hourly=precipitation_probability,precipitation&forecast_hours=12'+
+  '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=7&timezone=Asia%2FTokyo';
  try{
   const d=await fetchJsonWithTimeout(url,6500);
   const current=d.current||{};
@@ -3297,13 +3339,26 @@ async function updateWeather(pos,force=false){
     break;
    }
   }
+  const daily=d.daily||{};
+  const dates=Array.isArray(daily.time)?daily.time:[];
+  const codes=Array.isArray(daily.weather_code)?daily.weather_code:[];
+  const maxs=Array.isArray(daily.temperature_2m_max)?daily.temperature_2m_max:[];
+  const mins=Array.isArray(daily.temperature_2m_min)?daily.temperature_2m_min:[];
+  const pops=Array.isArray(daily.precipitation_probability_max)?daily.precipitation_probability_max:[];
   const result={
    savedAt:now,
    temp:Number(current.temperature_2m),
    code:Number(current.weather_code),
    precipitation:Number(current.precipitation||0),
    wind:Number(current.wind_speed_10m||0),
-   next:next||'向こう12時間に目立つ雨予報なし'
+   next:next||'向こう12時間に目立つ雨予報なし',
+   daily:dates.slice(0,7).map((date,i)=>({
+    date,
+    code:Number(codes[i]),
+    max:Number(maxs[i]),
+    min:Number(mins[i]),
+    pop:Number(pops[i])
+   }))
   };
   writeWeatherCache(result);
   renderWeatherData(result);
