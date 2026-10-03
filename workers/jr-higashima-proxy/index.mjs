@@ -878,9 +878,9 @@ async function buildHiroshimaEvents(ctx) {
     end_time_logic:{
       channel_count:LIVE_END_CHANNELS.length,
       channels:LIVE_END_CHANNELS.map(([id,label,weight])=>({id,label,weight})),
-      operational_goal:"営業判断で体感8割程度の有用性を目標。ユーザーには誤差幅を表示せず、根拠が弱い場合は『過去公演参考』として扱う。",
+      operational_goal:"営業判断で体感8割程度の有用性を目標。ユーザーには誤差幅や根拠の強弱を表示せず、終演時間の案内はすべて『過去公演参考』に統一する。",
       acceptable_error_minutes:30,
-      rule:"公式の直接終演時刻を最優先。同ツアー2公演以上、または同一アーティスト過去2公演以上で幅45分以内なら終演目安へ昇格。弱い根拠は過去公演参考として表示。45分超の外れ値は除外。"
+      rule:"内部では公式情報・同ツアー実績・過去公演実績の強弱を判定するが、ユーザー表示はすべて『過去公演参考』に統一。45分超の外れ値は除外。"
     },
     venues_covered:HIROSHIMA_LIVE_VENUES,
     events:mergedEvents,
