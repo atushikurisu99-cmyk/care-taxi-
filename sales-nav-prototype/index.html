@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-MONTH-GOAL-DUTY-DAYS-1 -->
+<!-- BUILD:2026-10-03-RESERVATION-LIST-ALL-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1017,7 +1017,7 @@ html,body{
      <div id="weatherNext" class="sub">現在地から更新</div>
     </div>
    </div>
-   <div class="card reservation-summary" onclick="openTodayDutyReservations()">
+   <div class="card reservation-summary" onclick="openAllReservations()">
     <div class="label">次の予約</div>
     <div id="homeReservationValue" class="value">---</div>
     <div id="homeReservationSub" class="sub">タップして予約を確認</div>
@@ -1070,7 +1070,7 @@ html,body{
      <span class="k">状況</span>
      <span id="vacantJrFacts" class="v">—</span>
     </div>
-    <div class="vacant-summary-row reservation-row" onclick="show('schedule')">
+    <div class="vacant-summary-row reservation-row" onclick="openAllReservations()">
      <span class="k">次の予約</span>
      <span id="vacantReservationValue" class="v">---</span>
     </div>
