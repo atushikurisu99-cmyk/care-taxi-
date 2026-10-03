@@ -647,6 +647,98 @@ function todayBlockFromCultureText(text,t){
   const re=new RegExp("(?:^|\\\\s)"+day+"日\\\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)\\\\s+([\\\\s\\\\S]*?)(?=\\\\s+[0-3]?[0-9]日\\\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)|$)");
   return String(text||"").match(re)?.[1]||"";
 }
+
+function daySegmentByRegex(text, startRe, nextRe){
+  const t=String(text||"");
+  const m=t.match(startRe);
+  if(!m) return "";
+  const start=(m.index||0)+m[0].length;
+  const rest=t.slice(start);
+  const n=rest.match(nextRe);
+  return (n?rest.slice(0,n.index):rest).trim();
+}
+async function makeOfficialVenueEvent({name,title,venue,start_time,open_time,venueText,venueUrl,t,ctx}){
+  if(!name||!venue) return null;
+  const evidence=await collectLiveEndEvidence({
+    name,venue,start_time,title:title||name,
+    venueText:venueText||"",venueUrl,t,ctx
+  });
+  const estimate=estimateLiveEndTime({
+    start_time,evidence,venue,title:title||name,artist:name
+  });
+  return {
+    kind:"live",
+    name,
+    title:title||name,
+    venue,
+    open_time:open_time||null,
+    start_time:start_time||null,
+    end_time:null,
+    end_time_estimate:estimate.end_time_estimate,
+    end_time_reference:estimate.end_time_reference,
+    end_time_range_start:estimate.end_time_range_start,
+    end_time_range_end:estimate.end_time_range_end,
+    end_time_reference_basis:estimate.reference_basis,
+    end_time_confidence:estimate.confidence,
+    end_time_evidence_count:estimate.evidence_count,
+    end_time_direct_count:estimate.direct_count,
+    end_time_spread_minutes:estimate.spread_minutes,
+    end_time_channels:estimate.channels,
+    source:"会場公式",
+    source_url:venueUrl
+  };
+}
+async function buildBlueLiveEvents(t,ctx){
+  const url="https://bluelive.jp/schedule";
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const mm=String(t.month).padStart(2,"0"),dd=String(t.day).padStart(2,"0");
+  const startRe=new RegExp(t.year+"\\\\/"+mm+"\\\\/"+dd+"\\\\s*\\\\([A-Za-z]{3}\\\\)","i");
+  const nextRe=/\d{4}\/\d{2}\/\d{2}\s*\([A-Za-z]{3}\)/i;
+  const seg=daySegmentByRegex(text,startRe,nextRe);
+  if(!seg||!looksLikeMusicEvent(seg)||/\[DANCE公演\]|CLOSED EVENT/i.test(seg)) return [];
+  const tm=seg.match(/OPEN\/START\s*\|?\s*([0-2][0-9]:[0-5][0-9])\s*\/\s*([0-2][0-9]:[0-5][0-9])/i);
+  const openTime=tm?.[1]||null,startTime=tm?.[2]||extractStartTime(seg);
+  let before=(tm?seg.slice(0,tm.index):seg).replace(/NOW ON SALE|SOLD OUT|スタンディング|指定席|自由席|シアター|ドリンク[^ ]*/gi," ").replace(/\s+/g," ").trim();
+  const pieces=before.split(/\s{2,}|(?<=\])\s+/).map(x=>x.trim()).filter(Boolean);
+  let name=pieces.find(x=>x.length>=2&&!/ライブスケジュール|Image|2026|公演|OPEN|PRICE/i.test(x))||before;
+  if(name.length>80) name=name.slice(0,80).trim();
+  const event=await makeOfficialVenueEvent({
+    name,title:before,venue:"BLUE LIVE HIROSHIMA",start_time:startTime,open_time:openTime,
+    venueText:seg,venueUrl:url,t,ctx
+  });
+  return event?[event]:[];
+}
+async function buildVanquishEvents(t,ctx){
+  const url="https://live-vanquish.com/";
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const mm=String(t.month).padStart(2,"0"),dd=String(t.day).padStart(2,"0");
+  const startRe=new RegExp(t.year+"\\\\s+"+mm.replace(/^0/,"")+"\\\\."+dd+"\\\\s+[A-Z]{3}","i");
+  const nextRe=/\d{4}\s+\d{1,2}\.\d{2}\s+[A-Z]{3}/i;
+  const seg=daySegmentByRegex(text,startRe,nextRe);
+  if(!seg||!looksLikeMusicEvent(seg)) return [];
+  const tm=seg.match(/OPEN[：:]\s*([0-2][0-9]:[0-5][0-9])\s*\/\s*([0-2][0-9]:[0-5][0-9])/i);
+  const openTime=tm?.[1]||null,startTime=tm?.[2]||extractStartTime(seg);
+  let before=(tm?seg.slice(0,tm.index):seg).replace(/\s+/g," ").trim();
+  let name=before.split(/料金|お問い合わせ/)[0].trim();
+  if(name.length>90) name=name.slice(0,90).trim();
+  const event=await makeOfficialVenueEvent({
+    name,title:before,venue:"LIVE VANQUISH",start_time:startTime,open_time:openTime,
+    venueText:seg,venueUrl:url,t,ctx
+  });
+  return event?[event]:[];
+}
+async function buildDirectVenueLiveEvents(t,ctx){
+  const groups=await Promise.all([
+    buildBlueLiveEvents(t,ctx),
+    buildVanquishEvents(t,ctx)
+  ]);
+  return groups.flat();
+}
+
 async function buildCultureHiroshimaLiveEvents(t,ctx){
   const url="https://artscouncil-hiroshima.jp/event/?md="+t.year+"-"+String(t.month).padStart(2,"0");
   let html="";
@@ -771,8 +863,12 @@ async function buildHiroshimaEvents(ctx) {
       });
     }
   }
-  const cultureEvents=await buildCultureHiroshimaLiveEvents(t,ctx);
-  const mergedEvents=mergeLiveEvents([...events,...cultureEvents]);
+  const [directVenueEvents,cultureEvents]=await Promise.all([
+    buildDirectVenueLiveEvents(t,ctx),
+    buildCultureHiroshimaLiveEvents(t,ctx)
+  ]);
+  // 専用会場公式を先に置き、同じ公演の補完情報より優先する。
+  const mergedEvents=mergeLiveEvents([...events,...directVenueEvents,...cultureEvents]);
   return {
     ok:true,
     area:"hiroshima",
