@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-WEEKLY-WEATHER-CACHE-FIX-1 -->
+<!-- BUILD:2026-10-03-WEATHER-SPLIT-CADENCE-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1442,8 +1442,10 @@ function show(id){
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
  if(id==='weatherDetail'){
   renderWeatherDetail();
-  const wc=readWeatherCache();
-  if((!Array.isArray(wc?.daily)||wc.daily.length<5)&&latestPosition) updateWeather(latestPosition,true);
+  if(latestPosition){
+   updateCurrentWeather(latestPosition,false);
+   updateWeeklyWeather(latestPosition,false);
+  }
  }
  if(id==='jrDetail') setTimeout(renderJrDetail,0);
  if(id==='eventDetail') setTimeout(renderEventDetail,0);
@@ -3352,7 +3354,10 @@ function gpsQualitySummary(){
  };
 }
 window.__gpsQualitySummary=gpsQualitySummary;
-let weatherFetchBusy=false;
+let weatherCurrentFetchBusy=false;
+let weatherWeeklyFetchBusy=false;
+const WEATHER_CURRENT_TTL_MS=15*60*1000;
+const WEATHER_WEEKLY_TTL_MS=2*60*60*1000;
 function weatherLabel(code){
  const c=Number(code);
  if(c===0) return ['☀️','晴れ'];
@@ -3451,22 +3456,20 @@ function readWeatherCache(){
 function writeWeatherCache(v){
  try{localStorage.setItem('taxi_weather_cache',JSON.stringify(v))}catch(e){}
 }
-async function updateWeather(pos,force=false){
- if(!pos||weatherFetchBusy) return;
- const cached=readWeatherCache();
+async function updateCurrentWeather(pos,force=false){
+ if(!pos||weatherCurrentFetchBusy) return;
+ const cached=readWeatherCache()||{};
  const now=Date.now();
- const hasWeekly=Array.isArray(cached?.daily)&&cached.daily.length>=5;
- if(!force&&cached&&hasWeekly&&now-(cached.savedAt||0)<7200000){
+ if(!force&&cached.currentSavedAt&&now-Number(cached.currentSavedAt)<WEATHER_CURRENT_TTL_MS){
   renderWeatherData(cached);
   return;
  }
- weatherFetchBusy=true;
+ weatherCurrentFetchBusy=true;
  const lat=pos.coords.latitude,lon=pos.coords.longitude;
  const url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+
   '&longitude='+encodeURIComponent(lon)+
   '&current=temperature_2m,weather_code,precipitation,rain,wind_speed_10m'+
-  '&hourly=precipitation_probability,precipitation&forecast_hours=12'+
-  '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&forecast_days=7&timezone=Asia%2FTokyo';
+  '&hourly=precipitation_probability,precipitation&forecast_hours=12&timezone=Asia%2FTokyo';
  try{
   const d=await fetchJsonWithTimeout(url,6500);
   const current=d.current||{};
@@ -3482,6 +3485,47 @@ async function updateWeather(pos,force=false){
     break;
    }
   }
+  const result={
+   ...cached,
+   savedAt:now,
+   currentSavedAt:now,
+   temp:Number(current.temperature_2m),
+   code:Number(current.weather_code),
+   precipitation:Number(current.precipitation||0),
+   wind:Number(current.wind_speed_10m||0),
+   next:next||'向こう12時間に目立つ雨予報なし'
+  };
+  writeWeatherCache(result);
+  renderWeatherData(result);
+ }catch(e){
+  if(cached&&Number.isFinite(Number(cached.temp))) renderWeatherData(cached);
+  else{
+   const nowEl=document.getElementById('weatherNow');
+   const nextEl=document.getElementById('weatherNext');
+   if(nowEl) nowEl.textContent='天気取得不能';
+   if(nextEl) nextEl.textContent='次回GPS更新時に再取得';
+  }
+ }finally{
+  weatherCurrentFetchBusy=false;
+ }
+}
+async function updateWeeklyWeather(pos,force=false){
+ if(!pos||weatherWeeklyFetchBusy) return;
+ const cached=readWeatherCache()||{};
+ const now=Date.now();
+ const hasWeekly=Array.isArray(cached.daily)&&cached.daily.length>=5;
+ if(!force&&hasWeekly&&cached.weeklySavedAt&&now-Number(cached.weeklySavedAt)<WEATHER_WEEKLY_TTL_MS){
+  renderWeatherDetail();
+  return;
+ }
+ weatherWeeklyFetchBusy=true;
+ const lat=pos.coords.latitude,lon=pos.coords.longitude;
+ const url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+
+  '&longitude='+encodeURIComponent(lon)+
+  '&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max'+
+  '&forecast_days=7&timezone=Asia%2FTokyo';
+ try{
+  const d=await fetchJsonWithTimeout(url,6500);
   const daily=d.daily||{};
   const dates=Array.isArray(daily.time)?daily.time:[];
   const codes=Array.isArray(daily.weather_code)?daily.weather_code:[];
@@ -3489,12 +3533,9 @@ async function updateWeather(pos,force=false){
   const mins=Array.isArray(daily.temperature_2m_min)?daily.temperature_2m_min:[];
   const pops=Array.isArray(daily.precipitation_probability_max)?daily.precipitation_probability_max:[];
   const result={
+   ...cached,
    savedAt:now,
-   temp:Number(current.temperature_2m),
-   code:Number(current.weather_code),
-   precipitation:Number(current.precipitation||0),
-   wind:Number(current.wind_speed_10m||0),
-   next:next||'向こう12時間に目立つ雨予報なし',
+   weeklySavedAt:now,
    daily:dates.slice(0,7).map((date,i)=>({
     date,
     code:Number(codes[i]),
@@ -3504,18 +3545,18 @@ async function updateWeather(pos,force=false){
    }))
   };
   writeWeatherCache(result);
-  renderWeatherData(result);
+  renderWeatherDetail();
  }catch(e){
-  if(cached) renderWeatherData(cached);
-  else{
-   const nowEl=document.getElementById('weatherNow');
-   const nextEl=document.getElementById('weatherNext');
-   if(nowEl) nowEl.textContent='天気取得不能';
-   if(nextEl) nextEl.textContent='次回GPS更新時に再取得';
-  }
+  renderWeatherDetail();
  }finally{
-  weatherFetchBusy=false;
+  weatherWeeklyFetchBusy=false;
  }
+}
+async function updateWeather(pos,force=false){
+ await Promise.all([
+  updateCurrentWeather(pos,force),
+  updateWeeklyWeather(pos,force)
+ ]);
 }
 function handlePosition(pos){
  latestPosition=pos;
@@ -3526,7 +3567,8 @@ function handlePosition(pos){
  updateVacantArea(pos);
  updateDutyDistance(pos);
  recordGpsQuality(pos);
- updateWeather(pos,false);
+ updateCurrentWeather(pos,false);
+ updateWeeklyWeather(pos,false);
  evaluateSafetyZone(pos);
 }
 
