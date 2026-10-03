@@ -36,6 +36,26 @@ const eventHtml = `
 <div>31 SAT. NEXT EVENT 開場/開演 18:00 / 19:00</div>
 </body></html>`;
 
+const setlistSearchHtml = `
+<html><body>
+<a href="/setlist/test-artist/${year}/venue-a-test-city-test-1.html">TEST ARTIST setlist A</a>
+<a href="/setlist/test-artist/${year}/venue-b-test-city-test-2.html">TEST ARTIST setlist B</a>
+</body></html>`;
+
+const setlistPageA = `
+<html><body>
+<h1>TEST ARTIST</h1>
+<div>Tour: TEST ARTIST Venue: TEST HALL</div>
+<div>Start time: 7:00 PM End: 9:00 PM</div>
+</body></html>`;
+
+const setlistPageB = `
+<html><body>
+<h1>TEST ARTIST</h1>
+<div>Tour: TEST ARTIST Venue: TEST HALL</div>
+<div>Start time: 7:05 PM End: 9:05 PM</div>
+</body></html>`;
+
 const mem = new Map();
 globalThis.caches = {default:{
   async match(req){ const v=mem.get(req.url); return v ? v.clone() : undefined; },
@@ -46,6 +66,9 @@ globalThis.fetch = async (url)=>{
   if(s.includes("npb.jp/games/") && s.includes("schedule_")) return new Response(scheduleHtml,{status:200});
   if(s.includes("npb.jp/scores/")) return new Response(scoreHtml,{status:200});
   if(s.includes("club-quattro.com/hiroshima/schedule")) return new Response(eventHtml,{status:200});
+  if(s.includes("setlist.fm/search?query=")) return new Response(setlistSearchHtml,{status:200});
+  if(s.includes("venue-a-test-city-test-1.html")) return new Response(setlistPageA,{status:200});
+  if(s.includes("venue-b-test-city-test-2.html")) return new Response(setlistPageB,{status:200});
   if(s.endsWith("_st.json")) return new Response(JSON.stringify(stationPayload),{status:200});
   if(s.endsWith(".json")) return new Response(JSON.stringify(posPayload),{status:200});
   throw new Error("unexpected "+url);
@@ -84,6 +107,8 @@ if(!Array.isArray(events.events)) throw new Error("events array missing");
 if(events.events.length!==1) throw new Error("event count "+events.events.length);
 if(events.events[0].name!=="TEST ARTIST") throw new Error("event name "+events.events[0].name);
 if(events.events[0].start_time!=="19:00") throw new Error("event time "+events.events[0].start_time);
+if(events.events[0].end_time_estimate!=="21:00") throw new Error("event end estimate "+events.events[0].end_time_estimate);
+if(events.events[0].end_time_confidence==="reference") throw new Error("history did not promote to estimate");
 
 console.log(JSON.stringify({
   ok:true,
