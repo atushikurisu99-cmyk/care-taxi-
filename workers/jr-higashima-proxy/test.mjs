@@ -73,6 +73,12 @@ if(carp?.team!=="広島東洋カープ") throw new Error("carp missing");
 if(carp?.status!=="ended") throw new Error("carp status "+carp?.status);
 if(carp?.end_time!=="21:15") throw new Error("carp end time "+carp?.end_time);
 
+const validation=await call("/api/events/live-end-validation");
+if(!Array.isArray(validation.cases)||validation.cases.length!==10) throw new Error("concert timing validation count");
+for(const c of validation.cases){
+  if(!c.reference_end_time) throw new Error("missing concert reference "+c.artist);
+}
+
 const events=await call("/api/events/hiroshima");
 if(!Array.isArray(events.events)) throw new Error("events array missing");
 if(events.events.length!==1) throw new Error("event count "+events.events.length);
