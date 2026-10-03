@@ -338,8 +338,8 @@ function estimateLiveEndTime({start_time,evidence=[]}={}){
 function extractExplicitEndTime(text=""){
   const t=String(text||"");
   const patterns=[
-    /(?:終演(?:予定|見込|見込み)?|公演終了(?:予定|見込|見込み)?|終了予定)\\s*[:：]?\\s*([0-2][0-9]:[0-5][0-9])/,
-    /([0-2][0-9]:[0-5][0-9])\\s*(?:終演予定|終了予定|終演見込|終演見込み)/,
+    /(?:終演(?:予定|見込|見込み)?|公演終了(?:予定|見込|見込み)?|終了予定)\s*[:：]?\s*([0-2][0-9]:[0-5][0-9])/,
+    /([0-2][0-9]:[0-5][0-9])\s*(?:終演予定|終了予定|終演見込|終演見込み)/,
   ];
   for(const re of patterns){ const m=t.match(re); if(m) return m[1]; }
   return null;
@@ -347,14 +347,14 @@ function extractExplicitEndTime(text=""){
 function absoluteHref(href, base){ try{return new URL(href,base).toString()}catch{return null} }
 function linksFromHtml(html="",base=""){
   const out=[];
-  for(const m of String(html).matchAll(/<a\\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\\s\\S]*?)<\\/a>/gi)){
+  for(const m of String(html).matchAll(/<a\b[^>]*href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
     const url=absoluteHref(m[1],base); if(!url) continue;
     out.push({url,text:stripHtml(m[2])});
   }
   return out;
 }
 function sameLooseText(a,b){
-  const norm=v=>String(v||"").toLowerCase().replace(/[\\s　"\'’“”‘・\\-‐‑–—―~〜～\\[\\]()（）]/g,"");
+  const norm=v=>String(v||"").toLowerCase().replace(/[\s　"'’“”‘・\-‐‑–—―~〜～\[\]()（）]/g,"");
   const x=norm(a),y=norm(b); if(!x||!y) return false;
   return x.includes(y)||y.includes(x)||x.slice(0,14)===y.slice(0,14);
 }
@@ -362,7 +362,7 @@ async function findYumebanchiEvent(name, venue, t, ctx){
   if(!name) return null;
   const searchUrl="https://www.yumebanchi.jp/?s="+encodeURIComponent(name);
   let html=""; try{html=await fetchTextCached(searchUrl,300,ctx)}catch{return null}
-  const links=linksFromHtml(html,searchUrl).filter(x=>/\\/event\\/\\d+\\/?(?:$|[?#])/.test(x.url));
+  const links=linksFromHtml(html,searchUrl).filter(x=>/\/event\/\d+\/?(?:$|[?#])/.test(x.url));
   const unique=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,12);
   const dateNeedle=t.year+"年"+String(t.month).padStart(2,"0")+"月"+String(t.day).padStart(2,"0")+"日";
   const dateNeedleLoose=t.year+"年"+t.month+"月"+t.day+"日";
