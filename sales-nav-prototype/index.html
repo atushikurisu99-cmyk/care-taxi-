@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-04-GPS-150-LIGHT-1 -->
+<!-- BUILD:2026-10-04-GPS-150-LIGHT-1 DAILY-REPORT-INPUT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -963,6 +963,90 @@ html,body{
 .weather-day .lo{color:#79aefe;font-weight:800}
 .weather-day .pop{font-size:10px;color:#aab8c4;margin-top:5px}
 @media(max-width:380px){.weather-week{gap:2px}.weather-day{padding:7px 1px}.weather-day .wi{font-size:20px}.weather-day .temps{font-size:10px}}
+
+/* daily report input v1 */
+.daily-report-content{overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:6px}
+.report-warning{
+ display:none;border:1px solid #9b3d42;background:#351719;color:#ffb6b9;
+ border-radius:13px;padding:11px 12px;font-size:14px;font-weight:900;line-height:1.35
+}
+.report-warning.show{display:block}
+.report-field{display:flex;flex-direction:column;gap:7px}
+.report-field-label{font-size:14px;font-weight:850;color:#d8e2e8}
+.report-input-wrap{
+ display:flex;align-items:center;gap:8px;background:#0b1620;border:1px solid #2a3a47;
+ border-radius:14px;padding:4px 12px
+}
+.report-input-wrap.error{border-color:#e55258;box-shadow:0 0 0 1px rgba(229,82,88,.2)}
+.report-input{
+ flex:1;min-width:0;width:100%;border:0;outline:0;background:transparent;color:#fff;
+ font-size:23px;font-weight:900;padding:11px 0;text-align:right
+}
+.report-unit{color:#aab8c4;font-size:14px;font-weight:800;white-space:nowrap}
+.expense-section{display:flex;flex-direction:column;gap:9px}
+.expense-row{
+ display:grid;grid-template-columns:minmax(0,1fr) minmax(112px,42%) auto;
+ align-items:center;gap:8px;padding:9px 0;border-bottom:1px solid #1f2d38
+}
+.expense-row:last-child{border-bottom:0}
+.expense-name{min-width:0;font-size:15px;font-weight:800;overflow-wrap:anywhere}
+.expense-input-wrap{
+ display:flex;align-items:center;gap:5px;background:#0b1620;border:1px solid #2a3a47;
+ border-radius:12px;padding:2px 8px;min-width:0
+}
+.expense-input{
+ width:100%;min-width:0;border:0;outline:0;background:transparent;color:#fff;
+ font-size:18px;font-weight:900;text-align:right;padding:10px 0
+}
+.expense-remove{
+ width:38px;height:38px;border-radius:10px;border:1px solid #3a4853;background:#111d27;
+ color:#aab8c4;font-size:18px
+}
+.expense-total{
+ display:flex;align-items:baseline;justify-content:space-between;gap:10px;
+ padding:12px 2px 2px;font-weight:900
+}
+.expense-total span:first-child{font-size:15px;color:#c6d2da}
+.expense-total strong{font-size:25px}
+.expense-add-btn{
+ width:100%;min-height:48px;border:1px dashed #3b5367;background:#0d1b26;color:#b9d5ef;
+ border-radius:13px;font-weight:900;font-size:15px
+}
+.expense-add-panel{display:none;background:#0b1620;border:1px solid #2a3a47;border-radius:14px;padding:12px}
+.expense-add-panel.show{display:flex;flex-direction:column;gap:9px}
+.report-select,.report-text{
+ width:100%;min-width:0;background:#0b1620;border:1px solid #2a3a47;border-radius:12px;
+ color:#fff;font-size:16px;padding:12px 13px
+}
+.report-text.hidden{display:none}
+.report-mini-actions{display:flex;gap:8px}
+.report-mini-actions button{flex:1;min-height:44px;border-radius:11px;border:1px solid #334756;background:#13212d;color:#fff;font-weight:850}
+.report-auto-card{display:flex;flex-direction:column;gap:8px}
+.report-auto-row{display:flex;justify-content:space-between;gap:12px;font-size:14px}
+.report-auto-row span{color:#9aabb7}
+.report-auto-row strong{text-align:right}
+.report-edit-link{
+ width:100%;min-height:44px;border-radius:12px;border:1px solid #304252;background:#13212d;
+ color:#d9e7f0;font-weight:900
+}
+.odometer-missing-banner{
+ display:none;border:1px solid #a63d43;background:#3a171a;color:#ffc1c4;
+ border-radius:14px;padding:11px 12px;font-size:14px;font-weight:900;line-height:1.35
+}
+.odometer-missing-banner.show{display:block}
+.report-edit-grid{display:flex;flex-direction:column;gap:10px}
+.report-edit-row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:center}
+.report-edit-row label{font-size:13px;color:#aab8c4;font-weight:800}
+.report-edit-row input,.report-edit-row textarea{
+ width:100%;min-width:0;background:#0b1620;border:1px solid #2a3a47;border-radius:12px;
+ color:#fff;font-size:17px;padding:11px 12px
+}
+.report-edit-row textarea{min-height:74px;resize:vertical}
+@media(max-width:360px){
+ .expense-row{grid-template-columns:minmax(0,1fr) 112px auto}
+ .report-edit-row{grid-template-columns:1fr;gap:5px}
+}
+
 </style>
 </head>
 <body>
@@ -1010,6 +1094,7 @@ html,body{
 
 <section id="home" class="screen active">
  <div class="content">
+  <div id="odometerMissingBanner" class="odometer-missing-banner" onclick="openLatestMissingOdometer()">前回の日報：入庫オドメーター未入力</div>
   <div class="home-top-grid">
    <div class="home-weather" onclick="show('weatherDetail')">
     <div class="home-weather-inner">
@@ -1312,6 +1397,78 @@ html,body{
  </div>
 </section>
 
+
+<section id="dailyReport" class="screen">
+ <div class="content daily-report-content">
+  <div id="reportMissingWarning" class="report-warning">入庫オドメーターが未入力です。確認して入力してください。空欄のまま保存する場合は、もう一度「保存」を押してください。</div>
+
+  <div class="card">
+   <div class="row"><div><div class="label">日報入力</div><h2 id="reportDateLabel" style="margin:3px 0 0">--</h2></div><span id="reportDutyState" class="badge">編集中</span></div>
+  </div>
+
+  <div class="card">
+   <div class="report-field">
+    <div class="report-field-label">入庫オドメーター</div>
+    <div id="reportOdometerWrap" class="report-input-wrap">
+     <input id="reportOdometerEnd" class="report-input" type="number" min="0" step="1" inputmode="numeric" placeholder="未入力">
+     <span class="report-unit">km</span>
+    </div>
+   </div>
+  </div>
+
+  <div class="card expense-section">
+   <div class="row"><h2 style="margin:0">経費</h2><span class="sub">項目ごとに入力</span></div>
+   <div id="reportExpenseRows"></div>
+   <button class="expense-add-btn" type="button" onclick="toggleExpenseAddPanel()">＋ 項目追加</button>
+
+   <div id="expenseAddPanel" class="expense-add-panel">
+    <div class="report-field-label">項目</div>
+    <select id="expenseMasterSelect" class="report-select" onchange="expenseMasterSelectionChanged()"></select>
+    <input id="expenseNewName" class="report-text hidden" type="text" placeholder="項目名（空欄でも登録可）" autocomplete="off">
+    <div id="expenseRenameWrap" class="hidden">
+     <div class="report-field-label" style="margin-bottom:6px">この項目名を変更</div>
+     <input id="expenseRenameName" class="report-text" type="text" placeholder="項目名">
+     <div class="report-mini-actions" style="margin-top:8px"><button type="button" onclick="renameSelectedExpenseMaster()">名称変更</button></div>
+    </div>
+    <div class="report-mini-actions">
+     <button type="button" onclick="toggleExpenseAddPanel(false)">閉じる</button>
+     <button type="button" onclick="addExpenseItemFromMaster()">追加</button>
+    </div>
+   </div>
+
+   <div class="expense-total"><span>経費合計</span><strong id="reportExpenseTotal">0円</strong></div>
+  </div>
+
+  <div class="card report-auto-card">
+   <div class="row"><h2 style="margin:0">自動記録内容</h2><span class="sub">必要なら編集</span></div>
+   <div class="report-auto-row"><span>出庫時刻</span><strong id="reportAutoStartTime">--</strong></div>
+   <div class="report-auto-row"><span>入庫時刻</span><strong id="reportAutoEndTime">--</strong></div>
+   <div class="report-auto-row"><span>売上</span><strong id="reportAutoSales">0円</strong></div>
+   <div class="report-auto-row"><span>売掛</span><strong id="reportAutoReceivable">0円</strong></div>
+   <div class="report-auto-row"><span>乗車回数</span><strong id="reportAutoTrips">0回</strong></div>
+   <button class="report-edit-link" type="button" onclick="openCurrentReportEdit()">編集する</button>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="cancelDailyReport()">戻る</button><button class="primary" onclick="saveDailyReport()">保存</button></div>
+</section>
+
+<section id="reportEdit" class="screen">
+ <div class="content daily-report-content">
+  <div class="card"><div class="label">自動記録内容の修正</div><h2 id="reportEditDate" style="margin:4px 0 0">--</h2></div>
+  <div class="card report-edit-grid">
+   <div class="report-edit-row"><label for="editStartTime">出庫時刻</label><input id="editStartTime" type="time"></div>
+   <div class="report-edit-row"><label for="editEndTime">入庫時刻</label><input id="editEndTime" type="time"></div>
+   <div class="report-edit-row"><label for="editOdometerStart">出庫オドメーター</label><input id="editOdometerStart" type="number" min="0" step="1" inputmode="numeric"></div>
+   <div class="report-edit-row"><label for="editOdometerEnd">入庫オドメーター</label><input id="editOdometerEnd" type="number" min="0" step="1" inputmode="numeric"></div>
+   <div class="report-edit-row"><label for="editSales">売上</label><input id="editSales" type="number" min="0" step="1" inputmode="numeric"></div>
+   <div class="report-edit-row"><label for="editReceivable">売掛</label><input id="editReceivable" type="number" min="0" step="1" inputmode="numeric"></div>
+   <div class="report-edit-row"><label for="editTrips">乗車回数</label><input id="editTrips" type="number" min="0" step="1" inputmode="numeric"></div>
+   <div class="report-edit-row"><label for="editNote">備考</label><textarea id="editNote"></textarea></div>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('dailyReport')">戻る</button><button class="primary" onclick="saveReportEdit()">反映</button></div>
+</section>
+
 <section id="sales" class="screen">
  <div class="content">
   <div class="segment"><button>日別</button><button class="active">10日間</button><button>グラフ</button></div>
@@ -1469,6 +1626,7 @@ html,body{
    <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
    <div class="menuitem" onclick="show('verify')">◎ 位置・警告検証</div>
+   <div class="menuitem" onclick="openLatestReport()">▤ 日報確認</div>
    <div class="menuitem" onclick="show('settings')">⚙ 設定</div>
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()">■ 乗務終了</div>
   </div>
@@ -1504,7 +1662,7 @@ preventIosPinchZoom();
  document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 })();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',dailyReport:'日報入力',reportEdit:'日報編集',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -1546,10 +1704,13 @@ function show(id){
  if(id==='eventDetail') setTimeout(renderEventDetail,0);
  if(id==='calendar') renderCalendar();
  if(id==='analysis') renderSimpleSalesAnalysis();
+ if(id==='dailyReport') renderDailyReport();
+ if(id==='reportEdit') renderReportEdit();
  if(id==='settings'){ openSettingsSection('root'); renderNotificationSettings(); renderSalesGoalSettings(); }
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
  renderDutyUI();
+ if(id==='home') renderOdometerMissingBanner();
 }
 function openSettingsSection(section){
  const root=document.getElementById('settingsRoot');
@@ -3159,6 +3320,378 @@ function upsertTripRecord(rideId,patch){
  saveTripRecords(rows);
 }
 
+
+const DAILY_REPORTS_KEY='taxi_daily_reports_v1';
+const EXPENSE_MASTER_KEY='taxi_expense_master_v1';
+const LAST_ODOMETER_KEY='taxi_last_end_odometer_v1';
+let activeReportId=null;
+let reportOdometerWarned=false;
+let reportEndDutyPending=false;
+let reportReturnScreen='menu';
+
+function localDayKeyFromTs(ts){
+ const d=new Date(Number(ts)||Date.now());
+ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+}
+function hmFromTs(ts){
+ if(!ts) return '';
+ const d=new Date(Number(ts));
+ return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0');
+}
+function displayDayFromTs(ts){
+ const d=new Date(Number(ts)||Date.now());
+ return (d.getMonth()+1)+'月'+d.getDate()+'日';
+}
+function getDailyReports(){
+ try{
+  const v=JSON.parse(localStorage.getItem(DAILY_REPORTS_KEY)||'[]');
+  return Array.isArray(v)?v:[];
+ }catch(e){return[]}
+}
+function saveDailyReports(rows){
+ try{localStorage.setItem(DAILY_REPORTS_KEY,JSON.stringify(rows.slice(-800)))}catch(e){}
+}
+function getExpenseMaster(){
+ try{
+  const v=JSON.parse(localStorage.getItem(EXPENSE_MASTER_KEY)||'null');
+  if(Array.isArray(v)&&v.length) return v;
+ }catch(e){}
+ const names=['燃料費','有料道路・高速','駐車料金','洗車','整備・修理','消耗品','その他'];
+ const rows=names.map((name,i)=>({id:'exp_'+(i+1),name,active:true,createdAt:Date.now()}));
+ try{localStorage.setItem(EXPENSE_MASTER_KEY,JSON.stringify(rows))}catch(e){}
+ return rows;
+}
+function saveExpenseMaster(rows){
+ try{localStorage.setItem(EXPENSE_MASTER_KEY,JSON.stringify(rows))}catch(e){}
+}
+function latestKnownOdometer(){
+ try{
+  const n=Number(localStorage.getItem(LAST_ODOMETER_KEY));
+  return Number.isFinite(n)&&n>=0?n:null;
+ }catch(e){return null}
+}
+function reportTripsForDuty(dutyId){
+ return getTripRecords().filter(x=>x&&x.dutyId===dutyId&&x.dropoffTs).length;
+}
+function ensureDailyReportForDuty(startTs){
+ const dutyId='duty_'+String(startTs);
+ const rows=getDailyReports();
+ let r=rows.find(x=>x.dutyId===dutyId);
+ if(r) return r;
+ const sales=getSalesGoalSettings().todaySales||0;
+ r={
+  id:'report_'+String(startTs),
+  dutyId,
+  dateKey:localDayKeyFromTs(startTs),
+  startTs:Number(startTs),
+  endTs:null,
+  startTime:hmFromTs(startTs),
+  endTime:'',
+  odometerStart:latestKnownOdometer(),
+  odometerEnd:null,
+  sales:Number(sales)||0,
+  receivable:0,
+  trips:0,
+  expenses:[],
+  note:'',
+  manual:{odometerStart:false,startTime:false,endTime:false,sales:false,receivable:false,trips:false},
+  status:'draft',
+  createdAt:Date.now(),
+  updatedAt:Date.now()
+ };
+ rows.push(r);saveDailyReports(rows);
+ return r;
+}
+function getReportById(id){
+ return getDailyReports().find(x=>x.id===id)||null;
+}
+function updateReport(id,patch){
+ const rows=getDailyReports();
+ const i=rows.findIndex(x=>x.id===id);
+ if(i<0) return null;
+ rows[i]={...rows[i],...patch,updatedAt:Date.now()};
+ saveDailyReports(rows);
+ return rows[i];
+}
+function openDailyReportForDutyEnd(){
+ const d=getDutyState();
+ if(!d.active){openLatestReport();return}
+ const r=ensureDailyReportForDuty(d.start);
+ activeReportId=r.id;
+ reportOdometerWarned=false;
+ reportEndDutyPending=true;
+ reportReturnScreen='menu';
+ updateReport(r.id,{
+  endTs:Date.now(),
+  endTime:r.manual?.endTime?r.endTime:hmFromTs(Date.now()),
+  trips:r.manual?.trips?r.trips:reportTripsForDuty(r.dutyId)
+ });
+ show('dailyReport');
+}
+function openLatestReport(){
+ const rows=getDailyReports().slice().sort((a,b)=>Number(b.startTs||0)-Number(a.startTs||0));
+ let r=rows[0];
+ if(!r&&getDutyState().active) r=ensureDailyReportForDuty(getDutyState().start);
+ if(!r){toast('日報はまだありません');return}
+ activeReportId=r.id;reportOdometerWarned=false;reportEndDutyPending=false;reportReturnScreen='menu';show('dailyReport');
+}
+function openLatestMissingOdometer(){
+ const rows=getDailyReports().filter(x=>(x.odometerEnd===null||x.odometerEnd==='')&&x.status!=='draft')
+  .sort((a,b)=>Number(b.startTs||0)-Number(a.startTs||0));
+ if(!rows.length){renderOdometerMissingBanner();return}
+ activeReportId=rows[0].id;reportOdometerWarned=false;reportEndDutyPending=false;reportReturnScreen='home';show('dailyReport');
+}
+function reportExpenseTotal(r){
+ return (Array.isArray(r?.expenses)?r.expenses:[]).reduce((sum,x)=>sum+Math.max(0,Number(x.amount)||0),0);
+}
+function renderExpenseMasterSelect(){
+ const sel=document.getElementById('expenseMasterSelect');
+ if(!sel) return;
+ const r=getReportById(activeReportId);
+ const used=new Set((r?.expenses||[]).map(x=>x.masterId).filter(Boolean));
+ const master=getExpenseMaster().filter(x=>x.active!==false);
+ const opts=['<option value="">選択してください</option>'];
+ for(const x of master){
+  if(used.has(x.id)) continue;
+  const label=String(x.name||'').trim()||'（名称未設定）';
+  opts.push('<option value="'+escapeHtml(x.id)+'">'+escapeHtml(label)+'</option>');
+ }
+ opts.push('<option value="__new__">＋ 新しい項目</option>');
+ sel.innerHTML=opts.join('');
+ expenseMasterSelectionChanged();
+}
+function expenseMasterSelectionChanged(){
+ const sel=document.getElementById('expenseMasterSelect');
+ const newName=document.getElementById('expenseNewName');
+ const renameWrap=document.getElementById('expenseRenameWrap');
+ const renameName=document.getElementById('expenseRenameName');
+ if(!sel||!newName||!renameWrap) return;
+ const isNew=sel.value==='__new__';
+ newName.classList.toggle('hidden',!isNew);
+ const canRename=!!sel.value&&!isNew;
+ renameWrap.classList.toggle('hidden',!canRename);
+ if(canRename&&renameName){
+  const m=getExpenseMaster().find(x=>x.id===sel.value);
+  renameName.value=m?.name||'';
+ }
+}
+function toggleExpenseAddPanel(force){
+ const p=document.getElementById('expenseAddPanel');
+ if(!p) return;
+ const next=typeof force==='boolean'?force:!p.classList.contains('show');
+ p.classList.toggle('show',next);
+ if(next) renderExpenseMasterSelect();
+}
+function addExpenseItemFromMaster(){
+ const sel=document.getElementById('expenseMasterSelect');
+ if(!sel||!sel.value){toast('経費項目を選んでください');return}
+ let masterId=sel.value;
+ let label='';
+ if(masterId==='__new__'){
+  const name=document.getElementById('expenseNewName')?.value||'';
+  const master=getExpenseMaster();
+  const blankExists=!String(name).trim()&&master.some(x=>x.active!==false&&!String(x.name||'').trim());
+  if(blankExists){toast('名称未設定の項目はすでにあります');return}
+  masterId='exp_'+Date.now();
+  master.push({id:masterId,name:String(name),active:true,createdAt:Date.now()});
+  saveExpenseMaster(master);
+  label=String(name);
+ }else{
+  const m=getExpenseMaster().find(x=>x.id===masterId);
+  if(!m) return;
+  label=String(m.name||'');
+ }
+ const r=getReportById(activeReportId);if(!r)return;
+ const expenses=Array.isArray(r.expenses)?r.expenses.slice():[];
+ if(expenses.some(x=>x.masterId===masterId)){toast('この項目は追加済みです');return}
+ expenses.push({id:'line_'+Date.now(),masterId,labelSnapshot:label,amount:null});
+ updateReport(r.id,{expenses});
+ toggleExpenseAddPanel(false);
+ renderDailyReport();
+}
+function renameSelectedExpenseMaster(){
+ const sel=document.getElementById('expenseMasterSelect');
+ if(!sel||!sel.value||sel.value==='__new__') return;
+ const name=document.getElementById('expenseRenameName')?.value??'';
+ const master=getExpenseMaster();
+ const i=master.findIndex(x=>x.id===sel.value);
+ if(i<0) return;
+ master[i]={...master[i],name:String(name),updatedAt:Date.now()};
+ saveExpenseMaster(master);
+ toast('項目名を変更しました');
+ renderExpenseMasterSelect();
+}
+function removeExpenseLine(lineId){
+ const r=getReportById(activeReportId);if(!r)return;
+ updateReport(r.id,{expenses:(r.expenses||[]).filter(x=>x.id!==lineId)});
+ renderDailyReport();
+}
+function updateExpenseAmount(lineId,value){
+ const r=getReportById(activeReportId);if(!r)return;
+ const expenses=(r.expenses||[]).map(x=>x.id===lineId?{...x,amount:value===''?null:Math.max(0,Math.round(Number(value)||0))}:x);
+ const rr=updateReport(r.id,{expenses});
+ const total=document.getElementById('reportExpenseTotal');
+ if(total) total.textContent=yen(reportExpenseTotal(rr));
+}
+function renderDailyReport(){
+ const r=getReportById(activeReportId);if(!r)return;
+ const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+ set('reportDateLabel',displayDayFromTs(r.startTs));
+ set('reportDutyState',r.status==='saved'?'保存済み':'編集中');
+ const odo=document.getElementById('reportOdometerEnd');
+ if(odo) odo.value=(r.odometerEnd===null||r.odometerEnd==='')?'':String(r.odometerEnd);
+ const warn=document.getElementById('reportMissingWarning');
+ const wrap=document.getElementById('reportOdometerWrap');
+ warn?.classList.toggle('show',reportOdometerWarned&&(r.odometerEnd===null||r.odometerEnd===''));
+ wrap?.classList.toggle('error',reportOdometerWarned&&(r.odometerEnd===null||r.odometerEnd===''));
+ set('reportAutoStartTime',r.startTime||'--');
+ set('reportAutoEndTime',r.endTime||'--');
+ set('reportAutoSales',yen(r.sales||0));
+ set('reportAutoReceivable',yen(r.receivable||0));
+ set('reportAutoTrips',Math.max(0,Number(r.trips)||0)+'回');
+ set('reportExpenseTotal',yen(reportExpenseTotal(r)));
+ const rows=document.getElementById('reportExpenseRows');
+ if(rows){
+  rows.innerHTML=(r.expenses||[]).length?(r.expenses||[]).map(x=>{
+   const label=String(x.labelSnapshot||'').trim()||'名称未設定';
+   const amount=(x.amount===null||x.amount==='')?'':String(x.amount);
+   return '<div class="expense-row"><div class="expense-name">'+escapeHtml(label)+'</div>'+
+    '<div class="expense-input-wrap"><input class="expense-input" type="number" min="0" step="1" inputmode="numeric" value="'+escapeHtml(amount)+'" placeholder="0" data-expense-line="'+escapeHtml(x.id)+'"><span class="report-unit">円</span></div>'+
+    '<button class="expense-remove" type="button" data-remove-expense="'+escapeHtml(x.id)+'" aria-label="この経費項目を外す">×</button></div>';
+  }).join(''):'<div class="sub" style="padding:5px 0 2px">経費がある時だけ「＋ 項目追加」から追加</div>';
+  rows.querySelectorAll('[data-expense-line]').forEach(el=>el.addEventListener('input',()=>updateExpenseAmount(el.dataset.expenseLine,el.value)));
+  rows.querySelectorAll('[data-remove-expense]').forEach(el=>el.addEventListener('click',()=>removeExpenseLine(el.dataset.removeExpense)));
+ }
+ renderExpenseMasterSelect();
+}
+function saveDailyReport(){
+ const r=getReportById(activeReportId);if(!r)return;
+ const odoEl=document.getElementById('reportOdometerEnd');
+ const raw=String(odoEl?.value??'').trim();
+ if(raw===''){
+  if(!reportOdometerWarned){
+   reportOdometerWarned=true;
+   renderDailyReport();
+   odoEl?.focus();
+   return;
+  }
+ }else{
+  reportOdometerWarned=false;
+ }
+ const odometerEnd=raw===''?null:Math.max(0,Math.round(Number(raw)||0));
+ const endedAt=r.endTs||Date.now();
+ let rr=updateReport(r.id,{
+  odometerEnd,
+  endTs:endedAt,
+  endTime:r.endTime||hmFromTs(endedAt),
+  trips:r.manual?.trips?r.trips:reportTripsForDuty(r.dutyId),
+  status:'saved',
+  savedAt:Date.now()
+ });
+ if(odometerEnd!==null){
+  try{localStorage.setItem(LAST_ODOMETER_KEY,String(odometerEnd))}catch(e){}
+  linkNextReportOdometer(rr);
+ }
+ logAnalyticsEvent('daily_report_saved',{reportId:r.id,odometerMissing:odometerEnd===null,expenseTotal:reportExpenseTotal(rr)});
+ if(reportEndDutyPending){
+  finalizeDutyAfterReport(rr);
+  reportEndDutyPending=false;
+  toast(odometerEnd===null?'日報を保存しました（オドメーター未入力）':'日報を保存しました');
+  show('home');
+ }else{
+  toast(odometerEnd===null?'保存しました（オドメーター未入力）':'保存しました');
+  show(reportReturnScreen||'menu');
+ }
+ renderOdometerMissingBanner();
+}
+function linkNextReportOdometer(source){
+ if(source.odometerEnd===null||source.odometerEnd==='') return;
+ const rows=getDailyReports().slice().sort((a,b)=>Number(a.startTs||0)-Number(b.startTs||0));
+ const idx=rows.findIndex(x=>x.id===source.id);
+ if(idx<0||idx+1>=rows.length) return;
+ const next=rows[idx+1];
+ if(next.manual?.odometerStart) return;
+ updateReport(next.id,{odometerStart:Number(source.odometerEnd)});
+}
+function finalizeDutyAfterReport(r){
+ const d=getDutyState();
+ const endedAt=Number(r.endTs)||Date.now();
+ const dur=d.active&&d.start?formatDuration(endedAt-d.start):'0時間00分';
+ if(d.active){
+  logAnalyticsEvent('duty_end',{
+   endedAt,
+   durationMs:Math.max(0,endedAt-(d.start||endedAt)),
+   dutyDistanceMeters:currentDutyMeters(),
+   reportId:r.id,
+   odometerEnd:r.odometerEnd
+  });
+ }
+ try{
+  localStorage.setItem('taxi_last_duty_end',String(endedAt));
+  localStorage.setItem('taxi_last_duty_duration',dur);
+ }catch(e){}
+ saveDutyState(false);
+ currentRideStart=null;
+ renderDutyUI();
+}
+function cancelDailyReport(){
+ reportOdometerWarned=false;
+ if(reportEndDutyPending){reportEndDutyPending=false;show('menu');}
+ else show(reportReturnScreen||'menu');
+}
+function openCurrentReportEdit(){show('reportEdit')}
+function renderReportEdit(){
+ const r=getReportById(activeReportId);if(!r)return;
+ const setv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??''};
+ const lab=document.getElementById('reportEditDate');if(lab)lab.textContent=displayDayFromTs(r.startTs);
+ setv('editStartTime',r.startTime||'');
+ setv('editEndTime',r.endTime||'');
+ setv('editOdometerStart',r.odometerStart===null?'':r.odometerStart);
+ setv('editOdometerEnd',r.odometerEnd===null?'':r.odometerEnd);
+ setv('editSales',r.sales||'');
+ setv('editReceivable',r.receivable||'');
+ setv('editTrips',r.trips||'');
+ setv('editNote',r.note||'');
+}
+function saveReportEdit(){
+ const r=getReportById(activeReportId);if(!r)return;
+ const num=(id,nullable=false)=>{
+  const raw=String(document.getElementById(id)?.value??'').trim();
+  if(nullable&&raw==='') return null;
+  return Math.max(0,Math.round(Number(raw)||0));
+ };
+ const startOdo=num('editOdometerStart',true);
+ const endOdo=num('editOdometerEnd',true);
+ const manual={...(r.manual||{}),odometerStart:true,startTime:true,endTime:true,sales:true,receivable:true,trips:true};
+ const rr=updateReport(r.id,{
+  startTime:document.getElementById('editStartTime')?.value||'',
+  endTime:document.getElementById('editEndTime')?.value||'',
+  odometerStart:startOdo,
+  odometerEnd:endOdo,
+  sales:num('editSales'),
+  receivable:num('editReceivable'),
+  trips:num('editTrips'),
+  note:document.getElementById('editNote')?.value||'',
+  manual
+ });
+ if(endOdo!==null){
+  try{localStorage.setItem(LAST_ODOMETER_KEY,String(endOdo))}catch(e){}
+  linkNextReportOdometer(rr);
+ }
+ toast('日報に反映しました');
+ show('dailyReport');
+ renderOdometerMissingBanner();
+}
+function renderOdometerMissingBanner(){
+ const el=document.getElementById('odometerMissingBanner');if(!el)return;
+ const rows=getDailyReports().filter(x=>x.status==='saved'&&(x.odometerEnd===null||x.odometerEnd===''))
+  .sort((a,b)=>Number(b.startTs||0)-Number(a.startTs||0));
+ if(!rows.length){el.classList.remove('show');return}
+ const r=rows[0];
+ el.textContent=displayDayFromTs(r.startTs)+'の日報：入庫オドメーター未入力';
+ el.classList.add('show');
+}
+
 let infoReturn='home';
 let dutyFallback={active:false,start:0};
 function getDutyState(){
@@ -3215,6 +3748,7 @@ function handleDutyMain(){
  if(d.active){show('vacant');return}
  const startedAt=Date.now();
  saveDutyState(true,startedAt);
+ ensureDailyReportForDuty(startedAt);
  resetDutyDistance(startedAt);
  resetGpsQualityLog();
  try{localStorage.removeItem(LAST_DROPOFF_KEY)}catch(e){}
@@ -3225,22 +3759,7 @@ function handleDutyMain(){
 function endDuty(){
  const d=getDutyState();
  if(!d.active){show('home');return}
- const dur=formatDuration(Date.now()-d.start);
- if(!confirm('乗務を終了しますか？\n乗務時間 '+dur)) return;
- const endedAt=Date.now();
- logAnalyticsEvent('duty_end',{
-  endedAt,
-  durationMs:Math.max(0,endedAt-(d.start||endedAt)),
-  dutyDistanceMeters:currentDutyMeters()
- });
- try{
-  localStorage.setItem('taxi_last_duty_end',String(endedAt));
-  localStorage.setItem('taxi_last_duty_duration',dur);
- }catch(e){}
- saveDutyState(false);
- currentRideStart=null;
- renderDutyUI();
- setTimeout(()=>show('home'),450);
+ openDailyReportForDutyEnd();
 }
 function openInfo(from){
  infoReturn=from||'home';
