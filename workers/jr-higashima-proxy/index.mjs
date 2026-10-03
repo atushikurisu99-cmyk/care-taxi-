@@ -267,6 +267,11 @@ function estimateLiveEndTime({start_time,evidence=[]}={}){
   for(const ev of evidence){
     const ch=byId.get(ev?.channel);
     if(!ch) continue;
+    if(ev?.checked && !ev?.end_time){
+      ch.status="checked_no_end_time";
+      ch.note=String(ev?.note||"");
+      continue;
+    }
     const candidate=hhmmToMinutes(ev?.end_time);
     if(candidate==null) continue;
     let endMin=candidate;
@@ -330,6 +335,72 @@ function estimateLiveEndTime({start_time,evidence=[]}={}){
   };
 }
 
+function extractExplicitEndTime(text=""){
+  const t=String(text||"");
+  const patterns=[
+    /(?:終演(?:予定|見込|見込み)?|公演終了(?:予定|見込|見込み)?|終了予定)\\s*[:：]?\\s*([0-2][0-9]:[0-5][0-9])/,
+    /([0-2][0-9]:[0-5][0-9])\\s*(?:終演予定|終了予定|終演見込|終演見込み)/,
+  ];
+  for(const re of patterns){ const m=t.match(re); if(m) return m[1]; }
+  return null;
+}
+function absoluteHref(href, base){ try{return new URL(href,base).toString()}catch{return null} }
+function linksFromHtml(html="",base=""){
+  const out=[];
+  for(const m of String(html).matchAll(/<a\\b[^>]*href=["\']([^"\']+)["\'][^>]*>([\\s\\S]*?)<\\/a>/gi)){
+    const url=absoluteHref(m[1],base); if(!url) continue;
+    out.push({url,text:stripHtml(m[2])});
+  }
+  return out;
+}
+function sameLooseText(a,b){
+  const norm=v=>String(v||"").toLowerCase().replace(/[\\s　"\'’“”‘・\\-‐‑–—―~〜～\\[\\]()（）]/g,"");
+  const x=norm(a),y=norm(b); if(!x||!y) return false;
+  return x.includes(y)||y.includes(x)||x.slice(0,14)===y.slice(0,14);
+}
+async function findYumebanchiEvent(name, venue, t, ctx){
+  if(!name) return null;
+  const searchUrl="https://www.yumebanchi.jp/?s="+encodeURIComponent(name);
+  let html=""; try{html=await fetchTextCached(searchUrl,300,ctx)}catch{return null}
+  const links=linksFromHtml(html,searchUrl).filter(x=>/\\/event\\/\\d+\\/?(?:$|[?#])/.test(x.url));
+  const unique=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,12);
+  const dateNeedle=t.year+"年"+String(t.month).padStart(2,"0")+"月"+String(t.day).padStart(2,"0")+"日";
+  const dateNeedleLoose=t.year+"年"+t.month+"月"+t.day+"日";
+  for(const link of unique){
+    try{
+      const page=await fetchTextCached(link.url,300,ctx); const text=stripHtml(page);
+      if(!text.includes(dateNeedle)&&!text.includes(dateNeedleLoose)) continue;
+      if(venue&&!text.includes(venue)) continue;
+      if(!sameLooseText(text,name)) continue;
+      return {url:link.url,html:page,text};
+    }catch{}
+  }
+  return null;
+}
+function pickArtistOfficialLink(html,base){
+  const links=linksFromHtml(html,base);
+  const external=links.filter(x=>{try{const h=new URL(x.url).hostname; return h!=="www.yumebanchi.jp"&&h!=="yumebanchi.jp";}catch{return false}});
+  const labeled=external.find(x=>/official|公式/i.test(x.text));
+  return (labeled||external[0]||null)?.url||null;
+}
+async function collectLiveEndEvidence({name,venue,start_time,venueText,venueUrl,t,ctx}){
+  const evidence=[];
+  const venueEnd=extractExplicitEndTime(venueText);
+  evidence.push({channel:"venue_official",end_time:venueEnd,direct:!!venueEnd,checked:true,note:venueEnd?("会場公式 "+(venueUrl||"")):"会場公式を確認・終演時刻の明記なし"});
+  const promoter=await findYumebanchiEvent(name,venue,t,ctx);
+  if(promoter){
+    const promoterEnd=extractExplicitEndTime(promoter.text);
+    evidence.push({channel:"promoter_official",end_time:promoterEnd,direct:!!promoterEnd,checked:true,note:promoterEnd?("夢番地 "+promoter.url):"夢番地を確認・終演時刻の明記なし"});
+    const artistUrl=pickArtistOfficialLink(promoter.html,promoter.url);
+    if(artistUrl){
+      try{
+        const artistHtml=await fetchTextCached(artistUrl,300,ctx); const artistText=stripHtml(artistHtml); const artistEnd=extractExplicitEndTime(artistText);
+        evidence.push({channel:"artist_official",end_time:artistEnd,direct:!!artistEnd,checked:true,note:artistEnd?("アーティスト公式 "+artistUrl):"アーティスト公式を確認・終演時刻の明記なし"});
+      }catch{ evidence.push({channel:"artist_official",checked:true,note:"アーティスト公式の取得に失敗"}); }
+    }else evidence.push({channel:"artist_official",checked:true,note:"アーティスト公式URLを特定できず"});
+  }else evidence.push({channel:"promoter_official",checked:true,note:"夢番地で一致する公演を特定できず"});
+  return evidence;
+}
 async function buildHiroshimaEvents(ctx) {
   const t = tokyoParts();
   const ym = `${t.year}${String(t.month).padStart(2,"0")}`;
@@ -354,17 +425,15 @@ async function buildHiroshimaEvents(ctx) {
     }
     if (name) {
       const startTime=time?time[2]:null;
-      const evidence=[];
-      // 会場公式に「終演」「終了予定」が明記されている場合だけ直接証拠として採用。
-      const directEnd=seg.match(/(?:終演(?:予定)?|公演終了(?:予定)?|終了予定)\s*[:：]?\s*([0-2][0-9]:[0-5][0-9])/);
-      if(directEnd){
-        evidence.push({
-          channel:"venue_official",
-          end_time:directEnd[1],
-          direct:true,
-          note:"会場公式ページに終演時刻の明記あり"
-        });
-      }
+      const evidence=await collectLiveEndEvidence({
+        name,
+        venue:"広島クラブクアトロ",
+        start_time:startTime,
+        venueText:seg,
+        venueUrl:url,
+        t,
+        ctx
+      });
       const estimate=estimateLiveEndTime({start_time:startTime,evidence});
       events.push({
         kind:"live",
