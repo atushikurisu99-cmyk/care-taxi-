@@ -658,17 +658,34 @@ function daySegmentByRegex(text, startRe, nextRe){
   const n=rest.match(nextRe);
   return (n?rest.slice(0,n.index):rest).trim();
 }
-async function makeOfficialVenueEvent({name,title,venue,start_time,open_time,venueText,venueUrl,t,ctx}){
+function liveDateKey(t){
+  return t.year+"-"+String(t.month).padStart(2,"0")+"-"+String(t.day).padStart(2,"0");
+}
+function futureTokyoDays(count=60){
+  const jst=new Date(Date.now()+9*3600000);
+  const base=Date.UTC(jst.getUTCFullYear(),jst.getUTCMonth(),jst.getUTCDate());
+  const out=[];
+  for(let i=0;i<count;i++){
+    const d=new Date(base+i*86400000);
+    out.push({year:d.getUTCFullYear(),month:d.getUTCMonth()+1,day:d.getUTCDate()});
+  }
+  return out;
+}
+async function makeOfficialVenueEvent({name,title,venue,start_time,open_time,venueText,venueUrl,t,ctx,enrichEnd=true}){
   if(!name||!venue) return null;
-  const evidence=await collectLiveEndEvidence({
+  const evidence=enrichEnd?await collectLiveEndEvidence({
     name,venue,start_time,title:title||name,
     venueText:venueText||"",venueUrl,t,ctx
-  });
-  const estimate=estimateLiveEndTime({
+  }):[];
+  const estimate=enrichEnd?estimateLiveEndTime({
     start_time,evidence,venue,title:title||name,artist:name
-  });
+  }):{
+    end_time_estimate:null,end_time_reference:null,end_time_range_start:null,end_time_range_end:null,
+    reference_basis:null,confidence:"none",evidence_count:0,direct_count:0,spread_minutes:null,channels:[]
+  };
   return {
     kind:"live",
+    date:liveDateKey(t),
     name,
     title:title||name,
     venue,
@@ -691,7 +708,7 @@ async function makeOfficialVenueEvent({name,title,venue,start_time,open_time,ven
 }
 
 
-async function buildGreenArenaEvents(t,ctx){
+async function buildGreenArenaEvents(t,ctx,enrichEnd=true){
   const url="https://h-jigyoudan.or.jp/sports-center/center-events/";
   let html="";
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
@@ -712,11 +729,11 @@ async function buildGreenArenaEvents(t,ctx){
   const event=await makeOfficialVenueEvent({
     name,title:name,venue:"広島グリーンアリーナ",
     start_time:startTime,open_time:null,
-    venueText:snippet,venueUrl:url,t,ctx
+    venueText:snippet,venueUrl:url,t,ctx,enrichEnd
   });
   return event?[event]:[];
 }
-async function buildAsterPlazaEvents(t,ctx){
+async function buildAsterPlazaEvents(t,ctx,enrichEnd=true){
   const url="https://artscouncil-hiroshima.jp/event/?md="+t.year+"-"+String(t.month).padStart(2,"0");
   let html="";
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
@@ -736,12 +753,12 @@ async function buildAsterPlazaEvents(t,ctx){
   const event=await makeOfficialVenueEvent({
     name,title:name,venue:"JMSアステールプラザ",
     start_time:startTime,open_time:null,
-    venueText:snippet,venueUrl:url,t,ctx
+    venueText:snippet,venueUrl:url,t,ctx,enrichEnd
   });
   return event?[event]:[];
 }
 
-async function buildHbgHallEvents(t,ctx){
+async function buildHbgHallEvents(t,ctx,enrichEnd=true){
   const slug=encodeURIComponent(t.year+"年"+t.month+"月");
   const url="https://h-bkk.jp/hall_schedule/"+slug+"/";
   let html="";
@@ -765,12 +782,12 @@ async function buildHbgHallEvents(t,ctx){
   const event=await makeOfficialVenueEvent({
     name,title:name,venue:"広島文化学園HBGホール",
     start_time:startTime,open_time:openTime,
-    venueText:seg,venueUrl:url,t,ctx
+    venueText:seg,venueUrl:url,t,ctx,enrichEnd
   });
   return event?[event]:[];
 }
 
-async function buildBlueLiveEvents(t,ctx){
+async function buildBlueLiveEvents(t,ctx,enrichEnd=true){
   const url="https://bluelive.jp/schedule";
   let html="";
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
@@ -788,11 +805,11 @@ async function buildBlueLiveEvents(t,ctx){
   if(name.length>80) name=name.slice(0,80).trim();
   const event=await makeOfficialVenueEvent({
     name,title:before,venue:"BLUE LIVE HIROSHIMA",start_time:startTime,open_time:openTime,
-    venueText:seg,venueUrl:url,t,ctx
+    venueText:seg,venueUrl:url,t,ctx,enrichEnd
   });
   return event?[event]:[];
 }
-async function buildVanquishEvents(t,ctx){
+async function buildVanquishEvents(t,ctx,enrichEnd=true){
   const url="https://live-vanquish.com/";
   let html="";
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
@@ -809,22 +826,22 @@ async function buildVanquishEvents(t,ctx){
   if(name.length>90) name=name.slice(0,90).trim();
   const event=await makeOfficialVenueEvent({
     name,title:before,venue:"LIVE VANQUISH",start_time:startTime,open_time:openTime,
-    venueText:seg,venueUrl:url,t,ctx
+    venueText:seg,venueUrl:url,t,ctx,enrichEnd
   });
   return event?[event]:[];
 }
-async function buildDirectVenueLiveEvents(t,ctx){
+async function buildDirectVenueLiveEvents(t,ctx,enrichEnd=true){
   const groups=await Promise.all([
-    buildGreenArenaEvents(t,ctx),
-    buildAsterPlazaEvents(t,ctx),
-    buildHbgHallEvents(t,ctx),
-    buildBlueLiveEvents(t,ctx),
-    buildVanquishEvents(t,ctx)
+    buildGreenArenaEvents(t,ctx,enrichEnd),
+    buildAsterPlazaEvents(t,ctx,enrichEnd),
+    buildHbgHallEvents(t,ctx,enrichEnd),
+    buildBlueLiveEvents(t,ctx,enrichEnd),
+    buildVanquishEvents(t,ctx,enrichEnd)
   ]);
   return groups.flat();
 }
 
-async function buildCultureHiroshimaLiveEvents(t,ctx){
+async function buildCultureHiroshimaLiveEvents(t,ctx,enrichEnd=true){
   const url="https://artscouncil-hiroshima.jp/event/?md="+t.year+"-"+String(t.month).padStart(2,"0");
   let html="";
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
@@ -843,15 +860,19 @@ async function buildCultureHiroshimaLiveEvents(t,ctx){
     if(name.length>100) name=name.slice(-100).trim();
     if(!name) name="ライブ";
     const startTime=extractStartTime(snippet);
-    const evidence=await collectLiveEndEvidence({
+    const evidence=enrichEnd?await collectLiveEndEvidence({
       name,venue,start_time:startTime,title:name,
       venueText:snippet,venueUrl:url,t,ctx
-    });
-    const estimate=estimateLiveEndTime({
+    }):[];
+    const estimate=enrichEnd?estimateLiveEndTime({
       start_time:startTime,evidence,venue,title:name,artist:name
-    });
+    }):{
+      end_time_estimate:null,end_time_reference:null,end_time_range_start:null,end_time_range_end:null,
+      reference_basis:null,confidence:"none",evidence_count:0,direct_count:0,spread_minutes:null,channels:[]
+    };
     found.push({
       kind:"live",
+      date:liveDateKey(t),
       name,
       venue,
       open_time:null,
