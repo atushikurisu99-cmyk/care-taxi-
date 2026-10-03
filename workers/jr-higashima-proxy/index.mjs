@@ -1152,6 +1152,77 @@ async function buildHiroshima(ctx) {
     lines,
   };
 }
+
+const JR_LAST_TRAIN_STATIONS = [
+  {id:"hiroshima-west",name:"広島駅",toward:"岩国方面",lat:34.3974,lon:132.4756,path:"3863022001",radius_km:4.0},
+  {id:"nishihiroshima-east",name:"西広島駅",toward:"広島方面",lat:34.3970,lon:132.4280,path:"3865022002",radius_km:4.5},
+  {id:"miyajimaguchi-east",name:"宮島口駅",toward:"広島方面",lat:34.3119,lon:132.3024,path:"3868022002",radius_km:6.0},
+  {id:"otake-east",name:"大竹駅",toward:"広島方面",lat:34.2113,lon:132.2238,path:"3871022002",radius_km:7.0},
+  {id:"iwakuni-east",name:"岩国駅",toward:"広島方面",lat:34.1717,lon:132.2256,path:"3872022001",radius_km:8.0}
+];
+
+function tokyoDateKey(d=new Date()){
+  const parts=new Intl.DateTimeFormat("en-CA",{timeZone:"Asia/Tokyo",year:"numeric",month:"2-digit",day:"2-digit"}).formatToParts(d);
+  const m=Object.fromEntries(parts.map(x=>[x.type,x.value]));
+  return m.year+m.month+m.day;
+}
+function serviceMinute(h,m){ return (h<4?h+24:h)*60+m; }
+function decodeHtmlText(html){
+  return String(html||"")
+    .replace(/<script[\s\S]*?<\/script>/gi," ")
+    .replace(/<style[\s\S]*?<\/style>/gi," ")
+    .replace(/<[^>]+>/g," ")
+    .replace(/&nbsp;|&#160;/g," ")
+    .replace(/&amp;/g,"&")
+    .replace(/&#x3a;|&#58;/gi,":")
+    .replace(/\s+/g," ");
+}
+function lastClockFromTimetableHtml(html){
+  const text=decodeHtmlText(html);
+  const times=[];
+  for(const m of text.matchAll(/(?:^|[^\d])([0-2]?\d):([0-5]\d)(?!\d)/g)){
+    const h=Number(m[1]),min=Number(m[2]);
+    if(h<=23) times.push({h,min,service:serviceMinute(h,min)});
+  }
+  if(!times.length) return null;
+  times.sort((a,b)=>a.service-b.service);
+  const x=times[times.length-1];
+  return String(x.h).padStart(2,"0")+":"+String(x.min).padStart(2,"0");
+}
+async function fetchJrLastTrainStation(st,dateKey,ctx){
+  const url="https://timetable.jr-odekake.net/station-timetable/"+st.path+"?date="+dateKey;
+  const cacheKey=new Request("https://taxi-jr-last-train.local/"+st.id+"?date="+dateKey);
+  const cache=caches.default;
+  let res=await cache.match(cacheKey);
+  let source="cache";
+  if(!res){
+    source="live";
+    const up=await fetch(url,{headers:{"User-Agent":"Mozilla/5.0","Accept":"text/html"}});
+    if(!up.ok) throw new Error("jr timetable "+st.id+" http "+up.status);
+    res=new Response(await up.text(),{headers:{"Content-Type":"text/html;charset=utf-8","Cache-Control":"public,max-age=21600"}});
+    ctx?.waitUntil(cache.put(cacheKey,res.clone()));
+  }
+  const html=await res.text();
+  const last=lastClockFromTimetableHtml(html);
+  return {...st,last_train:last,source};
+}
+async function buildJrLastTrains(ctx,dateKey=""){
+  const key=/^\d{8}$/.test(dateKey)?dateKey:tokyoDateKey();
+  const rows=await Promise.all(JR_LAST_TRAIN_STATIONS.map(async st=>{
+    try{return await fetchJrLastTrainStation(st,key,ctx)}
+    catch(e){return {...st,last_train:null,source:"error",error:String(e?.message||e)}}
+  }));
+  return {
+    ok:true,
+    area:"hiroshima",
+    date:key,
+    generated_at:Math.floor(Date.now()/1000),
+    source:"JR西日本 駅時刻表",
+    note:"時刻表ベース。実際の運行・遅延による通過時刻とは異なる場合があります。",
+    stations:rows
+  };
+}
+
 export default {
   async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin") || "";
@@ -1165,6 +1236,7 @@ export default {
 
     try {
       if (url.pathname === "/api/jr/hiroshima") return json(await buildHiroshima(ctx),200,origin);
+      if (url.pathname === "/api/jr/last-trains/hiroshima") return json(await buildJrLastTrains(ctx,url.searchParams.get("date")||""),200,origin);
       if (url.pathname === "/api/sports/hiroshima") return json(await buildHiroshimaSports(ctx),200,origin);
       if (url.pathname === "/api/events/live-end-validation") return json({
         ok:true,
