@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-LIVE-UPCOMING-CALENDAR-1 -->
+<!-- BUILD:2026-10-03-WEEKLY-WEATHER-CACHE-FIX-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1440,7 +1440,11 @@ function show(id){
  if(id==='today'||id==='home'||id==='eventDetail') loadEventSportsRealtime(false);
  if(id==='today'||id==='vacant'||id==='home'||id==='jrDetail') loadJrProbeSnapshot(false);
  if(id==='schedule'||id==='home'||id==='vacant'||id==='ride') renderReservations();
- if(id==='weatherDetail') renderWeatherDetail();
+ if(id==='weatherDetail'){
+  renderWeatherDetail();
+  const wc=readWeatherCache();
+  if((!Array.isArray(wc?.daily)||wc.daily.length<5)&&latestPosition) updateWeather(latestPosition,true);
+ }
  if(id==='jrDetail') setTimeout(renderJrDetail,0);
  if(id==='eventDetail') setTimeout(renderEventDetail,0);
  if(id==='calendar') renderCalendar();
@@ -3451,7 +3455,8 @@ async function updateWeather(pos,force=false){
  if(!pos||weatherFetchBusy) return;
  const cached=readWeatherCache();
  const now=Date.now();
- if(!force&&cached&&now-(cached.savedAt||0)<7200000){
+ const hasWeekly=Array.isArray(cached?.daily)&&cached.daily.length>=5;
+ if(!force&&cached&&hasWeekly&&now-(cached.savedAt||0)<7200000){
   renderWeatherData(cached);
   return;
  }
