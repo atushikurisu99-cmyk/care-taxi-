@@ -312,7 +312,9 @@ function estimateLiveEndTime({start_time,evidence=[],venue="",title="",artist=""
       label:ch.label,
       weight:Number(ev?.weight||ch.weight)||ch.weight,
       endMin,
-      direct:!!ev?.direct
+      direct:!!ev?.direct,
+      source_group:String(ev?.source_group||ch.id),
+      sample_count:Math.max(1,Number(ev?.sample_count||1)||1)
     });
   }
 
@@ -353,10 +355,18 @@ function estimateLiveEndTime({start_time,evidence=[],venue="",title="",artist=""
   let confidence="low";
   if(directs.length>=2 && spread<=20) confidence="high";
   else if(directs.length>=1) confidence="medium";
-  else if(pool.length>=3 && spread<=25) confidence="medium";
+  else if(pool.some(x=>x.channel==="same_tour_recent"&&x.sample_count>=3)&&spread<=25) confidence="medium";
+  else if(new Set(pool.map(x=>x.source_group)).size>=2&&spread<=25) confidence="medium";
 
-  // 直接情報なしで1件だけの推定は表示しない。
-  const publishable=directs.length>=1 || pool.length>=2;
+  // 「経路数」ではなく独立した根拠で判定する。
+  // 同一サイトから作った同ツアー中央値と過去平均を、別ソース2件とは数えない。
+  const independentGroups=new Set(pool.map(x=>x.source_group).filter(Boolean));
+  const historicalStrong=pool.some(x=>
+    x.channel==="same_tour_recent" && x.sample_count>=2
+  ) || pool.some(x=>
+    x.channel==="artist_history" && x.sample_count>=3 && spread<=35
+  );
+  const publishable=directs.length>=1 || independentGroups.size>=2 || historicalStrong;
 
   let ref={time:null,range_start:null,range_end:null,basis:null};
   if(!publishable){
@@ -550,6 +560,7 @@ async function collectSetlistHistoryEvidence(name,start_time,title,ctx){
     const med=median(ds);
     out.push({
       channel:"same_tour_recent",duration_minutes:med,checked:true,
+      source_group:"setlist_history",sample_count:sameTour.length,
       note:"setlist.fm同ツアー "+sameTour.length+"公演の中央値 "+Math.round(med)+"分"
     });
   }else{
@@ -563,6 +574,7 @@ async function collectSetlistHistoryEvidence(name,start_time,title,ctx){
     channel:"artist_history",
     duration_minutes:med,
     checked:true,
+    source_group:"setlist_history",sample_count:rows.length,
     note:"setlist.fm過去 "+rows.length+"公演の中央値 "+Math.round(med)+"分 / 幅 "+spread+"分"
   });
   return out;
