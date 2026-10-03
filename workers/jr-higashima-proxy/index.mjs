@@ -223,6 +223,113 @@ async function buildHiroshimaSports(ctx) {
     sports:[carp],
   };
 }
+const LIVE_END_CHANNELS = [
+  ["promoter_official","主催者・プロモーター公式",100],
+  ["artist_official","アーティスト公式",98],
+  ["venue_official","会場公式",96],
+  ["ticket_eplus","イープラス",78],
+  ["ticket_lawson","ローチケ",78],
+  ["ticket_pia","チケットぴあ",78],
+  ["same_tour_recent","同ツアー直近公演",74],
+  ["artist_history","同一アーティスト過去公演",62],
+  ["setlist_duration","セットリスト・曲数",56],
+  ["realtime_reports","当日リアルタイム情報",88],
+];
+function hhmmToMinutes(v){
+  const m=String(v||"").match(/^([0-2]?[0-9]):([0-5][0-9])$/);
+  if(!m) return null;
+  return Number(m[1])*60+Number(m[2]);
+}
+function minutesToHHMM(v){
+  if(!Number.isFinite(v)) return null;
+  let n=Math.round(v);
+  while(n<0) n+=1440;
+  n%=1440;
+  return String(Math.floor(n/60)).padStart(2,"0")+":"+String(n%60).padStart(2,"0");
+}
+function median(xs){
+  const a=xs.filter(Number.isFinite).sort((x,y)=>x-y);
+  if(!a.length) return null;
+  const i=Math.floor(a.length/2);
+  return a.length%2?a[i]:(a[i-1]+a[i])/2;
+}
+function estimateLiveEndTime({start_time,evidence=[]}={}){
+  const start=hhmmToMinutes(start_time);
+  const channels=LIVE_END_CHANNELS.map(([id,label,weight])=>({
+    id,label,weight,
+    status:"unavailable",
+    candidate_time:null,
+    note:null
+  }));
+  const byId=new Map(channels.map(x=>[x.id,x]));
+  const usable=[];
+
+  for(const ev of evidence){
+    const ch=byId.get(ev?.channel);
+    if(!ch) continue;
+    const candidate=hhmmToMinutes(ev?.end_time);
+    if(candidate==null) continue;
+    let endMin=candidate;
+    if(start!=null && endMin<start) endMin+=1440;
+    ch.status="available";
+    ch.candidate_time=minutesToHHMM(endMin);
+    ch.note=String(ev?.note||"");
+    usable.push({
+      channel:ch.id,
+      label:ch.label,
+      weight:Number(ev?.weight||ch.weight)||ch.weight,
+      endMin,
+      direct:!!ev?.direct
+    });
+  }
+
+  if(!usable.length){
+    return {
+      end_time_estimate:null,
+      confidence:"none",
+      evidence_count:0,
+      direct_count:0,
+      spread_minutes:null,
+      channels
+    };
+  }
+
+  // 公式の直接終演時刻が取れた場合は、それを最優先。
+  const directs=usable.filter(x=>x.direct);
+  let pool=directs.length?directs:usable;
+  let center=median(pool.map(x=>x.endMin));
+
+  // HTML誤読や別公演時刻を混ぜないため、中央値から45分超の候補を除外。
+  const filtered=pool.filter(x=>Math.abs(x.endMin-center)<=45);
+  if(filtered.length) pool=filtered;
+  center=median(pool.map(x=>x.endMin));
+
+  // 重み付き平均。表示は5分単位に丸める。
+  const wsum=pool.reduce((n,x)=>n+x.weight,0);
+  const weighted=pool.reduce((n,x)=>n+x.endMin*x.weight,0)/(wsum||1);
+  const rounded=Math.round(weighted/5)*5;
+  const spread=pool.length>1
+    ? Math.max(...pool.map(x=>x.endMin))-Math.min(...pool.map(x=>x.endMin))
+    : 0;
+
+  let confidence="low";
+  if(directs.length>=2 && spread<=20) confidence="high";
+  else if(directs.length>=1) confidence="medium";
+  else if(pool.length>=3 && spread<=25) confidence="medium";
+
+  // 直接情報なしで1件だけの推定は表示しない。
+  const publishable=directs.length>=1 || pool.length>=2;
+
+  return {
+    end_time_estimate:publishable?minutesToHHMM(rounded):null,
+    confidence:publishable?confidence:"none",
+    evidence_count:pool.length,
+    direct_count:directs.length,
+    spread_minutes:pool.length?spread:null,
+    channels
+  };
+}
+
 async function buildHiroshimaEvents(ctx) {
   const t = tokyoParts();
   const ym = `${t.year}${String(t.month).padStart(2,"0")}`;
@@ -245,22 +352,48 @@ async function buildHiroshimaEvents(ctx) {
         name=words.slice(0,half).join(" ");
       }
     }
-    if (name) events.push({
-      kind:"live",
-      name,
-      venue:"広島クラブクアトロ",
-      open_time:time?time[1]:null,
-      start_time:time?time[2]:null,
-      end_time:null,
-      source:"HIROSHIMA CLUB QUATTRO",
-      source_url:url,
-    });
+    if (name) {
+      const startTime=time?time[2]:null;
+      const evidence=[];
+      // 会場公式に「終演」「終了予定」が明記されている場合だけ直接証拠として採用。
+      const directEnd=seg.match(/(?:終演(?:予定)?|公演終了(?:予定)?|終了予定)\s*[:：]?\s*([0-2][0-9]:[0-5][0-9])/);
+      if(directEnd){
+        evidence.push({
+          channel:"venue_official",
+          end_time:directEnd[1],
+          direct:true,
+          note:"会場公式ページに終演時刻の明記あり"
+        });
+      }
+      const estimate=estimateLiveEndTime({start_time:startTime,evidence});
+      events.push({
+        kind:"live",
+        name,
+        venue:"広島クラブクアトロ",
+        open_time:time?time[1]:null,
+        start_time:startTime,
+        end_time:null,
+        end_time_estimate:estimate.end_time_estimate,
+        end_time_confidence:estimate.confidence,
+        end_time_evidence_count:estimate.evidence_count,
+        end_time_direct_count:estimate.direct_count,
+        end_time_spread_minutes:estimate.spread_minutes,
+        end_time_channels:estimate.channels,
+        source:"HIROSHIMA CLUB QUATTRO",
+        source_url:url,
+      });
+    }
   }
   return {
     ok:true,
     area:"hiroshima",
     generated_at:Math.floor(Date.now()/1000),
     coverage:"partial",
+    end_time_logic:{
+      channel_count:LIVE_END_CHANNELS.length,
+      channels:LIVE_END_CHANNELS.map(([id,label,weight])=>({id,label,weight})),
+      rule:"公式の直接終演時刻を最優先。直接情報がない場合は独立した2系統以上が一致した時だけ終演目安を公開。45分超の外れ値は除外。"
+    },
     events,
   };
 }
