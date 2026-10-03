@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-JR-LAST-TRAIN-NOTICE-1 -->
+<!-- BUILD:2026-10-04-GPS-SNAP-VALIDATION-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -3263,6 +3263,11 @@ let safetyZoneActive=false;
 const gsiRoadTileCache=new Map();
 let roadStructureEvalSeq=0;
 window.__roadDecision={state:'未判定'};
+const GPS_LOG_MAX_SAMPLES=6000;
+const GPS_GAP_EVENT_THRESHOLD_SEC=20;
+const GPS_INTERRUPTION_KEY='taxi_gps_interruption_log_v2';
+const GPS_STATE_EVENT_KEY='taxi_gps_state_event_log_v2';
+let lastLocationErrorState=null;
 
 async function loadJarticSpeedData(){
  try{
@@ -3297,6 +3302,50 @@ function distanceToSegmentMeters(lon,lat,a,b){
  const dx=bx-ax, dy=by-ay;
  const t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/((dx*dx+dy*dy)||1)));
  return Math.hypot(ax+t*dx,ay+t*dy);
+}
+function closestPointOnSegment(lon,lat,a,b){
+ const scaleX=111320*Math.cos(lat*Math.PI/180), scaleY=111320;
+ const ax=(a[0]-lon)*scaleX, ay=(a[1]-lat)*scaleY;
+ const bx=(b[0]-lon)*scaleX, by=(b[1]-lat)*scaleY;
+ const dx=bx-ax, dy=by-ay;
+ const t=Math.max(0,Math.min(1,-(ax*dx+ay*dy)/((dx*dx+dy*dy)||1)));
+ return {
+  lon:a[0]+(b[0]-a[0])*t,
+  lat:a[1]+(b[1]-a[1])*t,
+  distanceM:Math.hypot(ax+t*dx,ay+t*dy)
+ };
+}
+function closestPointOnLineSet(lines,lon,lat){
+ let best=null;
+ for(const pts of lines||[]){
+  if(!Array.isArray(pts)||!pts.length) continue;
+  if(pts.length===1){
+   const d=metersBetween(lon,lat,pts[0][0],pts[0][1]);
+   const p={lon:pts[0][0],lat:pts[0][1],distanceM:d};
+   if(!best||d<best.distanceM) best=p;
+   continue;
+  }
+  for(let i=1;i<pts.length;i++){
+   const p=closestPointOnSegment(lon,lat,pts[i-1],pts[i]);
+   if(!best||p.distanceM<best.distanceM) best=p;
+  }
+ }
+ return best;
+}
+function compactRoadProps(props={}){
+ return {
+  name:props.name||props.roadName||props.rdNm||props.道路名||null,
+  category:props.rdCtg||props.roadCategory||props.category||null,
+  width:props.rnkWidth??props.width??props.Width??props.幅員??null,
+  route:props.route||props.路線名||props.路線番号||null,
+  id:props.id||props.fid||props.linkId||props.rdID||null
+ };
+}
+function roadSnapConfidence(distanceM,accuracyM){
+ if(!Number.isFinite(distanceM)) return 'none';
+ if(accuracyM<=10&&distanceM<=8) return 'high';
+ if(accuracyM<=20&&distanceM<=Math.max(14,accuracyM+3)) return 'medium';
+ return 'low';
 }
 function distanceToFeatureMeters(f,lon,lat){
  if(!f||!Array.isArray(f.coords)||!f.coords.length) return Infinity;
@@ -3374,15 +3423,15 @@ function nearestStructureEvidence(lon,lat){
 }
 async function evaluateStatutory30Candidate(pos){
  const seq=++roadStructureEvalSeq;
- if(currentScreenId()!=='ride'||!jarticSpeedData) return;
+ if(currentScreenId()!=='ride'||!jarticSpeedData) return window.__roadDecision;
  const acc=Number(pos.coords.accuracy||9999);
  if(acc>10){
   window.__roadDecision={state:'判定保留',reason:'GPS精度',accuracy:acc};
-  return;
+  return window.__roadDecision;
  }
  const lon=pos.coords.longitude,lat=pos.coords.latitude;
  const roads=await loadNearbyGsiRoads(lon,lat);
- if(seq!==roadStructureEvalSeq||currentScreenId()!=='ride') return;
+ if(seq!==roadStructureEvalSeq||currentScreenId()!=='ride') return window.__roadDecision;
  let nearest=null;
  for(const f of roads){
   const d=distanceToRoadFeatureMeters(f,lon,lat);
@@ -3390,7 +3439,7 @@ async function evaluateStatutory30Candidate(pos){
  }
  if(!nearest||nearest.d>Math.max(8,acc+3)){
   window.__roadDecision={state:'判定保留',reason:'道路スナップ低確度',distance:nearest?nearest.d:null};
-  return;
+  return window.__roadDecision;
  }
  const props=nearest.f.properties||{};
  const structure=nearestStructureEvidence(lon,lat);
@@ -3405,19 +3454,17 @@ async function evaluateStatutory30Candidate(pos){
    roadDistance:Math.round(nearest.d),
    width,category
   };
-  return;
+  return window.__roadDecision;
  }
  const localRoad=!/国道|都道府県道|高速自動車国道/.test(category);
  if(localRoad&&width==='3-5.5m'){
-  // 中央線・車両通行帯の「不存在」は公開データだけでは断定できない。
-  // そのため候補として保持するだけで、速度表示や警告はまだ出さない。
   window.__roadDecision={
    state:'法定30候補',
    reason:'狭幅員の地域道路・構造規制ヒットなし',
    roadDistance:Math.round(nearest.d),
    width,category
   };
-  return;
+  return window.__roadDecision;
  }
  window.__roadDecision={
   state:'判定保留',
@@ -3425,6 +3472,7 @@ async function evaluateStatutory30Candidate(pos){
   roadDistance:Math.round(nearest.d),
   width,category
  };
+ return window.__roadDecision;
 }
 function setSpeedLimitUI(speed){
  // 制限速度の数値は利用者には表示しない。
@@ -3455,15 +3503,20 @@ function recordSafetyWarning(pos,evidence){
    renderVerify();
   }
  }).catch(()=>{});
+ return rec;
 }
-function evaluateSafetyZone(pos){
- if(currentScreenId()!=='ride'||!jarticSpeedData){setSpeedLimitUI(null);return}
+async function evaluateSafetyZone(pos){
+ let warningTriggered=false;
+ if(currentScreenId()!=='ride'||!jarticSpeedData){
+  setSpeedLimitUI(null);
+  return {decision:window.__roadDecision,warningTriggered:false};
+ }
  const acc=Number(pos.coords.accuracy||9999);
  if(acc>15){
   safetyZoneActive=false;
   setSpeedLimitUI(null);
   window.__roadDecision={state:'判定保留',reason:'GPS精度',accuracy:acc};
-  return;
+  return {decision:window.__roadDecision,warningTriggered:false};
  }
  const lon=pos.coords.longitude,lat=pos.coords.latitude;
  const candidates=[];
@@ -3480,7 +3533,7 @@ function evaluateSafetyZone(pos){
    safetyZoneActive=false;
    setSpeedLimitUI(null);
    window.__roadDecision={state:'判定保留',reason:'速度規制が競合'};
-   return;
+   return {decision:window.__roadDecision,warningTriggered:false};
   }
   setSpeedLimitUI(nearest.speed);
   const shouldWarn=nearest.speed===30||!!nearest.f.zone30;
@@ -3493,6 +3546,7 @@ function evaluateSafetyZone(pos){
     distance:Math.round(nearest.d),
     code:nearest.f.code||null
    });
+   warningTriggered=true;
   }
   safetyZoneActive=shouldWarn;
   window.__roadDecision={
@@ -3501,12 +3555,13 @@ function evaluateSafetyZone(pos){
    zone30:!!nearest.f.zone30,
    distance:Math.round(nearest.d)
   };
-  return;
+  return {decision:window.__roadDecision,warningTriggered};
  }
 
  safetyZoneActive=false;
  setSpeedLimitUI(null);
- evaluateStatutory30Candidate(pos);
+ const decision=await evaluateStatutory30Candidate(pos);
+ return {decision:decision||window.__roadDecision,warningTriggered:false};
 }
 let vacantAreaLookupBusy=false;
 
@@ -3579,29 +3634,181 @@ function getGpsQualityLog(){
  try{return JSON.parse(localStorage.getItem('taxi_gps_quality_log')||'[]')}catch(e){return[]}
 }
 function saveGpsQualityLog(log){
- localStorage.setItem('taxi_gps_quality_log',JSON.stringify(log.slice(-12000)));
+ localStorage.setItem('taxi_gps_quality_log',JSON.stringify(log.slice(-GPS_LOG_MAX_SAMPLES)));
+}
+function getGpsInterruptionLog(){
+ try{return JSON.parse(localStorage.getItem(GPS_INTERRUPTION_KEY)||'[]')}catch(e){return[]}
+}
+function saveGpsInterruptionLog(log){
+ try{localStorage.setItem(GPS_INTERRUPTION_KEY,JSON.stringify(log.slice(-1000)))}catch(e){}
+}
+function getGpsStateEventLog(){
+ try{return JSON.parse(localStorage.getItem(GPS_STATE_EVENT_KEY)||'[]')}catch(e){return[]}
+}
+function saveGpsStateEventLog(log){
+ try{localStorage.setItem(GPS_STATE_EVENT_KEY,JSON.stringify(log.slice(-1500)))}catch(e){}
+}
+function recordGpsStateEvent(kind,detail={}){
+ const duty=getDutyState();
+ if(!duty.active) return;
+ const now=Date.now();
+ const log=getGpsStateEventLog();
+ log.push({
+  t:now,
+  iso:new Date(now).toISOString(),
+  localTime:new Date(now).toLocaleString('ja-JP',{hour12:false}),
+  kind,
+  visibility:document.visibilityState,
+  latestRaw:latestPosition?{
+   lat:latestPosition.coords.latitude,
+   lon:latestPosition.coords.longitude,
+   accuracy:Math.round(Number(latestPosition.coords.accuracy||0))
+  }:null,
+  ...detail
+ });
+ saveGpsStateEventLog(log);
 }
 function recordGpsQuality(pos){
  const duty=getDutyState();
- if(!duty.active) return;
+ if(!duty.active) return null;
  const now=Date.now();
  const acc=Number(pos.coords.accuracy||9999);
  const speedMps=Number.isFinite(pos.coords.speed)?Math.max(0,pos.coords.speed):null;
  const log=getGpsQualityLog();
  const prev=log.length?log[log.length-1]:null;
  const gap=prev?Math.max(0,(now-prev.t)/1000):0;
- log.push({
+ const id='gps_'+now+'_'+Math.random().toString(36).slice(2,8);
+ const rec={
+  id,
   t:now,
+  iso:new Date(now).toISOString(),
+  localTime:new Date(now).toLocaleString('ja-JP',{hour12:false}),
   accuracy:Math.round(acc),
   gap:Math.round(gap*10)/10,
   speedKmh:speedMps===null?null:Math.round(speedMps*3.6*10)/10,
   lat:pos.coords.latitude,
-  lon:pos.coords.longitude
- });
+  lon:pos.coords.longitude,
+  raw:{
+   lat:pos.coords.latitude,
+   lon:pos.coords.longitude,
+   accuracyM:Math.round(acc*10)/10,
+   altitudeM:Number.isFinite(pos.coords.altitude)?Math.round(pos.coords.altitude*10)/10:null,
+   altitudeAccuracyM:Number.isFinite(pos.coords.altitudeAccuracy)?Math.round(pos.coords.altitudeAccuracy*10)/10:null,
+   headingDeg:Number.isFinite(pos.coords.heading)?Math.round(pos.coords.heading*10)/10:null,
+   speedKmh:speedMps===null?null:Math.round(speedMps*3.6*10)/10
+  },
+  roadSnap:null,
+  speedEvidence:null,
+  roadDecision:null,
+  warningTriggered:false
+ };
+ log.push(rec);
  saveGpsQualityLog(log);
+
+ if(prev&&gap>=GPS_GAP_EVENT_THRESHOLD_SEC){
+  const interruptions=getGpsInterruptionLog();
+  interruptions.push({
+   startTs:prev.t,
+   startIso:new Date(prev.t).toISOString(),
+   startLocalTime:new Date(prev.t).toLocaleString('ja-JP',{hour12:false}),
+   resumeTs:now,
+   resumeIso:new Date(now).toISOString(),
+   resumeLocalTime:new Date(now).toLocaleString('ja-JP',{hour12:false}),
+   durationSec:Math.round(gap*10)/10,
+   previousRaw:{lat:prev.lat,lon:prev.lon,accuracyM:prev.accuracy},
+   resumedRaw:{lat:rec.lat,lon:rec.lon,accuracyM:rec.accuracy},
+   lastLocationError:lastLocationErrorState,
+   visibilityAtResume:document.visibilityState
+  });
+  saveGpsInterruptionLog(interruptions);
+ }
+ lastLocationErrorState=null;
+ return id;
+}
+function updateGpsSample(id,patch){
+ if(!id) return;
+ const log=getGpsQualityLog();
+ const idx=log.findIndex(x=>x.id===id);
+ if(idx<0) return;
+ log[idx]={...log[idx],...patch};
+ saveGpsQualityLog(log);
+}
+function nearestPointOnGsiRoadFeature(f,lon,lat){
+ return closestPointOnLineSet(roadFeatureLines(f),lon,lat);
+}
+function nearestPointOnSpeedFeature(f,lon,lat){
+ const pts=Array.isArray(f&&f.coords)?f.coords:[];
+ return closestPointOnLineSet(pts.length?[pts]:[],lon,lat);
+}
+async function enrichGpsSampleWithRoadSnap(pos,sampleId,safetyResult={}){
+ if(!sampleId) return;
+ const lon=pos.coords.longitude,lat=pos.coords.latitude;
+ const acc=Number(pos.coords.accuracy||9999);
+ let roadSnap=null;
+ let speedEvidence=null;
+ try{
+  const roads=await loadNearbyGsiRoads(lon,lat);
+  let nearest=null;
+  for(const f of roads){
+   const p=nearestPointOnGsiRoadFeature(f,lon,lat);
+   if(p&&(!nearest||p.distanceM<nearest.point.distanceM)) nearest={f,point:p};
+  }
+  if(nearest){
+   const props=nearest.f.properties||{};
+   const meta=compactRoadProps(props);
+   roadSnap={
+    source:'GSI experimental_rdcl',
+    raw:{lat,lon},
+    snapped:{lat:nearest.point.lat,lon:nearest.point.lon},
+    distanceM:Math.round(nearest.point.distanceM*10)/10,
+    gpsAccuracyM:Math.round(acc*10)/10,
+    confidence:roadSnapConfidence(nearest.point.distanceM,acc),
+    roadName:meta.name,
+    roadId:nearest.f.id??meta.id??null,
+    roadCategory:meta.category,
+    roadWidth:roadWidthEvidence(props)||meta.width||null,
+    route:meta.route,
+    accepted:nearest.point.distanceM<=Math.max(8,acc+3)
+   };
+  }
+ }catch(e){
+  roadSnap={source:'GSI experimental_rdcl',error:String(e&&e.message||e),raw:{lat,lon}};
+ }
+
+ if(jarticSpeedData&&Array.isArray(jarticSpeedData.features)){
+  let nearestSpeed=null;
+  for(const f of jarticSpeedData.features){
+   const p=nearestPointOnSpeedFeature(f,lon,lat);
+   if(!p) continue;
+   if(!nearestSpeed||p.distanceM<nearestSpeed.point.distanceM) nearestSpeed={f,point:p};
+  }
+  if(nearestSpeed){
+   speedEvidence={
+    source:'JARTIC',
+    snapped:{lat:nearestSpeed.point.lat,lon:nearestSpeed.point.lon},
+    distanceM:Math.round(nearestSpeed.point.distanceM*10)/10,
+    speed:Number.isFinite(Number(nearestSpeed.f.speed))?Number(nearestSpeed.f.speed):null,
+    zone30:!!nearestSpeed.f.zone30,
+    code:nearestSpeed.f.code||null,
+    accepted:nearestSpeed.point.distanceM<=14
+   };
+  }
+ }
+
+ updateGpsSample(sampleId,{
+  roadSnap,
+  speedEvidence,
+  roadDecision:safetyResult&&safetyResult.decision?{...safetyResult.decision}:window.__roadDecision,
+  warningTriggered:!!(safetyResult&&safetyResult.warningTriggered),
+  evaluatedAt:Date.now(),
+  evaluatedIso:new Date().toISOString()
+ });
 }
 function resetGpsQualityLog(){
  localStorage.removeItem('taxi_gps_quality_log');
+ localStorage.removeItem(GPS_INTERRUPTION_KEY);
+ localStorage.removeItem(GPS_STATE_EVENT_KEY);
+ lastLocationErrorState=null;
 }
 function gpsQualitySummary(){
  const log=getGpsQualityLog();
@@ -3828,7 +4035,7 @@ async function updateWeather(pos,force=false){
   updateWeeklyWeather(pos,force)
  ]);
 }
-function handlePosition(pos){
+async function handlePosition(pos){
  latestPosition=pos;
  const a=Math.round(pos.coords.accuracy||9999);
  if(a<=25) setLocationUI('位置情報OK','精度 ±'+a+'m','good');
@@ -3836,12 +4043,13 @@ function handlePosition(pos){
  else setLocationUI('位置情報 低精度','精度 ±'+a+'m・判定保留','warn');
  updateVacantArea(pos);
  updateDutyDistance(pos);
- recordGpsQuality(pos);
+ const sampleId=recordGpsQuality(pos);
  updateCurrentWeather(pos,false);
  updateWeeklyWeather(pos,false);
  loadJrLastTrains(false);
  maybeNotifyJrLastTrain();
- evaluateSafetyZone(pos);
+ const safetyResult=await evaluateSafetyZone(pos);
+ if(sampleId) enrichGpsSampleWithRoadSnap(pos,sampleId,safetyResult);
 }
 
 async function updateVacantArea(pos){
@@ -3862,6 +4070,15 @@ async function updateVacantArea(pos){
 }
 
 function handleLocationError(err){
+ const now=Date.now();
+ lastLocationErrorState={
+  t:now,
+  iso:new Date(now).toISOString(),
+  localTime:new Date(now).toLocaleString('ja-JP',{hour12:false}),
+  code:err&&Number.isFinite(err.code)?err.code:null,
+  message:err&&err.message?String(err.message):''
+ };
+ recordGpsStateEvent('location_error',{error:lastLocationErrorState});
  const area=document.getElementById('vacantArea');
  if(area) area.textContent='判定不能';
  if(err && err.code===1) setLocationUI('位置情報OFF','タップして許可を確認','bad');
@@ -3877,6 +4094,7 @@ function startLocation(){
  }
  if(geoWatchId!==null) return;
  setLocationUI('位置情報を確認中','高精度GPSを取得中','');
+ recordGpsStateEvent('watch_start');
  geoWatchId=navigator.geolocation.watchPosition(
    handlePosition,
    handleLocationError,
@@ -3888,6 +4106,7 @@ function requestLocation(){
  if(geoWatchId!==null){
    navigator.geolocation.clearWatch(geoWatchId);
    geoWatchId=null;
+  recordGpsStateEvent('watch_restart');
  }
  startLocation();
 }
@@ -4412,9 +4631,9 @@ function buildValidationExport(){
  const gps=getGpsQualityLog();
  const verify=getVerifyLog();
  return {
-  schema:'taxi-sales-nav-validation-v1',
+  schema:'taxi-sales-nav-validation-v2',
   exportedAt:new Date().toISOString(),
-  build:'2026-10-01-1705',
+  build:'2026-10-04-GPS-SNAP-VALIDATION-1',
   duty:{
    active:!!duty.active,
    start:duty.start||null
@@ -4426,11 +4645,13 @@ function buildValidationExport(){
   },
   gpsSummary:gpsQualitySummary(),
   gpsSamples:gps,
+  gpsInterruptions:getGpsInterruptionLog(),
+  gpsStateEvents:getGpsStateEventLog(),
   warningAndPointLog:verify,
   analyticsSchema:ANALYTICS_SCHEMA,
   analyticsEvents:getAnalyticsEvents(),
   tripRecords:getTripRecords(),
-  note:'ChatGPT検証用。GPS・走行距離・30km/h警告判定の実走データ。'
+  note:'検証用。各GPS生座標→道路補正座標→速度判定→30km/h警告、GPS途切れ・再開時刻まで追跡する実走データ。'
  };
 }
 function validationSummaryText(){
@@ -4446,6 +4667,8 @@ function validationSummaryText(){
   '±20m以内: '+(s.within20Pct!=null?s.within20Pct+'%':'記録なし'),
   '30m超: '+(s.over30Count||0)+'回',
   '最大途切れ: '+(s.maxGap||0)+'秒',
+  '途切れ記録: '+(data.gpsInterruptions||[]).length+'件',
+  '道路補正済み: '+(data.gpsSamples||[]).filter(x=>x.roadSnap&&x.roadSnap.snapped).length+'件',
   '記録時間: '+(s.durationMin||0)+'分',
   '30km/h警告: '+warnings.length+'回'
  ].join('\n');
@@ -4636,6 +4859,7 @@ function refreshLiveFeedsNow(){
  loadEventSportsRealtime(true);
 }
 document.addEventListener('visibilitychange',()=>{
+ recordGpsStateEvent('visibility_change',{state:document.visibilityState});
  if(document.visibilityState==='visible') refreshLiveFeedsNow();
 });
 window.addEventListener('pageshow',refreshLiveFeedsNow);
