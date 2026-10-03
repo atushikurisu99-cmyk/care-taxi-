@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-03-LIVE-PAST-PERFORMANCE-LABEL-1 -->
+<!-- BUILD:2026-10-03-LIVE-UNIFIED-LABEL-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1606,9 +1606,8 @@ function maybeNotifySelectedLiveEvents(d){
   if(!e||!selected.has(e.venue)) continue;
   // 開演前通知は営業判断への寄与が弱いため出さない。
   // 推定根拠が揃ったものは「終演目安」、一般参考幅だけなら「終演参考」と明確に分ける。
-  const isReference=e.end_time_confidence==='reference'&&!e.end_time_estimate;
   const endGuide=e.end_time_estimate||e.end_time_reference||e.end_time||null;
-  const endLabel=isReference?'過去公演参考':'終演目安';
+  const endLabel='過去公演参考';
   if(!endGuide) continue;
   const p=String(endGuide).split(':').map(Number);
   if(p.length<2||p.some(x=>!Number.isFinite(x))) continue;
@@ -2383,7 +2382,7 @@ function renderLiveEvents(){
   if(e){
    const t=e.start_time?e.start_time+'〜':'時刻確認中';
    const end=e.end_time_estimate||e.end_time_reference||null;
-   const label=e.end_time_estimate?'終演目安':(e.end_time_reference?'過去公演参考':'');
+   const label=(e.end_time_estimate||e.end_time_reference)?'過去公演参考':'';
    bot.textContent=t+(end?(' / '+label+' '+String(end).slice(0,5)+'頃'):'')+(e.venue?' / '+e.venue:'');
   }else{
    bot.textContent=d.coverage==='partial'?'一部会場を確認中':'更新 '+formatAgo(d.generated_at);
