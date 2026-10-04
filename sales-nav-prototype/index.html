@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-REPORT-UI-2 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
+<!-- BUILD:2026-10-05-REPORT-UI-3 TIME-INPUT-FIX-1 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1052,8 +1052,12 @@ html,body{
 .report-edit-row{display:grid;grid-template-columns:118px minmax(0,1fr);gap:10px;align-items:center}
 .report-edit-row label{font-size:13px;color:#aab8c4;font-weight:800}
 .report-edit-row input,.report-edit-row textarea{
- width:100%;min-width:0;background:#0b1620;border:1px solid #2a3a47;border-radius:12px;
+ width:100%;min-width:0;max-width:100%;background:#0b1620;border:1px solid #2a3a47;border-radius:12px;
  color:#fff;font-size:17px;padding:11px 12px
+}
+.report-edit-row input[type="time"]{
+ width:100%;min-width:0;max-width:100%;inline-size:100%;min-inline-size:0;max-inline-size:100%;
+ display:block;overflow:hidden
 }
 .report-edit-row textarea{min-height:74px;resize:vertical}
 @media(max-width:360px){
