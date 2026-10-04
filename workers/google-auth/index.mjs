@@ -52,6 +52,10 @@ function validReturnTo(value,env){
     return u.protocol==='https:'&&allowedOrigins(env).includes(u.origin);
   }catch{return false}
 }
+function validDeviceId(value){
+  return /^[A-Za-z0-9_-]{20,120}$/.test(String(value||''));
+}
+
 function oauthConfigured(env){
   return !!(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET&&env.SESSION_SECRET);
 }
@@ -112,6 +116,13 @@ async function writeStore(env,uid,data){
   const r=await stub.fetch('https://store.local/profile',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify(data)});
   if(!r.ok) throw new Error('store_failed');
 }
+async function deleteStore(env,uid){
+  const id=env.USER_STORE.idFromName(uid);
+  const stub=env.USER_STORE.get(id);
+  const r=await stub.fetch('https://store.local/profile',{method:'DELETE'});
+  if(!r.ok&&r.status!==404) throw new Error('store_delete_failed');
+}
+
 async function ensureGoogleFiles(accessToken,profile){
   let folderId=profile.folderId||null;
   let spreadsheetId=profile.spreadsheetId||null;
@@ -126,8 +137,10 @@ async function authStart(req,env){
   if(!oauthConfigured(env)) return json({ok:false,error:'google_oauth_not_configured'},503);
   const u=new URL(req.url);
   const returnTo=u.searchParams.get('return_to')||'';
+  const deviceId=u.searchParams.get('device_id')||'';
   if(!validReturnTo(returnTo,env)) return json({ok:false,error:'return_origin_not_allowed'},400);
-  const state=await signedPayload(env.SESSION_SECRET,{returnTo,exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()});
+  if(!validDeviceId(deviceId)) return json({ok:false,error:'invalid_device_id'},400);
+  const state=await signedPayload(env.SESSION_SECRET,{returnTo,deviceId,exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()});
   const redirectUri=new URL('/oauth/callback',req.url).toString();
   const q=new URLSearchParams({
     client_id:env.GOOGLE_CLIENT_ID,
@@ -166,6 +179,13 @@ async function authCallback(req,env){
     updatedAt:Date.now()
   });
   const session=await signedPayload(env.SESSION_SECRET,{uid,exp:Date.now()+30*24*60*60*1000});
+  if(validDeviceId(state.deviceId)){
+    await writeStore(env,'device:'+state.deviceId,{
+      uid,
+      linkedAt:Date.now(),
+      updatedAt:Date.now()
+    });
+  }
   const ret=new URL(state.returnTo);
   ret.hash='google_auth_session='+encodeURIComponent(session);
   return Response.redirect(ret.toString(),302);
@@ -304,6 +324,37 @@ async function gmailSend(req,env){
   return json({ok:true,messageId:d.id||null,threadId:d.threadId||null},200,corsHeaders(req,env));
 }
 
+async function recoverSession(req,env){
+  const u=new URL(req.url);
+  const deviceId=u.searchParams.get('device_id')||'';
+  if(!validDeviceId(deviceId)) return json({ok:false,error:'invalid_device_id'},400,corsHeaders(req,env));
+  const binding=await readStore(env,'device:'+deviceId);
+  if(!binding?.uid) return json({ok:false,error:'not_linked'},404,corsHeaders(req,env));
+  const p=await readStore(env,binding.uid);
+  if(!p?.refreshToken) return json({ok:false,error:'google_reconnect_required'},409,corsHeaders(req,env));
+  const session=await signedPayload(env.SESSION_SECRET,{uid:binding.uid,exp:Date.now()+30*24*60*60*1000});
+  return json({
+    ok:true,
+    session,
+    email:p.email||'',
+    folderId:p.folderId||null,
+    spreadsheetId:p.spreadsheetId||null
+  },200,corsHeaders(req,env));
+}
+async function unlinkDevice(req,env){
+  const auth=req.headers.get('authorization')||'';
+  const sessionToken=auth.startsWith('Bearer ')?auth.slice(7):'';
+  const session=await verifySigned(env.SESSION_SECRET,sessionToken);
+  if(!session||Number(session.exp)<Date.now()) return json({ok:false,error:'unauthorized'},401,corsHeaders(req,env));
+  const input=await req.json().catch(()=>({}));
+  const deviceId=String(input?.deviceId||'');
+  if(!validDeviceId(deviceId)) return json({ok:false,error:'invalid_device_id'},400,corsHeaders(req,env));
+  const binding=await readStore(env,'device:'+deviceId);
+  if(binding?.uid&&binding.uid!==session.uid) return json({ok:false,error:'forbidden'},403,corsHeaders(req,env));
+  await deleteStore(env,'device:'+deviceId);
+  return json({ok:true},200,corsHeaders(req,env));
+}
+
 async function me(req,env){
   const auth=req.headers.get('authorization')||'';
   const token=auth.startsWith('Bearer ')?auth.slice(7):'';
@@ -340,6 +391,10 @@ export class UserStore{
       await this.state.storage.put('profile',p);
       return json({ok:true});
     }
+    if(req.method==='DELETE'){
+      await this.state.storage.delete('profile');
+      return json({ok:true});
+    }
     return new Response('method not allowed',{status:405});
   }
 }
@@ -352,6 +407,8 @@ export default{
       if(u.pathname==='/health') return json({ok:true,googleConfigured:oauthConfigured(env)});
       if(u.pathname==='/oauth/start') return authStart(req,env);
       if(u.pathname==='/oauth/callback') return authCallback(req,env);
+      if(u.pathname==='/session/recover') return recoverSession(req,env);
+      if(u.pathname==='/session/unlink'&&req.method==='POST') return unlinkDevice(req,env);
       if(u.pathname==='/me') return me(req,env);
       if(u.pathname==='/gmail/send'&&req.method==='POST') return gmailSend(req,env);
       if(u.pathname==='/sheets/sync'&&req.method==='POST') return sheetsSync(req,env);
