@@ -55,6 +55,13 @@ function validReturnTo(value,env){
 function validDeviceId(value){
   return /^[A-Za-z0-9_-]{20,120}$/.test(String(value||''));
 }
+function validPairId(value){
+  return /^pair_[A-Za-z0-9_-]{24,120}$/.test(String(value||''));
+}
+function html(body,status=200){
+  return new Response(body,{status,headers:{'content-type':'text/html;charset=UTF-8','cache-control':'no-store'}});
+}
+
 
 function oauthConfigured(env){
   return !!(env.GOOGLE_CLIENT_ID&&env.GOOGLE_CLIENT_SECRET&&env.SESSION_SECRET);
@@ -136,13 +143,24 @@ async function ensureGoogleFiles(accessToken,profile){
 async function authStart(req,env){
   if(!oauthConfigured(env)) return json({ok:false,error:'google_oauth_not_configured'},503);
   const u=new URL(req.url);
+  const pairId=u.searchParams.get('pair_id')||'';
   const returnTo=u.searchParams.get('return_to')||'';
   let deviceId=u.searchParams.get('device_id')||'';
-  if(!validReturnTo(returnTo,env)) return json({ok:false,error:'return_origin_not_allowed'},400);
-  // Backward compatible with an older/stale iPhone PWA build that did not send device_id.
-  // Generate a stable-length server-side id and return it to the app after OAuth.
-  if(!validDeviceId(deviceId)) deviceId='dev_'+crypto.randomUUID().replace(/-/g,'')+'_'+Date.now().toString(36);
-  const state=await signedPayload(env.SESSION_SECRET,{returnTo,deviceId,exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()});
+  let statePayload;
+  if(validPairId(pairId)){
+    await writeStore(env,'pair:'+pairId,{
+      pairId,
+      status:'pending',
+      exp:Date.now()+10*60*1000,
+      createdAt:Date.now()
+    });
+    statePayload={pairId,mode:'pair',exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()};
+  }else{
+    if(!validReturnTo(returnTo,env)) return json({ok:false,error:'return_origin_not_allowed'},400);
+    if(!validDeviceId(deviceId)) deviceId='dev_'+crypto.randomUUID().replace(/-/g,'')+'_'+Date.now().toString(36);
+    statePayload={returnTo,deviceId,mode:'legacy',exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()};
+  }
+  const state=await signedPayload(env.SESSION_SECRET,statePayload);
   const redirectUri=new URL('/oauth/callback',req.url).toString();
   const q=new URLSearchParams({
     client_id:env.GOOGLE_CLIENT_ID,
@@ -159,7 +177,9 @@ async function authStart(req,env){
 async function authCallback(req,env){
   const u=new URL(req.url);
   const state=await verifySigned(env.SESSION_SECRET,u.searchParams.get('state'));
-  if(!state||Number(state.exp)<Date.now()||!validReturnTo(state.returnTo,env)) return json({ok:false,error:'invalid_state'},400);
+  if(!state||Number(state.exp)<Date.now()) return json({ok:false,error:'invalid_state'},400);
+  if(state.mode==='legacy'&&!validReturnTo(state.returnTo,env)) return json({ok:false,error:'invalid_state'},400);
+  if(state.mode==='pair'&&!validPairId(state.pairId)) return json({ok:false,error:'invalid_pair'},400);
   const code=u.searchParams.get('code');
   if(!code) return json({ok:false,error:u.searchParams.get('error')||'missing_code'},400);
   const redirectUri=new URL('/oauth/callback',req.url).toString();
@@ -181,6 +201,17 @@ async function authCallback(req,env){
     updatedAt:Date.now()
   });
   const session=await signedPayload(env.SESSION_SECRET,{uid,exp:Date.now()+30*24*60*60*1000});
+  if(state.mode==='pair'&&validPairId(state.pairId)){
+    await writeStore(env,'pair:'+state.pairId,{
+      pairId:state.pairId,
+      status:'complete',
+      uid,
+      email:user.email||'',
+      exp:Date.now()+10*60*1000,
+      completedAt:Date.now()
+    });
+    return html(`<!doctype html><html lang="ja"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Google連携完了</title><body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#071019;color:#fff;margin:0;min-height:100vh;display:grid;place-items:center"><main style="text-align:center;padding:28px"><div style="font-size:56px">✓</div><h1>Google連携が完了しました</h1><p style="color:#aab8c4;line-height:1.7">この画面を閉じて、タクシー営業ナビへ戻ってください。<br>アプリ側が自動で連携を確認します。</p><button onclick="window.close()" style="margin-top:18px;padding:14px 28px;border:0;border-radius:14px;font-size:18px;font-weight:800">閉じる</button></main><script>try{window.opener&&window.opener.postMessage({type:'taxi-google-pair-complete',pairId:${JSON.stringify(state.pairId)}},'*')}catch(e){};</script></body></html>`);
+  }
   if(validDeviceId(state.deviceId)){
     await writeStore(env,'device:'+state.deviceId,{
       uid,
@@ -326,6 +357,30 @@ async function gmailSend(req,env){
   return json({ok:true,messageId:d.id||null,threadId:d.threadId||null},200,corsHeaders(req,env));
 }
 
+async function pairStatus(req,env){
+  const u=new URL(req.url);
+  const pairId=u.searchParams.get('pair_id')||'';
+  if(!validPairId(pairId)) return json({ok:false,error:'invalid_pair_id'},400,corsHeaders(req,env));
+  const p=await readStore(env,'pair:'+pairId);
+  if(!p) return json({ok:true,status:'pending'},200,corsHeaders(req,env));
+  if(Number(p.exp||0)<Date.now()){
+    await deleteStore(env,'pair:'+pairId);
+    return json({ok:false,error:'pair_expired'},410,corsHeaders(req,env));
+  }
+  if(p.status!=='complete'||!p.uid) return json({ok:true,status:'pending'},200,corsHeaders(req,env));
+  const profile=await readStore(env,p.uid);
+  if(!profile?.refreshToken) return json({ok:false,error:'google_reconnect_required'},409,corsHeaders(req,env));
+  const session=await signedPayload(env.SESSION_SECRET,{uid:p.uid,exp:Date.now()+30*24*60*60*1000});
+  return json({
+    ok:true,
+    status:'complete',
+    session,
+    email:profile.email||'',
+    folderId:profile.folderId||null,
+    spreadsheetId:profile.spreadsheetId||null
+  },200,corsHeaders(req,env));
+}
+
 async function recoverSession(req,env){
   const u=new URL(req.url);
   const deviceId=u.searchParams.get('device_id')||'';
@@ -409,6 +464,7 @@ export default{
       if(u.pathname==='/health') return json({ok:true,googleConfigured:oauthConfigured(env)});
       if(u.pathname==='/oauth/start') return authStart(req,env);
       if(u.pathname==='/oauth/callback') return authCallback(req,env);
+      if(u.pathname==='/pair/status') return pairStatus(req,env);
       if(u.pathname==='/session/recover') return recoverSession(req,env);
       if(u.pathname==='/session/unlink'&&req.method==='POST') return unlinkDevice(req,env);
       if(u.pathname==='/me') return me(req,env);
