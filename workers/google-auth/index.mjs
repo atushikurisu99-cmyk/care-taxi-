@@ -225,6 +225,57 @@ function buildMimeMessage({from,to,subject,bodyText,attachments=[]}){
   lines.push('--'+boundary+'--','');
   return lines.join('\r\n');
 }
+
+async function getSpreadsheetMeta(accessToken,spreadsheetId){
+  const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+encodeURIComponent(spreadsheetId)+'?fields=sheets.properties',{
+    headers:{authorization:'Bearer '+accessToken}
+  });
+  const d=await r.json();
+  if(!r.ok) throw new Error('sheet_meta_failed');
+  return d;
+}
+async function ensureWorksheet(accessToken,spreadsheetId,title){
+  const meta=await getSpreadsheetMeta(accessToken,spreadsheetId);
+  const found=(meta.sheets||[]).find(s=>s?.properties?.title===title);
+  if(found) return found.properties.sheetId;
+  const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+encodeURIComponent(spreadsheetId)+':batchUpdate',{
+    method:'POST',
+    headers:{authorization:'Bearer '+accessToken,'content-type':'application/json'},
+    body:JSON.stringify({requests:[{addSheet:{properties:{title}}}]})
+  });
+  const d=await r.json();
+  if(!r.ok) throw new Error('sheet_add_failed');
+  return d?.replies?.[0]?.addSheet?.properties?.sheetId;
+}
+async function sheetsSync(req,env){
+  const auth=req.headers.get('authorization')||'';
+  const sessionToken=auth.startsWith('Bearer ')?auth.slice(7):'';
+  const session=await verifySigned(env.SESSION_SECRET,sessionToken);
+  if(!session||Number(session.exp)<Date.now()) return json({ok:false,error:'unauthorized'},401,corsHeaders(req,env));
+  const p=await readStore(env,session.uid);
+  if(!p||!p.refreshToken||!p.spreadsheetId) return json({ok:false,error:'google_reconnect_required'},409,corsHeaders(req,env));
+  const input=await req.json();
+  const sheetName=String(input?.sheetName||'日報データ').trim().slice(0,80)||'日報データ';
+  const values=Array.isArray(input?.values)?input.values:[];
+  if(!values.length) return json({ok:false,error:'missing_values'},400,corsHeaders(req,env));
+  const accessToken=await refreshGoogleAccessToken(p.refreshToken,env);
+  await ensureWorksheet(accessToken,p.spreadsheetId,sheetName);
+  const range="'"+sheetName.replace(/'/g,"''")+"'!A:Z";
+  const clear=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+encodeURIComponent(p.spreadsheetId)+'/values/'+encodeURIComponent(range)+':clear',{
+    method:'POST',headers:{authorization:'Bearer '+accessToken,'content-type':'application/json'},body:'{}'
+  });
+  if(!clear.ok) throw new Error('sheet_clear_failed');
+  const target="'"+sheetName.replace(/'/g,"''")+"'!A1";
+  const r=await fetch('https://sheets.googleapis.com/v4/spreadsheets/'+encodeURIComponent(p.spreadsheetId)+'/values/'+encodeURIComponent(target)+'?valueInputOption=USER_ENTERED',{
+    method:'PUT',
+    headers:{authorization:'Bearer '+accessToken,'content-type':'application/json'},
+    body:JSON.stringify({majorDimension:'ROWS',values})
+  });
+  const d=await r.json();
+  if(!r.ok) throw new Error('sheet_write_failed:'+String(d?.error?.message||r.status));
+  return json({ok:true,spreadsheetId:p.spreadsheetId,sheetName,updatedRows:d.updatedRows||values.length},200,corsHeaders(req,env));
+}
+
 async function gmailSend(req,env){
   const auth=req.headers.get('authorization')||'';
   const sessionToken=auth.startsWith('Bearer ')?auth.slice(7):'';
@@ -303,6 +354,7 @@ export default{
       if(u.pathname==='/oauth/callback') return authCallback(req,env);
       if(u.pathname==='/me') return me(req,env);
       if(u.pathname==='/gmail/send'&&req.method==='POST') return gmailSend(req,env);
+      if(u.pathname==='/sheets/sync'&&req.method==='POST') return sheetsSync(req,env);
       return json({ok:false,error:'not_found'},404,corsHeaders(req,env));
     }catch(e){
       return json({ok:false,error:String(e&&e.message||e)},500,corsHeaders(req,env));

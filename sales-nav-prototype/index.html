@@ -1048,6 +1048,31 @@ html,body{
 }
 
 
+
+/* monthly report / submission center */
+.monthly-report-wrap{overflow:auto;padding-bottom:8px}
+.monthly-report-card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:13px 14px}
+.monthly-report-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
+.monthly-report-field{display:flex;flex-direction:column;gap:6px}
+.monthly-report-field label{font-size:12px;color:var(--muted);font-weight:800}
+.monthly-report-field input,.monthly-report-field select,.monthly-report-field textarea{width:100%;min-width:0;background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff;padding:10px 11px;font-size:14px}
+.monthly-report-field textarea{min-height:104px;resize:vertical;line-height:1.5}
+.monthly-report-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.monthly-report-actions button{min-height:48px;border:1px solid #334756;border-radius:12px;background:#13212d;color:#fff;font-weight:900}
+.monthly-report-actions button.main{background:#176fd4;border-color:#2f86ff}
+.monthly-report-actions button.mail{background:#1b6f49;border-color:#2c8d60}
+.monthly-report-status{font-size:12px;color:#9fb0bc;line-height:1.45}
+.monthly-report-paper{display:none;background:#fff;color:#111;border-radius:7px;padding:12px;overflow:auto;box-shadow:0 5px 22px rgba(0,0,0,.28)}
+.monthly-report-paper.show{display:block}
+.monthly-report-paper h3{margin:0 0 8px;text-align:center;font-size:15px}
+.monthly-report-paper table{width:100%;border-collapse:collapse;font-size:8px;white-space:nowrap}
+.monthly-report-paper th,.monthly-report-paper td{border:1px solid #777;padding:3px 4px;text-align:right}
+.monthly-report-paper th:first-child,.monthly-report-paper td:first-child{text-align:center}
+.monthly-report-paper th{background:#efefef}
+.monthly-report-paper .paper-summary{display:flex;justify-content:space-between;font-size:9px;margin:5px 0 7px;gap:8px;flex-wrap:wrap}
+.template-note{font-size:11px;color:#aab8c4;line-height:1.45;margin-top:7px}
+@media(max-width:360px){.monthly-report-grid{grid-template-columns:1fr}.monthly-report-actions{grid-template-columns:1fr}}
+
 /* google account connection v1 */
 .google-auth-card{display:flex;flex-direction:column;gap:10px}
 .google-auth-status{display:flex;align-items:center;justify-content:space-between;gap:10px}
@@ -1060,6 +1085,7 @@ html,body{
 .google-auth-detail{font-size:12px;color:#9aabb7;line-height:1.45;overflow-wrap:anywhere}
 
 </style>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
 <div class="app">
@@ -1541,6 +1567,63 @@ html,body{
  <div class="action"><button class="primary secondary" onclick="show('home')">ホームへ戻る</button></div>
 </section>
 
+
+<section id="monthlyReport" class="screen">
+ <div class="content monthly-report-wrap">
+  <div class="monthly-report-card">
+   <div class="row"><div><div class="label">帳票・提出</div><h2 style="margin:3px 0 0">月報作成</h2></div><span id="monthlyReportState" class="badge">準備</span></div>
+   <div class="template-note">乗務データは共通で保存し、選んだ組合ひな型へ出力します。まず第一事業団の公開月報をサンプルとして実装します。</div>
+  </div>
+
+  <div class="monthly-report-card">
+   <div class="monthly-report-grid">
+    <div class="monthly-report-field">
+     <label>対象月</label>
+     <input id="monthlyReportMonth" type="month" onchange="renderMonthlyReportCenter()">
+    </div>
+    <div class="monthly-report-field">
+     <label>ひな型</label>
+     <select id="monthlyReportTemplate" onchange="saveMonthlyReportSettings();renderMonthlyReportCenter()">
+      <option value="daiichi">第一事業団（月報・暫定対応）</option>
+      <option value="standard">営業ナビ標準</option>
+     </select>
+    </div>
+   </div>
+   <div id="monthlyReportTemplateNote" class="template-note"></div>
+  </div>
+
+  <div class="monthly-report-card">
+   <div class="monthly-report-grid">
+    <div class="monthly-report-field">
+     <label>送信先メール</label>
+     <input id="monthlyReportTo" type="email" inputmode="email" placeholder="組合・税理士など" onchange="saveMonthlyReportSettings()">
+    </div>
+    <div class="monthly-report-field">
+     <label>件名</label>
+     <input id="monthlyReportSubject" type="text" onchange="saveMonthlyReportSettings()">
+    </div>
+   </div>
+   <div class="monthly-report-field" style="margin-top:9px">
+    <label>メール本文</label>
+    <textarea id="monthlyReportBody" onchange="saveMonthlyReportSettings()"></textarea>
+   </div>
+  </div>
+
+  <div class="monthly-report-card">
+   <div class="monthly-report-actions">
+    <button type="button" onclick="syncDailyReportsToGoogleSheets(false)">Google Sheetsへ同期</button>
+    <button type="button" onclick="toggleMonthlyReportPreview()">A4プレビュー</button>
+    <button type="button" class="main" onclick="downloadMonthlyReportXlsx()">Excelダウンロード</button>
+    <button type="button" class="mail" onclick="sendMonthlyReportMail()">メール送信</button>
+   </div>
+   <div id="monthlyReportStatus" class="monthly-report-status" style="margin-top:10px">日報データを読み込み中</div>
+  </div>
+
+  <div id="monthlyReportPreview" class="monthly-report-paper"></div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
+</section>
+
 <section id="settings" class="screen">
  <div class="content settings-wrap">
   <div id="settingsRoot">
@@ -1658,6 +1741,7 @@ html,body{
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
    <div class="menuitem" onclick="show('verify')">◎ 位置・警告検証</div>
    <div class="menuitem" onclick="openLatestReport()">▤ 日報確認</div>
+   <div class="menuitem" onclick="show('monthlyReport')">▦ 月報・帳票出力</div>
    <div class="menuitem" onclick="show('settings')">⚙ 設定</div>
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()">■ 乗務終了</div>
   </div>
@@ -1693,7 +1777,7 @@ preventIosPinchZoom();
  document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 })();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',dailyReport:'日報入力',reportEdit:'日報編集',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',dailyReport:'日報入力',reportEdit:'日報編集',monthlyReport:'月報・帳票出力',menu:'メニュー'};
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -1737,6 +1821,7 @@ function show(id){
  if(id==='analysis') renderSimpleSalesAnalysis();
  if(id==='dailyReport') renderDailyReport();
  if(id==='reportEdit') renderReportEdit();
+ if(id==='monthlyReport') renderMonthlyReportCenter();
  if(id==='settings'){ openSettingsSection('root'); renderNotificationSettings(); renderSalesGoalSettings(); }
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
@@ -1862,6 +1947,218 @@ async function sendGoogleTestMail(){
  }finally{
   if(btn){btn.disabled=false;btn.textContent='テストメール送信'}
  }
+}
+
+
+const MONTHLY_REPORT_SETTINGS_KEY='taxi_monthly_report_settings_v1';
+const MONTHLY_REPORT_SOURCE_URL='https://kojin1-or-jp.prm-ssl.jp/useful.html';
+
+function monthKeyNow(){
+ const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
+}
+function getMonthlyReportSettings(){
+ let v={};
+ try{v=JSON.parse(localStorage.getItem(MONTHLY_REPORT_SETTINGS_KEY)||'{}')||{}}catch(e){}
+ return {
+  template:v.template||'daiichi',
+  to:v.to||getGoogleMailRecipient()||'',
+  subject:v.subject||'',
+  body:v.body||''
+ };
+}
+function saveMonthlyReportSettings(){
+ const v={
+  template:document.getElementById('monthlyReportTemplate')?.value||'daiichi',
+  to:String(document.getElementById('monthlyReportTo')?.value||'').trim(),
+  subject:String(document.getElementById('monthlyReportSubject')?.value||''),
+  body:String(document.getElementById('monthlyReportBody')?.value||'')
+ };
+ try{localStorage.setItem(MONTHLY_REPORT_SETTINGS_KEY,JSON.stringify(v))}catch(e){}
+ if(v.to){try{localStorage.setItem(GOOGLE_MAIL_RECIPIENT_KEY,v.to)}catch(e){}}
+}
+function monthlyRows(monthKey){
+ return getDailyReports()
+  .filter(r=>String(r?.dateKey||'').slice(0,7)===monthKey)
+  .slice().sort((a,b)=>String(a.dateKey||'').localeCompare(String(b.dateKey||'')));
+}
+function reportTravelKm(r){
+ const a=Number(r?.odometerStart),b=Number(r?.odometerEnd);
+ return Number.isFinite(a)&&Number.isFinite(b)&&b>=a?Math.round(b-a):null;
+}
+function monthlyTotals(rows){
+ return rows.reduce((o,r)=>{
+  o.sales+=Math.max(0,Number(r.sales)||0);
+  o.receivable+=Math.max(0,Number(r.receivable)||0);
+  o.trips+=Math.max(0,Number(r.trips)||0);
+  o.expenses+=reportExpenseTotal(r);
+  const km=reportTravelKm(r); if(km!==null)o.km+=km;
+  return o;
+ },{sales:0,receivable:0,trips:0,expenses:0,km:0});
+}
+function monthlyDefaultSubject(monthKey){
+ const [y,m]=monthKey.split('-'); return y+'年'+Number(m)+'月 個人タクシー月報';
+}
+function monthlyDefaultBody(monthKey){
+ const [y,m]=monthKey.split('-');
+ return 'お世話になっております。\n'+y+'年'+Number(m)+'月分の月報を送付いたします。\nご確認をお願いいたします。';
+}
+function renderMonthlyReportCenter(){
+ const monthEl=document.getElementById('monthlyReportMonth'); if(!monthEl)return;
+ if(!monthEl.value) monthEl.value=monthKeyNow();
+ const monthKey=monthEl.value;
+ const saved=getMonthlyReportSettings();
+ const template=document.getElementById('monthlyReportTemplate');
+ const to=document.getElementById('monthlyReportTo');
+ const subject=document.getElementById('monthlyReportSubject');
+ const body=document.getElementById('monthlyReportBody');
+ if(template) template.value=saved.template||'daiichi';
+ if(to && document.activeElement!==to) to.value=saved.to||getGoogleMailRecipient()||'';
+ if(subject && document.activeElement!==subject) subject.value=saved.subject||monthlyDefaultSubject(monthKey);
+ if(body && document.activeElement!==body) body.value=saved.body||monthlyDefaultBody(monthKey);
+ const rows=monthlyRows(monthKey),tot=monthlyTotals(rows);
+ const state=document.getElementById('monthlyReportState');
+ if(state) state.textContent=rows.length?rows.length+'日分':'データなし';
+ const status=document.getElementById('monthlyReportStatus');
+ if(status) status.textContent=rows.length
+   ?('対象 '+rows.length+'日 / 売上 '+yen(tot.sales)+' / '+tot.trips+'回 / 走行 '+tot.km.toLocaleString('ja-JP')+'km / 経費 '+yen(tot.expenses))
+   :'この月の日報データはまだありません';
+ const note=document.getElementById('monthlyReportTemplateNote');
+ if(note) note.innerHTML=(template?.value==='daiichi')
+  ?'第一事業団が公開している「運転日報集計表・現金出納帳作成用Excel（R7.3.17）」を基準にした暫定マッピング。元ひな型のセル配置を取得後、完全互換へ差し替えます。'
+  :'営業ナビ標準の運転日報集計表・現金出納帳。';
+ renderMonthlyReportPreview(false);
+}
+function monthlyReportTableHtml(monthKey){
+ const rows=monthlyRows(monthKey),tot=monthlyTotals(rows);
+ const title=(document.getElementById('monthlyReportTemplate')?.value==='daiichi'?'運転日報集計表':'タクシー営業ナビ 月報');
+ const body=rows.map(r=>{
+  const km=reportTravelKm(r);
+  return '<tr><td>'+escapeHtml(String(r.dateKey||'').slice(8,10))+'</td><td>'+escapeHtml(r.startTime||'')+'</td><td>'+escapeHtml(r.endTime||'')+'</td>'+
+   '<td>'+escapeHtml(r.odometerStart??'')+'</td><td>'+escapeHtml(r.odometerEnd??'')+'</td><td>'+(km??'')+'</td>'+
+   '<td>'+Math.round(Number(r.sales)||0).toLocaleString('ja-JP')+'</td><td>'+Math.round(Number(r.receivable)||0).toLocaleString('ja-JP')+'</td>'+
+   '<td>'+Math.round(Number(r.trips)||0)+'</td><td>'+reportExpenseTotal(r).toLocaleString('ja-JP')+'</td></tr>';
+ }).join('');
+ return '<h3>'+escapeHtml(title)+'　'+escapeHtml(monthKey)+'</h3>'+
+  '<div class="paper-summary"><span>売上 '+yen(tot.sales)+'</span><span>未収 '+yen(tot.receivable)+'</span><span>乗車 '+tot.trips+'回</span><span>走行 '+tot.km+'km</span></div>'+
+  '<table><thead><tr><th>日</th><th>出庫</th><th>入庫</th><th>出庫km</th><th>入庫km</th><th>走行km</th><th>売上</th><th>未収</th><th>回数</th><th>経費</th></tr></thead><tbody>'+
+  (body||'<tr><td colspan="10">データなし</td></tr>')+
+  '<tr><th colspan="5">合計</th><th>'+tot.km+'</th><th>'+tot.sales.toLocaleString('ja-JP')+'</th><th>'+tot.receivable.toLocaleString('ja-JP')+'</th><th>'+tot.trips+'</th><th>'+tot.expenses.toLocaleString('ja-JP')+'</th></tr>'+
+  '</tbody></table>';
+}
+function renderMonthlyReportPreview(forceShow=true){
+ const p=document.getElementById('monthlyReportPreview'); if(!p)return;
+ const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
+ p.innerHTML=monthlyReportTableHtml(monthKey);
+ if(forceShow)p.classList.add('show');
+}
+function toggleMonthlyReportPreview(){
+ const p=document.getElementById('monthlyReportPreview');if(!p)return;
+ if(p.classList.contains('show'))p.classList.remove('show');
+ else renderMonthlyReportPreview(true);
+}
+function monthlyWorkbook(monthKey){
+ if(typeof XLSX==='undefined') throw new Error('xlsx_library_not_loaded');
+ const reports=monthlyRows(monthKey),tot=monthlyTotals(reports);
+ const header=['日付','出庫時刻','入庫時刻','出庫オドメーター','入庫オドメーター','走行km','営業収入','未収','乗車回数','経費合計','備考'];
+ const daily=[header,...reports.map(r=>[
+  r.dateKey||'',r.startTime||'',r.endTime||'',r.odometerStart??'',r.odometerEnd??'',reportTravelKm(r)??'',
+  Math.round(Number(r.sales)||0),Math.round(Number(r.receivable)||0),Math.round(Number(r.trips)||0),reportExpenseTotal(r),r.note||''
+ ])];
+ daily.push(['合計','','','','',tot.km,tot.sales,tot.receivable,tot.trips,tot.expenses,'']);
+ const cash=[['日付','摘要','収入','支出','残高']];
+ let balance=0;
+ for(const r of reports){
+  const cashSales=Math.max(0,Math.round((Number(r.sales)||0)-(Number(r.receivable)||0)));
+  if(cashSales){balance+=cashSales;cash.push([r.dateKey,'現金売上',cashSales,'',balance]);}
+  for(const e of (r.expenses||[])){
+   const amount=Math.max(0,Math.round(Number(e.amount)||0)); if(!amount)continue;
+   balance-=amount; cash.push([r.dateKey,String(e.labelSnapshot||'経費'),'',amount,balance]);
+  }
+ }
+ const wb=XLSX.utils.book_new();
+ const ws1=XLSX.utils.aoa_to_sheet(daily);
+ const ws2=XLSX.utils.aoa_to_sheet(cash);
+ ws1['!cols']=[{wch:11},{wch:9},{wch:9},{wch:14},{wch:14},{wch:9},{wch:12},{wch:10},{wch:9},{wch:10},{wch:24}];
+ ws2['!cols']=[{wch:11},{wch:24},{wch:12},{wch:12},{wch:12}];
+ ws1['!margins']={left:0.25,right:0.25,top:0.4,bottom:0.4,header:0.2,footer:0.2};
+ ws2['!margins']={left:0.3,right:0.3,top:0.4,bottom:0.4,header:0.2,footer:0.2};
+ XLSX.utils.book_append_sheet(wb,ws1,'運転日報集計表');
+ XLSX.utils.book_append_sheet(wb,ws2,'現金出納帳');
+ return wb;
+}
+function monthlyReportFilename(monthKey){
+ return monthKey.replace('-','年')+'月_個人タクシー月報.xlsx';
+}
+function monthlyWorkbookBase64(monthKey){
+ const wb=monthlyWorkbook(monthKey);
+ return XLSX.write(wb,{bookType:'xlsx',type:'base64'});
+}
+function downloadMonthlyReportXlsx(){
+ const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
+ const rows=monthlyRows(monthKey); if(!rows.length){toast('対象月の日報がありません');return}
+ try{
+  const wb=monthlyWorkbook(monthKey);
+  XLSX.writeFile(wb,monthlyReportFilename(monthKey));
+  toast('Excelを作成しました');
+ }catch(e){console.error(e);toast('Excel作成に失敗しました')}
+}
+function dailyReportsSheetValues(){
+ const rows=getDailyReports().slice().sort((a,b)=>Number(a.startTs||0)-Number(b.startTs||0));
+ return [
+  ['日付','出庫時刻','入庫時刻','出庫オドメーター','入庫オドメーター','走行km','売上','未収','乗車回数','経費','備考','更新時刻'],
+  ...rows.map(r=>[
+   r.dateKey||'',r.startTime||'',r.endTime||'',r.odometerStart??'',r.odometerEnd??'',reportTravelKm(r)??'',
+   Math.round(Number(r.sales)||0),Math.round(Number(r.receivable)||0),Math.round(Number(r.trips)||0),reportExpenseTotal(r),r.note||'',
+   r.updatedAt?new Date(Number(r.updatedAt)).toISOString():''
+  ])
+ ];
+}
+async function syncDailyReportsToGoogleSheets(silent=false){
+ const token=getGoogleAuthToken(); if(!token){if(!silent)toast('Google連携が必要です');return false}
+ try{
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/sheets/sync',{
+   method:'POST',
+   headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+   body:JSON.stringify({sheetName:'日報データ',values:dailyReportsSheetValues()})
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok||!d?.ok)throw new Error(d?.error||('HTTP '+r.status));
+  if(!silent)toast('Google Sheetsへ同期しました');
+  return true;
+ }catch(e){console.error(e);if(!silent)toast('Sheets同期に失敗しました');return false}
+}
+async function sendMonthlyReportMail(){
+ saveMonthlyReportSettings();
+ const token=getGoogleAuthToken();
+ const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
+ const rows=monthlyRows(monthKey);
+ const to=String(document.getElementById('monthlyReportTo')?.value||'').trim();
+ const subject=String(document.getElementById('monthlyReportSubject')?.value||monthlyDefaultSubject(monthKey)).trim();
+ const bodyText=String(document.getElementById('monthlyReportBody')?.value||monthlyDefaultBody(monthKey));
+ if(!rows.length){toast('対象月の日報がありません');return}
+ if(!token){toast('Google連携が必要です');return}
+ if(!to){toast('送信先メールを入力してください');return}
+ const btns=[...document.querySelectorAll('#monthlyReport .monthly-report-actions button')];btns.forEach(b=>b.disabled=true);
+ try{
+  await syncDailyReportsToGoogleSheets(true);
+  const base64=monthlyWorkbookBase64(monthKey);
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/gmail/send',{
+   method:'POST',
+   headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+   body:JSON.stringify({
+    to,subject,bodyText,
+    attachments:[{filename:monthlyReportFilename(monthKey),mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',base64}]
+   })
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok||!d?.ok)throw new Error(d?.error||('HTTP '+r.status));
+  const histKey='taxi_monthly_report_send_history_v1';
+  let hist=[];try{hist=JSON.parse(localStorage.getItem(histKey)||'[]')}catch(e){}
+  hist.push({monthKey,to,subject,messageId:d.messageId||'',sentAt:Date.now()});
+  try{localStorage.setItem(histKey,JSON.stringify(hist.slice(-200)))}catch(e){}
+  toast('月報をメール送信しました');
+ }catch(e){console.error(e);toast('月報メール送信に失敗しました')}
+ finally{btns.forEach(b=>b.disabled=false)}
 }
 
 const SALES_GOAL_SETTINGS_KEY='taxi_sales_goal_settings_v1';
@@ -3769,6 +4066,7 @@ function saveDailyReport(){
   linkNextReportOdometer(rr);
  }
  logAnalyticsEvent('daily_report_saved',{reportId:r.id,odometerMissing:odometerEnd===null,expenseTotal:reportExpenseTotal(rr)});
+ if(getGoogleAuthToken()) syncDailyReportsToGoogleSheets(true); // auto-sync after daily report save
  if(reportEndDutyPending){
   finalizeDutyAfterReport(rr);
   reportEndDutyPending=false;
