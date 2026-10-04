@@ -132,8 +132,8 @@
   if(location.origin!==NEW_ORIGIN) return false;
   const u=new URL(location.href);
   const migrationId=u.searchParams.get('migration');
-  const secret=u.searchParams.get('secret');
   const hash=new URLSearchParams(location.hash.replace(/^#/,''));
+  const secret=hash.get('migration_secret');
   const key=hash.get('migration_key');
   if(!migrationId||!secret||!key) return false;
   try{
@@ -165,8 +165,7 @@
    const m=await uploadEncrypted(enc.blob);
    const dest=new URL(NEW_ORIGIN+'/');
    dest.searchParams.set('migration',m.migrationId);
-   dest.searchParams.set('secret',m.migrationSecret);
-   dest.hash='migration_key='+encodeURIComponent(enc.key);
+   dest.hash='migration_secret='+encodeURIComponent(m.migrationSecret)+'&migration_key='+encodeURIComponent(enc.key);
    location.href=dest.toString();
    return true;
   }catch(e){
