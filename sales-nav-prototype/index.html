@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-GOOGLE-AUTH-RECOVERY-1 SERVER-DEVICE-BIND -->
+<!-- BUILD:2026-10-05-GOOGLE-AUTH-RECOVERY-2 STALE-PWA-COMPAT -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2144,8 +2144,10 @@ function consumeGoogleAuthCallback(){
   const hash=String(location.hash||'');
   const p=new URLSearchParams(hash.replace(/^#/,''));
   const token=p.get('google_auth_session');
+  const deviceId=p.get('google_auth_device');
   if(!token) return false;
   localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,token);
+  if(deviceId&&validGoogleDeviceId(deviceId)) localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,deviceId);
   history.replaceState(null,'',location.pathname+location.search);
   setTimeout(()=>{toast('Googleアカウントを連携しました');refreshGoogleAuthStatus();},50);
   return true;
@@ -2154,6 +2156,10 @@ function consumeGoogleAuthCallback(){
 function getGoogleAuthToken(){
  try{return localStorage.getItem(GOOGLE_AUTH_TOKEN_KEY)||''}catch(e){return''}
 }
+function validGoogleDeviceId(value){
+ return /^[A-Za-z0-9_-]{20,120}$/.test(String(value||''));
+}
+
 function getGoogleAuthDeviceId(create=true){
  try{
   let id=localStorage.getItem(GOOGLE_AUTH_DEVICE_KEY)||'';
