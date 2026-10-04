@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-GOOGLE-AUTH-RECOVERY-2 STALE-PWA-COMPAT -->
+<!-- BUILD:2026-10-05-GOOGLE-AUTH-RECOVERY-3 INVALID-ID-RESET -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2163,8 +2163,14 @@ function validGoogleDeviceId(value){
 function getGoogleAuthDeviceId(create=true){
  try{
   let id=localStorage.getItem(GOOGLE_AUTH_DEVICE_KEY)||'';
+  // Older builds may have left an unusable id behind. Never reuse it.
+  if(id&&!validGoogleDeviceId(id)){
+   localStorage.removeItem(GOOGLE_AUTH_DEVICE_KEY);
+   id='';
+  }
   if(!id&&create){
-   id=(crypto.randomUUID?crypto.randomUUID():('dev_'+Date.now()+'_'+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2))).replace(/[^A-Za-z0-9_-]/g,'');
+   id=('dev_'+(crypto.randomUUID?crypto.randomUUID().replace(/-/g,''):(Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2))));
+   if(!validGoogleDeviceId(id)) id='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)+'_'+Math.random().toString(36).slice(2);
    localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,id);
   }
   return id;
@@ -2201,6 +2207,9 @@ async function ensureGoogleAuthSession(showError=false){
 function beginGoogleConnect(){
  const returnTo=location.origin+location.pathname+location.search;
  const deviceId=getGoogleAuthDeviceId(true);
+ if(!validGoogleDeviceId(deviceId)){toast('端末IDを作成できませんでした');return}
+ // Persist before leaving the standalone PWA for Google/Safari.
+ try{localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,deviceId)}catch(e){}
  location.href=GOOGLE_AUTH_WORKER_URL+'/oauth/start?return_to='+encodeURIComponent(returnTo)+'&device_id='+encodeURIComponent(deviceId);
 }
 async function disconnectGoogleAccount(){
