@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-04-GPS-150-LIGHT-1 DAILY-REPORT-INPUT-1 -->
+<!-- BUILD:2026-10-04-GPS-150-LIGHT-1 DAILY-REPORT-INPUT-1 GOOGLE-AUTH-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1047,6 +1047,18 @@ html,body{
  .report-edit-row{grid-template-columns:1fr;gap:5px}
 }
 
+
+/* google account connection v1 */
+.google-auth-card{display:flex;flex-direction:column;gap:10px}
+.google-auth-status{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.google-auth-status strong{font-size:16px}
+.google-auth-pill{font-size:12px;font-weight:900;padding:6px 9px;border-radius:999px;border:1px solid #445462;color:#c1ccd4;background:#111d27}
+.google-auth-pill.on{border-color:#2e6d4a;color:#a7e2bf;background:#10291d}
+.google-auth-actions{display:flex;gap:8px}
+.google-auth-actions button{flex:1;min-height:46px;border-radius:12px;font-weight:900;border:1px solid #304252;background:#13212d;color:#fff}
+.google-auth-actions .connect{background:#f5f7f8;color:#17212a;border-color:#d7dde2}
+.google-auth-detail{font-size:12px;color:#9aabb7;line-height:1.45;overflow-wrap:anywhere}
+
 </style>
 </head>
 <body>
@@ -1546,6 +1558,19 @@ html,body{
 
   <div id="settingsPersonal" class="hidden">
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
+   <div class="settings-card google-auth-card">
+    <div class="settings-title">Googleアカウント</div>
+    <div class="settings-note">初回連携後、専用のDriveフォルダとスプレッドシートを自動作成する設計です。</div>
+    <div class="google-auth-status">
+     <strong id="googleAuthAccount">未接続</strong>
+     <span id="googleAuthPill" class="google-auth-pill">未接続</span>
+    </div>
+    <div id="googleAuthDetail" class="google-auth-detail">Google連携を開始すると、Drive・Sheets保存に必要な権限を確認します。</div>
+    <div class="google-auth-actions">
+     <button id="googleAuthConnectBtn" class="connect" type="button" onclick="beginGoogleConnect()">Googleで連携</button>
+     <button id="googleAuthDisconnectBtn" class="hidden" type="button" onclick="disconnectGoogleAccount()">この端末の連携を解除</button>
+    </div>
+   </div>
    <div class="settings-card">
    <div class="settings-title">売上・目標</div>
    <div class="settings-note">この端末だけに保存します。月目標と予定乗務日数から、1乗務あたり必要額を自動計算します。</div>
@@ -1720,9 +1745,72 @@ function openSettingsSection(section){
  root.classList.toggle('hidden',section!=='root');
  personal.classList.toggle('hidden',section!=='personal');
  notifications.classList.toggle('hidden',section!=='notifications');
- if(section==='personal') renderSalesGoalSettings();
+ if(section==='personal'){ renderSalesGoalSettings(); refreshGoogleAuthStatus(); }
  if(section==='notifications') renderNotificationSettings();
 }
+
+const GOOGLE_AUTH_WORKER_URL='https://taxi-google-auth.atushi-works.workers.dev';
+const GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v1';
+
+function consumeGoogleAuthCallback(){
+ try{
+  const hash=String(location.hash||'');
+  const p=new URLSearchParams(hash.replace(/^#/,''));
+  const token=p.get('google_auth_session');
+  if(!token) return false;
+  localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,token);
+  history.replaceState(null,'',location.pathname+location.search);
+  setTimeout(()=>{toast('Googleアカウントを連携しました');refreshGoogleAuthStatus();},50);
+  return true;
+ }catch(e){return false}
+}
+function getGoogleAuthToken(){
+ try{return localStorage.getItem(GOOGLE_AUTH_TOKEN_KEY)||''}catch(e){return''}
+}
+function beginGoogleConnect(){
+ const returnTo=location.origin+location.pathname+location.search;
+ location.href=GOOGLE_AUTH_WORKER_URL+'/oauth/start?return_to='+encodeURIComponent(returnTo);
+}
+function disconnectGoogleAccount(){
+ try{localStorage.removeItem(GOOGLE_AUTH_TOKEN_KEY)}catch(e){}
+ renderGoogleAuthStatus(null);
+ toast('この端末のGoogle連携を解除しました');
+}
+function renderGoogleAuthStatus(profile){
+ const account=document.getElementById('googleAuthAccount');
+ const pill=document.getElementById('googleAuthPill');
+ const detail=document.getElementById('googleAuthDetail');
+ const connect=document.getElementById('googleAuthConnectBtn');
+ const disconnect=document.getElementById('googleAuthDisconnectBtn');
+ if(!account||!pill||!detail||!connect||!disconnect) return;
+ if(profile&&profile.ok){
+  account.textContent=profile.email||'Google連携済み';
+  pill.textContent='連携済み';pill.classList.add('on');
+  const folder=profile.folderId?'Driveフォルダ作成済み':'Drive準備中';
+  const sheet=profile.spreadsheetId?'スプレッドシート作成済み':'Sheets準備中';
+  detail.textContent=folder+' / '+sheet;
+  connect.textContent='再認証';disconnect.classList.remove('hidden');
+ }else{
+  account.textContent='未接続';
+  pill.textContent='未接続';pill.classList.remove('on');
+  detail.textContent='Google連携を開始すると、Drive・Sheets保存に必要な権限を確認します。';
+  connect.textContent='Googleで連携';disconnect.classList.add('hidden');
+ }
+}
+async function refreshGoogleAuthStatus(){
+ const token=getGoogleAuthToken();
+ if(!token){renderGoogleAuthStatus(null);return}
+ try{
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+  if(!r.ok) throw new Error('auth '+r.status);
+  const d=await r.json();
+  if(!d?.ok) throw new Error('not connected');
+  renderGoogleAuthStatus(d);
+ }catch(e){
+  renderGoogleAuthStatus(null);
+ }
+}
+
 const SALES_GOAL_SETTINGS_KEY='taxi_sales_goal_settings_v1';
 function getSalesGoalSettings(){
  try{
@@ -5829,6 +5917,8 @@ document.addEventListener('visibilitychange',()=>{
 });
 window.addEventListener('pageshow',refreshLiveFeedsNow);
 window.addEventListener('focus',refreshLiveFeedsNow);
+
+consumeGoogleAuthCallback();
 </script>
 </body>
 </html>

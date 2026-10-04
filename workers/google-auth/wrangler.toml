@@ -1,0 +1,19 @@
+name = "taxi-google-auth"
+main = "index.mjs"
+compatibility_date = "2026-10-04"
+
+[[durable_objects.bindings]]
+name = "USER_STORE"
+class_name = "UserStore"
+
+[[migrations]]
+tag = "v1"
+new_classes = ["UserStore"]
+
+# Runtime secrets required before OAuth can complete:
+# GOOGLE_CLIENT_ID
+# GOOGLE_CLIENT_SECRET
+# SESSION_SECRET
+#
+# Runtime var required:
+# ALLOWED_RETURN_ORIGINS
