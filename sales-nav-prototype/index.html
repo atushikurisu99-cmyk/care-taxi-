@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-REPORT-UI-8 DAILY-DISTANCE-1 MOCKUP-BALANCE-1 COMPACT-EDIT-2 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
+<!-- BUILD:2026-10-05-DAILY-REPORT-V2-1 APPROVED-MOCKUP-LAYOUT DAILY-DISTANCE-2 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -979,6 +979,46 @@ html,body{
 @media(max-width:380px){.weather-week{gap:2px}.weather-day{padding:7px 1px}.weather-day .wi{font-size:20px}.weather-day .temps{font-size:10px}}
 
 /* daily report input v1 */
+/* daily report v2 approved compact layout */
+#dailyReport .daily-report-content{gap:8px}
+.daily-report-v2{overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:5px}
+.daily-v2-head{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px 2px}
+.daily-v2-title{font-size:22px;font-weight:1000;color:#fff}
+.daily-v2-date{display:flex;align-items:center;gap:8px;font-size:16px;font-weight:900;color:#fff}
+#dailyReport .card{padding:11px 12px;border-radius:15px}
+.daily-v2-section{display:flex;flex-direction:column;gap:8px}
+.daily-v2-section-title{font-size:16px;font-weight:950;color:#dce7ef}
+.daily-v2-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.daily-v2-field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.daily-v2-field label,.daily-v2-note label{font-size:12px;color:#b4c1cb;font-weight:850;line-height:1.15}
+.daily-v2-field>input,.daily-v2-unit,.daily-v2-note textarea{background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff}
+.daily-v2-field>input{width:100%;min-width:0;box-sizing:border-box;font-size:20px;font-weight:950;padding:9px 11px;min-height:42px}
+.daily-v2-time{-webkit-appearance:none;appearance:none;font-variant-numeric:tabular-nums}
+.daily-v2-unit{display:flex;align-items:center;gap:8px;padding:0 10px;min-width:0}
+.daily-v2-unit input{flex:1;min-width:0;border:0;background:transparent;color:#fff;font-size:20px;font-weight:950;padding:9px 0;outline:0}
+.daily-v2-unit span{font-size:13px;color:#aebcc7;font-weight:900;white-space:nowrap}
+.daily-v2-unit.error{border-color:#e55258;box-shadow:0 0 0 1px rgba(229,82,88,.2)}
+.daily-v2-distance{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #1d2c37;padding-top:8px}
+.daily-v2-distance span{font-size:14px;color:#c7d2da;font-weight:900}
+.daily-v2-distance strong{font-size:18px;color:#fff;font-weight:1000}
+.daily-v2-summary-row{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:center;padding:3px 0}
+.daily-v2-summary-row+ .daily-v2-summary-row{border-top:1px solid #1d2c37;padding-top:8px}
+.daily-v2-summary-row label{font-size:16px;color:#fff;font-weight:950}
+.daily-v2-unit.wide input{font-size:19px}
+.daily-v2-note{display:flex;flex-direction:column;gap:4px;padding-top:3px}
+.daily-v2-note textarea{width:100%;min-height:68px;resize:vertical;box-sizing:border-box;padding:10px 11px;font-size:15px;line-height:1.35}
+.daily-v2-links{padding:0 12px!important}
+.daily-v2-link-row{width:100%;min-height:52px;display:grid;grid-template-columns:1fr auto 18px;gap:8px;align-items:center;border:0;background:transparent;color:#fff;padding:0;text-align:left}
+.daily-v2-link-row+ .daily-v2-link-row{border-top:1px solid #1d2c37}
+.daily-v2-link-row span,.daily-v2-link-row strong{font-size:17px;font-weight:950}
+.daily-v2-link-row b{font-size:24px;color:#b8c8d3}
+.daily-v2-expense-detail.hidden{display:none}
+.daily-v2-actions .primary{font-size:22px}
+@media(max-width:360px){
+ .daily-v2-grid{gap:8px}
+ .daily-v2-summary-row{grid-template-columns:82px minmax(0,1fr)}
+ .daily-v2-summary-row label{font-size:15px}
+}
 .daily-report-content{overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:6px}
 .report-warning{
  display:none;border:1px solid #9b3d42;background:#351719;color:#ffb6b9;
@@ -1499,25 +1539,55 @@ html,body{
 
 
 <section id="dailyReport" class="screen">
- <div class="content daily-report-content">
+ <div class="content daily-report-content daily-report-v2">
   <div id="reportMissingWarning" class="report-warning">入庫オドメーターが未入力です。確認して入力してください。空欄のまま保存する場合は、もう一度「保存」を押してください。</div>
 
-  <div class="card">
-   <div class="row"><div><div class="label">日報入力</div><h2 id="reportDateLabel" style="margin:3px 0 0">--</h2></div><span id="reportDutyState" class="badge">編集中</span></div>
-  </div>
-
-  <div class="card">
-   <div class="report-field">
-    <div class="report-field-label">入庫オドメーター</div>
-    <div id="reportOdometerWrap" class="report-input-wrap">
-     <input id="reportOdometerEnd" class="report-input" type="number" min="0" step="1" inputmode="numeric" placeholder="未入力">
-     <span class="report-unit">km</span>
-    </div>
+  <div class="daily-v2-head">
+   <div class="daily-v2-title">日報編集</div>
+   <div class="daily-v2-date">
+    <span id="reportDateLabel">--</span>
+    <span id="reportDutyState" class="badge">編集中</span>
    </div>
   </div>
 
-  <div class="card expense-section">
-   <div class="row"><h2 style="margin:0">経費</h2><span class="sub">項目ごとに入力</span></div>
+  <div class="card daily-v2-section">
+   <div class="daily-v2-section-title">運行情報</div>
+   <div class="daily-v2-grid">
+    <div class="daily-v2-field">
+     <label for="reportStartTime">出庫時刻</label>
+     <input id="reportStartTime" class="daily-v2-time" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)">
+    </div>
+    <div class="daily-v2-field">
+     <label for="reportEndTime">入庫時刻</label>
+     <input id="reportEndTime" class="daily-v2-time" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)">
+    </div>
+    <div class="daily-v2-field">
+     <label for="reportOdometerStart">出庫オドメーター</label>
+     <div class="daily-v2-unit"><input id="reportOdometerStart" type="number" min="0" step="1" inputmode="numeric" oninput="updateDailyReportTravelKm()"><span>km</span></div>
+    </div>
+    <div class="daily-v2-field">
+     <label for="reportOdometerEnd">入庫オドメーター</label>
+     <div id="reportOdometerWrap" class="daily-v2-unit"><input id="reportOdometerEnd" type="number" min="0" step="1" inputmode="numeric" oninput="updateDailyReportTravelKm()"><span>km</span></div>
+    </div>
+   </div>
+   <div class="daily-v2-distance"><span>本日の走行距離</span><strong id="reportDailyDistance">-- km</strong></div>
+  </div>
+
+  <div class="card daily-v2-section">
+   <div class="daily-v2-section-title">売上・乗務情報</div>
+   <div class="daily-v2-summary-row"><label for="reportSalesInput">売上</label><div class="daily-v2-unit wide"><input id="reportSalesInput" type="number" min="0" step="1" inputmode="numeric"><span>円</span></div></div>
+   <div class="daily-v2-summary-row"><label for="reportReceivableInput">未収</label><div class="daily-v2-unit wide"><input id="reportReceivableInput" type="number" min="0" step="1" inputmode="numeric"><span>円</span></div></div>
+   <div class="daily-v2-summary-row"><label for="reportTripsInput">乗車回数</label><div class="daily-v2-unit wide"><input id="reportTripsInput" type="number" min="0" step="1" inputmode="numeric"><span>回</span></div></div>
+   <div class="daily-v2-note"><label for="reportNoteInput">備考</label><textarea id="reportNoteInput" placeholder="備考を入力（任意）"></textarea></div>
+  </div>
+
+  <div class="card daily-v2-links">
+   <button class="daily-v2-link-row" type="button" onclick="toggleDailyExpenseDetail()"><span>経費</span><strong id="reportExpenseTotal">0円</strong><b>›</b></button>
+   <button class="daily-v2-link-row" type="button" onclick="openDailyTripRecords()"><span>乗車記録</span><strong id="reportTripCount">0件</strong><b>›</b></button>
+  </div>
+
+  <div id="dailyExpenseDetail" class="card expense-section daily-v2-expense-detail hidden">
+   <div class="row"><h2 style="margin:0">経費</h2><span class="sub">必要な時だけ入力</span></div>
    <div id="reportExpenseRows"></div>
    <button class="expense-add-btn" type="button" onclick="toggleExpenseAddPanel()">＋ 項目追加</button>
 
@@ -1535,21 +1605,9 @@ html,body{
      <button type="button" onclick="addExpenseItemFromMaster()">追加</button>
     </div>
    </div>
-
-   <div class="expense-total"><span>経費合計</span><strong id="reportExpenseTotal">0円</strong></div>
-  </div>
-
-  <div class="card report-auto-card">
-   <div class="row"><h2 style="margin:0">自動記録内容</h2><span class="sub">必要なら編集</span></div>
-   <div class="report-auto-row"><span>出庫時刻</span><strong id="reportAutoStartTime">--</strong></div>
-   <div class="report-auto-row"><span>入庫時刻</span><strong id="reportAutoEndTime">--</strong></div>
-   <div class="report-auto-row"><span>売上</span><strong id="reportAutoSales">0円</strong></div>
-   <div class="report-auto-row"><span>売掛</span><strong id="reportAutoReceivable">0円</strong></div>
-   <div class="report-auto-row"><span>乗車回数</span><strong id="reportAutoTrips">0回</strong></div>
-   <button class="report-edit-link" type="button" onclick="openCurrentReportEdit()">編集する</button>
   </div>
  </div>
- <div class="action"><button class="primary secondary" onclick="cancelDailyReport()">戻る</button><button class="primary" onclick="saveDailyReport()">保存</button></div>
+ <div class="action daily-v2-actions"><button class="primary secondary" onclick="cancelDailyReport()">戻る</button><button class="primary" onclick="saveDailyReport()">保存</button></div>
 </section>
 
 <section id="reportEdit" class="screen">
@@ -4103,27 +4161,52 @@ function updateExpenseAmount(lineId,value){
  const rr=updateReport(r.id,{expenses});
  const total=document.getElementById('reportExpenseTotal');
  if(total) total.textContent=yen(reportExpenseTotal(rr));
+ const total2=document.getElementById('reportEditExpenseTotal');
+ if(total2) total2.textContent=yen(reportExpenseTotal(rr));
+}
+function updateDailyReportTravelKm(){
+ const el=document.getElementById('reportDailyDistance');if(!el)return;
+ const aRaw=String(document.getElementById('reportOdometerStart')?.value??'').trim();
+ const bRaw=String(document.getElementById('reportOdometerEnd')?.value??'').trim();
+ if(aRaw===''||bRaw===''){el.textContent='-- km';return}
+ const a=Number(aRaw),b=Number(bRaw);
+ el.textContent=(Number.isFinite(a)&&Number.isFinite(b)&&b>=a)?(Math.round(b-a).toLocaleString('ja-JP')+' km'):'-- km';
+}
+function toggleDailyExpenseDetail(){
+ const el=document.getElementById('dailyExpenseDetail');if(!el)return;
+ el.classList.toggle('hidden');
+ if(!el.classList.contains('hidden')) el.scrollIntoView({behavior:'smooth',block:'nearest'});
+}
+function openDailyTripRecords(){
+ show('reportEdit');
+ setTimeout(scrollReportTripsIntoView,50);
 }
 function renderDailyReport(){
  let r=getReportById(activeReportId);if(!r)return;
  if(!Array.isArray(r.expenses)||r.expenses.length===0){
   r=updateReport(r.id,{expenses:DEFAULT_EXPENSE_ITEMS.map(x=>({id:'line_'+x.id+'_'+r.startTs,masterId:x.id,labelSnapshot:x.name,amount:null}))})||r;
  }
- const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
- set('reportDateLabel',displayDayFromTs(r.startTs));
- set('reportDutyState',r.status==='saved'?'保存済み':'編集中');
- const odo=document.getElementById('reportOdometerEnd');
- if(odo) odo.value=(r.odometerEnd===null||r.odometerEnd==='')?'':String(r.odometerEnd);
+ const setText=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+ const setVal=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??''};
+ setText('reportDateLabel',displayDayFromTs(r.startTs));
+ setText('reportDutyState',r.status==='saved'?'保存済み':'編集中');
+ setVal('reportStartTime',r.startTime||'');
+ setVal('reportEndTime',r.endTime||'');
+ setVal('reportOdometerStart',r.odometerStart===null||r.odometerStart===''?'':r.odometerStart);
+ setVal('reportOdometerEnd',r.odometerEnd===null||r.odometerEnd===''?'':r.odometerEnd);
+ setVal('reportSalesInput',r.sales||0);
+ setVal('reportReceivableInput',r.receivable||0);
+ setVal('reportTripsInput',Math.max(0,Number(r.trips)||0));
+ setVal('reportNoteInput',r.note||'');
+ setText('reportExpenseTotal',yen(reportExpenseTotal(r)));
+ setText('reportTripCount',reportTripsForDuty(r.dutyId)+'件');
+ updateDailyReportTravelKm();
+
  const warn=document.getElementById('reportMissingWarning');
  const wrap=document.getElementById('reportOdometerWrap');
  warn?.classList.toggle('show',reportOdometerWarned&&(r.odometerEnd===null||r.odometerEnd===''));
  wrap?.classList.toggle('error',reportOdometerWarned&&(r.odometerEnd===null||r.odometerEnd===''));
- set('reportAutoStartTime',r.startTime||'--');
- set('reportAutoEndTime',r.endTime||'--');
- set('reportAutoSales',yen(r.sales||0));
- set('reportAutoReceivable',yen(r.receivable||0));
- set('reportAutoTrips',Math.max(0,Number(r.trips)||0)+'回');
- set('reportExpenseTotal',yen(reportExpenseTotal(r)));
+
  const rows=document.getElementById('reportExpenseRows');
  if(rows){
   rows.innerHTML=(r.expenses||[]).length?(r.expenses||[]).map(x=>{
@@ -4140,34 +4223,45 @@ function renderDailyReport(){
 }
 function saveDailyReport(){
  const r=getReportById(activeReportId);if(!r)return;
- const odoEl=document.getElementById('reportOdometerEnd');
- const raw=String(odoEl?.value??'').trim();
- if(raw===''){
+ const val=id=>String(document.getElementById(id)?.value??'').trim();
+ const num=(id,nullable=false)=>{
+  const raw=val(id);
+  if(nullable&&raw==='') return null;
+  return Math.max(0,Math.round(Number(raw)||0));
+ };
+ const rawOdo=val('reportOdometerEnd');
+ if(rawOdo===''){
   if(!reportOdometerWarned){
    reportOdometerWarned=true;
    renderDailyReport();
-   odoEl?.focus();
+   document.getElementById('reportOdometerEnd')?.focus();
    return;
   }
- }else{
-  reportOdometerWarned=false;
- }
- const odometerEnd=raw===''?null:Math.max(0,Math.round(Number(raw)||0));
+ }else reportOdometerWarned=false;
+
+ const odometerEnd=rawOdo===''?null:num('reportOdometerEnd',true);
+ const odometerStart=num('reportOdometerStart',true);
  const endedAt=r.endTs||Date.now();
- let rr=updateReport(r.id,{
+ const rr=updateReport(r.id,{
+  startTime:val('reportStartTime'),
+  endTime:val('reportEndTime')||hmFromTs(endedAt),
+  odometerStart,
   odometerEnd,
+  sales:num('reportSalesInput'),
+  receivable:num('reportReceivableInput'),
+  trips:num('reportTripsInput'),
+  note:document.getElementById('reportNoteInput')?.value||'',
   endTs:endedAt,
-  endTime:r.endTime||hmFromTs(endedAt),
-  trips:r.manual?.trips?r.trips:reportTripsForDuty(r.dutyId),
   status:'saved',
-  savedAt:Date.now()
+  savedAt:Date.now(),
+  manual:{...(r.manual||{}),startTime:true,endTime:true,odometerStart:true,sales:true,receivable:true,trips:true}
  });
  if(odometerEnd!==null){
   try{localStorage.setItem(LAST_ODOMETER_KEY,String(odometerEnd))}catch(e){}
   linkNextReportOdometer(rr);
  }
  logAnalyticsEvent('daily_report_saved',{reportId:r.id,odometerMissing:odometerEnd===null,expenseTotal:reportExpenseTotal(rr)});
- if(getGoogleAuthToken()) syncDailyReportsToGoogleSheets(true); // auto-sync after daily report save
+ if(getGoogleAuthToken()) syncDailyReportsToGoogleSheets(true);
  if(reportEndDutyPending){
   finalizeDutyAfterReport(rr);
   reportEndDutyPending=false;
