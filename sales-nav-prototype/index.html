@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-DAILY-REPORT-V2-2 ODOMETER-DISTANCE-FIX -->
+<!-- BUILD:2026-10-05-MENU-CLEANUP-1 NO-CALENDAR-RESERVATION-IN-MENU -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -158,6 +158,9 @@ main{position:relative;min-height:0;overflow:hidden}
  radial-gradient(circle at 30% 62%,rgba(40,160,255,.7),transparent 15%),
  linear-gradient(135deg,#163044,#101b24)}
 .menuitem{padding:14px 0;border-bottom:1px solid #22313d;font-size:16px;font-weight:700}
+.menu-card-compact{padding-top:4px!important;padding-bottom:4px!important}
+.menu-card-compact .menuitem:first-child{border-top:0}
+
 .menuitem:last-child{border-bottom:0}
 .verify-card{background:#0c1721;border:1px solid #22313d;border-radius:15px;padding:12px 13px}
 .verify-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
@@ -1891,10 +1894,8 @@ html,body{
 
 <section id="menu" class="screen">
  <div class="content">
-  <div class="card"><h2>メニュー</h2>
+  <div class="card menu-card-compact">
    <div class="menuitem" onclick="show('home')">⌂ ホーム</div>
-   <div class="menuitem" onclick="show('calendar')">□ カレンダー</div>
-   <div class="menuitem" onclick="openAllReservations()">▣ 予約一覧</div>
    <div class="menuitem" onclick="show('today')">＋ 本日の営業情報</div>
    <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
    <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
