@@ -1568,6 +1568,7 @@ html,body{
     <div id="googleAuthDetail" class="google-auth-detail">Google連携を開始すると、Drive・Sheets保存に必要な権限を確認します。</div>
     <div class="google-auth-actions">
      <button id="googleAuthConnectBtn" class="connect" type="button" onclick="beginGoogleConnect()">Googleで連携</button>
+     <button id="googleAuthTestMailBtn" class="hidden" type="button" onclick="sendGoogleTestMail()">テストメール送信</button>
      <button id="googleAuthDisconnectBtn" class="hidden" type="button" onclick="disconnectGoogleAccount()">この端末の連携を解除</button>
     </div>
    </div>
@@ -1751,6 +1752,7 @@ function openSettingsSection(section){
 
 const GOOGLE_AUTH_WORKER_URL='https://taxi-google-auth.atushi-works.workers.dev';
 const GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v1';
+let googleAuthProfile=null;
 
 function consumeGoogleAuthCallback(){
  try{
@@ -1782,19 +1784,21 @@ function renderGoogleAuthStatus(profile){
  const detail=document.getElementById('googleAuthDetail');
  const connect=document.getElementById('googleAuthConnectBtn');
  const disconnect=document.getElementById('googleAuthDisconnectBtn');
- if(!account||!pill||!detail||!connect||!disconnect) return;
+ const testMail=document.getElementById('googleAuthTestMailBtn');
+ if(!account||!pill||!detail||!connect||!disconnect||!testMail) return;
+ googleAuthProfile=(profile&&profile.ok)?profile:null;
  if(profile&&profile.ok){
   account.textContent=profile.email||'Google連携済み';
   pill.textContent='連携済み';pill.classList.add('on');
   const folder=profile.folderId?'Driveフォルダ作成済み':'Drive準備中';
   const sheet=profile.spreadsheetId?'スプレッドシート作成済み':'Sheets準備中';
   detail.textContent=folder+' / '+sheet;
-  connect.textContent='再認証';disconnect.classList.remove('hidden');
+  connect.textContent='再認証';testMail.classList.remove('hidden');disconnect.classList.remove('hidden');
  }else{
   account.textContent='未接続';
   pill.textContent='未接続';pill.classList.remove('on');
   detail.textContent='Google連携を開始すると、Drive・Sheets保存に必要な権限を確認します。';
-  connect.textContent='Googleで連携';disconnect.classList.add('hidden');
+  connect.textContent='Googleで連携';testMail.classList.add('hidden');disconnect.classList.add('hidden');
  }
 }
 async function refreshGoogleAuthStatus(){
@@ -1808,6 +1812,33 @@ async function refreshGoogleAuthStatus(){
   renderGoogleAuthStatus(d);
  }catch(e){
   renderGoogleAuthStatus(null);
+ }
+}
+
+async function sendGoogleTestMail(){
+ const token=getGoogleAuthToken();
+ const to=googleAuthProfile?.email||'';
+ if(!token||!to){toast('Google連携を確認してください');return}
+ const btn=document.getElementById('googleAuthTestMailBtn');
+ if(btn){btn.disabled=true;btn.textContent='送信中…'}
+ try{
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/gmail/send',{
+   method:'POST',
+   headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
+   body:JSON.stringify({
+    to,
+    subject:'タクシー営業ナビ Gmail送信テスト',
+    bodyText:'タクシー営業ナビからのテストメールです。\nGoogle連携とGmail送信が正常に動作しています。'
+   })
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok||!d?.ok) throw new Error(d?.error||('HTTP '+r.status));
+  toast('テストメールを送信しました');
+ }catch(e){
+  console.error(e);
+  toast('メール送信に失敗しました');
+ }finally{
+  if(btn){btn.disabled=false;btn.textContent='テストメール送信'}
  }
 }
 
