@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-04-GPS-150-LIGHT-1 DAILY-REPORT-INPUT-1 GOOGLE-AUTH-1 -->
+<!-- BUILD:2026-10-05-REPORT-UI-2 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -128,7 +128,21 @@ main{position:relative;min-height:0;overflow:hidden}
 .payopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
 .payopt{min-height:60px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
 .payopt.selected{background:#123456;border-color:#2f86ff}
+.discount-toggle{width:100%;min-height:48px;border:1px solid #3b4a55;background:#101b24;color:#d8e2e9;border-radius:12px;font-weight:850;font-size:15px}
+.discount-toggle.selected{background:#4a3512;border-color:#b6842d;color:#ffe4a1}
+.payment-note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.4}
 .fare{font-size:44px;font-weight:1000}
+.report-trip-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
+.report-trip-card{border:1px solid #263743;border-radius:13px;background:#0b1720;padding:11px 12px}
+.report-trip-top{display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:8px}
+.report-trip-no{font-size:13px;font-weight:900;color:#9aabb7}
+.report-trip-time{font-size:16px;font-weight:900;color:#fff}
+.report-trip-pay{font-size:12px;font-weight:850;color:#c5d2dc;white-space:nowrap}
+.report-trip-route{display:grid;grid-template-columns:18px minmax(0,1fr);gap:6px;margin-top:9px;font-size:13px;line-height:1.35}
+.report-trip-route .mark{color:#6faeff;font-weight:900}
+.report-trip-route strong{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.report-trip-meta{display:flex;justify-content:space-between;gap:8px;margin-top:9px;padding-top:8px;border-top:1px solid #1d2a34;color:#8fa0ad;font-size:11px}
+.report-trip-empty{padding:18px 8px;text-align:center;color:var(--muted);font-size:13px;line-height:1.55}
 .list{display:flex;flex-direction:column;gap:8px}
 .listitem{background:#0c1721;border:1px solid #22313d;border-radius:14px;padding:12px 13px;display:grid;grid-template-columns:62px 1fr auto;gap:8px;align-items:center}
 .time{font-size:18px;font-weight:900}
@@ -1221,19 +1235,26 @@ html,body{
 
   <div class="drive-note">通知は必要な時だけ重ねて表示</div>
  </div>
- <div class="action"><button class="primary pay" onclick="show('payment')">支払</button></div>
+ <div class="action"><button class="primary pay" onclick="resetPaymentChoices();show('payment')">支払</button></div>
 </section>
 
 <section id="payment" class="screen">
  <div class="content">
   <div class="card"><div class="label">運賃</div><div class="fare">3,680円</div></div>
-  <div class="card"><h2>支払方法</h2><div class="payopts">
-   <button class="payopt selected" onclick="pickPay(this)">現金</button>
-   <button class="payopt" onclick="pickPay(this)">カード</button>
-   <button class="payopt" onclick="pickPay(this)">その他</button>
-  </div></div>
+  <div class="card">
+   <h2>支払方法</h2>
+   <div class="payopts">
+    <button class="payopt selected" data-pay="現金" onclick="pickPay(this)">現金</button>
+    <button class="payopt" data-pay="キャッシュレス" onclick="pickPay(this)">キャッシュレス</button>
+    <button class="payopt" data-pay="タクシーチケット" onclick="pickPay(this)">タクシーチケット</button>
+   </div>
+   <div style="margin-top:10px">
+    <button id="disabilityDiscountButton" class="discount-toggle" type="button" aria-pressed="false" onclick="toggleDisabilityDiscount()">身障者割引</button>
+    <div class="payment-note">割引は支払方法と別に記録します</div>
+   </div>
+  </div>
   <div class="ride-location">
-   <div class="label">乗車地</div>
+   <div class="label">乗車地（GPS自動記録）</div>
    <div id="paymentStartAddress" class="address">場所を確認中…</div>
   </div>
  </div>
@@ -1502,6 +1523,10 @@ html,body{
    <div class="report-edit-row"><label for="editReceivable">売掛</label><input id="editReceivable" type="number" min="0" step="1" inputmode="numeric"></div>
    <div class="report-edit-row"><label for="editTrips">乗車回数</label><input id="editTrips" type="number" min="0" step="1" inputmode="numeric"></div>
    <div class="report-edit-row"><label for="editNote">備考</label><textarea id="editNote"></textarea></div>
+  </div>
+  <div class="card">
+   <div class="row"><div><h2 style="margin:0">乗車記録</h2><div class="sub">乗車地・降車地はGPSから自動記録</div></div><span class="badge">確認用</span></div>
+   <div id="reportTripEditList" class="report-trip-list"></div>
   </div>
  </div>
  <div class="action"><button class="primary secondary" onclick="show('dailyReport')">戻る</button><button class="primary" onclick="saveReportEdit()">反映</button></div>
@@ -4126,6 +4151,37 @@ function renderReportEdit(){
  setv('editReceivable',r.receivable||'');
  setv('editTrips',r.trips||'');
  setv('editNote',r.note||'');
+ renderReportTripEditList(r);
+}
+function reportTripPlaceText(point){
+ if(!point) return '位置情報なし';
+ const a=String(point.address||'').trim();
+ if(!a) return '住所確認中';
+ return isCoordFallbackLabel(a)?'住所確認中':a;
+}
+function renderReportTripEditList(r){
+ const el=document.getElementById('reportTripEditList');if(!el)return;
+ const rows=getTripRecords()
+  .filter(x=>x&&x.dutyId===r.dutyId&&x.pickupTs)
+  .slice().sort((a,b)=>Number(a.pickupTs||0)-Number(b.pickupTs||0));
+ if(!rows.length){
+  el.innerHTML='<div class="report-trip-empty">この乗務の乗車記録はまだありません。<br>乗車・降車操作から自動で追加されます。</div>';
+  return;
+ }
+ const hm=ts=>ts?new Date(Number(ts)).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'--:--';
+ el.innerHTML=rows.map((x,i)=>{
+  const pay=escapeHtml(x.paymentMethod||'未選択');
+  const discount=x.disabilityDiscount?'・身障者割引':'';
+  const pickup=escapeHtml(reportTripPlaceText(x.pickup));
+  const dropoff=escapeHtml(reportTripPlaceText(x.dropoff));
+  const acc1=x.pickup&&Number.isFinite(Number(x.pickup.accuracy))?'±'+Math.round(Number(x.pickup.accuracy))+'m':'';
+  const acc2=x.dropoff&&Number.isFinite(Number(x.dropoff.accuracy))?'±'+Math.round(Number(x.dropoff.accuracy))+'m':'';
+  return '<div class="report-trip-card">'+
+   '<div class="report-trip-top"><span class="report-trip-no">'+(i+1)+'件目</span><span class="report-trip-time">'+hm(x.pickupTs)+' → '+hm(x.dropoffTs)+'</span><span class="report-trip-pay">'+pay+escapeHtml(discount)+'</span></div>'+
+   '<div class="report-trip-route"><span class="mark">乗</span><strong>'+pickup+'</strong><span class="mark">降</span><strong>'+dropoff+'</strong></div>'+
+   '<div class="report-trip-meta"><span>GPS自動記録</span><span>'+escapeHtml([acc1,acc2].filter(Boolean).join(' / ')||'精度情報なし')+'</span></div>'+
+  '</div>';
+ }).join('');
 }
 function saveReportEdit(){
  const r=getReportById(activeReportId);if(!r)return;
@@ -5536,6 +5592,18 @@ function toggleMap(){
  document.getElementById('homeMap').classList.toggle('hidden',!mapEnabled);
 }
 function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function toggleDisabilityDiscount(){
+ const b=document.getElementById('disabilityDiscountButton');if(!b)return;
+ const on=!b.classList.contains('selected');
+ b.classList.toggle('selected',on);
+ b.setAttribute('aria-pressed',on?'true':'false');
+}
+function resetPaymentChoices(){
+ const opts=[...document.querySelectorAll('.payopt')];
+ opts.forEach((x,i)=>x.classList.toggle('selected',i===0));
+ const b=document.getElementById('disabilityDiscountButton');
+ if(b){b.classList.remove('selected');b.setAttribute('aria-pressed','false')}
+}
 function initNoticeSwipe(){
  const n=document.getElementById('notice');
  if(!n||n.dataset.swipeReady==='1') return;
@@ -6008,15 +6076,17 @@ async function finishRide(){
   };
   const rideId=rideBeforeFinish&&rideBeforeFinish.rideId?rideBeforeFinish.rideId:null;
   const payEl=document.querySelector('.payopt.selected');
-  const paymentMethod=payEl?payEl.textContent.trim():null;
+  const paymentMethod=payEl?(payEl.dataset.pay||payEl.textContent.trim()):null;
+  const disabilityDiscount=!!document.getElementById('disabilityDiscountButton')?.classList.contains('selected');
   upsertTripRecord(rideId,{
    dropoffTs:dropoffAt,
    dropoffIso:new Date(dropoffAt).toISOString(),
    dropoff:{lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy,address:rec.address},
-   paymentMethod
+   paymentMethod,
+   disabilityDiscount
   });
   saveLastDropoffSnapshot({t:dropoffAt,dutyMeters:currentDutyMeters(),lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy});
-  logAnalyticsEvent('ride_end',{rideId,paymentMethod});
+  logAnalyticsEvent('ride_end',{rideId,paymentMethod,disabilityDiscount});
   const log=getVerifyLog();
   log.unshift(rec);
   saveVerifyLog(log);
