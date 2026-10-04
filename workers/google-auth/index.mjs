@@ -169,6 +169,89 @@ async function authCallback(req,env){
   ret.hash='google_auth_session='+encodeURIComponent(session);
   return Response.redirect(ret.toString(),302);
 }
+async function refreshGoogleAccessToken(refreshToken,env){
+  if(!refreshToken) throw new Error('missing_refresh_token');
+  const body=new URLSearchParams({
+    client_id:env.GOOGLE_CLIENT_ID,
+    client_secret:env.GOOGLE_CLIENT_SECRET,
+    refresh_token:refreshToken,
+    grant_type:'refresh_token'
+  });
+  const r=await fetch('https://oauth2.googleapis.com/token',{
+    method:'POST',
+    headers:{'content-type':'application/x-www-form-urlencoded'},
+    body
+  });
+  const d=await r.json();
+  if(!r.ok||!d.access_token) throw new Error('refresh_token_failed');
+  return d.access_token;
+}
+function b64urlText(text){
+  const bytes=enc.encode(text);
+  let bin=''; for(const b of bytes) bin+=String.fromCharCode(b);
+  return btoa(bin).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function buildMimeMessage({from,to,subject,bodyText,attachments=[]}){
+  const safeSubject=String(subject||'');
+  const boundary='taxi_nav_'+crypto.randomUUID().replace(/-/g,'');
+  const lines=[
+    'From: '+from,
+    'To: '+to,
+    'Subject: =?UTF-8?B?'+btoa(unescape(encodeURIComponent(safeSubject)))+'?=',
+    'MIME-Version: 1.0',
+    'Content-Type: multipart/mixed; boundary="'+boundary+'"',
+    '',
+    '--'+boundary,
+    'Content-Type: text/plain; charset="UTF-8"',
+    'Content-Transfer-Encoding: base64',
+    '',
+    btoa(unescape(encodeURIComponent(String(bodyText||''))))
+  ];
+  for(const a of (Array.isArray(attachments)?attachments:[])){
+    const filename=String(a?.filename||'attachment.bin').replace(/[\r\n"]/g,'_');
+    const mime=String(a?.mimeType||'application/octet-stream');
+    const base64=String(a?.base64||'').replace(/^data:[^,]*,/, '');
+    if(!base64) continue;
+    lines.push(
+      '--'+boundary,
+      'Content-Type: '+mime+'; name="'+filename+'"',
+      'Content-Disposition: attachment; filename="'+filename+'"',
+      'Content-Transfer-Encoding: base64',
+      '',
+      base64
+    );
+  }
+  lines.push('--'+boundary+'--','');
+  return lines.join('\r\n');
+}
+async function gmailSend(req,env){
+  const auth=req.headers.get('authorization')||'';
+  const sessionToken=auth.startsWith('Bearer ')?auth.slice(7):'';
+  const session=await verifySigned(env.SESSION_SECRET,sessionToken);
+  if(!session||Number(session.exp)<Date.now()) return json({ok:false,error:'unauthorized'},401,corsHeaders(req,env));
+  const p=await readStore(env,session.uid);
+  if(!p||!p.refreshToken) return json({ok:false,error:'google_reconnect_required'},409,corsHeaders(req,env));
+  const input=await req.json();
+  const to=String(input?.to||'').trim();
+  const subject=String(input?.subject||'').trim();
+  const bodyText=String(input?.bodyText||'');
+  if(!to||!subject) return json({ok:false,error:'missing_to_or_subject'},400,corsHeaders(req,env));
+  const accessToken=await refreshGoogleAccessToken(p.refreshToken,env);
+  const raw=b64urlText(buildMimeMessage({
+    from:p.email||'me',
+    to,subject,bodyText,
+    attachments:Array.isArray(input?.attachments)?input.attachments:[]
+  }));
+  const r=await fetch('https://gmail.googleapis.com/gmail/v1/users/me/messages/send',{
+    method:'POST',
+    headers:{authorization:'Bearer '+accessToken,'content-type':'application/json'},
+    body:JSON.stringify({raw})
+  });
+  const d=await r.json();
+  if(!r.ok) throw new Error('gmail_send_failed:'+String(d?.error?.message||r.status));
+  return json({ok:true,messageId:d.id||null,threadId:d.threadId||null},200,corsHeaders(req,env));
+}
+
 async function me(req,env){
   const auth=req.headers.get('authorization')||'';
   const token=auth.startsWith('Bearer ')?auth.slice(7):'';
@@ -204,6 +287,7 @@ export default{
       if(u.pathname==='/oauth/start') return authStart(req,env);
       if(u.pathname==='/oauth/callback') return authCallback(req,env);
       if(u.pathname==='/me') return me(req,env);
+      if(u.pathname==='/gmail/send'&&req.method==='POST') return gmailSend(req,env);
       return json({ok:false,error:'not_found'},404,corsHeaders(req,env));
     }catch(e){
       return json({ok:false,error:String(e&&e.message||e)},500,corsHeaders(req,env));
