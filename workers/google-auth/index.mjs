@@ -46,15 +46,6 @@ function corsHeaders(req,env){
 function allowedOrigins(env){
   return String(env.ALLOWED_RETURN_ORIGINS||'').split(',').map(x=>x.trim()).filter(Boolean);
 }
-function validReturnTo(value,env){
-  try{
-    const u=new URL(value);
-    return u.protocol==='https:'&&allowedOrigins(env).includes(u.origin);
-  }catch{return false}
-}
-function validDeviceId(value){
-  return /^[A-Za-z0-9_-]{20,120}$/.test(String(value||''));
-}
 function validPairId(value){
   return /^pair_[A-Za-z0-9_-]{24,120}$/.test(String(value||''));
 }
@@ -68,12 +59,6 @@ function randomSecret(prefix){
   const bytes=new Uint8Array(32);
   crypto.getRandomValues(bytes);
   return prefix+b64url(bytes);
-}
-function validMigrationId(value){
-  return /^mig_[A-Za-z0-9_-]{40,180}$/.test(String(value||''));
-}
-function validMigrationSecret(value){
-  return /^msec_[A-Za-z0-9_-]{40,180}$/.test(String(value||''));
 }
 
 function originAllowed(req,env){
@@ -167,21 +152,18 @@ async function authStart(req,env){
   if(!oauthConfigured(env)) return json({ok:false,error:'google_oauth_not_configured'},503);
   const u=new URL(req.url);
   const pairId=u.searchParams.get('pair_id')||'';
-  const returnTo=u.searchParams.get('return_to')||'';
-  let deviceId=u.searchParams.get('device_id')||'';
-  let statePayload;
-  if(validPairId(pairId)){
-    const pair=await readStore(env,'pair:'+pairId);
-    if(!pair||pair.status!=='pending'||Number(pair.exp||0)<Date.now()){
-      return json({ok:false,error:'invalid_or_expired_pair'},400);
-    }
-    statePayload={pairId,mode:'pair',exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()};
-  }else{
-    if(!validReturnTo(returnTo,env)) return json({ok:false,error:'return_origin_not_allowed'},400);
-    if(!validDeviceId(deviceId)) deviceId='dev_'+crypto.randomUUID().replace(/-/g,'')+'_'+Date.now().toString(36);
-    statePayload={returnTo,deviceId,mode:'legacy',exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()};
+  if(!validPairId(pairId)) return json({ok:false,error:'invalid_pair_id'},400);
+
+  const pair=await readStore(env,'pair:'+pairId);
+  if(!pair||pair.status!=='pending'||Number(pair.exp||0)<Date.now()){
+    return json({ok:false,error:'invalid_or_expired_pair'},400);
   }
-  const state=await signedPayload(env.SESSION_SECRET,statePayload);
+
+  const state=await signedPayload(env.SESSION_SECRET,{
+    pairId,
+    exp:Date.now()+10*60*1000,
+    nonce:crypto.randomUUID()
+  });
   const redirectUri=new URL('/oauth/callback',req.url).toString();
   const q=new URLSearchParams({
     client_id:env.GOOGLE_CLIENT_ID,
@@ -189,7 +171,6 @@ async function authStart(req,env){
     response_type:'code',
     scope:'openid email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.send',
     access_type:'offline',
-    prompt:'consent',
     include_granted_scopes:'true',
     state
   });
@@ -198,18 +179,16 @@ async function authStart(req,env){
 async function authCallback(req,env){
   const u=new URL(req.url);
   const state=await verifySigned(env.SESSION_SECRET,u.searchParams.get('state'));
-  if(!state||Number(state.exp)<Date.now()) return json({ok:false,error:'invalid_state'},400);
-  if(state.mode==='legacy'&&!validReturnTo(state.returnTo,env)) return json({ok:false,error:'invalid_state'},400);
-  if(state.mode==='pair'&&!validPairId(state.pairId)) return json({ok:false,error:'invalid_pair'},400);
+  if(!state||Number(state.exp)<Date.now()||!validPairId(state.pairId)){
+    return json({ok:false,error:'invalid_state'},400);
+  }
 
   const code=u.searchParams.get('code');
   if(!code) return json({ok:false,error:u.searchParams.get('error')||'missing_code'},400);
 
-  if(state.mode==='pair'){
-    const pair=await readStore(env,'pair:'+state.pairId);
-    if(!pair||pair.status!=='pending'||Number(pair.exp||0)<Date.now()){
-      return json({ok:false,error:'pair_expired'},410);
-    }
+  const pair=await readStore(env,'pair:'+state.pairId);
+  if(!pair||pair.status!=='pending'||Number(pair.exp||0)<Date.now()){
+    return json({ok:false,error:'pair_expired'},410);
   }
 
   const redirectUri=new URL('/oauth/callback',req.url).toString();
@@ -232,27 +211,16 @@ async function authCallback(req,env){
     updatedAt:Date.now()
   });
 
-  const session=await signedPayload(env.SESSION_SECRET,{uid,exp:Date.now()+30*24*60*60*1000});
+  await writeStore(env,'pair:'+state.pairId,{
+    ...pair,
+    status:'complete',
+    uid,
+    email:user.email||'',
+    exp:Date.now()+10*60*1000,
+    completedAt:Date.now()
+  });
 
-  if(state.mode==='pair'&&validPairId(state.pairId)){
-    const pair=await readStore(env,'pair:'+state.pairId);
-    await writeStore(env,'pair:'+state.pairId,{
-      ...pair,
-      status:'complete',
-      uid,
-      email:user.email||'',
-      exp:Date.now()+10*60*1000,
-      completedAt:Date.now()
-    });
-    return html(`<!doctype html><html lang="ja"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Google連携完了</title><body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#071019;color:#fff;margin:0;min-height:100vh;display:grid;place-items:center"><main style="text-align:center;padding:28px"><div style="font-size:56px">✓</div><h1>Google連携が完了しました</h1><p style="color:#aab8c4;line-height:1.7">この画面を閉じて、タクシー営業ナビへ戻ってください。<br>アプリ側で連携状態を自動確認します。</p><button onclick="window.close()" style="margin-top:18px;padding:14px 28px;border:0;border-radius:14px;font-size:18px;font-weight:800">閉じる</button></main><script>try{window.opener&&window.opener.postMessage({type:'taxi-google-pair-complete'},'*')}catch(e){};</script></body></html>`);
-  }
-
-  if(validDeviceId(state.deviceId)){
-    await writeStore(env,'device:'+state.deviceId,{uid,linkedAt:Date.now(),updatedAt:Date.now()});
-  }
-  const ret=new URL(state.returnTo);
-  ret.hash='google_auth_session='+encodeURIComponent(session)+'&google_auth_device='+encodeURIComponent(state.deviceId||'');
-  return Response.redirect(ret.toString(),302);
+  return html(`<!doctype html><html lang="ja"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Google連携完了</title><body style="font-family:-apple-system,BlinkMacSystemFont,sans-serif;background:#071019;color:#fff;margin:0;min-height:100vh;display:grid;place-items:center"><main style="text-align:center;padding:28px"><div style="font-size:56px">✓</div><h1>Google連携が完了しました</h1><p style="color:#aab8c4;line-height:1.7">この画面を閉じて、タクシー営業ナビへ戻ってください。<br>アプリ側で連携状態を自動確認します。</p><button onclick="window.close()" style="margin-top:18px;padding:14px 28px;border:0;border-radius:14px;font-size:18px;font-weight:800">閉じる</button></main><script>try{window.opener&&window.opener.postMessage({type:'taxi-google-pair-complete'},'*')}catch(e){};<\/script></body></html>`);
 }
 async function refreshGoogleAccessToken(refreshToken,env){
   if(!refreshToken) throw new Error('missing_refresh_token');
@@ -388,91 +356,6 @@ async function gmailSend(req,env){
   return json({ok:true,messageId:d.id||null,threadId:d.threadId||null},200,corsHeaders(req,env));
 }
 
-async function migrationStart(req,env){
-  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
-  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
-  const migrationId=randomSecret('mig_');
-  const migrationSecret=randomSecret('msec_');
-  const secretHash=await sha256(migrationSecret);
-  await writeStore(env,'migration:'+migrationId,{
-    migrationId,
-    secretHash,
-    status:'open',
-    chunkCount:0,
-    totalChars:0,
-    createdAt:Date.now(),
-    exp:Date.now()+30*60*1000
-  });
-  return json({ok:true,migrationId,migrationSecret,expiresIn:1800},200,corsHeaders(req,env));
-}
-async function migrationPut(req,env){
-  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
-  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
-  const input=await req.json().catch(()=>({}));
-  const migrationId=String(input?.migrationId||'');
-  const migrationSecret=String(input?.migrationSecret||'');
-  const index=Number(input?.index);
-  const total=Number(input?.total);
-  const chunk=String(input?.chunk||'');
-  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
-  if(!Number.isInteger(index)||index<0||index>255||!Number.isInteger(total)||total<1||total>256||index>=total) return json({ok:false,error:'invalid_chunk_index'},400,corsHeaders(req,env));
-  if(!chunk||chunk.length>70000) return json({ok:false,error:'invalid_chunk_size'},400,corsHeaders(req,env));
-  const meta=await readStore(env,'migration:'+migrationId);
-  if(!meta||Number(meta.exp||0)<Date.now()) return json({ok:false,error:'migration_expired'},410,corsHeaders(req,env));
-  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
-  await writeStore(env,'migration:'+migrationId+':'+index,{chunk,index,total,updatedAt:Date.now()});
-  await writeStore(env,'migration:'+migrationId,{
-    ...meta,
-    status:index===total-1?'ready':'uploading',
-    chunkCount:Math.max(Number(meta.chunkCount)||0,index+1),
-    expectedChunks:total,
-    totalChars:(Number(meta.totalChars)||0)+chunk.length,
-    updatedAt:Date.now()
-  });
-  return json({ok:true,index,total},200,corsHeaders(req,env));
-}
-async function migrationGet(req,env){
-  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
-  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
-  const input=await req.json().catch(()=>({}));
-  const migrationId=String(input?.migrationId||'');
-  const migrationSecret=String(input?.migrationSecret||'');
-  const index=Number(input?.index);
-  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)||!Number.isInteger(index)||index<0||index>255) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
-  const meta=await readStore(env,'migration:'+migrationId);
-  if(!meta||Number(meta.exp||0)<Date.now()) return json({ok:false,error:'migration_expired'},410,corsHeaders(req,env));
-  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
-  const part=await readStore(env,'migration:'+migrationId+':'+index);
-  if(!part?.chunk) return json({ok:false,error:'chunk_not_found'},404,corsHeaders(req,env));
-  return json({ok:true,chunk:part.chunk,index,total:Number(meta.expectedChunks)||Number(part.total)||0},200,corsHeaders(req,env));
-}
-async function migrationMeta(req,env){
-  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
-  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
-  const input=await req.json().catch(()=>({}));
-  const migrationId=String(input?.migrationId||'');
-  const migrationSecret=String(input?.migrationSecret||'');
-  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
-  const meta=await readStore(env,'migration:'+migrationId);
-  if(!meta||Number(meta.exp||0)<Date.now()) return json({ok:false,error:'migration_expired'},410,corsHeaders(req,env));
-  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
-  return json({ok:true,status:meta.status,total:Number(meta.expectedChunks)||0,expiresAt:Number(meta.exp)||0},200,corsHeaders(req,env));
-}
-async function migrationDelete(req,env){
-  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
-  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
-  const input=await req.json().catch(()=>({}));
-  const migrationId=String(input?.migrationId||'');
-  const migrationSecret=String(input?.migrationSecret||'');
-  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
-  const meta=await readStore(env,'migration:'+migrationId);
-  if(!meta) return json({ok:true},200,corsHeaders(req,env));
-  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
-  const total=Math.min(256,Number(meta.expectedChunks)||Number(meta.chunkCount)||0);
-  for(let i=0;i<total;i++) await deleteStore(env,'migration:'+migrationId+':'+i);
-  await deleteStore(env,'migration:'+migrationId);
-  return json({ok:true},200,corsHeaders(req,env));
-}
 
 async function pairStart(req,env){
   if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
@@ -574,38 +457,6 @@ async function revokeAppDevice(req,env){
 }
 
 
-
-async function recoverSession(req,env){
-  const u=new URL(req.url);
-  const deviceId=u.searchParams.get('device_id')||'';
-  if(!validDeviceId(deviceId)) return json({ok:false,error:'invalid_device_id'},400,corsHeaders(req,env));
-  const binding=await readStore(env,'device:'+deviceId);
-  if(!binding?.uid) return json({ok:false,error:'not_linked'},404,corsHeaders(req,env));
-  const p=await readStore(env,binding.uid);
-  if(!p?.refreshToken) return json({ok:false,error:'google_reconnect_required'},409,corsHeaders(req,env));
-  const session=await signedPayload(env.SESSION_SECRET,{uid:binding.uid,exp:Date.now()+30*24*60*60*1000});
-  return json({
-    ok:true,
-    session,
-    email:p.email||'',
-    folderId:p.folderId||null,
-    spreadsheetId:p.spreadsheetId||null
-  },200,corsHeaders(req,env));
-}
-async function unlinkDevice(req,env){
-  const auth=req.headers.get('authorization')||'';
-  const sessionToken=auth.startsWith('Bearer ')?auth.slice(7):'';
-  const session=await verifySigned(env.SESSION_SECRET,sessionToken);
-  if(!session||Number(session.exp)<Date.now()) return json({ok:false,error:'unauthorized'},401,corsHeaders(req,env));
-  const input=await req.json().catch(()=>({}));
-  const deviceId=String(input?.deviceId||'');
-  if(!validDeviceId(deviceId)) return json({ok:false,error:'invalid_device_id'},400,corsHeaders(req,env));
-  const binding=await readStore(env,'device:'+deviceId);
-  if(binding?.uid&&binding.uid!==session.uid) return json({ok:false,error:'forbidden'},403,corsHeaders(req,env));
-  await deleteStore(env,'device:'+deviceId);
-  return json({ok:true},200,corsHeaders(req,env));
-}
-
 async function me(req,env){
   const auth=req.headers.get('authorization')||'';
   const token=auth.startsWith('Bearer ')?auth.slice(7):'';
@@ -658,17 +509,10 @@ export default{
       if(u.pathname==='/health') return json({ok:true,googleConfigured:oauthConfigured(env)});
       if(u.pathname==='/oauth/start') return authStart(req,env);
       if(u.pathname==='/oauth/callback') return authCallback(req,env);
-      if(u.pathname==='/migration/start'&&req.method==='POST') return migrationStart(req,env);
-      if(u.pathname==='/migration/put'&&req.method==='POST') return migrationPut(req,env);
-      if(u.pathname==='/migration/meta'&&req.method==='POST') return migrationMeta(req,env);
-      if(u.pathname==='/migration/get'&&req.method==='POST') return migrationGet(req,env);
-      if(u.pathname==='/migration/delete'&&req.method==='POST') return migrationDelete(req,env);
       if(u.pathname==='/pair/start'&&req.method==='POST') return pairStart(req,env);
       if(u.pathname==='/pair/status'&&req.method==='POST') return pairStatus(req,env);
       if(u.pathname==='/session/refresh'&&req.method==='POST') return refreshAppSession(req,env);
       if(u.pathname==='/session/revoke'&&req.method==='POST') return revokeAppDevice(req,env);
-      if(u.pathname==='/session/recover') return recoverSession(req,env);
-      if(u.pathname==='/session/unlink'&&req.method==='POST') return unlinkDevice(req,env);
       if(u.pathname==='/me') return me(req,env);
       if(u.pathname==='/gmail/send'&&req.method==='POST') return gmailSend(req,env);
       if(u.pathname==='/sheets/sync'&&req.method==='POST') return sheetsSync(req,env);
