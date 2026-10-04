@@ -8,12 +8,12 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-CALENDAR-HEADER-INLINE MONTH-NAV-BESIDE-TITLE -->
+<!-- BUILD:2026-10-05-GLOBAL-NAV-V3 CALENDAR-INLINE-HARDENED -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
  --blue:#2f86ff;--green:#49a775;--yellow:#f4c34f;--red:#ff5757;--cyan:#5cbad6;
- --header:58px;--nav:92px;--action:78px;--gap:10px;
+ --header:58px;--nav:98px;--action:78px;--gap:10px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
@@ -25,13 +25,13 @@ button,input{font:inherit}
 .app>nav{grid-row:3}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
 header h1{font-size:21px;margin:0}
-.header-title-row{display:flex;align-items:center;gap:10px;min-width:0}
-.calendar-header-nav{display:none;align-items:center;gap:3px;min-width:0}
+.header-title-row{display:flex;align-items:center;gap:8px;min-width:0}
+.calendar-header-nav{display:none;align-items:center;gap:1px;min-width:0}
 .calendar-header-nav.show{display:flex}
-.calendar-header-title{font-size:14px;font-weight:900;color:#dce8f1;white-space:nowrap}
+.calendar-header-title{font-size:15px;font-weight:950;color:#f3f7fa;white-space:nowrap}
 .calendar-header-move{
- width:28px;height:28px;border:0;background:transparent;color:#fff;border-radius:8px;
- display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:950;
+ width:27px;height:30px;border:0;background:transparent;color:#fff;border-radius:8px;
+ display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:950;
  padding:0;touch-action:manipulation
 }
 .calendar-header-move:active{background:rgba(255,255,255,.06)}
@@ -100,42 +100,42 @@ main{position:relative;min-height:0;overflow:hidden}
  align-items:stretch;
  border-top:1px solid #1a2833;
  background:#09131d;
- padding:6px 5px calc(5px + env(safe-area-inset-bottom));
+ padding:6px 5px calc(6px + env(safe-area-inset-bottom));
  overflow:hidden;
  z-index:20;
- gap:4px
+ gap:5px
 }
 .nav button{
  border:0;
  background:transparent;
- color:#93a3b0;
- border-radius:15px;
+ color:#94a5b2;
+ border-radius:18px;
  min-width:0;
  min-height:0;
  height:100%;
  max-height:100%;
- padding:4px 2px 3px;
+ padding:4px 2px;
  overflow:hidden;
  display:flex;
  flex-direction:column;
  align-items:center;
  justify-content:center;
- gap:2px;
+ gap:4px;
  touch-action:manipulation
 }
 .nav-icon{
- width:29px;height:29px;display:flex;align-items:center;justify-content:center;
- flex:0 0 29px;color:currentColor
+ width:34px;height:34px;display:flex;align-items:center;justify-content:center;
+ flex:0 0 34px;color:currentColor
 }
 .nav-icon svg{width:100%;height:100%;display:block}
-.nav-label{font-size:11px;font-weight:850;line-height:1;white-space:nowrap}
+.nav-label{font-size:13px;font-weight:900;line-height:1;white-space:nowrap}
 .nav button.active{
- background:linear-gradient(180deg,#153757,#102c47);
- color:#71b0ff;font-weight:900;
- box-shadow:inset 0 0 0 1px rgba(47,134,255,.18)
+ background:linear-gradient(180deg,#17446d,#123452);
+ color:#77b8ff;font-weight:950;
+ box-shadow:inset 0 0 0 1px rgba(47,134,255,.42),0 0 0 1px rgba(47,134,255,.08)
 }
-.nav button.active .nav-icon{color:#78b8ff}
-.nav button.active .nav-label{color:#ddecff}
+.nav button.active .nav-icon{color:#7ebcff}
+.nav button.active .nav-label{color:#f2f7ff}
 .mapcard{flex:1;min-height:210px;border-radius:18px;border:1px solid #1d2d38;background:
  radial-gradient(circle at 72% 32%,rgba(255,197,84,.22),transparent 16%),
  radial-gradient(circle at 38% 65%,rgba(43,139,255,.2),transparent 18%),
@@ -402,6 +402,7 @@ main{position:relative;min-height:0;overflow:hidden}
 /* monthly calendar: TimeTree-inspired layout, approved 2026-10-05 */
 #calendar{padding:6px 8px;grid-template-rows:minmax(0,1fr) 62px;gap:7px}
 #calendar .content{gap:0;overflow:hidden;padding-top:2px}
+#calendar .calendar-head{display:none!important}
 .calendar-weekdays,.calendar-grid{
  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0
 }
@@ -1981,8 +1982,16 @@ function stateLabelFor(id){
  if(id==='vacant') return '空車';
  return getDutyState().active ? '空車' : '未乗務';
 }
+function ensureCalendarHeaderNav(){
+ const headerTitleRow=document.querySelector('header .header-title-row');
+ const nav=document.getElementById('calendarHeaderNav');
+ const legacy=document.querySelector('#calendar .calendar-head');
+ if(headerTitleRow&&nav&&nav.parentElement!==headerTitleRow) headerTitleRow.appendChild(nav);
+ if(legacy) legacy.style.display='none';
+}
 function show(id){
  hideNotice();hideSafety();
+ ensureCalendarHeaderNav();
  closeCalendarDayDetail();
  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
  document.getElementById(id).classList.add('active');
