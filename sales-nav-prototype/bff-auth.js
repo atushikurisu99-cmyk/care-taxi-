@@ -61,8 +61,12 @@
   window.beginGoogleConnect=async function(){
     const host=location.hostname;
     if(host!=='taxi-sales-nav.pages.dev'&&!host.endsWith('.taxi-sales-nav.pages.dev')){
-      console.error('Google BFF requires Cloudflare Pages origin',{origin:location.origin});
-      if(typeof toast==='function') toast('このホーム画面は旧URLです。Google連携は新URLへの移行が必要です');
+      console.info('Legacy origin detected; starting one-time encrypted migration',{origin:location.origin});
+      if(typeof window.migrateLegacyOriginToCloudflare==='function'){
+        await window.migrateLegacyOriginToCloudflare();
+      }else if(typeof toast==='function'){
+        toast('新URLへの移行機能を読み込めませんでした');
+      }
       return;
     }
     let authWindow=null;
