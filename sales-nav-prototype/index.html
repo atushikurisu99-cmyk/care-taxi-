@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-GOOGLE-AUTH-RECOVERY-3 INVALID-ID-RESET -->
+<!-- BUILD:2026-10-05-GOOGLE-AUTH-RECOVERY-4 COOKIE-URL-REDUNDANCY -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2147,7 +2147,10 @@ function consumeGoogleAuthCallback(){
   const deviceId=p.get('google_auth_device');
   if(!token) return false;
   localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,token);
-  if(deviceId&&validGoogleDeviceId(deviceId)) localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,deviceId);
+  if(deviceId&&validGoogleDeviceId(deviceId)){
+   localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,deviceId);
+   writeGoogleDeviceCookie(deviceId);
+  }
   history.replaceState(null,'',location.pathname+location.search);
   setTimeout(()=>{toast('Googleアカウントを連携しました');refreshGoogleAuthStatus();},50);
   return true;
@@ -2159,20 +2162,49 @@ function getGoogleAuthToken(){
 function validGoogleDeviceId(value){
  return /^[A-Za-z0-9_-]{20,120}$/.test(String(value||''));
 }
+function readGoogleDeviceCookie(){
+ try{
+  const m=document.cookie.match(/(?:^|; )taxi_ga_device=([^;]+)/);
+  return m?decodeURIComponent(m[1]):'';
+ }catch(e){return''}
+}
+function writeGoogleDeviceCookie(id){
+ if(!validGoogleDeviceId(id)) return;
+ try{
+  document.cookie='taxi_ga_device='+encodeURIComponent(id)+'; Max-Age=31536000; Path=/; SameSite=Lax; Secure';
+ }catch(e){}
+}
+
 
 function getGoogleAuthDeviceId(create=true){
  try{
   let id=localStorage.getItem(GOOGLE_AUTH_DEVICE_KEY)||'';
-  // Older builds may have left an unusable id behind. Never reuse it.
   if(id&&!validGoogleDeviceId(id)){
    localStorage.removeItem(GOOGLE_AUTH_DEVICE_KEY);
    id='';
+  }
+  if(!id){
+   const cookieId=readGoogleDeviceCookie();
+   if(validGoogleDeviceId(cookieId)){
+    id=cookieId;
+    localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,id);
+   }
+  }
+  if(!id){
+   try{
+    const q=new URL(location.href).searchParams.get('ga_device')||'';
+    if(validGoogleDeviceId(q)){
+     id=q;
+     localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,id);
+    }
+   }catch(e){}
   }
   if(!id&&create){
    id=('dev_'+(crypto.randomUUID?crypto.randomUUID().replace(/-/g,''):(Date.now().toString(36)+Math.random().toString(36).slice(2)+Math.random().toString(36).slice(2))));
    if(!validGoogleDeviceId(id)) id='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2)+'_'+Math.random().toString(36).slice(2);
    localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,id);
   }
+  if(validGoogleDeviceId(id)) writeGoogleDeviceCookie(id);
   return id;
  }catch(e){return''}
 }
@@ -2205,11 +2237,15 @@ async function ensureGoogleAuthSession(showError=false){
  return token||'';
 }
 function beginGoogleConnect(){
- const returnTo=location.origin+location.pathname+location.search;
  const deviceId=getGoogleAuthDeviceId(true);
  if(!validGoogleDeviceId(deviceId)){toast('端末IDを作成できませんでした');return}
- // Persist before leaving the standalone PWA for Google/Safari.
- try{localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,deviceId)}catch(e){}
+ try{
+  localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,deviceId);
+  writeGoogleDeviceCookie(deviceId);
+ }catch(e){}
+ const ret=new URL(location.origin+location.pathname);
+ ret.searchParams.set('ga_device',deviceId);
+ const returnTo=ret.toString();
  location.href=GOOGLE_AUTH_WORKER_URL+'/oauth/start?return_to='+encodeURIComponent(returnTo)+'&device_id='+encodeURIComponent(deviceId);
 }
 async function disconnectGoogleAccount(){
@@ -2227,6 +2263,7 @@ async function disconnectGoogleAccount(){
  try{
   localStorage.removeItem(GOOGLE_AUTH_TOKEN_KEY);
   localStorage.removeItem(GOOGLE_AUTH_DEVICE_KEY);
+  document.cookie='taxi_ga_device=; Max-Age=0; Path=/; SameSite=Lax; Secure';
  }catch(e){}
  renderGoogleAuthStatus(null);
  toast('この端末のGoogle連携を解除しました');
