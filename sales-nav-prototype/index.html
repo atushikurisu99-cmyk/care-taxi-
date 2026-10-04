@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-CLEANUP-2 DEADCODE -->
+<!-- BUILD:2026-10-05-CLEANUP-3 ROAD-HELPERS -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -5174,14 +5174,6 @@ function roadFeatureLines(f){
  if(g.type==='MultiLineString') return g.coordinates||[];
  return [];
 }
-function distanceToRoadFeatureMeters(f,lon,lat){
- let best=Infinity;
- for(const pts of roadFeatureLines(f)){
-  if(pts.length===1) best=Math.min(best,metersBetween(lon,lat,pts[0][0],pts[0][1]));
-  for(let i=1;i<pts.length;i++) best=Math.min(best,distanceToSegmentMeters(lon,lat,pts[i-1],pts[i]));
- }
- return best;
-}
 function roadWidthEvidence(props={}){
  const raw=props.rnkWidth;
  const n=Number(raw);
@@ -5198,15 +5190,6 @@ function roadWidthEvidence(props={}){
 }
 function roadCategory(props={}){
  return String(props.rdCtg||props.roadCategory||props.category||'');
-}
-function nearestStructureEvidence(lon,lat){
- const arr=(jarticSpeedData&&Array.isArray(jarticSpeedData.structures))?jarticSpeedData.structures:[];
- let best=null;
- for(const f of arr){
-  const d=distanceToFeatureMeters(f,lon,lat);
-  if(d<=14 && (!best||d<best.d)) best={f,d};
- }
- return best;
 }
 async function setSpeedLimitUI(speed){
  // 制限速度の数値は利用者には表示しない。
