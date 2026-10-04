@@ -69,6 +69,13 @@ function randomSecret(prefix){
   crypto.getRandomValues(bytes);
   return prefix+b64url(bytes);
 }
+function validMigrationId(value){
+  return /^mig_[A-Za-z0-9_-]{40,180}$/.test(String(value||''));
+}
+function validMigrationSecret(value){
+  return /^msec_[A-Za-z0-9_-]{40,180}$/.test(String(value||''));
+}
+
 function originAllowed(req,env){
   const origin=req.headers.get('origin')||'';
   return allowedOrigins(env).includes(origin);
@@ -381,6 +388,92 @@ async function gmailSend(req,env){
   return json({ok:true,messageId:d.id||null,threadId:d.threadId||null},200,corsHeaders(req,env));
 }
 
+async function migrationStart(req,env){
+  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
+  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
+  const migrationId=randomSecret('mig_');
+  const migrationSecret=randomSecret('msec_');
+  const secretHash=await sha256(migrationSecret);
+  await writeStore(env,'migration:'+migrationId,{
+    migrationId,
+    secretHash,
+    status:'open',
+    chunkCount:0,
+    totalChars:0,
+    createdAt:Date.now(),
+    exp:Date.now()+30*60*1000
+  });
+  return json({ok:true,migrationId,migrationSecret,expiresIn:1800},200,corsHeaders(req,env));
+}
+async function migrationPut(req,env){
+  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
+  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
+  const input=await req.json().catch(()=>({}));
+  const migrationId=String(input?.migrationId||'');
+  const migrationSecret=String(input?.migrationSecret||'');
+  const index=Number(input?.index);
+  const total=Number(input?.total);
+  const chunk=String(input?.chunk||'');
+  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
+  if(!Number.isInteger(index)||index<0||index>255||!Number.isInteger(total)||total<1||total>256||index>=total) return json({ok:false,error:'invalid_chunk_index'},400,corsHeaders(req,env));
+  if(!chunk||chunk.length>70000) return json({ok:false,error:'invalid_chunk_size'},400,corsHeaders(req,env));
+  const meta=await readStore(env,'migration:'+migrationId);
+  if(!meta||Number(meta.exp||0)<Date.now()) return json({ok:false,error:'migration_expired'},410,corsHeaders(req,env));
+  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
+  await writeStore(env,'migration:'+migrationId+':'+index,{chunk,index,total,updatedAt:Date.now()});
+  await writeStore(env,'migration:'+migrationId,{
+    ...meta,
+    status:index===total-1?'ready':'uploading',
+    chunkCount:Math.max(Number(meta.chunkCount)||0,index+1),
+    expectedChunks:total,
+    totalChars:(Number(meta.totalChars)||0)+chunk.length,
+    updatedAt:Date.now()
+  });
+  return json({ok:true,index,total},200,corsHeaders(req,env));
+}
+async function migrationGet(req,env){
+  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
+  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
+  const input=await req.json().catch(()=>({}));
+  const migrationId=String(input?.migrationId||'');
+  const migrationSecret=String(input?.migrationSecret||'');
+  const index=Number(input?.index);
+  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)||!Number.isInteger(index)||index<0||index>255) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
+  const meta=await readStore(env,'migration:'+migrationId);
+  if(!meta||Number(meta.exp||0)<Date.now()) return json({ok:false,error:'migration_expired'},410,corsHeaders(req,env));
+  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
+  const part=await readStore(env,'migration:'+migrationId+':'+index);
+  if(!part?.chunk) return json({ok:false,error:'chunk_not_found'},404,corsHeaders(req,env));
+  return json({ok:true,chunk:part.chunk,index,total:Number(meta.expectedChunks)||Number(part.total)||0},200,corsHeaders(req,env));
+}
+async function migrationMeta(req,env){
+  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
+  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
+  const input=await req.json().catch(()=>({}));
+  const migrationId=String(input?.migrationId||'');
+  const migrationSecret=String(input?.migrationSecret||'');
+  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
+  const meta=await readStore(env,'migration:'+migrationId);
+  if(!meta||Number(meta.exp||0)<Date.now()) return json({ok:false,error:'migration_expired'},410,corsHeaders(req,env));
+  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
+  return json({ok:true,status:meta.status,total:Number(meta.expectedChunks)||0,expiresAt:Number(meta.exp)||0},200,corsHeaders(req,env));
+}
+async function migrationDelete(req,env){
+  if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
+  if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
+  const input=await req.json().catch(()=>({}));
+  const migrationId=String(input?.migrationId||'');
+  const migrationSecret=String(input?.migrationSecret||'');
+  if(!validMigrationId(migrationId)||!validMigrationSecret(migrationSecret)) return json({ok:false,error:'invalid_migration'},400,corsHeaders(req,env));
+  const meta=await readStore(env,'migration:'+migrationId);
+  if(!meta) return json({ok:true},200,corsHeaders(req,env));
+  if(await sha256(migrationSecret)!==meta.secretHash) return json({ok:false,error:'migration_forbidden'},403,corsHeaders(req,env));
+  const total=Math.min(256,Number(meta.expectedChunks)||Number(meta.chunkCount)||0);
+  for(let i=0;i<total;i++) await deleteStore(env,'migration:'+migrationId+':'+i);
+  await deleteStore(env,'migration:'+migrationId);
+  return json({ok:true},200,corsHeaders(req,env));
+}
+
 async function pairStart(req,env){
   if(req.method!=='POST') return json({ok:false,error:'method_not_allowed'},405,corsHeaders(req,env));
   if(!originAllowed(req,env)) return json({ok:false,error:'origin_not_allowed'},403,corsHeaders(req,env));
@@ -565,6 +658,11 @@ export default{
       if(u.pathname==='/health') return json({ok:true,googleConfigured:oauthConfigured(env)});
       if(u.pathname==='/oauth/start') return authStart(req,env);
       if(u.pathname==='/oauth/callback') return authCallback(req,env);
+      if(u.pathname==='/migration/start'&&req.method==='POST') return migrationStart(req,env);
+      if(u.pathname==='/migration/put'&&req.method==='POST') return migrationPut(req,env);
+      if(u.pathname==='/migration/meta'&&req.method==='POST') return migrationMeta(req,env);
+      if(u.pathname==='/migration/get'&&req.method==='POST') return migrationGet(req,env);
+      if(u.pathname==='/migration/delete'&&req.method==='POST') return migrationDelete(req,env);
       if(u.pathname==='/pair/start'&&req.method==='POST') return pairStart(req,env);
       if(u.pathname==='/pair/status'&&req.method==='POST') return pairStatus(req,env);
       if(u.pathname==='/session/refresh'&&req.method==='POST') return refreshAppSession(req,env);
