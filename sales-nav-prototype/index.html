@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-GOOGLE-AUTH-RECOVERY-5 STORAGE-SAFE-ID -->
+<!-- BUILD:2026-10-05-GOOGLE-OAUTH-PAIRING-1 SERVER-POLL -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1871,7 +1871,7 @@ html,body{
     <button type="button" class="mail" onclick="sendMonthlyReportMail()">メール送信</button>
    </div>
    <div id="monthlyReportStatus" class="monthly-report-status" style="margin-top:10px">日報データを読み込み中</div>
-   <div class="monthly-report-status" style="margin-top:6px">Google連携はサーバー側から自動復元します。再ログインは通常不要です。</div>
+   <div class="monthly-report-status" style="margin-top:6px">Google連携はサーバー側で完了確認します。iPhoneのSafariとホーム画面アプリの保存領域に依存しません。</div>
   </div>
 
   <div id="monthlyReportPreview" class="monthly-report-paper"></div>
@@ -2124,6 +2124,8 @@ const GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v1';
 const GOOGLE_AUTH_DEVICE_KEY='taxi_google_auth_device_v1';
 const GOOGLE_MAIL_RECIPIENT_KEY='taxi_google_mail_recipient_v1';
 let googleAuthProfile=null;
+let googlePairPollTimer=null;
+let googlePairStartedAt=0;
 
 function getGoogleMailRecipient(){
  try{return String(localStorage.getItem(GOOGLE_MAIL_RECIPIENT_KEY)||'').trim()}catch(e){return''}
@@ -2225,30 +2227,75 @@ async function recoverGoogleAuthSession(showError=false){
  }
 }
 async function ensureGoogleAuthSession(showError=false){
- let token=getGoogleAuthToken();
- if(token){
-  try{
-   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
-   if(r.ok){
-    const d=await r.json().catch(()=>({}));
-    if(d?.ok) return token;
-   }
-  }catch(e){}
+ const token=getGoogleAuthToken();
+ if(token) return token;
+ if(showError) toast('Google連携が必要です');
+ return '';
+}
+function createGooglePairId(){
+ try{
+  if(globalThis.crypto&&typeof globalThis.crypto.randomUUID==='function'){
+   return 'pair_'+globalThis.crypto.randomUUID().replace(/-/g,'')+Date.now().toString(36);
+  }
+ }catch(e){}
+ return 'pair_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,14)+'_'+Math.random().toString(36).slice(2,14);
+}
+function stopGooglePairPolling(){
+ if(googlePairPollTimer){clearInterval(googlePairPollTimer);googlePairPollTimer=null}
+ googlePairStartedAt=0;
+}
+async function checkGooglePairStatus(pairId,showError=false){
+ try{
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/pair/status?pair_id='+encodeURIComponent(pairId),{cache:'no-store'});
+  const d=await r.json().catch(()=>({}));
+  if(r.status===410){
+   stopGooglePairPolling();
+   if(showError) toast('Google連携の確認時間が切れました');
+   return false;
+  }
+  if(!r.ok||!d?.ok){
+   if(showError) toast('Google連携の確認に失敗しました');
+   return false;
+  }
+  if(d.status!=='complete'||!d.session) return false;
+  try{localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,d.session)}catch(e){}
+  googleAuthProfile=null;
+  stopGooglePairPolling();
+  await refreshGoogleAuthStatus();
+  toast('Googleアカウントを連携しました');
+  return true;
+ }catch(e){
+  if(showError) toast('Google連携の確認に失敗しました');
+  return false;
  }
- token=await recoverGoogleAuthSession(showError);
- return token||'';
+}
+function startGooglePairPolling(pairId){
+ stopGooglePairPolling();
+ googlePairStartedAt=Date.now();
+ googlePairPollTimer=setInterval(async()=>{
+  if(Date.now()-googlePairStartedAt>10*60*1000){
+   stopGooglePairPolling();
+   toast('Google連携の確認時間が切れました');
+   return;
+  }
+  await checkGooglePairStatus(pairId,false);
+ },1200);
 }
 function beginGoogleConnect(){
- const deviceId=getGoogleAuthDeviceId(true);
- if(!validGoogleDeviceId(deviceId)){
-  console.error('google device id generation failed',{secureContext:window.isSecureContext,crypto:!!globalThis.crypto});
-  toast('端末IDの作成に失敗しました。再読み込みしてください');
+ const pairId=createGooglePairId();
+ if(!/^pair_[A-Za-z0-9_-]{24,120}$/.test(pairId)){
+  toast('Google連携の準備に失敗しました');
   return;
  }
- const ret=new URL(location.origin+location.pathname);
- ret.searchParams.set('ga_device',deviceId);
- const returnTo=ret.toString();
- location.href=GOOGLE_AUTH_WORKER_URL+'/oauth/start?return_to='+encodeURIComponent(returnTo)+'&device_id='+encodeURIComponent(deviceId);
+ let authWindow=null;
+ try{authWindow=window.open('about:blank','_blank')}catch(e){}
+ const url=GOOGLE_AUTH_WORKER_URL+'/oauth/start?pair_id='+encodeURIComponent(pairId);
+ startGooglePairPolling(pairId);
+ if(authWindow){
+  try{authWindow.location.href=url}catch(e){location.href=url}
+ }else{
+  location.href=url;
+ }
 }
 async function disconnectGoogleAccount(){
  const token=getGoogleAuthToken();
@@ -2296,7 +2343,7 @@ function renderGoogleAuthStatus(profile){
  renderGoogleMailRecipient();
 }
 async function refreshGoogleAuthStatus(){
- const token=await ensureGoogleAuthSession(false);
+ const token=getGoogleAuthToken();
  if(!token){renderGoogleAuthStatus(null);return}
  try{
   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
@@ -6841,11 +6888,16 @@ document.addEventListener('visibilitychange',()=>{
  }
 });
 window.addEventListener('pageshow',refreshLiveFeedsNow);
-window.addEventListener('pageshow',()=>{ensureGoogleAuthSession(false).then(token=>{if(token)refreshGoogleAuthStatus()})});
+window.addEventListener('pageshow',()=>{if(getGoogleAuthToken())refreshGoogleAuthStatus()});
 window.addEventListener('focus',refreshLiveFeedsNow);
 
 consumeGoogleAuthCallback();
-ensureGoogleAuthSession(false).then(token=>{if(token)refreshGoogleAuthStatus()});
+if(getGoogleAuthToken()) refreshGoogleAuthStatus();
+window.addEventListener('message',e=>{
+ if(e?.data?.type==='taxi-google-pair-complete'&&e.data.pairId){
+  checkGooglePairStatus(String(e.data.pairId),false);
+ }
+});
 </script>
 </body>
 </html>
