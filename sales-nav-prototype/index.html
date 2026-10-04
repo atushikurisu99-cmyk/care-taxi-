@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-REPORT-UI-6 TIME-PAIR-1 COMPACT-EDIT-1 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
+<!-- BUILD:2026-10-05-REPORT-UI-7 MOCKUP-BALANCE-1 COMPACT-EDIT-2 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1048,28 +1048,42 @@ html,body{
  border-radius:14px;padding:11px 12px;font-size:14px;font-weight:900;line-height:1.35
 }
 .odometer-missing-banner.show{display:block}
-#reportEdit .daily-report-content{gap:7px}
-#reportEdit .card{padding:9px 11px;border-radius:13px}
-#reportEdit .report-edit-head{padding:8px 11px}
-#reportEdit .report-edit-head .label{font-size:11px}
-#reportEdit .report-edit-head h2{font-size:18px!important;margin-top:2px!important}
-.report-edit-grid{display:flex;flex-direction:column;gap:6px}
-.report-time-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.report-time-field{display:flex;flex-direction:column;gap:5px;min-width:0}
-.report-time-field label{font-size:11px;color:#aab8c4;font-weight:800;line-height:1.2}
-.report-time-field input{width:100%;min-width:0;max-width:100%;background:#0b1620;border:1px solid #2a3a47;border-radius:10px;color:#fff;font-size:18px;font-weight:850;padding:8px 10px;min-height:40px;text-align:center}
-.report-edit-row{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px;align-items:center}
-.report-edit-row label{font-size:12px;color:#aab8c4;font-weight:800;line-height:1.2}
-.report-edit-row input,.report-edit-row textarea{
- width:100%;min-width:0;max-width:100%;background:#0b1620;border:1px solid #2a3a47;border-radius:10px;
- color:#fff;font-size:16px;padding:8px 10px;min-height:40px
+#reportEdit .daily-report-content{gap:8px}
+#reportEdit .card{padding:11px 12px;border-radius:15px}
+.report-edit-content{overflow-y:auto!important;overflow-x:hidden!important;padding-bottom:4px}
+.report-edit-topbar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:0 2px 2px}
+.report-edit-title{font-size:22px;font-weight:1000;color:#fff}
+.report-edit-date-pill{padding:8px 12px;border:1px solid #2f516b;border-radius:18px;background:#0b1822;color:#fff;font-size:16px;font-weight:900;white-space:nowrap}
+.report-edit-section{display:flex;flex-direction:column;gap:8px}
+.report-edit-section-title{font-size:16px;font-weight:950;color:#dce7ef}
+.report-edit-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
+.report-compact-field{display:flex;flex-direction:column;gap:4px;min-width:0}
+.report-compact-field label,.report-note-field label{font-size:12px;color:#b4c1cb;font-weight:850;line-height:1.15}
+.report-compact-field input,.report-unit-input,.report-note-field textarea{
+ background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff
 }
+.report-compact-field input{width:100%;min-width:0;box-sizing:border-box;font-size:20px;font-weight:950;padding:9px 11px;min-height:42px;text-align:left}
 .report-time-text{
- width:100%!important;min-width:0!important;max-width:100%!important;
- display:block;box-sizing:border-box;text-align:right;font-variant-numeric:tabular-nums;
- -webkit-appearance:none;appearance:none
+ width:100%!important;min-width:0!important;max-width:100%!important;display:block;box-sizing:border-box;
+ text-align:left!important;font-variant-numeric:tabular-nums;-webkit-appearance:none;appearance:none
 }
-.report-edit-row textarea{min-height:54px;resize:vertical;line-height:1.3}
+.report-unit-input{display:flex;align-items:center;gap:8px;padding:0 10px;min-width:0}
+.report-unit-input input{flex:1;min-width:0;border:0;background:transparent;color:#fff;font-size:20px;font-weight:950;padding:9px 0;outline:0}
+.report-unit-input span{font-size:13px;color:#aebcc7;font-weight:900;white-space:nowrap}
+.report-summary-row{display:grid;grid-template-columns:92px minmax(0,1fr);gap:10px;align-items:center;padding:3px 0}
+.report-summary-row+ .report-summary-row{border-top:1px solid #1d2c37;padding-top:8px}
+.report-summary-row label{font-size:16px;color:#fff;font-weight:950}
+.report-unit-input.wide input{font-size:19px}
+.report-note-field{display:flex;flex-direction:column;gap:4px;padding-top:3px}
+.report-note-field textarea{width:100%;min-height:68px;resize:vertical;box-sizing:border-box;padding:10px 11px;font-size:15px;line-height:1.35}
+.report-edit-links{padding:0 12px!important}
+.report-edit-link-row{width:100%;min-height:52px;display:grid;grid-template-columns:1fr auto 18px;gap:8px;align-items:center;border:0;background:transparent;color:#fff;padding:0;text-align:left}
+.report-edit-link-row+ .report-edit-link-row{border-top:1px solid #1d2c37}
+.report-edit-link-row span{font-size:17px;font-weight:950}
+.report-edit-link-row strong{font-size:17px;font-weight:950}
+.report-edit-link-row b{font-size:24px;color:#b8c8d3}
+.report-edit-actions .primary{font-size:22px}
+.report-trip-panel{scroll-margin-top:8px}
 #reportEdit .report-trip-list{gap:6px;margin-top:6px}
 #reportEdit .report-trip-card{padding:8px 10px;border-radius:11px}
 #reportEdit .report-trip-top{grid-template-columns:48px 1fr auto;gap:6px}
@@ -1080,7 +1094,9 @@ html,body{
 #reportEdit .report-trip-meta{margin-top:6px;padding-top:6px;font-size:10px}
 @media(max-width:360px){
  .expense-row{grid-template-columns:minmax(0,1fr) 112px auto}
- .report-edit-row{grid-template-columns:105px minmax(0,1fr);gap:6px}
+ .report-edit-two-col{gap:8px}
+ .report-summary-row{grid-template-columns:82px minmax(0,1fr)}
+ .report-summary-row label{font-size:15px}
 }
 
 
@@ -1534,26 +1550,55 @@ html,body{
 </section>
 
 <section id="reportEdit" class="screen">
- <div class="content daily-report-content">
-  <div class="card report-edit-head"><div class="label">自動記録内容の修正</div><h2 id="reportEditDate" style="margin:4px 0 0">--</h2></div>
-  <div class="card report-edit-grid">
-   <div class="report-time-pair">
-    <div class="report-time-field"><label for="editStartTime">出庫時刻</label><input id="editStartTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)"></div>
-    <div class="report-time-field"><label for="editEndTime">入庫時刻</label><input id="editEndTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)"></div>
+ <div class="content daily-report-content report-edit-content">
+  <div class="report-edit-topbar">
+   <div>
+    <div class="report-edit-title">日報編集</div>
    </div>
-   <div class="report-edit-row"><label for="editOdometerStart">出庫オドメーター</label><input id="editOdometerStart" type="number" min="0" step="1" inputmode="numeric"></div>
-   <div class="report-edit-row"><label for="editOdometerEnd">入庫オドメーター</label><input id="editOdometerEnd" type="number" min="0" step="1" inputmode="numeric"></div>
-   <div class="report-edit-row"><label for="editSales">売上</label><input id="editSales" type="number" min="0" step="1" inputmode="numeric"></div>
-   <div class="report-edit-row"><label for="editReceivable">売掛</label><input id="editReceivable" type="number" min="0" step="1" inputmode="numeric"></div>
-   <div class="report-edit-row"><label for="editTrips">乗車回数</label><input id="editTrips" type="number" min="0" step="1" inputmode="numeric"></div>
-   <div class="report-edit-row"><label for="editNote">備考</label><textarea id="editNote"></textarea></div>
+   <div id="reportEditDatePill" class="report-edit-date-pill">--</div>
   </div>
-  <div class="card">
+
+  <div class="card report-edit-section">
+   <div class="report-edit-section-title">運行情報</div>
+   <div class="report-edit-two-col">
+    <div class="report-compact-field">
+     <label for="editStartTime">出庫時刻</label>
+     <input id="editStartTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)">
+    </div>
+    <div class="report-compact-field">
+     <label for="editEndTime">入庫時刻</label>
+     <input id="editEndTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)">
+    </div>
+    <div class="report-compact-field">
+     <label for="editOdometerStart">出庫オドメーター</label>
+     <div class="report-unit-input"><input id="editOdometerStart" type="number" min="0" step="1" inputmode="numeric"><span>km</span></div>
+    </div>
+    <div class="report-compact-field">
+     <label for="editOdometerEnd">入庫オドメーター</label>
+     <div class="report-unit-input"><input id="editOdometerEnd" type="number" min="0" step="1" inputmode="numeric"><span>km</span></div>
+    </div>
+   </div>
+  </div>
+
+  <div class="card report-edit-section">
+   <div class="report-edit-section-title">売上・乗務情報</div>
+   <div class="report-summary-row"><label for="editSales">売上</label><div class="report-unit-input wide"><input id="editSales" type="number" min="0" step="1" inputmode="numeric"><span>円</span></div></div>
+   <div class="report-summary-row"><label for="editReceivable">未収</label><div class="report-unit-input wide"><input id="editReceivable" type="number" min="0" step="1" inputmode="numeric"><span>円</span></div></div>
+   <div class="report-summary-row"><label for="editTrips">乗車回数</label><div class="report-unit-input wide"><input id="editTrips" type="number" min="0" step="1" inputmode="numeric"><span>回</span></div></div>
+   <div class="report-note-field"><label for="editNote">備考</label><textarea id="editNote" placeholder="備考を入力（任意）"></textarea></div>
+  </div>
+
+  <div class="card report-edit-links">
+   <button type="button" class="report-edit-link-row" onclick="show('dailyReport')"><span>経費</span><strong id="reportEditExpenseTotal">0円</strong><b>›</b></button>
+   <button type="button" class="report-edit-link-row" onclick="scrollReportTripsIntoView()"><span>乗車記録</span><strong id="reportEditTripCount">0件</strong><b>›</b></button>
+  </div>
+
+  <div class="card report-trip-panel">
    <div class="row"><div><h2 style="margin:0">乗車記録</h2><div class="sub">乗車地・降車地はGPSから自動記録</div></div><span class="badge">確認用</span></div>
    <div id="reportTripEditList" class="report-trip-list"></div>
   </div>
  </div>
- <div class="action"><button class="primary secondary" onclick="show('dailyReport')">戻る</button><button class="primary" onclick="saveReportEdit()">反映</button></div>
+ <div class="action report-edit-actions"><button class="primary secondary" onclick="show('dailyReport')">戻る</button><button class="primary" onclick="saveReportEdit()">反映</button></div>
 </section>
 
 <section id="sales" class="screen">
@@ -4180,6 +4225,7 @@ function renderReportEdit(){
  const r=getReportById(activeReportId);if(!r)return;
  const setv=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??''};
  const lab=document.getElementById('reportEditDate');if(lab)lab.textContent=displayDayFromTs(r.startTs);
+ const pill=document.getElementById('reportEditDatePill');if(pill)pill.textContent=displayDayFromTs(r.startTs);
  setv('editStartTime',r.startTime||'');
  setv('editEndTime',r.endTime||'');
  setv('editOdometerStart',r.odometerStart===null?'':r.odometerStart);
@@ -4188,7 +4234,13 @@ function renderReportEdit(){
  setv('editReceivable',r.receivable||'');
  setv('editTrips',r.trips||'');
  setv('editNote',r.note||'');
+ const exp=document.getElementById('reportEditExpenseTotal');if(exp)exp.textContent=yen(reportExpenseTotal(r));
+ const tc=document.getElementById('reportEditTripCount');if(tc)tc.textContent=reportTripsForDuty(r.dutyId)+'件';
  renderReportTripEditList(r);
+}
+function scrollReportTripsIntoView(){
+ const p=document.querySelector('#reportEdit .report-trip-panel');
+ if(p) p.scrollIntoView({behavior:'smooth',block:'start'});
 }
 function reportTripPlaceText(point){
  if(!point) return '位置情報なし';
