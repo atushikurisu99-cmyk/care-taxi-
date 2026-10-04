@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-GOOGLE-OAUTH-PAIRING-1 SERVER-POLL -->
+<!-- BUILD:2026-10-05-GOOGLE-OAUTH-PAIRING-2 SERVER-ISSUED-CLAIM-RENEWABLE-SESSION -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2120,12 +2120,13 @@ function openSettingsSection(section){
 }
 
 const GOOGLE_AUTH_WORKER_URL='https://taxi-google-auth.atushi-works.workers.dev';
-const GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v1';
-const GOOGLE_AUTH_DEVICE_KEY='taxi_google_auth_device_v1';
+const GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v2';
+const GOOGLE_AUTH_APP_DEVICE_KEY='taxi_google_auth_app_device_v1';
+const GOOGLE_AUTH_ACTIVE_PAIR_KEY='taxi_google_auth_active_pair_v1';
 const GOOGLE_MAIL_RECIPIENT_KEY='taxi_google_mail_recipient_v1';
+const GOOGLE_AUTH_DB='taxi_google_auth_v1';
 let googleAuthProfile=null;
 let googlePairPollTimer=null;
-let googlePairStartedAt=0;
 
 function getGoogleMailRecipient(){
  try{return String(localStorage.getItem(GOOGLE_MAIL_RECIPIENT_KEY)||'').trim()}catch(e){return''}
@@ -2141,115 +2142,168 @@ function renderGoogleMailRecipient(){
  if(input) input.value=getGoogleMailRecipient();
 }
 
+function openGoogleAuthDb(){
+ return new Promise((resolve,reject)=>{
+  try{
+   const req=indexedDB.open(GOOGLE_AUTH_DB,1);
+   req.onupgradeneeded=()=>{if(!req.result.objectStoreNames.contains('kv'))req.result.createObjectStore('kv')};
+   req.onsuccess=()=>resolve(req.result);
+   req.onerror=()=>reject(req.error||new Error('indexeddb_open_failed'));
+  }catch(e){reject(e)}
+ });
+}
+async function authDbGet(key){
+ try{
+  const db=await openGoogleAuthDb();
+  return await new Promise((resolve,reject)=>{
+   const tx=db.transaction('kv','readonly');
+   const r=tx.objectStore('kv').get(key);
+   r.onsuccess=()=>resolve(r.result||'');
+   r.onerror=()=>reject(r.error);
+  });
+ }catch(e){return''}
+}
+async function authDbSet(key,value){
+ try{
+  const db=await openGoogleAuthDb();
+  await new Promise((resolve,reject)=>{
+   const tx=db.transaction('kv','readwrite');
+   tx.objectStore('kv').put(value,key);
+   tx.oncomplete=()=>resolve();
+   tx.onerror=()=>reject(tx.error);
+  });
+  return true;
+ }catch(e){return false}
+}
+async function authDbDelete(key){
+ try{
+  const db=await openGoogleAuthDb();
+  await new Promise((resolve,reject)=>{
+   const tx=db.transaction('kv','readwrite');
+   tx.objectStore('kv').delete(key);
+   tx.oncomplete=()=>resolve();
+   tx.onerror=()=>reject(tx.error);
+  });
+ }catch(e){}
+}
+function getGoogleAuthToken(){
+ try{return localStorage.getItem(GOOGLE_AUTH_TOKEN_KEY)||''}catch(e){return''}
+}
+async function persistGoogleSession(session,appDeviceToken=''){
+ try{if(session)localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,session)}catch(e){}
+ if(session) await authDbSet(GOOGLE_AUTH_TOKEN_KEY,session);
+ if(appDeviceToken){
+  try{localStorage.setItem(GOOGLE_AUTH_APP_DEVICE_KEY,appDeviceToken)}catch(e){}
+  await authDbSet(GOOGLE_AUTH_APP_DEVICE_KEY,appDeviceToken);
+ }
+}
+async function getGoogleAppDeviceToken(){
+ let v='';
+ try{v=localStorage.getItem(GOOGLE_AUTH_APP_DEVICE_KEY)||''}catch(e){}
+ if(!v){
+  v=String(await authDbGet(GOOGLE_AUTH_APP_DEVICE_KEY)||'');
+  if(v){try{localStorage.setItem(GOOGLE_AUTH_APP_DEVICE_KEY,v)}catch(e){}}
+ }
+ return v;
+}
+async function clearGoogleLocalAuth(){
+ try{
+  localStorage.removeItem(GOOGLE_AUTH_TOKEN_KEY);
+  localStorage.removeItem(GOOGLE_AUTH_APP_DEVICE_KEY);
+  localStorage.removeItem(GOOGLE_AUTH_ACTIVE_PAIR_KEY);
+ }catch(e){}
+ await authDbDelete(GOOGLE_AUTH_TOKEN_KEY);
+ await authDbDelete(GOOGLE_AUTH_APP_DEVICE_KEY);
+ await authDbDelete(GOOGLE_AUTH_ACTIVE_PAIR_KEY);
+}
+async function loadGoogleSessionBackup(){
+ let token=getGoogleAuthToken();
+ if(!token){
+  token=String(await authDbGet(GOOGLE_AUTH_TOKEN_KEY)||'');
+  if(token){try{localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,token)}catch(e){}}
+ }
+ return token;
+}
+async function refreshSessionFromAppDevice(){
+ const appDeviceToken=await getGoogleAppDeviceToken();
+ if(!appDeviceToken) return '';
+ try{
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/session/refresh',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({appDeviceToken}),
+   cache:'no-store'
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok||!d?.ok||!d?.session) return '';
+  await persistGoogleSession(d.session,appDeviceToken);
+  return d.session;
+ }catch(e){return''}
+}
+async function ensureGoogleAuthSession(showError=false){
+ let token=await loadGoogleSessionBackup();
+ if(token){
+  try{
+   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+   if(r.ok){
+    const d=await r.json().catch(()=>({}));
+    if(d?.ok) return token;
+   }
+  }catch(e){}
+ }
+ token=await refreshSessionFromAppDevice();
+ if(token) return token;
+ if(showError) toast('Google連携が必要です');
+ return '';
+}
 function consumeGoogleAuthCallback(){
  try{
   const hash=String(location.hash||'');
   const p=new URLSearchParams(hash.replace(/^#/,''));
   const token=p.get('google_auth_session');
-  const deviceId=p.get('google_auth_device');
   if(!token) return false;
-  localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,token);
-  if(deviceId&&validGoogleDeviceId(deviceId)){
-   localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,deviceId);
-   writeGoogleDeviceCookie(deviceId);
-  }
+  persistGoogleSession(token);
   history.replaceState(null,'',location.pathname+location.search);
   setTimeout(()=>{toast('Googleアカウントを連携しました');refreshGoogleAuthStatus();},50);
   return true;
  }catch(e){return false}
 }
-function getGoogleAuthToken(){
- try{return localStorage.getItem(GOOGLE_AUTH_TOKEN_KEY)||''}catch(e){return''}
-}
-function validGoogleDeviceId(value){
- return /^[A-Za-z0-9_-]{20,120}$/.test(String(value||''));
-}
-function readGoogleDeviceCookie(){
- try{
-  const m=document.cookie.match(/(?:^|; )taxi_ga_device=([^;]+)/);
-  return m?decodeURIComponent(m[1]):'';
- }catch(e){return''}
-}
-function writeGoogleDeviceCookie(id){
- if(!validGoogleDeviceId(id)) return;
- try{
-  document.cookie='taxi_ga_device='+encodeURIComponent(id)+'; Max-Age=31536000; Path=/; SameSite=Lax; Secure';
- }catch(e){}
-}
 
-
-function getGoogleAuthDeviceId(create=true){
- let id='';
- try{id=localStorage.getItem(GOOGLE_AUTH_DEVICE_KEY)||''}catch(e){}
- if(id&&!validGoogleDeviceId(id)){
-  try{localStorage.removeItem(GOOGLE_AUTH_DEVICE_KEY)}catch(e){}
-  id='';
- }
- if(!id){
-  const cookieId=readGoogleDeviceCookie();
-  if(validGoogleDeviceId(cookieId)) id=cookieId;
- }
- if(!id){
-  try{
-   const q=new URL(location.href).searchParams.get('ga_device')||'';
-   if(validGoogleDeviceId(q)) id=q;
-  }catch(e){}
- }
- if(!id&&create){
-  try{
-   if(globalThis.crypto&&typeof globalThis.crypto.randomUUID==='function'){
-    id='dev_'+globalThis.crypto.randomUUID().replace(/-/g,'');
-   }
-  }catch(e){}
-  if(!validGoogleDeviceId(id)){
-   id='dev_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,12)+'_'+Math.random().toString(36).slice(2,12);
-  }
- }
- if(validGoogleDeviceId(id)){
-  try{localStorage.setItem(GOOGLE_AUTH_DEVICE_KEY,id)}catch(e){}
-  writeGoogleDeviceCookie(id);
-  return id;
- }
- return '';
+async function saveActiveGooglePair(pair){
+ const raw=JSON.stringify(pair);
+ try{localStorage.setItem(GOOGLE_AUTH_ACTIVE_PAIR_KEY,raw)}catch(e){}
+ await authDbSet(GOOGLE_AUTH_ACTIVE_PAIR_KEY,raw);
 }
-async function recoverGoogleAuthSession(showError=false){
- const deviceId=getGoogleAuthDeviceId(false);
- if(!deviceId) return '';
+async function loadActiveGooglePair(){
+ let raw='';
+ try{raw=localStorage.getItem(GOOGLE_AUTH_ACTIVE_PAIR_KEY)||''}catch(e){}
+ if(!raw) raw=String(await authDbGet(GOOGLE_AUTH_ACTIVE_PAIR_KEY)||'');
+ if(!raw) return null;
  try{
-  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/session/recover?device_id='+encodeURIComponent(deviceId),{cache:'no-store'});
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok||!d?.ok||!d?.session) throw new Error(d?.error||('HTTP '+r.status));
-  localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,d.session);
-  return d.session;
- }catch(e){
-  if(showError) toast('Google連携の復元に失敗しました');
-  return '';
- }
+  const p=JSON.parse(raw);
+  if(!p?.pairId||!p?.claimSecret||!p?.expiresAt) return null;
+  return p;
+ }catch(e){return null}
 }
-async function ensureGoogleAuthSession(showError=false){
- const token=getGoogleAuthToken();
- if(token) return token;
- if(showError) toast('Google連携が必要です');
- return '';
-}
-function createGooglePairId(){
- try{
-  if(globalThis.crypto&&typeof globalThis.crypto.randomUUID==='function'){
-   return 'pair_'+globalThis.crypto.randomUUID().replace(/-/g,'')+Date.now().toString(36);
-  }
- }catch(e){}
- return 'pair_'+Date.now().toString(36)+'_'+Math.random().toString(36).slice(2,14)+'_'+Math.random().toString(36).slice(2,14);
+async function clearActiveGooglePair(){
+ try{localStorage.removeItem(GOOGLE_AUTH_ACTIVE_PAIR_KEY)}catch(e){}
+ await authDbDelete(GOOGLE_AUTH_ACTIVE_PAIR_KEY);
 }
 function stopGooglePairPolling(){
  if(googlePairPollTimer){clearInterval(googlePairPollTimer);googlePairPollTimer=null}
- googlePairStartedAt=0;
 }
-async function checkGooglePairStatus(pairId,showError=false){
+async function checkGooglePairStatus(pair,showError=false){
  try{
-  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/pair/status?pair_id='+encodeURIComponent(pairId),{cache:'no-store'});
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/pair/status',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:JSON.stringify({pairId:pair.pairId,claimSecret:pair.claimSecret}),
+   cache:'no-store'
+  });
   const d=await r.json().catch(()=>({}));
   if(r.status===410){
    stopGooglePairPolling();
+   await clearActiveGooglePair();
    if(showError) toast('Google連携の確認時間が切れました');
    return false;
   }
@@ -2257,10 +2311,10 @@ async function checkGooglePairStatus(pairId,showError=false){
    if(showError) toast('Google連携の確認に失敗しました');
    return false;
   }
-  if(d.status!=='complete'||!d.session) return false;
-  try{localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,d.session)}catch(e){}
-  googleAuthProfile=null;
+  if(d.status!=='complete'||!d.session||!d.appDeviceToken) return false;
+  await persistGoogleSession(d.session,d.appDeviceToken);
   stopGooglePairPolling();
+  await clearActiveGooglePair();
   await refreshGoogleAuthStatus();
   toast('Googleアカウントを連携しました');
   return true;
@@ -2269,51 +2323,74 @@ async function checkGooglePairStatus(pairId,showError=false){
   return false;
  }
 }
-function startGooglePairPolling(pairId){
+function startGooglePairPolling(pair){
  stopGooglePairPolling();
- googlePairStartedAt=Date.now();
- googlePairPollTimer=setInterval(async()=>{
-  if(Date.now()-googlePairStartedAt>10*60*1000){
+ const tick=async()=>{
+  if(Date.now()>Number(pair.expiresAt||0)){
    stopGooglePairPolling();
+   await clearActiveGooglePair();
    toast('Google連携の確認時間が切れました');
    return;
   }
-  await checkGooglePairStatus(pairId,false);
- },1200);
+  await checkGooglePairStatus(pair,false);
+ };
+ googlePairPollTimer=setInterval(tick,1500);
+ tick();
 }
-function beginGoogleConnect(){
- const pairId=createGooglePairId();
- if(!/^pair_[A-Za-z0-9_-]{24,120}$/.test(pairId)){
-  toast('Google連携の準備に失敗しました');
-  return;
+async function resumeGooglePairing(){
+ const pair=await loadActiveGooglePair();
+ if(!pair) return false;
+ if(Date.now()>Number(pair.expiresAt||0)){
+  await clearActiveGooglePair();
+  return false;
  }
+ startGooglePairPolling(pair);
+ return true;
+}
+async function beginGoogleConnect(){
  let authWindow=null;
  try{authWindow=window.open('about:blank','_blank')}catch(e){}
- const url=GOOGLE_AUTH_WORKER_URL+'/oauth/start?pair_id='+encodeURIComponent(pairId);
- startGooglePairPolling(pairId);
- if(authWindow){
-  try{authWindow.location.href=url}catch(e){location.href=url}
- }else{
-  location.href=url;
+ try{
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/pair/start',{
+   method:'POST',
+   headers:{'Content-Type':'application/json'},
+   body:'{}',
+   cache:'no-store'
+  });
+  const d=await r.json().catch(()=>({}));
+  if(!r.ok||!d?.ok||!d.pairId||!d.claimSecret||!d.authUrl) throw new Error(d?.error||('HTTP '+r.status));
+  const pair={
+   pairId:d.pairId,
+   claimSecret:d.claimSecret,
+   expiresAt:Date.now()+Math.max(60,Number(d.expiresIn)||600)*1000
+  };
+  await saveActiveGooglePair(pair);
+  startGooglePairPolling(pair);
+  if(authWindow){
+   try{authWindow.location.href=d.authUrl}catch(e){location.href=d.authUrl}
+  }else{
+   location.href=d.authUrl;
+  }
+ }catch(e){
+  try{authWindow?.close()}catch(_){}
+  console.error(e);
+  toast('Google連携を開始できませんでした');
  }
 }
 async function disconnectGoogleAccount(){
- const token=getGoogleAuthToken();
- const deviceId=getGoogleAuthDeviceId(false);
+ const token=await ensureGoogleAuthSession(false);
+ const appDeviceToken=await getGoogleAppDeviceToken();
  try{
-  if(token&&deviceId){
-   await fetch(GOOGLE_AUTH_WORKER_URL+'/session/unlink',{
+  if(token&&appDeviceToken){
+   await fetch(GOOGLE_AUTH_WORKER_URL+'/session/revoke',{
     method:'POST',
     headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
-    body:JSON.stringify({deviceId})
+    body:JSON.stringify({appDeviceToken})
    });
   }
  }catch(e){}
- try{
-  localStorage.removeItem(GOOGLE_AUTH_TOKEN_KEY);
-  localStorage.removeItem(GOOGLE_AUTH_DEVICE_KEY);
-  document.cookie='taxi_ga_device=; Max-Age=0; Path=/; SameSite=Lax; Secure';
- }catch(e){}
+ stopGooglePairPolling();
+ await clearGoogleLocalAuth();
  renderGoogleAuthStatus(null);
  toast('この端末のGoogle連携を解除しました');
 }
@@ -2333,17 +2410,21 @@ function renderGoogleAuthStatus(profile){
   const sheet=profile.spreadsheetId?'Sheets準備済み':'Sheets準備中';
   const gmail=profile.capabilities?.gmailSend?'Gmail送信OK':'Gmail再認証が必要';
   detail.textContent=folder+' / '+sheet+' / '+gmail;
-  connect.textContent='再認証';testMail.classList.remove('hidden');disconnect.classList.remove('hidden');
+  connect.textContent='再認証';
+  testMail.classList.remove('hidden');
+  disconnect.classList.remove('hidden');
  }else{
   account.textContent='未接続';
   pill.textContent='未接続';pill.classList.remove('on');
   detail.textContent='Google連携を開始すると、Drive・Sheets保存とGmail送信に必要な権限を確認します。';
-  connect.textContent='Googleで連携';testMail.classList.add('hidden');disconnect.classList.add('hidden');
+  connect.textContent='Googleで連携';
+  testMail.classList.add('hidden');
+  disconnect.classList.add('hidden');
  }
  renderGoogleMailRecipient();
 }
 async function refreshGoogleAuthStatus(){
- const token=getGoogleAuthToken();
+ const token=await ensureGoogleAuthSession(false);
  if(!token){renderGoogleAuthStatus(null);return}
  try{
   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
@@ -2355,9 +2436,8 @@ async function refreshGoogleAuthStatus(){
   renderGoogleAuthStatus(null);
  }
 }
-
 async function sendGoogleTestMail(){
- const token=getGoogleAuthToken();
+ const token=await ensureGoogleAuthSession(true);
  const to=getGoogleMailRecipient()||googleAuthProfile?.email||'';
  if(!token||!to){toast('Google連携を確認してください');return}
  const btn=document.getElementById('googleAuthTestMailBtn');
@@ -2382,7 +2462,6 @@ async function sendGoogleTestMail(){
   if(btn){btn.disabled=false;btn.textContent='テストメール送信'}
  }
 }
-
 
 const MONTHLY_REPORT_SETTINGS_KEY='taxi_monthly_report_settings_v1';
 const MONTHLY_REPORT_SOURCE_URL='https://kojin1-or-jp.prm-ssl.jp/useful.html';
@@ -6885,19 +6964,18 @@ document.addEventListener('visibilitychange',()=>{
  if(document.visibilityState==='visible'){
   refreshLiveFeedsNow();
   refreshLocationDependentFeeds();
+  resumeGooglePairing();
+  if(getGoogleAuthToken()) refreshGoogleAuthStatus();
  }
 });
 window.addEventListener('pageshow',refreshLiveFeedsNow);
-window.addEventListener('pageshow',()=>{if(getGoogleAuthToken())refreshGoogleAuthStatus()});
+window.addEventListener('pageshow',()=>{resumeGooglePairing();refreshGoogleAuthStatus()});
 window.addEventListener('focus',refreshLiveFeedsNow);
 
 consumeGoogleAuthCallback();
-if(getGoogleAuthToken()) refreshGoogleAuthStatus();
-window.addEventListener('message',e=>{
- if(e?.data?.type==='taxi-google-pair-complete'&&e.data.pairId){
-  checkGooglePairStatus(String(e.data.pairId),false);
- }
-});
+resumeGooglePairing();
+refreshGoogleAuthStatus();
+window.addEventListener('message',()=>{resumeGooglePairing()});
 </script>
 </body>
 </html>
