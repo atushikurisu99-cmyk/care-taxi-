@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-GOOGLE-AUTH-DIRECT-PAIR-RESTORE -->
+<!-- BUILD:2026-10-05-CLEANUP-1 AUTH-DEADCODE-REFRESH -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1217,7 +1217,6 @@ html,body{
 }
 
 
-
 /* monthly report / submission center */
 .monthly-report-wrap{overflow:auto;padding-bottom:8px}
 .monthly-report-card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:16px;padding:13px 14px}
@@ -2120,13 +2119,14 @@ function openSettingsSection(section){
 }
 
 const GOOGLE_AUTH_WORKER_URL='https://taxi-google-auth.atushi-works.workers.dev';
-const GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v2';
+const LEGACY_GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v2';
 const GOOGLE_AUTH_APP_DEVICE_KEY='taxi_google_auth_app_device_v1';
 const GOOGLE_AUTH_ACTIVE_PAIR_KEY='taxi_google_auth_active_pair_v1';
 const GOOGLE_MAIL_RECIPIENT_KEY='taxi_google_mail_recipient_v1';
 const GOOGLE_AUTH_DB='taxi_google_auth_v1';
 let googleAuthProfile=null;
 let googlePairPollTimer=null;
+let googleSessionToken='';
 
 function getGoogleMailRecipient(){
  try{return String(localStorage.getItem(GOOGLE_MAIL_RECIPIENT_KEY)||'').trim()}catch(e){return''}
@@ -2186,12 +2186,9 @@ async function authDbDelete(key){
   });
  }catch(e){}
 }
-function getGoogleAuthToken(){
- try{return localStorage.getItem(GOOGLE_AUTH_TOKEN_KEY)||''}catch(e){return''}
-}
+function getGoogleAuthToken(){return googleSessionToken}
 async function persistGoogleSession(session,appDeviceToken=''){
- try{if(session)localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,session)}catch(e){}
- if(session) await authDbSet(GOOGLE_AUTH_TOKEN_KEY,session);
+ googleSessionToken=session||'';
  if(appDeviceToken){
   try{localStorage.setItem(GOOGLE_AUTH_APP_DEVICE_KEY,appDeviceToken)}catch(e){}
   await authDbSet(GOOGLE_AUTH_APP_DEVICE_KEY,appDeviceToken);
@@ -2207,22 +2204,22 @@ async function getGoogleAppDeviceToken(){
  return v;
 }
 async function clearGoogleLocalAuth(){
+ googleSessionToken='';
  try{
-  localStorage.removeItem(GOOGLE_AUTH_TOKEN_KEY);
+  localStorage.removeItem(LEGACY_GOOGLE_AUTH_TOKEN_KEY);
   localStorage.removeItem(GOOGLE_AUTH_APP_DEVICE_KEY);
   localStorage.removeItem(GOOGLE_AUTH_ACTIVE_PAIR_KEY);
  }catch(e){}
- await authDbDelete(GOOGLE_AUTH_TOKEN_KEY);
+ await authDbDelete(LEGACY_GOOGLE_AUTH_TOKEN_KEY);
  await authDbDelete(GOOGLE_AUTH_APP_DEVICE_KEY);
  await authDbDelete(GOOGLE_AUTH_ACTIVE_PAIR_KEY);
 }
 async function loadGoogleSessionBackup(){
- let token=getGoogleAuthToken();
- if(!token){
-  token=String(await authDbGet(GOOGLE_AUTH_TOKEN_KEY)||'');
-  if(token){try{localStorage.setItem(GOOGLE_AUTH_TOKEN_KEY,token)}catch(e){}}
- }
- return token;
+ if(googleSessionToken) return googleSessionToken;
+ // Remove no-longer-used persistent session copies from older builds.
+ try{localStorage.removeItem(LEGACY_GOOGLE_AUTH_TOKEN_KEY)}catch(e){}
+ await authDbDelete(LEGACY_GOOGLE_AUTH_TOKEN_KEY);
+ return '';
 }
 async function refreshSessionFromAppDevice(){
  const appDeviceToken=await getGoogleAppDeviceToken();
@@ -2255,18 +2252,6 @@ async function ensureGoogleAuthSession(showError=false){
  if(token) return token;
  if(showError) toast('Google連携が必要です');
  return '';
-}
-function consumeGoogleAuthCallback(){
- try{
-  const hash=String(location.hash||'');
-  const p=new URLSearchParams(hash.replace(/^#/,''));
-  const token=p.get('google_auth_session');
-  if(!token) return false;
-  persistGoogleSession(token);
-  history.replaceState(null,'',location.pathname+location.search);
-  setTimeout(()=>{toast('Googleアカウントを連携しました');refreshGoogleAuthStatus();},50);
-  return true;
- }catch(e){return false}
 }
 
 async function saveActiveGooglePair(pair){
@@ -2496,7 +2481,7 @@ function monthlyRows(monthKey){
 }
 function reportTravelKm(r){
  const a=Number(r?.odometerStart),b=Number(r?.odometerEnd);
- return Number.isFinite(a)&&Number.isFinite(b)&&b>=a?Math.round(b-a):null;
+ return Number.isFinite(a)&&Number.isFinite(b)&&a>0&&b>=a?Math.round(b-a):null;
 }
 function monthlyTotals(rows){
  return rows.reduce((o,r)=>{
@@ -2884,17 +2869,6 @@ function selectBusWard(ward){
  busSettingsActiveStop='';
  renderNotificationSettings();
 }
-function toggleBusStopSetting(stop){
- const cfg=getBusNotifySettings();
- cfg.stops[stop]=!cfg.stops[stop];
- if(cfg.stops[stop]) busSettingsActiveStop=stop;
- else{
-  delete cfg.destinations[stop];
-  if(busSettingsActiveStop===stop) busSettingsActiveStop='';
- }
- saveBusNotifySettings(cfg);
- renderNotificationSettings();
-}
 function openBusDestinationSetting(stop){
  const cfg=getBusNotifySettings();
 
@@ -2924,19 +2898,6 @@ function destinationCandidatesForStop(stop){
  const rows=Array.isArray(busDestinationCatalog?.stops?.[stop]?.directions)
   ?busDestinationCatalog.stops[stop].directions:[];
  return rows.map(x=>typeof x==='string'?x:(x?.name||'')).filter(Boolean);
-}
-function addManualBusDestination(){
- const stop=busSettingsActiveStop;
- const input=document.getElementById('busDestinationInput');
- if(!stop||!input) return;
- const name=input.value.trim();
- if(!name) return;
- const cfg=getBusNotifySettings();
- if(!Array.isArray(cfg.destinations[stop])) cfg.destinations[stop]=[];
- if(!cfg.destinations[stop].includes(name)) cfg.destinations[stop].push(name);
- saveBusNotifySettings(cfg);
- input.value='';
- renderNotificationSettings();
 }
 function toggleBusDestination(stop,dest){
  const cfg=getBusNotifySettings();
@@ -3266,10 +3227,6 @@ function reservationDateLabel(v){
  return Number(m[2])+'月'+Number(m[3])+'日（'+wd+'）';
 }
 let reservationListMode='all';
-function openTodayDutyReservations(){
- reservationListMode='today';
- show('schedule');
-}
 function openAllReservations(){
  reservationListMode='all';
  show('schedule');
@@ -3654,31 +3611,6 @@ function jrTrendText(){
  if(countDelta<=-2 || delayDelta<=-5) return '回復中';
  return '横ばい';
 }
-function currentTimeBand(){
- const h=new Date().getHours();
- if(h>=5&&h<10) return '朝';
- if(h>=10&&h<17) return '日中';
- if(h>=17&&h<20) return '夕方';
- if(h>=20&&h<22) return '夜';
- return '深夜';
-}
-function currentWeatherFact(){
- const w=readWeatherCache();
- if(!w) return '';
- const code=Number(w.code);
- const rain=Number(w.precipitation||0)>0 || [51,53,55,56,57,61,63,65,66,67,80,81,82,95,96,99].includes(code);
- return rain?'雨':'';
-}
-function currentBusFact(){
- const d=busRealtimeData;
- if(!d) return '';
- const age=Math.max(0,Math.floor(Date.now()/1000-Number(d.generated_at||0)));
- if(age>900) return '';
- const s=d.summary||{};
- if(Number(s.alerts||0)>0) return 'バス運行情報あり';
- if(Number(s.delayed_trips||0)>0) return 'バス遅延あり';
- return 'バス平常';
-}
 function jrRelatedLines(top){
  const lines=Array.isArray(top?.lines)?top.lines.filter(Boolean):[];
  if(!lines.length) return '';
@@ -4013,9 +3945,6 @@ async function loadEventSportsRealtime(force=false){
 let busRealtimeData=null;
 let busRealtimeFetchedAt=0;
 
-function openJrOfficial(){
- window.open('https://trafficinfo.westjr.co.jp/chugoku.html','_blank','noopener');
-}
 function formatAgo(ts){
  const sec=Math.max(0,Math.floor(Date.now()/1000-Number(ts||0)));
  if(sec<60) return sec+'秒前';
@@ -4701,7 +4630,6 @@ function cancelDailyReport(){
  if(reportEndDutyPending){reportEndDutyPending=false;show('menu');}
  else show(reportReturnScreen||'menu');
 }
-function openCurrentReportEdit(){show('reportEdit')}
 function normalizeReportTimeInput(el){
  if(!el) return;
  let s=String(el.value||'').replace(/[^0-9]/g,'').slice(0,4);
@@ -4885,10 +4813,6 @@ function endDuty(){
  if(!d.active){show('home');return}
  openDailyReportForDutyEnd();
 }
-function openInfo(from){
- infoReturn=from||'home';
- show('today');
-}
 function backFromInfo(){
  const d=getDutyState();
  if(infoReturn==='vacant' && d.active) show('vacant');
@@ -4999,12 +4923,6 @@ function compactRoadProps(props={}){
   route:props.route||props.路線名||props.路線番号||null,
   id:props.id||props.fid||props.linkId||props.rdID||null
  };
-}
-function roadSnapConfidence(distanceM,accuracyM){
- if(!Number.isFinite(distanceM)) return 'none';
- if(accuracyM<=10&&distanceM<=8) return 'high';
- if(accuracyM<=20&&distanceM<=Math.max(14,accuracyM+3)) return 'medium';
- return 'low';
 }
 function normBearing(v){
  const n=Number(v);
@@ -5373,64 +5291,6 @@ function recordSafetyWarning(pos,evidence){
   }
  }).catch(()=>{});
  return rec;
-}
-async function evaluateSafetyZone(pos){
- let warningTriggered=false;
- if(currentScreenId()!=='ride'||!jarticSpeedData){
-  setSpeedLimitUI(null);
-  return {decision:window.__roadDecision,warningTriggered:false};
- }
- const acc=Number(pos.coords.accuracy||9999);
- if(acc>15){
-  safetyZoneActive=false;
-  setSpeedLimitUI(null);
-  window.__roadDecision={state:'判定保留',reason:'GPS精度',accuracy:acc};
-  return {decision:window.__roadDecision,warningTriggered:false};
- }
- const lon=pos.coords.longitude,lat=pos.coords.latitude;
- const candidates=[];
- for(const f of jarticSpeedData.features){
-  const d=distanceToFeatureMeters(f,lon,lat);
-  const speed=Number(f.speed);
-  if(d<=14&&Number.isFinite(speed)) candidates.push({f,d,speed});
- }
- candidates.sort((a,b)=>a.d-b.d);
- if(candidates.length){
-  const nearest=candidates[0];
-  const conflict=candidates.some(x=>x!==nearest&&x.d<=nearest.d+4&&x.speed!==nearest.speed);
-  if(conflict){
-   safetyZoneActive=false;
-   setSpeedLimitUI(null);
-   window.__roadDecision={state:'判定保留',reason:'速度規制が競合'};
-   return {decision:window.__roadDecision,warningTriggered:false};
-  }
-  setSpeedLimitUI(nearest.speed);
-  const shouldWarn=nearest.speed===30||!!nearest.f.zone30;
-  if(shouldWarn&&!safetyZoneActive){
-   showSafety(5200);
-   recordSafetyWarning(pos,{
-    source:'JARTIC',
-    speed:nearest.speed,
-    zone30:!!nearest.f.zone30,
-    distance:Math.round(nearest.d),
-    code:nearest.f.code||null
-   });
-   warningTriggered=true;
-  }
-  safetyZoneActive=shouldWarn;
-  window.__roadDecision={
-   state:'指定速度',
-   speed:nearest.speed,
-   zone30:!!nearest.f.zone30,
-   distance:Math.round(nearest.d)
-  };
-  return {decision:window.__roadDecision,warningTriggered};
- }
-
- safetyZoneActive=false;
- setSpeedLimitUI(null);
- const decision=await evaluateStatutory30Candidate(pos);
- return {decision:decision||window.__roadDecision,warningTriggered:false};
 }
 let vacantAreaLookupBusy=false;
 
@@ -6160,14 +6020,6 @@ function startLocation(){
  );
 }
 
-function requestLocation(){
- if(geoWatchId!==null){
-   navigator.geolocation.clearWatch(geoWatchId);
-   geoWatchId=null;
-  recordGpsStateEvent('watch_restart');
- }
- startLocation();
-}
 function refreshLocationDependentFeeds(){
  if(latestPosition){
   updateCurrentWeather(latestPosition,false);
@@ -6177,14 +6029,6 @@ function refreshLocationDependentFeeds(){
  maybeNotifyJrLastTrain();
 }
 
-let mapEnabled=false;
-function toggleMap(){
- mapEnabled=!mapEnabled;
- document.getElementById('mapSwitch').classList.toggle('on',mapEnabled);
- document.getElementById('mapStateText').textContent=mapEnabled?'ON・地図モード（試作）':'OFF・情報表示を優先';
- document.getElementById('homeInfo').classList.toggle('hidden',mapEnabled);
- document.getElementById('homeMap').classList.toggle('hidden',!mapEnabled);
-}
 function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
 function toggleDisabilityDiscount(){
  const b=document.getElementById('disabilityDiscountButton');if(!b)return;
@@ -6272,35 +6116,6 @@ function normalizeJrLivePayload(d){
    (b.max_delay-a.max_delay)||(b.delayed_trains-a.delayed_trains)
  );
  return d;
-}
-function maybeNotifyBusFacts(d){
- if(!d||!canUseFreshSource(d.generated_at,600)) return;
- const ops=Array.isArray(d.operators)?d.operators:[];
- const materialWord=/(運休|見合わせ|遅延|遅れ|迂回|通行止|事故|渋滞|運行中止|運行変更|区間運休|折返し|打ち切り)/;
- const alerts=[];
- for(const op of ops){
-  for(const a of (Array.isArray(op.alerts)?op.alerts:[])){
-   if(!a) continue;
-   const title=String(a.title||'').trim();
-   const desc=String(a.description||'').trim();
-   if(!materialWord.test(title+' '+desc)) continue;
-   const routes=Array.isArray(a.routes)?a.routes.filter(Boolean):[];
-   alerts.push({operator:op.name||'',title:title||'運行情報',desc,routes});
-  }
- }
- if(!alerts.length) return;
-
- // バスは全体の「何便遅れ」だけでは営業判断に粗すぎるため、
- // 自動通知は公式アラートのうち運休・見合わせ等の事実情報に限定。
- // 停留所直前/直後の通知はGPS連動が完成してから別ロジックで出す。
- const a=alerts[0];
- const shortDesc=(a.desc||'').slice(0,44);
- const body=[a.operator,a.routes.slice(0,2).join('・'),a.title,shortDesc].filter(Boolean).join(' / ');
- const key='alert|'+alerts.map(x=>[x.operator,x.title,x.desc,x.routes.join(',')].join(':')).sort().join('|');
- notifyFact('bus',{
-  level:'warn',icon:'!',title:'バス 運行情報',body,key,
-  sourceTs:d.generated_at,maxAgeSec:600,minIntervalMs:15*60*1000
- });
 }
 function maybeNotifySportsFacts(d){
  if(!d||!canUseFreshSource(d.generated_at,180)) return;
@@ -6513,25 +6328,6 @@ function getVerifyLog(){
  try{return JSON.parse(localStorage.getItem('taxi_verify_log')||'[]')}catch(e){return[]}
 }
 function saveVerifyLog(log){localStorage.setItem('taxi_verify_log',JSON.stringify(log.slice(0,20)))}
-async function capturePoint(type){
- if(!latestPosition){toast('位置情報を取得できていません');return null}
- const p=latestPosition;
- const rec={
-   type,
-   time:new Date().toLocaleString('ja-JP',{hour12:false}),
-   lat:p.coords.latitude,
-   lon:p.coords.longitude,
-   accuracy:Math.round(p.coords.accuracy||0),
-   address:'場所を確認中…'
- };
- const log=getVerifyLog();log.unshift(rec);saveVerifyLog(log);renderVerify();
- rec.address=await reverseGeocode(rec.lat,rec.lon);
- const log2=getVerifyLog();
- const idx=log2.findIndex(x=>x.type===rec.type&&x.time===rec.time&&Math.abs(x.lat-rec.lat)<0.0000001);
- if(idx>=0){log2[idx]=rec;saveVerifyLog(log2)}
- renderVerify();
- return rec;
-}
 let currentRideStart=null;
 function isCoordFallbackLabel(v){
  return /^-?\d+\.\d+,\s*-?\d+\.\d+$/.test(String(v||''));
@@ -6950,7 +6746,11 @@ function runNotificationSelfTest(){
  return {ok,results};
 }
 
-function refreshLiveFeedsNow(){
+let lastForegroundFeedRefreshAt=0;
+function refreshLiveFeedsNow(force=false){
+ const now=Date.now();
+ if(!force&&now-lastForegroundFeedRefreshAt<15000) return;
+ lastForegroundFeedRefreshAt=now;
  loadJrProbeSnapshot(true);
  loadBusRealtime(true);
  loadEventSportsRealtime(true);
@@ -6968,11 +6768,13 @@ document.addEventListener('visibilitychange',()=>{
   if(getGoogleAuthToken()) refreshGoogleAuthStatus();
  }
 });
-window.addEventListener('pageshow',refreshLiveFeedsNow);
-window.addEventListener('pageshow',()=>{resumeGooglePairing();refreshGoogleAuthStatus()});
+window.addEventListener('pageshow',()=>{
+ refreshLiveFeedsNow();
+ resumeGooglePairing();
+ refreshGoogleAuthStatus();
+});
 window.addEventListener('focus',refreshLiveFeedsNow);
 
-consumeGoogleAuthCallback();
 resumeGooglePairing();
 refreshGoogleAuthStatus();
 window.addEventListener('message',()=>{resumeGooglePairing()});
