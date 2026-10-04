@@ -3442,14 +3442,39 @@ function getDailyReports(){
 function saveDailyReports(rows){
  try{localStorage.setItem(DAILY_REPORTS_KEY,JSON.stringify(rows.slice(-800)))}catch(e){}
 }
+const DEFAULT_EXPENSE_ITEMS=[
+ {id:'exp_fuel',name:'燃料'},
+ {id:'exp_wash',name:'洗車'},
+ {id:'exp_maintenance',name:'整備'},
+ {id:'exp_supplies',name:'消耗品'}
+];
 function getExpenseMaster(){
+ let rows=[];
  try{
   const v=JSON.parse(localStorage.getItem(EXPENSE_MASTER_KEY)||'null');
-  if(Array.isArray(v)&&v.length) return v;
+  if(Array.isArray(v)) rows=v;
  }catch(e){}
- const names=['燃料費','有料道路・高速','駐車料金','洗車','整備・修理','消耗品','その他'];
- const rows=names.map((name,i)=>({id:'exp_'+(i+1),name,active:true,createdAt:Date.now()}));
- try{localStorage.setItem(EXPENSE_MASTER_KEY,JSON.stringify(rows))}catch(e){}
+ if(!rows.length){
+  rows=DEFAULT_EXPENSE_ITEMS.map(x=>({...x,active:true,source:'default',createdAt:Date.now()}));
+  try{localStorage.setItem(EXPENSE_MASTER_KEY,JSON.stringify(rows))}catch(e){}
+  return rows;
+ }
+ // 旧デフォルト名は短い名称へ移行。利用者が追加した項目は残す。
+ const legacyMap={'燃料費':'燃料','整備・修理':'整備'};
+ let changed=false;
+ rows=rows.map(x=>{
+  const mapped=legacyMap[String(x?.name||'')];
+  if(mapped){changed=true;return {...x,name:mapped,source:x.source||'default',updatedAt:Date.now()}}
+  return x;
+ });
+ for(const d of DEFAULT_EXPENSE_ITEMS){
+  const exists=rows.some(x=>String(x?.name||'')===d.name || x?.id===d.id);
+  if(!exists){
+   rows.push({...d,active:true,source:'default',createdAt:Date.now()});
+   changed=true;
+  }
+ }
+ if(changed) try{localStorage.setItem(EXPENSE_MASTER_KEY,JSON.stringify(rows))}catch(e){}
  return rows;
 }
 function saveExpenseMaster(rows){
@@ -3483,7 +3508,7 @@ function ensureDailyReportForDuty(startTs){
   sales:Number(sales)||0,
   receivable:0,
   trips:0,
-  expenses:[],
+  expenses:DEFAULT_EXPENSE_ITEMS.map(x=>({id:'line_'+x.id+'_'+startTs,masterId:x.id,labelSnapshot:x.name,amount:null})),
   note:'',
   manual:{odometerStart:false,startTime:false,endTime:false,sales:false,receivable:false,trips:false},
   status:'draft',
@@ -3625,7 +3650,10 @@ function updateExpenseAmount(lineId,value){
  if(total) total.textContent=yen(reportExpenseTotal(rr));
 }
 function renderDailyReport(){
- const r=getReportById(activeReportId);if(!r)return;
+ let r=getReportById(activeReportId);if(!r)return;
+ if(!Array.isArray(r.expenses)||r.expenses.length===0){
+  r=updateReport(r.id,{expenses:DEFAULT_EXPENSE_ITEMS.map(x=>({id:'line_'+x.id+'_'+r.startTs,masterId:x.id,labelSnapshot:x.name,amount:null}))})||r;
+ }
  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
  set('reportDateLabel',displayDayFromTs(r.startTs));
  set('reportDutyState',r.status==='saved'?'保存済み':'編集中');
