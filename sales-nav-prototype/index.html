@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-GLOBAL-NAV-V3 CALENDAR-INLINE-HARDENED -->
+<!-- BUILD:2026-10-05-CALENDAR-NAV-BALANCE-1 MIDPOINT-CHEVRONS -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -24,15 +24,16 @@ button,input{font:inherit}
 .app>main{grid-row:2}
 .app>nav{grid-row:3}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
+header:has(.calendar-header-nav.show){padding-right:8px}
 header h1{font-size:21px;margin:0}
-.header-title-row{display:flex;align-items:center;gap:8px;min-width:0}
-.calendar-header-nav{display:none;align-items:center;gap:1px;min-width:0}
-.calendar-header-nav.show{display:flex}
-.calendar-header-title{font-size:15px;font-weight:950;color:#f3f7fa;white-space:nowrap}
+.header-title-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;min-width:0;width:100%}
+.calendar-header-nav{display:none;grid-template-columns:34px auto 34px;align-items:center;justify-content:center;column-gap:20px;min-width:0;justify-self:end;padding-right:10px}
+.calendar-header-nav.show{display:grid}
+.calendar-header-title{font-size:16px;font-weight:1000;color:#f7f9fb;white-space:nowrap;letter-spacing:.1px}
 .calendar-header-move{
- width:27px;height:30px;border:0;background:transparent;color:#fff;border-radius:8px;
- display:flex;align-items:center;justify-content:center;font-size:24px;font-weight:950;
- padding:0;touch-action:manipulation
+ width:34px;height:34px;border:0;background:transparent;color:#fff;border-radius:9px;
+ display:flex;align-items:center;justify-content:center;font-size:27px;font-weight:1000;
+ padding:0;touch-action:manipulation;line-height:1
 }
 .calendar-header-move:active{background:rgba(255,255,255,.06)}
 
