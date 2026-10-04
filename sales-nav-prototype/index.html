@@ -2997,6 +2997,9 @@ let eventSportsFetchedAt=0;
 const LIVE_EVENTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima';
 const SPORTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/sports/hiroshima';
 
+function isLocalSportsEvent(x){
+ return !!(x&&x.status&&x.status!=='none'&&/マツダスタジアム|MAZDA Zoom-Zoom スタジアム/i.test(String(x.venue||'')));
+}
 function renderHomeEventSummary(){
  const hv=document.getElementById('homeEventValue');
  const hs=document.getElementById('homeEventSub');
@@ -3008,7 +3011,7 @@ function renderHomeEventSummary(){
  }
  const today=localDateValue(new Date());
  const events=selectedLiveEventsForDate(today);
- const sports=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[]).filter(x=>x&&x.status&&x.status!=='none');
+ const sports=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[]).filter(isLocalSportsEvent);
  const total=events.length+sports.length;
  hv.textContent=total?total+'件':'なし';
  const liveNow=sports.find(x=>x.status==='live');
@@ -3069,7 +3072,7 @@ function renderSportsRealtime(){
   renderHomeEventSummary();
   return;
  }
- const sports=Array.isArray(d.sports)?d.sports:[];
+ const sports=(Array.isArray(d.sports)?d.sports:[]).filter(isLocalSportsEvent);
  const carp=sports.find(x=>x.team==='広島東洋カープ')||sports[0]||null;
  if(!carp){
   if(st) st.textContent='予定なし';
@@ -5288,7 +5291,7 @@ function maybeNotifyBusFacts(d){
 function maybeNotifySportsFacts(d){
  if(!d||!canUseFreshSource(d.generated_at,180)) return;
  const sports=Array.isArray(d.sports)?d.sports:[];
- const carp=sports.find(x=>x.team==='広島東洋カープ');
+ const carp=sports.find(x=>x.team==='広島東洋カープ'&&/マツダスタジアム|MAZDA Zoom-Zoom スタジアム/i.test(String(x.venue||'')));
  if(!carp||carp.status!=='ended'||!carp.end_time) return;
  const key=[new Date().toLocaleDateString('ja-JP'),carp.team,carp.end_time].join('|');
  notifyFact('sports',{

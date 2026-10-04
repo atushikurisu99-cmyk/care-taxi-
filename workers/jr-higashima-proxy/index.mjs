@@ -212,6 +212,16 @@ async function buildHiroshimaSports(ctx) {
     } catch {}
   }
 
+  // Taxi demand in Hiroshima is venue-based, not team-based.
+  // Away games (Jingu, Koshien, etc.) are irrelevant to local taxi demand,
+  // so only a Mazda Stadium game is exposed as today's sports event.
+  const isMazda=/マツダスタジアム|MAZDA Zoom-Zoom スタジアム/i.test(String(carp.venue||""));
+  if(carp.status!=="none" && !isMazda){
+    carp={...carp,status:"none",start_time:null,end_time:null,score:null,venue:null,local_relevant:false};
+  }else{
+    carp.local_relevant=isMazda && carp.status!=="none";
+  }
+
   return {
     ok:true,
     area:"hiroshima",
