@@ -1224,7 +1224,171 @@ async function buildJrLastTrains(ctx,dateKey=""){
   };
 }
 
+
+function researchTrainKey(line,tr){
+  return String(line.code||line.name||'')+':'+String(tr.no||tr.dest||tr.pos||'unknown');
+}
+function researchPositionKey(tr){
+  const t=String(tr.positionText||'').replace(/(?:〜|～)?#+/g,'').replace(/[〜～]+$/,'').trim();
+  return t || String(tr.pos||'');
+}
+function researchCompactPayload(data){
+  const trains=[];
+  for(const line of (data.lines||[])){
+    for(const tr of (line.trains||[])){
+      trains.push({
+        k:researchTrainKey(line,tr),
+        l:String(line.name||line.code||''),
+        n:String(tr.no||''),
+        p:researchPositionKey(tr),
+        d:Number(tr.delayMinutes||0)
+      });
+    }
+  }
+  return {t:Number(data.generated_at||Math.floor(Date.now()/1000)),trains};
+}
+export class JrResearchStore{
+  constructor(state){this.state=state}
+  async fetch(req){
+    const u=new URL(req.url);
+    if(req.method==='POST'&&u.pathname==='/record'){
+      const x=await req.json();
+      return json(await this.record(x));
+    }
+    if(req.method==='GET'&&u.pathname==='/summary'){
+      const limit=Math.max(12,Math.min(2016,Number(u.searchParams.get('limit')||288)));
+      return json(await this.summary(limit));
+    }
+    return json({ok:false,error:'not_found'},404);
+  }
+  async record(x){
+    const now=Number(x.t||Math.floor(Date.now()/1000));
+    const prev=await this.state.storage.get('last_trains')||{};
+    const next={};
+    const suspicious=[];
+    const byPosition=new Map();
+    let maxDelay=0, delayed=0, delayGrowth=0, stopped5=0, stopped10=0;
+
+    for(const tr of (Array.isArray(x.trains)?x.trains:[])){
+      const key=String(tr.k||'');
+      if(!key) continue;
+      const pos=String(tr.p||'');
+      const delay=Math.max(0,Number(tr.d||0));
+      const old=prev[key]||null;
+      let stationarySec=0;
+      if(old&&pos&&old.p===pos){
+        stationarySec=Math.max(0,Number(old.stationarySec||0)+(now-Number(old.t||now)));
+      }
+      const delta=old?delay-Number(old.d||0):0;
+      if(delay>0) delayed++;
+      if(delta>0) delayGrowth+=delta;
+      maxDelay=Math.max(maxDelay,delay);
+      if(stationarySec>=300) stopped5++;
+      if(stationarySec>=600) stopped10++;
+      next[key]={p:pos,d:delay,t:now,stationarySec,l:tr.l,n:tr.n};
+      if(pos){
+        const a=byPosition.get(pos)||[];
+        a.push({key,l:tr.l,n:tr.n,delay,stationarySec,delta});
+        byPosition.set(pos,a);
+      }
+    }
+
+    let queueMax=0;
+    for(const [position,rows] of byPosition){
+      const active=rows.filter(r=>r.stationarySec>=300||r.delay>=5);
+      queueMax=Math.max(queueMax,active.length);
+      if(active.length>=2){
+        suspicious.push({type:'cluster',position,count:active.length,maxDelay:Math.max(...active.map(r=>r.delay)),maxStopSec:Math.max(...active.map(r=>r.stationarySec)),lines:[...new Set(active.map(r=>r.l).filter(Boolean))]});
+      }
+    }
+    for(const [key,v] of Object.entries(next)){
+      if(v.stationarySec>=600){
+        suspicious.push({type:'long_stop',position:v.p,train:v.n,line:v.l,delay:v.d,stopSec:v.stationarySec});
+      }
+    }
+
+    const score=
+      Math.min(4,stopped10*2)+
+      Math.min(4,queueMax>=2?queueMax:0)+
+      Math.min(4,Math.floor(maxDelay/5))+
+      Math.min(3,Math.floor(delayGrowth/3));
+
+    const sample={
+      t:now,
+      delayed,
+      maxDelay,
+      delayGrowth,
+      stopped5,
+      stopped10,
+      queueMax,
+      score,
+      suspicious:suspicious.slice(0,12)
+    };
+    await this.state.storage.put('last_trains',next);
+    await this.state.storage.put('sample:'+String(now),sample);
+
+    const lastAnomaly=await this.state.storage.get('last_anomaly')||null;
+    if(score>=5){
+      const event={...sample,id:'anomaly_'+now};
+      await this.state.storage.put('event:'+String(now),event);
+      await this.state.storage.put('last_anomaly',event);
+    }
+
+    const cutoff=now-90*24*60*60;
+    const oldSamples=await this.state.storage.list({prefix:'sample:',limit:200});
+    for(const [k] of oldSamples){
+      const ts=Number(String(k).slice(7));
+      if(ts&&ts<cutoff) await this.state.storage.delete(k);
+    }
+    const oldEvents=await this.state.storage.list({prefix:'event:',limit:100});
+    for(const [k] of oldEvents){
+      const ts=Number(String(k).slice(6));
+      if(ts&&ts<cutoff) await this.state.storage.delete(k);
+    }
+    return {ok:true,sample,lastAnomaly};
+  }
+  async summary(limit){
+    const rows=await this.state.storage.list({prefix:'sample:',reverse:true,limit});
+    const events=await this.state.storage.list({prefix:'event:',reverse:true,limit:50});
+    const samples=[...rows.values()];
+    const ev=[...events.values()];
+    const normal=samples.filter(x=>Number(x.score||0)<5);
+    const avg=(arr,k)=>arr.length?Math.round(arr.reduce((s,x)=>s+Number(x[k]||0),0)/arr.length*10)/10:0;
+    return {
+      ok:true,
+      samples:samples.length,
+      baseline:{
+        avgDelayed:avg(normal,'delayed'),
+        avgMaxDelay:avg(normal,'maxDelay'),
+        avgStopped5:avg(normal,'stopped5'),
+        avgQueueMax:avg(normal,'queueMax')
+      },
+      recent:samples.slice(0,48),
+      anomalyEvents:ev.slice(0,20)
+    };
+  }
+}
+async function recordJrResearch(env,data){
+  if(!env.JR_RESEARCH) return null;
+  const id=env.JR_RESEARCH.idFromName('hiroshima');
+  const stub=env.JR_RESEARCH.get(id);
+  const r=await stub.fetch('https://jr-research.local/record',{
+    method:'POST',
+    headers:{'content-type':'application/json'},
+    body:JSON.stringify(researchCompactPayload(data))
+  });
+  return r.ok?await r.json():null;
+}
+
 export default {
+  async scheduled(controller, env, ctx) {
+    try{
+      const data=await buildHiroshima(ctx);
+      await recordJrResearch(env,data);
+    }catch(e){
+      console.log("jr_research_scheduled_error",String(e?.message||e));
+    }
+  },
   async fetch(request, env, ctx) {
     const origin = request.headers.get("Origin") || "";
     if (request.method === "OPTIONS") return new Response(null,{status:204,headers:corsHeaders(origin)});
@@ -1237,6 +1401,13 @@ export default {
 
     try {
       if (url.pathname === "/api/jr/hiroshima") return json(await buildHiroshima(ctx),200,origin);
+      if (url.pathname === "/api/jr/research/summary") {
+        if(!env.JR_RESEARCH) return json({ok:false,error:"research_store_unavailable"},503,origin);
+        const id=env.JR_RESEARCH.idFromName("hiroshima");
+        const stub=env.JR_RESEARCH.get(id);
+        const r=await stub.fetch("https://jr-research.local/summary?limit="+encodeURIComponent(url.searchParams.get("limit")||"288"));
+        return new Response(await r.text(),{status:r.status,headers:{...corsHeaders(origin),"content-type":"application/json;charset=UTF-8","cache-control":"no-store"}});
+      }
       if (url.pathname === "/api/jr/last-trains/hiroshima") return json(await buildJrLastTrains(ctx,url.searchParams.get("date")||""),200,origin);
       if (url.pathname === "/api/sports/hiroshima") return json(await buildHiroshimaSports(ctx),200,origin);
       if (url.pathname === "/api/events/live-end-validation") return json({

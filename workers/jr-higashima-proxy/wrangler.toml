@@ -2,3 +2,15 @@ name = "taxi-jr-higashima-proxy"
 main = "index.mjs"
 compatibility_date = "2026-10-01"
 workers_dev = true
+
+
+[[durable_objects.bindings]]
+name = "JR_RESEARCH"
+class_name = "JrResearchStore"
+
+[[migrations]]
+tag = "jr-research-v1"
+new_sqlite_classes = ["JrResearchStore"]
+
+[triggers]
+crons = ["*/5 * * * *"]
