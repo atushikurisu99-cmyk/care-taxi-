@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-CARD-ICONS-2 FIX-HOME-COLLISION -->
+<!-- BUILD:2026-10-05-MENU-ICONS-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -210,7 +210,20 @@ main{position:relative;min-height:0;overflow:hidden}
  radial-gradient(circle at 49% 55%,rgba(255,196,0,.75),transparent 12%),
  radial-gradient(circle at 30% 62%,rgba(40,160,255,.7),transparent 15%),
  linear-gradient(135deg,#163044,#101b24)}
-.menuitem{padding:14px 0;border-bottom:1px solid #22313d;font-size:16px;font-weight:700}
+.menuitem{padding:14px 0;border-bottom:1px solid #22313d;font-size:16px;font-weight:700;display:flex;align-items:center;gap:12px}
+.menu-icon{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 26px;color:#a8b7c2}
+.menu-icon svg{width:100%;height:100%;display:block}
+.menu-icon.home{color:#7fb9ff}
+.menu-icon.info{color:#7ec9ff}
+.menu-icon.sales{color:#64d59a}
+.menu-icon.analysis{color:#89a7ff}
+.menu-icon.gps{color:#62c8f2}
+.menu-icon.daily{color:#8fa8ff}
+.menu-icon.monthly{color:#b49cff}
+.menu-icon.settings{color:#b6c0c7}
+.menu-icon.end{color:#ff8f95}
+.menuitem.danger .menu-icon{color:#ff8f95}
+
 .menu-card-compact{padding-top:4px!important;padding-bottom:4px!important}
 .menu-card-compact .menuitem{padding-top:19px;padding-bottom:19px}
 .menu-card-compact .menuitem:first-child{border-top:0}
@@ -1948,15 +1961,15 @@ html,body{
 <section id="menu" class="screen">
  <div class="content">
   <div class="card menu-card-compact">
-   <div class="menuitem" onclick="show('home')">⌂ ホーム</div>
-   <div class="menuitem" onclick="show('today')">＋ 本日の営業情報</div>
-   <div class="menuitem" onclick="show('sales')">▥ 売上・実績</div>
-   <div class="menuitem" onclick="show('analysis')">⌁ 営業分析</div>
-   <div class="menuitem" onclick="show('verify')">◎ 位置・警告検証</div>
-   <div class="menuitem" onclick="openLatestReport()">▤ 日報確認</div>
-   <div class="menuitem" onclick="show('monthlyReport')">▦ 月報・帳票出力</div>
-   <div class="menuitem" onclick="show('settings')">⚙ 設定</div>
-   <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()">■ 乗務終了</div>
+   <div class="menuitem" onclick="show('home')"><span class="menu-icon home" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.6 12 3l9 7.6v9.1A1.3 1.3 0 0 1 19.7 21h-5.1v-6.2H9.4V21H4.3A1.3 1.3 0 0 1 3 19.7z"/></svg></span><span>ホーム</span></div>
+   <div class="menuitem" onclick="show('today')"><span class="menu-icon info" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span>本日の営業情報</span></div>
+   <div class="menuitem" onclick="show('sales')"><span class="menu-icon sales" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M6 15l4-4 3 2 5-6"/><path d="M15 7h3v3"/></svg></span><span>売上・実績</span></div>
+   <div class="menuitem" onclick="show('analysis')"><span class="menu-icon analysis" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4" height="9" rx="1.2"/><rect x="10" y="7" width="4" height="14" rx="1.2"/><rect x="17" y="3" width="4" height="18" rx="1.2"/></svg></span><span>営業分析</span></div>
+   <div class="menuitem" onclick="show('verify')"><span class="menu-icon gps" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><span>位置・警告検証</span></div>
+   <div class="menuitem" onclick="openLatestReport()"><span class="menu-icon daily" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg></span><span>日報確認</span></div>
+   <div class="menuitem" onclick="show('monthlyReport')"><span class="menu-icon monthly" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span>月報・帳票出力</span></div>
+   <div class="menuitem" onclick="show('settings')"><span class="menu-icon settings" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.4 2.7a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.4 2.7h4.4l.4-2.7a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg></span><span>設定</span></div>
+   <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></span><span>乗務終了</span></div>
   </div>
  </div>
  <div class="action"><button class="primary secondary">ログアウト</button></div>
