@@ -1560,16 +1560,21 @@ html,body{
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
    <div class="settings-card google-auth-card">
     <div class="settings-title">Googleアカウント</div>
-    <div class="settings-note">初回連携後、専用のDriveフォルダとスプレッドシートを自動作成する設計です。</div>
+    <div class="settings-note">初回連携後、専用のDriveフォルダとスプレッドシートを自動作成し、Gmail送信も利用できます。</div>
     <div class="google-auth-status">
      <strong id="googleAuthAccount">未接続</strong>
      <span id="googleAuthPill" class="google-auth-pill">未接続</span>
     </div>
-    <div id="googleAuthDetail" class="google-auth-detail">Google連携を開始すると、Drive・Sheets保存に必要な権限を確認します。</div>
+    <div id="googleAuthDetail" class="google-auth-detail">Google連携を開始すると、Drive・Sheets保存とGmail送信に必要な権限を確認します。</div>
     <div class="google-auth-actions">
      <button id="googleAuthConnectBtn" class="connect" type="button" onclick="beginGoogleConnect()">Googleで連携</button>
      <button id="googleAuthTestMailBtn" class="hidden" type="button" onclick="sendGoogleTestMail()">テストメール送信</button>
      <button id="googleAuthDisconnectBtn" class="hidden" type="button" onclick="disconnectGoogleAccount()">この端末の連携を解除</button>
+    </div>
+    <div id="googleMailRecipientWrap" class="hidden" style="margin-top:12px">
+     <div class="settings-subhead">月報送付先メール</div>
+     <input id="googleMailRecipient" class="report-text" type="email" inputmode="email" placeholder="税理士・組合などのメールアドレス" onchange="saveGoogleMailRecipient()">
+     <div class="settings-note" style="margin-top:7px">未入力なら、テストメールは連携中のGoogleアカウント本人へ送ります。</div>
     </div>
    </div>
    <div class="settings-card">
@@ -1752,7 +1757,22 @@ function openSettingsSection(section){
 
 const GOOGLE_AUTH_WORKER_URL='https://taxi-google-auth.atushi-works.workers.dev';
 const GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v1';
+const GOOGLE_MAIL_RECIPIENT_KEY='taxi_google_mail_recipient_v1';
 let googleAuthProfile=null;
+
+function getGoogleMailRecipient(){
+ try{return String(localStorage.getItem(GOOGLE_MAIL_RECIPIENT_KEY)||'').trim()}catch(e){return''}
+}
+function saveGoogleMailRecipient(){
+ const el=document.getElementById('googleMailRecipient');
+ try{localStorage.setItem(GOOGLE_MAIL_RECIPIENT_KEY,String(el?.value||'').trim())}catch(e){}
+}
+function renderGoogleMailRecipient(){
+ const wrap=document.getElementById('googleMailRecipientWrap');
+ const input=document.getElementById('googleMailRecipient');
+ if(wrap) wrap.classList.toggle('hidden',!googleAuthProfile);
+ if(input) input.value=getGoogleMailRecipient();
+}
 
 function consumeGoogleAuthCallback(){
  try{
@@ -1790,16 +1810,18 @@ function renderGoogleAuthStatus(profile){
  if(profile&&profile.ok){
   account.textContent=profile.email||'Google連携済み';
   pill.textContent='連携済み';pill.classList.add('on');
-  const folder=profile.folderId?'Driveフォルダ作成済み':'Drive準備中';
-  const sheet=profile.spreadsheetId?'スプレッドシート作成済み':'Sheets準備中';
-  detail.textContent=folder+' / '+sheet;
+  const folder=profile.folderId?'Drive準備済み':'Drive準備中';
+  const sheet=profile.spreadsheetId?'Sheets準備済み':'Sheets準備中';
+  const gmail=profile.capabilities?.gmailSend?'Gmail送信OK':'Gmail再認証が必要';
+  detail.textContent=folder+' / '+sheet+' / '+gmail;
   connect.textContent='再認証';testMail.classList.remove('hidden');disconnect.classList.remove('hidden');
  }else{
   account.textContent='未接続';
   pill.textContent='未接続';pill.classList.remove('on');
-  detail.textContent='Google連携を開始すると、Drive・Sheets保存に必要な権限を確認します。';
+  detail.textContent='Google連携を開始すると、Drive・Sheets保存とGmail送信に必要な権限を確認します。';
   connect.textContent='Googleで連携';testMail.classList.add('hidden');disconnect.classList.add('hidden');
  }
+ renderGoogleMailRecipient();
 }
 async function refreshGoogleAuthStatus(){
  const token=getGoogleAuthToken();
@@ -1817,7 +1839,7 @@ async function refreshGoogleAuthStatus(){
 
 async function sendGoogleTestMail(){
  const token=getGoogleAuthToken();
- const to=googleAuthProfile?.email||'';
+ const to=getGoogleMailRecipient()||googleAuthProfile?.email||'';
  if(!token||!to){toast('Google連携を確認してください');return}
  const btn=document.getElementById('googleAuthTestMailBtn');
  if(btn){btn.disabled=true;btn.textContent='送信中…'}
@@ -1833,7 +1855,7 @@ async function sendGoogleTestMail(){
   });
   const d=await r.json().catch(()=>({}));
   if(!r.ok||!d?.ok) throw new Error(d?.error||('HTTP '+r.status));
-  toast('テストメールを送信しました');
+  toast('テストメールを送信しました：'+to);
  }catch(e){
   console.error(e);
   toast('メール送信に失敗しました');

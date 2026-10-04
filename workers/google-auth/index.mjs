@@ -159,6 +159,7 @@ async function authCallback(req,env){
     name:user.name||'',
     picture:user.picture||'',
     refreshToken:token.refresh_token||prev.refreshToken||'',
+    grantedScopes:String(token.scope||prev.grantedScopes||''),
     folderId:files.folderId,
     spreadsheetId:files.spreadsheetId,
     connectedAt:prev.connectedAt||Date.now(),
@@ -259,7 +260,21 @@ async function me(req,env){
   if(!session||Number(session.exp)<Date.now()) return json({ok:false,error:'unauthorized'},401,corsHeaders(req,env));
   const p=await readStore(env,session.uid);
   if(!p) return json({ok:false,error:'not_found'},404,corsHeaders(req,env));
-  return json({ok:true,userId:p.uid,email:p.email,name:p.name,folderId:p.folderId||null,spreadsheetId:p.spreadsheetId||null},200,corsHeaders(req,env));
+  const scopes=String(p.grantedScopes||'').split(/\s+/).filter(Boolean);
+  const has=s=>scopes.includes(s);
+  return json({
+    ok:true,
+    userId:p.uid,
+    email:p.email,
+    name:p.name,
+    folderId:p.folderId||null,
+    spreadsheetId:p.spreadsheetId||null,
+    capabilities:{
+      driveFile:has('https://www.googleapis.com/auth/drive.file'),
+      spreadsheets:has('https://www.googleapis.com/auth/spreadsheets'),
+      gmailSend:has('https://www.googleapis.com/auth/gmail.send')
+    }
+  },200,corsHeaders(req,env));
 }
 
 export class UserStore{
