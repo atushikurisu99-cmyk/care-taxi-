@@ -8,12 +8,12 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-MENU-SPACING-2 ROW-PADDING-19PX -->
+<!-- BUILD:2026-10-05-NAV-CALENDAR-V2 LARGE-NAV-ICONS TIMETREE-CALENDAR -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
  --blue:#2f86ff;--green:#49a775;--yellow:#f4c34f;--red:#ff5757;--cyan:#5cbad6;
- --header:58px;--nav:66px;--action:78px;--gap:10px;
+ --header:58px;--nav:92px;--action:78px;--gap:10px;
 }
 *{box-sizing:border-box}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
@@ -89,25 +89,42 @@ main{position:relative;min-height:0;overflow:hidden}
  align-items:stretch;
  border-top:1px solid #1a2833;
  background:#09131d;
- padding:5px 4px calc(5px + env(safe-area-inset-bottom));
+ padding:6px 5px calc(5px + env(safe-area-inset-bottom));
  overflow:hidden;
- z-index:20
+ z-index:20;
+ gap:4px
 }
 .nav button{
  border:0;
  background:transparent;
- color:#8d9ca7;
- font-size:10px;
- border-radius:12px;
+ color:#93a3b0;
+ border-radius:15px;
  min-width:0;
  min-height:0;
  height:100%;
  max-height:100%;
- padding:2px 0;
- overflow:hidden
+ padding:4px 2px 3px;
+ overflow:hidden;
+ display:flex;
+ flex-direction:column;
+ align-items:center;
+ justify-content:center;
+ gap:2px;
+ touch-action:manipulation
 }
-.nav button b{display:block;font-size:18px;margin-bottom:2px}
-.nav button.active{background:#112739;color:#71b0ff;font-weight:800}
+.nav-icon{
+ width:29px;height:29px;display:flex;align-items:center;justify-content:center;
+ flex:0 0 29px;color:currentColor
+}
+.nav-icon svg{width:100%;height:100%;display:block}
+.nav-label{font-size:11px;font-weight:850;line-height:1;white-space:nowrap}
+.nav button.active{
+ background:linear-gradient(180deg,#153757,#102c47);
+ color:#71b0ff;font-weight:900;
+ box-shadow:inset 0 0 0 1px rgba(47,134,255,.18)
+}
+.nav button.active .nav-icon{color:#78b8ff}
+.nav button.active .nav-label{color:#ddecff}
 .mapcard{flex:1;min-height:210px;border-radius:18px;border:1px solid #1d2d38;background:
  radial-gradient(circle at 72% 32%,rgba(255,197,84,.22),transparent 16%),
  radial-gradient(circle at 38% 65%,rgba(43,139,255,.2),transparent 18%),
@@ -371,50 +388,62 @@ main{position:relative;min-height:0;overflow:hidden}
 }
 .info-card.state-alert .info-top{color:#ffb0b0}
 
-/* monthly calendar: one-screen, TimeTree-like layout */
-#calendar{padding:6px 8px;grid-template-rows:minmax(0,1fr) 58px;gap:6px}
+/* monthly calendar: TimeTree-inspired layout, approved 2026-10-05 */
+#calendar{padding:6px 8px;grid-template-rows:minmax(0,1fr) 62px;gap:7px}
 #calendar .content{gap:0;overflow:hidden}
 .calendar-head{
- height:50px;display:flex;align-items:center;justify-content:space-between;gap:8px;
- padding:0 4px;border-bottom:1px solid #21303c
+ height:58px;display:flex;align-items:center;justify-content:space-between;gap:8px;
+ padding:0 8px;margin:0 4px 8px;border:1px solid #2a4358;border-radius:15px;
+ background:linear-gradient(180deg,#0e1e2c,#0a1823)
 }
-.calendar-title{font-size:20px;font-weight:900}
+.calendar-title{font-size:21px;font-weight:950;letter-spacing:.2px}
 .calendar-move{
- width:42px;height:38px;border:0;background:transparent;color:#fff;
- font-size:26px;font-weight:900;border-radius:10px;touch-action:manipulation
+ width:44px;height:42px;border:0;background:transparent;color:#fff;
+ font-size:30px;font-weight:900;border-radius:11px;touch-action:manipulation;
+ display:flex;align-items:center;justify-content:center
 }
+.calendar-move:active{background:rgba(255,255,255,.05)}
 .calendar-weekdays,.calendar-grid{
  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0
 }
 .calendar-weekdays{
- height:26px;border-bottom:1px solid #21303c
+ height:30px;border-bottom:1px solid #21303c
 }
 .calendar-weekdays div{
- text-align:center;font-size:11px;color:var(--muted);font-weight:800;
+ text-align:center;font-size:12px;color:#9eafbb;font-weight:900;
  display:flex;align-items:center;justify-content:center
 }
+.calendar-weekdays div:first-child{color:#ff7777}
+.calendar-weekdays div:last-child{color:#70a9ff}
 .calendar-grid{
  flex:1;min-height:0;grid-template-rows:repeat(6,minmax(0,1fr));
 }
 .calendar-day{
- min-height:0;border:0;border-radius:0;background:transparent;
- padding:5px 3px;overflow:hidden;touch-action:manipulation
+ min-height:0;border:0;border-bottom:1px solid #172b3a;border-radius:0;background:transparent;
+ padding:8px 3px 5px;overflow:hidden;touch-action:manipulation;position:relative
 }
-.calendar-day.out{opacity:.28}
-.calendar-day.today .d{
- display:inline-flex;align-items:center;justify-content:center;
- min-width:22px;height:22px;padding:0 5px;border-radius:999px;background:#2f86ff;color:#fff
-}
+.calendar-day:nth-last-child(-n+7){border-bottom:0}
+.calendar-day.out{opacity:.34}
 .calendar-day .d{
- font-size:14px;font-weight:900;margin:0 auto 4px;text-align:center;width:max-content
+ font-size:15px;font-weight:950;margin:0 auto 5px;text-align:center;width:max-content;
+ line-height:28px;min-width:28px;height:28px;border-radius:999px
+}
+.calendar-day.today .d{
+ display:flex;align-items:center;justify-content:center;
+ min-width:30px;height:30px;padding:0 6px;border-radius:999px;
+ background:linear-gradient(180deg,#39a2ff,#2f86ff);color:#fff;
+ box-shadow:0 0 0 1px #62b8ff,0 3px 10px rgba(47,134,255,.28);
+ line-height:30px
 }
 .calendar-day:nth-child(7n+1) .d{color:#ff7777}
-.calendar-day:nth-child(7n) .d{color:#77aaff}
+.calendar-day:nth-child(7n) .d{color:#6ea8ff}
 .calendar-day.today:nth-child(7n+1) .d,.calendar-day.today:nth-child(7n) .d{color:#fff}
-.calendar-day .marks{display:flex;flex-direction:column;gap:3px}
+.calendar-day .marks{
+ display:flex;flex-direction:column;align-items:center;gap:3px;min-height:15px
+}
 .calendar-mark{
- font-size:11px;font-weight:800;line-height:1.18;white-space:nowrap;
- overflow:hidden;text-overflow:clip;padding:3px 4px;border-radius:3px;
+ max-width:100%;font-size:10px;font-weight:900;line-height:1.15;white-space:nowrap;
+ overflow:hidden;text-overflow:clip;padding:3px 5px;border-radius:5px;
  color:#fff;background:#42515d
 }
 .calendar-mark.res{background:#9a7822;color:#fff6c6}
@@ -423,9 +452,9 @@ main{position:relative;min-height:0;overflow:hidden}
 .calendar-mark.soccer{background:#7750b7;color:#f6f0ff}
 .calendar-mark.court{background:#3378b8;color:#eef7ff}
 .calendar-mark.sports{background:#51677c;color:#f2f7fb}
+.calendar-dot{width:6px;height:6px;border-radius:50%;background:#1f3a50;margin-top:4px}
 .calendar-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px}
-.calendar-actions .primary{min-height:52px;font-size:17px}
-
+.calendar-actions .primary{min-height:56px;font-size:18px;border-radius:16px}
 
 /* calendar day detail: tap a date to inspect everything for that day */
 .calendar-day{cursor:pointer}
@@ -1912,10 +1941,22 @@ html,body{
 </main>
 
 <nav class="nav">
- <button class="active" data-target="home" onclick="show('home')"><b>⌂</b>ホーム</button>
- <button data-target="calendar" onclick="show('calendar')"><b>□</b>カレンダー</button>
- <button data-target="analysis" onclick="show('analysis')"><b>⌁</b>分析</button>
- <button data-target="menu" onclick="show('menu')"><b>☰</b>メニュー</button>
+ <button class="active" data-target="home" onclick="show('home')" aria-label="ホーム">
+  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.6 12 3l9 7.6v9.1a1.3 1.3 0 0 1-1.3 1.3h-5.1v-6.2H9.4V21H4.3A1.3 1.3 0 0 1 3 19.7z"/></svg></span>
+  <span class="nav-label">ホーム</span>
+ </button>
+ <button data-target="calendar" onclick="show('calendar')" aria-label="カレンダー">
+  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M7 3v4M17 3v4M3 9h18"/><path d="M7.5 13h2M12 13h2M16.5 13h.5M7.5 17h2M12 17h2M16.5 17h.5"/></svg></span>
+  <span class="nav-label">カレンダー</span>
+ </button>
+ <button data-target="analysis" onclick="show('analysis')" aria-label="分析">
+  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4" height="9" rx="1.2"/><rect x="10" y="7" width="4" height="14" rx="1.2"/><rect x="17" y="3" width="4" height="18" rx="1.2"/></svg></span>
+  <span class="nav-label">分析</span>
+ </button>
+ <button data-target="menu" onclick="show('menu')" aria-label="メニュー">
+  <span class="nav-icon" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M4 6h16M4 12h16M4 18h16"/></svg></span>
+  <span class="nav-label">メニュー</span>
+ </button>
 </nav>
 </div>
 <div class="toast" id="toast">保存しました</div>
@@ -2835,9 +2876,12 @@ function renderCalendar(){
   const cls=['calendar-day'];
   if(d.getMonth()!==m) cls.push('out');
   if(key===todayKey) cls.push('today');
+  const visible=entries.slice(0,2);
   html+='<div class="'+cls.join(' ')+'" onclick="openCalendarDayDetail(\''+key+'\')"><div class="d">'+d.getDate()+'</div><div class="marks">'+
-   entries.slice(0,3).map(x=>'<div class="calendar-mark '+x.type+'">'+escapeHtml(x.text)+'</div>').join('')+
-   (entries.length>3?'<div class="calendar-mark">+'+(entries.length-3)+'</div>':'')+
+   (visible.length
+    ? visible.map(x=>'<div class="calendar-mark '+x.type+'">'+escapeHtml(x.text)+'</div>').join('')+
+      (entries.length>2?'<div class="calendar-mark">+'+(entries.length-2)+'</div>':'')
+    : '<span class="calendar-dot" aria-hidden="true"></span>')+
    '</div></div>';
  }
  grid.innerHTML=html;
