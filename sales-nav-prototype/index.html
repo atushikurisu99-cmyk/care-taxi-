@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-REPORT-UI-7 MOCKUP-BALANCE-1 COMPACT-EDIT-2 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
+<!-- BUILD:2026-10-05-REPORT-UI-8 DAILY-DISTANCE-1 MOCKUP-BALANCE-1 COMPACT-EDIT-2 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1056,6 +1056,9 @@ html,body{
 .report-edit-date-pill{padding:8px 12px;border:1px solid #2f516b;border-radius:18px;background:#0b1822;color:#fff;font-size:16px;font-weight:900;white-space:nowrap}
 .report-edit-section{display:flex;flex-direction:column;gap:8px}
 .report-edit-section-title{font-size:16px;font-weight:950;color:#dce7ef}
+.report-distance-row{display:flex;align-items:center;justify-content:space-between;gap:10px;border-top:1px solid #1d2c37;padding-top:8px}
+.report-distance-row span{font-size:14px;color:#c7d2da;font-weight:900}
+.report-distance-row strong{font-size:18px;color:#fff;font-weight:1000;white-space:nowrap}
 .report-edit-two-col{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px}
 .report-compact-field{display:flex;flex-direction:column;gap:4px;min-width:0}
 .report-compact-field label,.report-note-field label{font-size:12px;color:#b4c1cb;font-weight:850;line-height:1.15}
@@ -1571,12 +1574,16 @@ html,body{
     </div>
     <div class="report-compact-field">
      <label for="editOdometerStart">出庫オドメーター</label>
-     <div class="report-unit-input"><input id="editOdometerStart" type="number" min="0" step="1" inputmode="numeric"><span>km</span></div>
+     <div class="report-unit-input"><input id="editOdometerStart" type="number" min="0" step="1" inputmode="numeric" oninput="updateReportEditTravelKm()"><span>km</span></div>
     </div>
     <div class="report-compact-field">
      <label for="editOdometerEnd">入庫オドメーター</label>
-     <div class="report-unit-input"><input id="editOdometerEnd" type="number" min="0" step="1" inputmode="numeric"><span>km</span></div>
+     <div class="report-unit-input"><input id="editOdometerEnd" type="number" min="0" step="1" inputmode="numeric" oninput="updateReportEditTravelKm()"><span>km</span></div>
     </div>
+   </div>
+   <div class="report-distance-row">
+    <span>本日の走行距離</span>
+    <strong id="reportEditTravelKm">-- km</strong>
    </div>
   </div>
 
@@ -4234,9 +4241,20 @@ function renderReportEdit(){
  setv('editReceivable',r.receivable||'');
  setv('editTrips',r.trips||'');
  setv('editNote',r.note||'');
+ updateReportEditTravelKm();
  const exp=document.getElementById('reportEditExpenseTotal');if(exp)exp.textContent=yen(reportExpenseTotal(r));
  const tc=document.getElementById('reportEditTripCount');if(tc)tc.textContent=reportTripsForDuty(r.dutyId)+'件';
  renderReportTripEditList(r);
+}
+function updateReportEditTravelKm(){
+ const el=document.getElementById('reportEditTravelKm');if(!el)return;
+ const a=Number(document.getElementById('editOdometerStart')?.value);
+ const b=Number(document.getElementById('editOdometerEnd')?.value);
+ if(Number.isFinite(a)&&Number.isFinite(b)&&a>=0&&b>=a){
+  el.textContent=Math.round(b-a).toLocaleString('ja-JP')+' km';
+ }else{
+  el.textContent='-- km';
+ }
 }
 function scrollReportTripsIntoView(){
  const p=document.querySelector('#reportEdit .report-trip-panel');
