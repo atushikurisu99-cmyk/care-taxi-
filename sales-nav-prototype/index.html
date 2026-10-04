@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-CLEANUP-1 AUTH-DEADCODE-REFRESH -->
+<!-- BUILD:2026-10-05-CLEANUP-2 DEADCODE -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -5208,60 +5208,7 @@ function nearestStructureEvidence(lon,lat){
  }
  return best;
 }
-async function evaluateStatutory30Candidate(pos){
- const seq=++roadStructureEvalSeq;
- if(currentScreenId()!=='ride'||!jarticSpeedData) return window.__roadDecision;
- const acc=Number(pos.coords.accuracy||9999);
- if(acc>10){
-  window.__roadDecision={state:'判定保留',reason:'GPS精度',accuracy:acc};
-  return window.__roadDecision;
- }
- const lon=pos.coords.longitude,lat=pos.coords.latitude;
- const roads=await loadNearbyGsiRoads(lon,lat);
- if(seq!==roadStructureEvalSeq||currentScreenId()!=='ride') return window.__roadDecision;
- let nearest=null;
- for(const f of roads){
-  const d=distanceToRoadFeatureMeters(f,lon,lat);
-  if(!nearest||d<nearest.d) nearest={f,d};
- }
- if(!nearest||nearest.d>Math.max(8,acc+3)){
-  window.__roadDecision={state:'判定保留',reason:'道路スナップ低確度',distance:nearest?nearest.d:null};
-  return window.__roadDecision;
- }
- const props=nearest.f.properties||{};
- const structure=nearestStructureEvidence(lon,lat);
- const width=roadWidthEvidence(props);
- const category=roadCategory(props);
- if(structure){
-  window.__roadDecision={
-   state:'法定30対象外材料あり',
-   reason:structure.f.type,
-   code:structure.f.code,
-   structureDistance:Math.round(structure.d),
-   roadDistance:Math.round(nearest.d),
-   width,category
-  };
-  return window.__roadDecision;
- }
- const localRoad=!/国道|都道府県道|高速自動車国道/.test(category);
- if(localRoad&&width==='3-5.5m'){
-  window.__roadDecision={
-   state:'法定30候補',
-   reason:'狭幅員の地域道路・構造規制ヒットなし',
-   roadDistance:Math.round(nearest.d),
-   width,category
-  };
-  return window.__roadDecision;
- }
- window.__roadDecision={
-  state:'判定保留',
-  reason:'法定30の必要条件を確定できない',
-  roadDistance:Math.round(nearest.d),
-  width,category
- };
- return window.__roadDecision;
-}
-function setSpeedLimitUI(speed){
+async function setSpeedLimitUI(speed){
  // 制限速度の数値は利用者には表示しない。
  // 規制値は生活道路警告の判定材料としてのみ内部利用する。
  window.__lastSpeedEvidence=Number.isFinite(speed)?speed:null;
