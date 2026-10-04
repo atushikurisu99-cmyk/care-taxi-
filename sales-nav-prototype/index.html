@@ -2817,22 +2817,25 @@ function maybeNotifyJrFacts(d){
  const moderate=Number((s.delay_buckets||{})['10_14']||0);
  const f=jrFactsForDriver(d);
  const top=f.top;
+ const topCount=Number(top?.delayed_trains||0);
+ const topMax=Number(top?.max_delay||0);
 
- // 行動指示や需要断定はせず、鉄道の事実だけ通知。
- // ライブWorkerでは駅間位置を駅周辺候補としてまとめる。
- const material=severe>0 || moderate>=2 || delayed>=4;
- if(!material) return;
+ // 1〜4分程度の小さな遅れは日常的に発生し、公式運行情報にも出ないことが多い。
+ // 通知は「局地的に複数列車が5分以上」または「1列車でも10分以上」に絞る。
+ // これにより、公式発表前の早期シグナルは残しつつノイズ通知を抑える。
+ const material=(topMax>=10) || (topMax>=5 && topCount>=2) || severe>0 || moderate>=2;
+ if(!material || !top) return;
 
  const body=[
-  top?.station?top.station+'周辺':'',
-  delayed?'遅延 '+delayed+'本':'',
-  top?.max_delay?'最大 '+top.max_delay+'分':'',
+  top.station?top.station+'周辺':'',
+  topCount?'遅延 '+topCount+'本':'',
+  topMax?'最大 '+topMax+'分':'',
   f.lines
  ].filter(Boolean).join(' / ');
  if(!body) return;
 
  const key=[
-  top?.station||'',delayed,severe,moderate,top?.max_delay||0,f.lines||''
+  top.station||'',topCount,topMax,severe,moderate,f.lines||''
  ].join('|');
 
  notifyFact('jr',{
@@ -5210,8 +5213,9 @@ function normalizeJrLivePayload(d){
   for(const tr of (Array.isArray(line.trains)?line.trains:[])){
    const delay=Number(tr.delayMinutes||0);
    if(delay<=0) continue;
-   const station=String(tr.positionText||'').trim();
-   if(!station) continue;
+   const rawStation=String(tr.positionText||'').trim();
+   const station=rawStation.replace(/(?:〜|～)?#+/g,'').replace(/[〜～]+$/,'').trim();
+   if(!station || station.includes('#')) continue;
    const cur=impacts.get(station)||{station,delayed_trains:0,max_delay:0,lines:[]};
    cur.delayed_trains+=1;
    cur.max_delay=Math.max(cur.max_delay,delay);

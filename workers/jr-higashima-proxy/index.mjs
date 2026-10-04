@@ -80,7 +80,8 @@ function trains(payload, stations) {
   return rows.filter(x=>x && typeof x==="object").map(tr=>{
     const pos = String(tr.pos ?? "");
     const parts = pos.split("_").filter(Boolean);
-    const positionText = parts.map(x=>stations[x] ?? x).join("〜");
+    const knownParts = parts.map(x=>stations[x] ?? "").filter(x=>x && !String(x).includes("#"));
+    const positionText = knownParts.length ? knownParts.join("〜") : "";
     const dest = tr.dest && typeof tr.dest==="object" ? (tr.dest.text ?? tr.dest.name ?? "") : (tr.dest ?? "");
     return {
       no: tr.no ?? null,
