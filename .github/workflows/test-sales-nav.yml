@@ -27,12 +27,15 @@ jobs:
           required=[
             "function notifyFact(kind",
             "function maybeNotifyJrFacts",
-            "function maybeNotifyBusFacts",
+            "function maybeNotifySelectedLastBuses",
             "function maybeNotifySportsFacts",
             "function runNotificationSelfTest",
             "JR_WORKER_URL",
             "LIVE_EVENTS_URL",
             "SPORTS_URL",
+            "async function beginGoogleConnect()",
+            "async function checkGooglePairStatus(pair",
+            "async function refreshSessionFromAppDevice()",
             'id="jrInfoStatus"',
             'id="busInfoStatus"',
             'id="liveInfoStatus"',
@@ -40,6 +43,14 @@ jobs:
           ]
           missing=[x for x in required if x not in html]
           assert not missing, "missing contract: "+", ".join(missing)
+          forbidden=[
+            "/migration/start",
+            "/migration/put",
+            "/session/recover",
+            "function consumeGoogleAuthCallback()",
+          ]
+          stale=[x for x in forbidden if x in html]
+          assert not stale, "stale auth code remains: "+", ".join(stale)
           print("contract OK")
           PY
       - name: JavaScript syntax check
