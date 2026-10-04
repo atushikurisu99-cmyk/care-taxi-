@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-DAILY-REPORT-V2-1 APPROVED-MOCKUP-LAYOUT DAILY-DISTANCE-2 -->
+<!-- BUILD:2026-10-05-DAILY-REPORT-V2-2 ODOMETER-DISTANCE-FIX -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -3999,6 +3999,16 @@ function latestKnownOdometer(){
   return Number.isFinite(n)&&n>=0?n:null;
  }catch(e){return null}
 }
+function previousReportOdometer(report){
+ const rows=getDailyReports()
+  .filter(x=>x&&x.id!==report?.id&&Number(x.startTs||0)<Number(report?.startTs||0))
+  .sort((a,b)=>Number(b.startTs||0)-Number(a.startTs||0));
+ for(const x of rows){
+  const n=Number(x.odometerEnd);
+  if(Number.isFinite(n)&&n>0) return n;
+ }
+ return null;
+}
 function reportTripsForDuty(dutyId){
  return getTripRecords().filter(x=>x&&x.dutyId===dutyId&&x.dropoffTs).length;
 }
@@ -4170,7 +4180,7 @@ function updateDailyReportTravelKm(){
  const bRaw=String(document.getElementById('reportOdometerEnd')?.value??'').trim();
  if(aRaw===''||bRaw===''){el.textContent='-- km';return}
  const a=Number(aRaw),b=Number(bRaw);
- el.textContent=(Number.isFinite(a)&&Number.isFinite(b)&&b>=a)?(Math.round(b-a).toLocaleString('ja-JP')+' km'):'-- km';
+ el.textContent=(Number.isFinite(a)&&Number.isFinite(b)&&a>0&&b>=a)?(Math.round(b-a).toLocaleString('ja-JP')+' km'):'-- km';
 }
 function toggleDailyExpenseDetail(){
  const el=document.getElementById('dailyExpenseDetail');if(!el)return;
@@ -4192,7 +4202,15 @@ function renderDailyReport(){
  setText('reportDutyState',r.status==='saved'?'保存済み':'編集中');
  setVal('reportStartTime',r.startTime||'');
  setVal('reportEndTime',r.endTime||'');
- setVal('reportOdometerStart',r.odometerStart===null||r.odometerStart===''?'':r.odometerStart);
+ let startOdo=r.odometerStart;
+ if(startOdo===null||startOdo===''||Number(startOdo)<=0){
+  const prev=previousReportOdometer(r);
+  startOdo=(prev!==null)?prev:'';
+  if(prev!==null && (r.odometerStart===null||r.odometerStart===''||Number(r.odometerStart)<=0)){
+   r=updateReport(r.id,{odometerStart:prev})||r;
+  }
+ }
+ setVal('reportOdometerStart',startOdo);
  setVal('reportOdometerEnd',r.odometerEnd===null||r.odometerEnd===''?'':r.odometerEnd);
  setVal('reportSalesInput',r.sales||0);
  setVal('reportReceivableInput',r.receivable||0);
@@ -4240,7 +4258,9 @@ function saveDailyReport(){
  }else reportOdometerWarned=false;
 
  const odometerEnd=rawOdo===''?null:num('reportOdometerEnd',true);
- const odometerStart=num('reportOdometerStart',true);
+ const startRaw=val('reportOdometerStart');
+ const startNum=startRaw===''?null:Number(startRaw);
+ const odometerStart=(Number.isFinite(startNum)&&startNum>0)?Math.round(startNum):null;
  const endedAt=r.endTs||Date.now();
  const rr=updateReport(r.id,{
   startTime:val('reportStartTime'),
