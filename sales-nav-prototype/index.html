@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-REPORT-UI-5 TIME-TEXT-FIX-2 COMPACT-EDIT-1 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
+<!-- BUILD:2026-10-05-REPORT-UI-6 TIME-PAIR-1 COMPACT-EDIT-1 PAYMENT-SIMPLE-1 GPS-TRIP-EDIT-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1054,6 +1054,10 @@ html,body{
 #reportEdit .report-edit-head .label{font-size:11px}
 #reportEdit .report-edit-head h2{font-size:18px!important;margin-top:2px!important}
 .report-edit-grid{display:flex;flex-direction:column;gap:6px}
+.report-time-pair{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.report-time-field{display:flex;flex-direction:column;gap:5px;min-width:0}
+.report-time-field label{font-size:11px;color:#aab8c4;font-weight:800;line-height:1.2}
+.report-time-field input{width:100%;min-width:0;max-width:100%;background:#0b1620;border:1px solid #2a3a47;border-radius:10px;color:#fff;font-size:18px;font-weight:850;padding:8px 10px;min-height:40px;text-align:center}
 .report-edit-row{display:grid;grid-template-columns:112px minmax(0,1fr);gap:8px;align-items:center}
 .report-edit-row label{font-size:12px;color:#aab8c4;font-weight:800;line-height:1.2}
 .report-edit-row input,.report-edit-row textarea{
@@ -1533,8 +1537,10 @@ html,body{
  <div class="content daily-report-content">
   <div class="card report-edit-head"><div class="label">自動記録内容の修正</div><h2 id="reportEditDate" style="margin:4px 0 0">--</h2></div>
   <div class="card report-edit-grid">
-   <div class="report-edit-row"><label for="editStartTime">出庫時刻</label><input id="editStartTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)"></div>
-   <div class="report-edit-row"><label for="editEndTime">入庫時刻</label><input id="editEndTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)"></div>
+   <div class="report-time-pair">
+    <div class="report-time-field"><label for="editStartTime">出庫時刻</label><input id="editStartTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)"></div>
+    <div class="report-time-field"><label for="editEndTime">入庫時刻</label><input id="editEndTime" class="report-time-text" type="text" inputmode="numeric" maxlength="5" placeholder="00:00" autocomplete="off" onblur="normalizeReportTimeInput(this)"></div>
+   </div>
    <div class="report-edit-row"><label for="editOdometerStart">出庫オドメーター</label><input id="editOdometerStart" type="number" min="0" step="1" inputmode="numeric"></div>
    <div class="report-edit-row"><label for="editOdometerEnd">入庫オドメーター</label><input id="editOdometerEnd" type="number" min="0" step="1" inputmode="numeric"></div>
    <div class="report-edit-row"><label for="editSales">売上</label><input id="editSales" type="number" min="0" step="1" inputmode="numeric"></div>
