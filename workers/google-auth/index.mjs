@@ -137,9 +137,11 @@ async function authStart(req,env){
   if(!oauthConfigured(env)) return json({ok:false,error:'google_oauth_not_configured'},503);
   const u=new URL(req.url);
   const returnTo=u.searchParams.get('return_to')||'';
-  const deviceId=u.searchParams.get('device_id')||'';
+  let deviceId=u.searchParams.get('device_id')||'';
   if(!validReturnTo(returnTo,env)) return json({ok:false,error:'return_origin_not_allowed'},400);
-  if(!validDeviceId(deviceId)) return json({ok:false,error:'invalid_device_id'},400);
+  // Backward compatible with an older/stale iPhone PWA build that did not send device_id.
+  // Generate a stable-length server-side id and return it to the app after OAuth.
+  if(!validDeviceId(deviceId)) deviceId='dev_'+crypto.randomUUID().replace(/-/g,'')+'_'+Date.now().toString(36);
   const state=await signedPayload(env.SESSION_SECRET,{returnTo,deviceId,exp:Date.now()+10*60*1000,nonce:crypto.randomUUID()});
   const redirectUri=new URL('/oauth/callback',req.url).toString();
   const q=new URLSearchParams({
@@ -187,7 +189,7 @@ async function authCallback(req,env){
     });
   }
   const ret=new URL(state.returnTo);
-  ret.hash='google_auth_session='+encodeURIComponent(session);
+  ret.hash='google_auth_session='+encodeURIComponent(session)+'&google_auth_device='+encodeURIComponent(state.deviceId||'');
   return Response.redirect(ret.toString(),302);
 }
 async function refreshGoogleAccessToken(refreshToken,env){
