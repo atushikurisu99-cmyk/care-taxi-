@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-MONTHLY-PRINT-1 IOS-AIRPRINT -->
+<!-- BUILD:2026-10-05-IOS-MAIL-SHARE-1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1871,6 +1871,7 @@ html,body{
     <button type="button" class="mail" onclick="sendMonthlyReportMail()">メール送信</button>
    </div>
    <div id="monthlyReportStatus" class="monthly-report-status" style="margin-top:10px">日報データを読み込み中</div>
+   <div class="monthly-report-status" style="margin-top:6px">iPhoneはGoogle連携なしでも、メール送信からExcel添付の共有画面を開けます。</div>
   </div>
 
   <div id="monthlyReportPreview" class="monthly-report-paper"></div>
@@ -2428,10 +2429,36 @@ async function sendMonthlyReportMail(){
  const subject=String(document.getElementById('monthlyReportSubject')?.value||monthlyDefaultSubject(monthKey)).trim();
  const bodyText=String(document.getElementById('monthlyReportBody')?.value||monthlyDefaultBody(monthKey));
  if(!rows.length){toast('対象月の日報がありません');return}
- if(!token){toast('Google連携が必要です');return}
- if(!to){toast('送信先メールを入力してください');return}
- const btns=[...document.querySelectorAll('#monthlyReport .monthly-report-actions button')];btns.forEach(b=>b.disabled=true);
+
+ const btns=[...document.querySelectorAll('#monthlyReport .monthly-report-actions button')];
+ btns.forEach(b=>b.disabled=true);
  try{
+  // iPhone/PWAではGoogle OAuthをSafariで完了すると、
+  // Safariとホーム画面PWAの保存領域が分かれることがある。
+  // その場合でも共有シートからExcel添付メールを送れるようにする。
+  if(!token){
+   const wb=monthlyWorkbook(monthKey);
+   const bytes=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+   const file=new File(
+    [bytes],
+    monthlyReportFilename(monthKey),
+    {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}
+   );
+   const shareData={
+    title:subject||monthlyReportFilename(monthKey),
+    text:(to?('送信先: '+to+'\n\n'):'')+bodyText,
+    files:[file]
+   };
+   if(navigator.share && (!navigator.canShare || navigator.canShare({files:[file]}))){
+    await navigator.share(shareData);
+    toast('メールアプリを選んで送信してください');
+    return;
+   }
+   XLSX.writeFile(wb,monthlyReportFilename(monthKey));
+   toast('Excelを保存しました。メールに添付してください');
+   return;
+  }
+
   await syncDailyReportsToGoogleSheets(true);
   const base64=monthlyWorkbookBase64(monthKey);
   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/gmail/send',{
@@ -2449,8 +2476,13 @@ async function sendMonthlyReportMail(){
   hist.push({monthKey,to,subject,messageId:d.messageId||'',sentAt:Date.now()});
   try{localStorage.setItem(histKey,JSON.stringify(hist.slice(-200)))}catch(e){}
   toast('月報をメール送信しました');
- }catch(e){console.error(e);toast('月報メール送信に失敗しました')}
- finally{btns.forEach(b=>b.disabled=false)}
+ }catch(e){
+  if(e?.name==='AbortError'){toast('共有をキャンセルしました');return}
+  console.error(e);
+  toast(token?'月報メール送信に失敗しました':'共有に失敗しました');
+ }finally{
+  btns.forEach(b=>b.disabled=false)
+ }
 }
 
 const SALES_GOAL_SETTINGS_KEY='taxi_sales_goal_settings_v1';
