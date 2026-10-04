@@ -38,6 +38,21 @@ jobs:
 
       - run: npm install
 
+      - name: JavaScript syntax check
+        run: node --check index.mjs
+
+      - name: Verify active auth routes only
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const s=fs.readFileSync('index.mjs','utf8');
+          const required=['/pair/start','/pair/status','/session/refresh','/session/revoke','/gmail/send','/sheets/sync'];
+          const forbidden=['/migration/start','/migration/put','/session/recover','/session/unlink'];
+          for(const x of required){if(!s.includes(x)) throw new Error('missing route '+x)}
+          for(const x of forbidden){if(s.includes(x)) throw new Error('stale route '+x)}
+          console.log('auth routes OK');
+          NODE
+
       - name: Deploy Worker
         run: npx wrangler deploy
         env:
