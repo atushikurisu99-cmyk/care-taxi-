@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-MENU-ICONS-1 -->
+<!-- BUILD:2026-10-05-MONTHLY-PRINT-1 IOS-AIRPRINT -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1230,6 +1230,7 @@ html,body{
 .monthly-report-actions button{min-height:48px;border:1px solid #334756;border-radius:12px;background:#13212d;color:#fff;font-weight:900}
 .monthly-report-actions button.main{background:#176fd4;border-color:#2f86ff}
 .monthly-report-actions button.mail{background:#1b6f49;border-color:#2c8d60}
+.monthly-report-actions button.print{background:#5a4930;border-color:#9b7b45;color:#fff}
 .monthly-report-status{font-size:12px;color:#9fb0bc;line-height:1.45}
 .monthly-report-paper{display:none;background:#fff;color:#111;border-radius:7px;padding:12px;overflow:auto;box-shadow:0 5px 22px rgba(0,0,0,.28)}
 .monthly-report-paper.show{display:block}
@@ -1240,6 +1241,30 @@ html,body{
 .monthly-report-paper th{background:#efefef}
 .monthly-report-paper .paper-summary{display:flex;justify-content:space-between;font-size:9px;margin:5px 0 7px;gap:8px;flex-wrap:wrap}
 .template-note{font-size:11px;color:#aab8c4;line-height:1.45;margin-top:7px}
+
+@media print{
+ @page{size:A4 landscape;margin:8mm}
+ html,body{background:#fff!important;width:auto!important;height:auto!important;overflow:visible!important}
+ body.print-monthly-report .app{width:auto!important;max-width:none!important;height:auto!important;min-height:0!important;background:#fff!important;display:block!important}
+ body.print-monthly-report header,
+ body.print-monthly-report .nav,
+ body.print-monthly-report #monthlyReport>.action,
+ body.print-monthly-report #monthlyReport .monthly-report-wrap>*:not(#monthlyReportPreview),
+ body.print-monthly-report .toast,
+ body.print-monthly-report #notice,
+ body.print-monthly-report #safety{display:none!important}
+ body.print-monthly-report main{display:block!important;overflow:visible!important;height:auto!important;min-height:0!important}
+ body.print-monthly-report .screen{display:none!important}
+ body.print-monthly-report #monthlyReport{display:block!important;padding:0!important;height:auto!important;overflow:visible!important}
+ body.print-monthly-report #monthlyReport .monthly-report-wrap{display:block!important;overflow:visible!important;padding:0!important}
+ body.print-monthly-report #monthlyReportPreview{display:block!important;width:100%!important;max-width:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;box-shadow:none!important;overflow:visible!important;background:#fff!important;color:#000!important}
+ body.print-monthly-report #monthlyReportPreview h3{font-size:14pt!important;margin:0 0 5mm!important}
+ body.print-monthly-report #monthlyReportPreview table{font-size:7.5pt!important;width:100%!important;white-space:nowrap!important}
+ body.print-monthly-report #monthlyReportPreview th,
+ body.print-monthly-report #monthlyReportPreview td{padding:1.6mm 1.8mm!important;border-color:#555!important}
+ body.print-monthly-report #monthlyReportPreview .paper-summary{font-size:8.5pt!important;margin:0 0 4mm!important}
+}
+
 @media(max-width:360px){.monthly-report-grid{grid-template-columns:1fr}.monthly-report-actions{grid-template-columns:1fr}}
 
 /* google account connection v1 */
@@ -1841,6 +1866,7 @@ html,body{
    <div class="monthly-report-actions">
     <button type="button" onclick="syncDailyReportsToGoogleSheets(false)">Google Sheetsへ同期</button>
     <button type="button" onclick="toggleMonthlyReportPreview()">A4プレビュー</button>
+    <button type="button" class="print" onclick="printMonthlyReport()">印刷</button>
     <button type="button" class="main" onclick="downloadMonthlyReportXlsx()">Excelダウンロード</button>
     <button type="button" class="mail" onclick="sendMonthlyReportMail()">メール送信</button>
    </div>
@@ -2308,6 +2334,20 @@ function toggleMonthlyReportPreview(){
  if(p.classList.contains('show'))p.classList.remove('show');
  else renderMonthlyReportPreview(true);
 }
+
+function printMonthlyReport(){
+ const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
+ const rows=monthlyRows(monthKey);
+ if(!rows.length){toast('対象月の日報がありません');return}
+ renderMonthlyReportPreview(true);
+ document.body.classList.add('print-monthly-report');
+ const cleanup=()=>document.body.classList.remove('print-monthly-report');
+ window.addEventListener('afterprint',cleanup,{once:true});
+ requestAnimationFrame(()=>setTimeout(()=>{
+  try{window.print()}catch(e){console.error(e);cleanup();toast('印刷画面を開けませんでした')}
+ },80));
+}
+
 function monthlyWorkbook(monthKey){
  if(typeof XLSX==='undefined') throw new Error('xlsx_library_not_loaded');
  const reports=monthlyRows(monthKey),tot=monthlyTotals(reports);
