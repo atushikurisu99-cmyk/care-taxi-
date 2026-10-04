@@ -133,7 +133,7 @@ async function authStart(req,env){
     client_id:env.GOOGLE_CLIENT_ID,
     redirect_uri:redirectUri,
     response_type:'code',
-    scope:'openid email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets',
+    scope:'openid email profile https://www.googleapis.com/auth/drive.file https://www.googleapis.com/auth/spreadsheets https://www.googleapis.com/auth/gmail.send',
     access_type:'offline',
     prompt:'consent',
     include_granted_scopes:'true',
