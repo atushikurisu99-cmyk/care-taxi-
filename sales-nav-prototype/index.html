@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-NAV-CALENDAR-V2 LARGE-NAV-ICONS TIMETREE-CALENDAR -->
+<!-- BUILD:2026-10-05-CALENDAR-HEADER-INLINE MONTH-NAV-BESIDE-TITLE -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -25,6 +25,17 @@ button,input{font:inherit}
 .app>nav{grid-row:3}
 header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
 header h1{font-size:21px;margin:0}
+.header-title-row{display:flex;align-items:center;gap:10px;min-width:0}
+.calendar-header-nav{display:none;align-items:center;gap:3px;min-width:0}
+.calendar-header-nav.show{display:flex}
+.calendar-header-title{font-size:14px;font-weight:900;color:#dce8f1;white-space:nowrap}
+.calendar-header-move{
+ width:28px;height:28px;border:0;background:transparent;color:#fff;border-radius:8px;
+ display:flex;align-items:center;justify-content:center;font-size:23px;font-weight:950;
+ padding:0;touch-action:manipulation
+}
+.calendar-header-move:active{background:rgba(255,255,255,.06)}
+
 header.state-only{justify-content:flex-end}
 header.state-only h1{display:none}
 .badge{font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;background:#0f2431;border:1px solid #274052}
@@ -390,19 +401,7 @@ main{position:relative;min-height:0;overflow:hidden}
 
 /* monthly calendar: TimeTree-inspired layout, approved 2026-10-05 */
 #calendar{padding:6px 8px;grid-template-rows:minmax(0,1fr) 62px;gap:7px}
-#calendar .content{gap:0;overflow:hidden}
-.calendar-head{
- height:58px;display:flex;align-items:center;justify-content:space-between;gap:8px;
- padding:0 8px;margin:0 4px 8px;border:1px solid #2a4358;border-radius:15px;
- background:linear-gradient(180deg,#0e1e2c,#0a1823)
-}
-.calendar-title{font-size:21px;font-weight:950;letter-spacing:.2px}
-.calendar-move{
- width:44px;height:42px;border:0;background:transparent;color:#fff;
- font-size:30px;font-weight:900;border-radius:11px;touch-action:manipulation;
- display:flex;align-items:center;justify-content:center
-}
-.calendar-move:active{background:rgba(255,255,255,.05)}
+#calendar .content{gap:0;overflow:hidden;padding-top:2px}
 .calendar-weekdays,.calendar-grid{
  display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:0
 }
@@ -1217,7 +1216,7 @@ html,body{
 </head>
 <body>
 <div class="app">
-<header><h1 id="title">タクシー営業ナビ</h1><div id="homeHeaderState" class="header-state"><span class="badge" id="badge">空車</span><span id="headerDutyMeta" class="header-duty-meta">乗務開始前</span></div></header>
+<header><div class="header-title-row"><h1 id="title">タクシー営業ナビ</h1><div id="calendarHeaderNav" class="calendar-header-nav" aria-hidden="true"><button class="calendar-header-move" type="button" onclick="moveCalendarMonth(-1)" aria-label="前の月">‹</button><span id="calendarTitle" class="calendar-header-title">----</span><button class="calendar-header-move" type="button" onclick="moveCalendarMonth(1)" aria-label="次の月">›</button></div></div><div id="homeHeaderState" class="header-state"><span class="badge" id="badge">空車</span><span id="headerDutyMeta" class="header-duty-meta">乗務開始前</span></div></header>
 <main>
 <div id="notice" class="notice normal"><div class="icon" id="nicon">i</div><div><strong id="ntitle">通知</strong><span id="nbody">お知らせ</span></div></div>
 <div id="safety" class="safety">
@@ -1554,11 +1553,6 @@ html,body{
 
 <section id="calendar" class="screen">
  <div class="content">
-  <div class="calendar-head">
-   <button class="calendar-move" type="button" onclick="moveCalendarMonth(-1)">‹</button>
-   <div id="calendarTitle" class="calendar-title">----</div>
-   <button class="calendar-move" type="button" onclick="moveCalendarMonth(1)">›</button>
-  </div>
   <div class="calendar-weekdays">
    <div>日</div><div>月</div><div>火</div><div>水</div><div>木</div><div>金</div><div>土</div>
   </div>
@@ -1996,11 +1990,17 @@ function show(id){
  const title=document.getElementById('title');
  const badge=document.getElementById('badge');
  const headerState=document.getElementById('homeHeaderState');
+ const calendarHeaderNav=document.getElementById('calendarHeaderNav');
  const isHome=id==='home';
  header.classList.remove('state-only');
  document.querySelector('.app')?.classList.remove('header-collapsed');
  title.textContent=isHome?'タクシー営業ナビ':(titles[id]||'タクシー営業ナビ');
  if(headerState) headerState.style.display=isHome?'':'none';
+ if(calendarHeaderNav){
+  const onCalendar=id==='calendar';
+  calendarHeaderNav.classList.toggle('show',onCalendar);
+  calendarHeaderNav.setAttribute('aria-hidden',onCalendar?'false':'true');
+ }
  badge.style.display='';
  if(isHome) badge.textContent=stateLabelFor(id);
  document.querySelectorAll('.nav button').forEach(b=>b.classList.toggle('active',b.dataset.target===id || (id==='vacant'&&b.dataset.target==='home')));
