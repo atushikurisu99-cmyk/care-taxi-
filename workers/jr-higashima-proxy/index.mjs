@@ -183,17 +183,11 @@ async function buildHiroshimaSports(ctx) {
     source_url:scheduleUrl
   };
 
-  // First detect whether today's schedule text contains Hiroshima.
-  const scheduleText = stripHtml(html);
-  const todaySlice = datePos>=0 ? scheduleText.slice(datePos, datePos+1800) : scheduleText;
-  if (/広島/.test(todaySlice)) {
-    carp.status="scheduled";
-    const startMatch = todaySlice.match(/(?:マツダスタジアム|マツダ)[^0-9]{0,40}([0-2][0-9]:[0-5][0-9])/);
-    if (startMatch) carp.start_time=startMatch[1];
-    if (/マツダ/.test(todaySlice)) carp.venue="マツダスタジアム";
-  }
-
-  // Follow today's score pages and keep the one containing Hiroshima.
+  // Today's score-page links are date-scoped by /MMDD/.
+  // Do not scan a broad chunk of the monthly schedule: it can include the next day's
+  // Hiroshima game and create a false positive on a no-game day.
+  // A Carp game is considered scheduled only when one of today's own score pages
+  // actually contains Hiroshima.
   for (const href of uniq.slice(0,12)) {
     const abs = href.startsWith("http") ? href : `https://npb.jp${href.startsWith("/")?"":"/"}${href}`;
     try {
@@ -201,6 +195,7 @@ async function buildHiroshimaSports(ctx) {
       const text = stripHtml(page);
       if (!/広島東洋カープ|広島/.test(text)) continue;
       carp.source_url=abs;
+      carp.status="scheduled";
       if (/マツダスタジアム|マツダ/.test(text)) carp.venue="マツダスタジアム";
       const st = text.match(/開始\s*([0-2][0-9]:[0-5][0-9])/);
       const en = text.match(/終了\s*([0-2][0-9]:[0-5][0-9])/);
