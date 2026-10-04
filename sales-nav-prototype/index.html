@@ -5125,15 +5125,6 @@ function candidateDiagnostic(f,point,posHeading,motionHeading){
   motionHeadingDiff:bearingDiff(dir,motionHeading)
  };
 }
-function distanceToFeatureMeters(f,lon,lat){
- if(!f||!Array.isArray(f.coords)||!f.coords.length) return Infinity;
- const pts=f.coords;
- if(f.shape==='3'&&pts.length>=3&&pointInPolygon(lon,lat,pts)) return 0;
- if(pts.length===1) return metersBetween(lon,lat,pts[0][0],pts[0][1]);
- let best=Infinity;
- for(let i=1;i<pts.length;i++) best=Math.min(best,distanceToSegmentMeters(lon,lat,pts[i-1],pts[i]));
- return best;
-}
 function lonLatToTile(lon,lat,z=16){
  const n=Math.pow(2,z);
  const x=Math.floor((lon+180)/360*n);
