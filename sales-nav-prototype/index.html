@@ -2911,16 +2911,24 @@ function toggleBusDestination(stop,dest){
  renderNotificationSettings();
 }
 const LIVE_NOTIFY_SETTINGS_KEY='taxi_live_notify_settings_v1';
-const LIVE_VENUES=[
+const BASE_LIVE_VENUES=[
  '広島グリーンアリーナ',
  '上野学園ホール',
  '広島文化学園HBGホール',
  'JMSアステールプラザ',
+ '広島国際会議場 フェニックスホール',
  '広島クラブクアトロ',
  'BLUE LIVE HIROSHIMA',
  'LIVE VANQUISH',
  'セカンド・クラッチ'
 ];
+function availableLiveVenues(source=eventRealtimeData){
+ const dynamic=[
+  ...(Array.isArray(source?.venues_covered)?source.venues_covered:[]),
+  ...(Array.isArray(source?.events)?source.events.map(e=>e?.venue):[])
+ ].filter(Boolean);
+ return [...new Set([...BASE_LIVE_VENUES,...dynamic])];
+}
 function getLiveNotifySettings(){
  try{
   const v=JSON.parse(localStorage.getItem(LIVE_NOTIFY_SETTINGS_KEY)||'null');
@@ -2939,7 +2947,7 @@ function toggleLiveVenueSetting(venue){
 }
 function selectedLiveVenues(){
  const cfg=getLiveNotifySettings();
- return LIVE_VENUES.filter(v=>!!cfg.venues[v]);
+ return availableLiveVenues().filter(v=>!!cfg.venues[v]);
 }
 function selectedLiveEvents(source=eventRealtimeData){
  const selected=new Set(selectedLiveVenues());
@@ -2993,7 +3001,7 @@ function renderLiveVenueSettings(){
  const box=document.getElementById('liveVenueSettingsList');
  if(!box) return;
  const cfg=getLiveNotifySettings();
- box.innerHTML=LIVE_VENUES.map(venue=>{
+ box.innerHTML=availableLiveVenues().map(venue=>{
   const on=!!cfg.venues[venue];
   return '<button type="button" class="setting-choice '+(on?'on':'')+'" onclick="toggleLiveVenueSetting(\''+escapeHtml(venue).replace(/'/g,"\\'")+'\')">'+
     '<div><strong>'+escapeHtml(venue)+'</strong><small>'+(on?'通知対象':'タップして選択')+'</small></div>'+
