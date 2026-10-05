@@ -1180,8 +1180,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v6");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v6");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v7");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v7");
 
   const hit=await cache.match(liveKey);
   if(hit){
