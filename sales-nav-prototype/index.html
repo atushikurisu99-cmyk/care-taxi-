@@ -3827,6 +3827,33 @@ let sportsRealtimeData=null;
 let eventSportsFetchedAt=0;
 const LIVE_EVENTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima';
 const SPORTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/sports/hiroshima';
+const EVENT_FEED_CACHE_KEY='taxi_event_feed_cache_v2';
+const SPORTS_FEED_CACHE_KEY='taxi_sports_feed_cache_v2';
+const EVENT_FEED_CACHE_MAX_AGE_MS=48*60*60*1000;
+function readFeedCache(key){
+ try{
+  const v=JSON.parse(localStorage.getItem(key)||'null');
+  if(!v||!v.savedAt||Date.now()-Number(v.savedAt)>EVENT_FEED_CACHE_MAX_AGE_MS) return null;
+  return v.payload||null;
+ }catch(e){return null}
+}
+function writeFeedCache(key,payload){
+ try{localStorage.setItem(key,JSON.stringify({savedAt:Date.now(),payload}))}catch(e){}
+}
+function hasFutureLiveEvents(payload){
+ const today=localDateValue(new Date());
+ return Array.isArray(payload?.events)&&payload.events.some(e=>String(liveEventDate(e)||'')>=today);
+}
+function restoreEventFeedsFromCache(){
+ if(!eventRealtimeData){
+  const cached=readFeedCache(EVENT_FEED_CACHE_KEY);
+  if(cached?.ok&&Array.isArray(cached.events)) eventRealtimeData=cached;
+ }
+ if(!sportsRealtimeData){
+  const cached=readFeedCache(SPORTS_FEED_CACHE_KEY);
+  if(cached?.ok&&Array.isArray(cached.sports)) sportsRealtimeData=cached;
+ }
+}
 
 const HIROSHIMA_SPORTS_VENUE_RE=/マツダスタジアム|MAZDA Zoom-Zoom スタジアム|エディオンピースウイング広島|Eピース|広島サンプラザ(?:ホール)?|広島グリーンアリーナ|広島県立総合体育館|猫田記念体育館|広島広域公園/i;
 function isLocalSportsEvent(x){
@@ -3958,6 +3985,10 @@ async function loadEventSportsRealtime(force=false){
  const now=Date.now();
  if(!force&&eventSportsFetchedAt&&now-eventSportsFetchedAt<30000) return;
  eventSportsFetchedAt=now;
+
+ // 先に前回正常データを復元。通信失敗中でも表示を消さない。
+ restoreEventFeedsFromCache();
+
  const fetchOne=async(url)=>{
   const controller=new AbortController();
   const timer=setTimeout(()=>controller.abort(),7000);
@@ -3968,21 +3999,37 @@ async function loadEventSportsRealtime(force=false){
   }finally{clearTimeout(timer)}
  };
  const [events,sports]=await Promise.allSettled([fetchOne(LIVE_EVENTS_URL),fetchOne(SPORTS_URL)]);
- if(events.status==='fulfilled'&&events.value?.ok){
-  eventRealtimeData=events.value;
-  logAnalyticsEvent('feed_loaded',{feed:'events',source:'worker',generatedAt:events.value.generated_at,count:Array.isArray(events.value.events)?events.value.events.length:0});
-  maybeNotifySelectedLiveEvents(events.value);
+
+ if(events.status==='fulfilled'&&events.value?.ok&&Array.isArray(events.value.events)){
+  const incoming=events.value;
+  const incomingHasFuture=hasFutureLiveEvents(incoming);
+  const existingHasFuture=hasFutureLiveEvents(eventRealtimeData);
+
+  // 一時的に空データが返っても、直前の正常な未来イベントを消さない。
+  if(incomingHasFuture||!existingHasFuture){
+   eventRealtimeData=incoming;
+   writeFeedCache(EVENT_FEED_CACHE_KEY,incoming);
+   logAnalyticsEvent('feed_loaded',{feed:'events',source:'worker',generatedAt:incoming.generated_at,count:incoming.events.length});
+   maybeNotifySelectedLiveEvents(incoming);
+  }else{
+   logAnalyticsEvent('feed_error',{feed:'events',message:'empty payload retained previous cache'});
+  }
  }else{
-  logAnalyticsEvent('feed_error',{feed:'events',message:String(events.reason||'invalid payload')});
+  logAnalyticsEvent('feed_error',{feed:'events',message:String(events.reason||'invalid payload; using cache')});
  }
- if(sports.status==='fulfilled'&&sports.value?.ok){
+
+ if(sports.status==='fulfilled'&&sports.value?.ok&&Array.isArray(sports.value.sports)){
   sportsRealtimeData=sports.value;
-  logAnalyticsEvent('feed_loaded',{feed:'sports',source:'worker',generatedAt:sports.value.generated_at,count:Array.isArray(sports.value.sports)?sports.value.sports.length:0});
+  writeFeedCache(SPORTS_FEED_CACHE_KEY,sports.value);
+  logAnalyticsEvent('feed_loaded',{feed:'sports',source:'worker',generatedAt:sports.value.generated_at,count:sports.value.sports.length});
  }else{
-  logAnalyticsEvent('feed_error',{feed:'sports',message:String(sports.reason||'invalid payload')});
+  logAnalyticsEvent('feed_error',{feed:'sports',message:String(sports.reason||'invalid payload; using cache')});
  }
+
  renderLiveEvents();
  renderSportsRealtime();
+ renderHomeEventSummary();
+ renderEventDetail();
  if(document.getElementById('calendar')?.classList.contains('active')) renderCalendar();
 }
 
