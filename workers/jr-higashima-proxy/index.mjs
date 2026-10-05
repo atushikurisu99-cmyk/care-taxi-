@@ -239,6 +239,80 @@ function tokyoParts() {
     mmdd:`${o.month}${o.day}`
   };
 }
+function sportDateISO(year,month,day){
+  return String(year)+"-"+String(month).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+}
+function sportEndEstimate(start,minutes){
+  const n=hhmmToMinutes(start);
+  return n==null?null:minutesToHHMM(n+minutes);
+}
+async function buildSanfrecceHomeSchedule(t,ctx){
+  const url="https://www.sanfrecce.co.jp/tickets/schedule";
+  let html="";
+  try{html=await fetchTextCached(url,900,ctx)}catch{return []}
+  const text=stripHtml(html).normalize("NFKC").replace(/\s+/g," ");
+  const out=[];
+  const re=/(\d{1,2})\.(\d{1,2})\s*\[[^\]]+\]\s*([0-2]?\d:[0-5]\d)\s*K\.O\.\s+([\s\S]{1,80}?)(?=\s+[☆★]|\s+販売|\s+\d{1,2}\/\d{1,2}|$)/g;
+  let m;
+  while((m=re.exec(text))){
+    const month=Number(m[1]),day=Number(m[2]);
+    let year=t.year;
+    if(month<t.month-6) year++;
+    const opponent=String(m[4]||"").replace(/Image:\s*/g,"").replace(/画像/g,"").trim().split(/\s{2,}/)[0].trim();
+    const date=sportDateISO(year,month,day);
+    out.push({
+      kind:"soccer",team:"サンフレッチェ広島",opponent:opponent||null,
+      date,venue:"エディオンピースウイング広島",area:"広島市",
+      status:"scheduled",start_time:m[3],end_time:null,end_time_estimate:sportEndEstimate(m[3],120),
+      source:"サンフレッチェ広島公式",source_url:url,source_role:"official_fixed_schedule"
+    });
+  }
+  return out;
+}
+async function buildDragonfliesHomeSchedule(t,ctx){
+  const url="https://hiroshimadragonflies.com/schedule/calendar/?scheduleYear="+t.year;
+  let html="";
+  try{html=await fetchTextCached(url,900,ctx)}catch{return []}
+  const text=stripHtml(html).normalize("NFKC").replace(/\s+/g," ");
+  const out=[];
+  const re=/HOME\s+(?:レギュラーシーズン|ポストシーズン|プレシーズン)?\s*(?:Image:\s*)?広島\s+(\d{1,2})\/(\d{1,2})\s*\([^)]*\)\s*([0-2]?\d:[0-5]\d)[\s\S]{0,120}?location_on\s*([^\s][\s\S]{1,60}?)(?=\s+(?:Image:|sports_basketball|試合情報|confirmation_number|チケット|ゲームデー))/g;
+  let m;
+  while((m=re.exec(text))){
+    const month=Number(m[1]),day=Number(m[2]);
+    const venue=String(m[4]||"").replace(/\s+/g," ").trim();
+    if(!/広島グリーンアリーナ|広島サンプラザホール/i.test(venue)) continue;
+    out.push({
+      kind:"basketball",team:"広島ドラゴンフライズ",opponent:null,
+      date:sportDateISO(t.year,month,day),venue,area:"広島市",
+      status:"scheduled",start_time:m[3],end_time:null,end_time_estimate:sportEndEstimate(m[3],130),
+      source:"広島ドラゴンフライズ公式",source_url:url,source_role:"official_fixed_schedule"
+    });
+  }
+  return out;
+}
+async function buildThundersHomeSchedule(t,ctx){
+  const url="https://www.hiroshima-thunders.com/game/score/2026/index.html";
+  let html="";
+  try{html=await fetchTextCached(url,900,ctx)}catch{return []}
+  const text=stripHtml(html).normalize("NFKC").replace(/\s+/g," ");
+  const out=[];
+  const re=/(\d{1,2})\s+(\d{1,2})\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)\s+([0-2]?\d:[0-5]\d)\s+試合開始[\s\S]{0,80}?広島サンダーズ\s+VS\s+(?:Image:\s*)?([^\s][\s\S]{1,30}?)\s+会場\s+([^（(]{2,60})\s*(?:（広島）|\(広島\))/g;
+  let m;
+  while((m=re.exec(text))){
+    const month=Number(m[1]),day=Number(m[2]);
+    let year=t.year;
+    if(month<t.month-6) year++;
+    const venue=String(m[5]||"").replace(/\s+/g," ").trim();
+    if(!/広島グリーンアリーナ|広島サンプラザホール|猫田記念体育館/i.test(venue)) continue;
+    out.push({
+      kind:"volleyball",team:"広島サンダーズ",opponent:String(m[4]||"").trim(),
+      date:sportDateISO(year,month,day),venue,area:"広島市",
+      status:"scheduled",start_time:m[3],end_time:null,end_time_estimate:sportEndEstimate(m[3],140),
+      source:"広島サンダーズ公式",source_url:url,source_role:"official_fixed_schedule"
+    });
+  }
+  return out;
+}
 async function buildHiroshimaSports(ctx) {
   const t = tokyoParts();
   const scheduleUrl = `https://npb.jp/games/${t.year}/schedule_${String(t.month).padStart(2,"0")}_detail.html`;
@@ -300,11 +374,32 @@ async function buildHiroshimaSports(ctx) {
     carp.local_relevant=isMazda && carp.status!=="none";
   }
 
+  const [soccer,basketball,volleyball]=await Promise.all([
+    buildSanfrecceHomeSchedule(t,ctx),
+    buildDragonfliesHomeSchedule(t,ctx),
+    buildThundersHomeSchedule(t,ctx)
+  ]);
+  const today=t.ymd;
+  const cutoff=(()=>{
+    const d=new Date(today+"T00:00:00+09:00");
+    d.setDate(d.getDate()+60);
+    return d.toLocaleDateString("sv-SE",{timeZone:"Asia/Tokyo"});
+  })();
+  const upcoming=[...soccer,...basketball,...volleyball]
+    .filter(x=>x.date>=today&&x.date<=cutoff)
+    .sort((a,b)=>a.date.localeCompare(b.date)||String(a.start_time||"99:99").localeCompare(String(b.start_time||"99:99")));
+  if(carp.status!=="none"){
+    carp.date=t.ymd;
+    carp.kind="baseball";
+    carp.area="広島市";
+    carp.end_time_estimate=carp.end_time||null;
+  }
   return {
     ok:true,
     area:"hiroshima",
     generated_at:Math.floor(Date.now()/1000),
-    sports:[carp],
+    coverage:"today_realtime_plus_60_day_home_schedule",
+    sports:[...(carp.status!=="none"?[carp]:[]),...upcoming],
   };
 }
 const LIVE_END_CHANNELS = [
