@@ -1601,7 +1601,7 @@ async function buildDiveDemandEvents(ctx){
   const cutoff=cutoffDate.toLocaleDateString("sv-SE",{timeZone:"Asia/Tokyo"});
   const links=linksFromHtml(html,listUrl)
     .filter(x=>/dive-hiroshima\.com\/events\/events-[^/?#]+\/?$/i.test(x.url));
-  const unique=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,45);
+  const unique=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,18);
   const rows=await Promise.all(unique.map(async link=>{
     let page="";
     try{page=await fetchTextCached(link.url,1800,ctx)}catch{return null}
