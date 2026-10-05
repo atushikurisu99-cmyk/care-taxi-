@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-JR-CAUSE-COMPACT -->
+<!-- BUILD:2026-10-05-NEXT-DATE-CARDS -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -3226,6 +3226,11 @@ function reservationDateLabel(v){
  const wd=['日','月','火','水','木','金','土'][d.getDay()];
  return Number(m[2])+'月'+Number(m[3])+'日（'+wd+'）';
 }
+function compactMonthDay(v,slash=false){
+ const m=String(v||'').match(/^(\d{4})-(\d{2})-(\d{2})$/);
+ if(!m) return String(v||'');
+ return slash?(Number(m[2])+'/'+Number(m[3])):(Number(m[2])+'月'+Number(m[3])+'日');
+}
 let reservationListMode='all';
 function openAllReservations(){
  reservationListMode='all';
@@ -3274,11 +3279,11 @@ function renderReservations(){
  const n=nextReservation();
  const hv=document.getElementById('homeReservationValue');
  const hs=document.getElementById('homeReservationSub');
- if(hv) hv.textContent=n?(n.timed&&n.time?n.time:'時間なし'):'---';
- if(hs) hs.textContent=n?n.pickup:'タップして予約を登録';
+ if(hv) hv.textContent=n?compactMonthDay(n.date):'---';
+ if(hs) hs.textContent=n?([n.timed&&n.time?n.time:'時間なし',n.pickup].filter(Boolean).join(' / ')):'タップして予約を登録';
 
  const vv=document.getElementById('vacantReservationValue');
- if(vv) vv.textContent=n?((n.timed&&n.time?n.time+'　':'')+n.pickup):'---';
+ if(vv) vv.textContent=n?([compactMonthDay(n.date,true),n.timed&&n.time?n.time:'',n.pickup].filter(Boolean).join(' ')):'---';
 
  const ride=document.getElementById('rideReservationCard');
  const rideSub=document.getElementById('rideReservationSub');
@@ -3832,25 +3837,41 @@ function renderHomeEventSummary(){
   hs.textContent='ライブ・スポーツを確認中';
   return;
  }
+
  const today=localDateValue(new Date());
- const events=selectedLiveEventsForDate(today);
- const sports=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[]).filter(isLocalSportsEvent);
- const total=events.length+sports.length;
- hv.textContent=total?total+'件':'なし';
- const liveNow=sports.find(x=>x.status==='live');
- const nextEvent=events[0]||sports.find(x=>x.status==='scheduled')||liveNow||sports[0]||null;
+ const liveEvents=selectedLiveEvents()
+  .filter(e=>String(liveEventDate(e)||'')>=today)
+  .sort((a,b)=>
+   String(liveEventDate(a)||'9999-12-31').localeCompare(String(liveEventDate(b)||'9999-12-31'))||
+   String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99'))
+  );
+
+ const sports=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[])
+  .filter(isLocalSportsEvent)
+  .filter(x=>x.status!=='ended')
+  .map(x=>({...x,date:x.date||today}));
+
+ const candidates=[
+  ...liveEvents.map(x=>({...x,_eventType:'live'})),
+  ...sports.map(x=>({...x,_eventType:'sports'}))
+ ].sort((a,b)=>
+  String(a.date||'9999-12-31').localeCompare(String(b.date||'9999-12-31'))||
+  String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99'))
+ );
+
+ const nextEvent=candidates[0]||null;
  if(!nextEvent){
-  hs.textContent=selectedLiveVenues().length?'選択会場のライブ・スポーツなし':'ライブ会場を設定';
+  hv.textContent='なし';
+  hs.textContent=selectedLiveVenues().length?'次のイベントなし':'ライブ会場を設定';
   return;
  }
- if(events.includes(nextEvent)){
-  const t=nextEvent.start_time?nextEvent.start_time+'〜 ':'';
-  hs.textContent=t+(nextEvent.name||nextEvent.venue||'イベント');
- }else{
-  const prefix=nextEvent.status==='live'?'試合中 ':nextEvent.status==='ended'?'終了 ':'';
-  const t=nextEvent.start_time&&nextEvent.status==='scheduled'?nextEvent.start_time+'〜 ':'';
-  hs.textContent=prefix+t+(nextEvent.venue||nextEvent.team||'スポーツ');
- }
+
+ hv.textContent=compactMonthDay(nextEvent.date||today);
+ const who=nextEvent._eventType==='sports'
+  ?(nextEvent.team==='広島東洋カープ'?'カープ戦':(nextEvent.team||'スポーツ'))
+  :(nextEvent.name||'ライブ');
+ const where=nextEvent.venue||'会場確認中';
+ hs.textContent=who+' / '+where;
 }
 function renderLiveEvents(){
  const d=eventRealtimeData;
