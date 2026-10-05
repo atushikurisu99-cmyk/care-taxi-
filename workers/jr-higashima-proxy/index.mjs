@@ -933,6 +933,69 @@ async function buildDirectVenueLiveEvents(t,ctx,enrichEnd=true){
   return groups.flat();
 }
 
+async function buildCandyMajorVenueEvents(ctx){
+  const url="https://www.candy-p.com/schedule/";
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const out=[];
+  const sections=[...html.matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>([\s\S]*?)(?=<h3[^>]*>|$)/gi)];
+  for(const sec of sections){
+    const artist=stripHtml(sec[1]).replace(/\s+/g," ").trim();
+    if(!artist) continue;
+    const body=stripHtml(sec[2]);
+    const re=/(20\d{2})\/(\d{2})\/(\d{2})[^0-9]{0,20}?([^\d]{2,120}?)\s+([0-2]\d:[0-5]\d)\s*\/\s*([0-2]\d:[0-5]\d)/g;
+    for(const m of body.matchAll(re)){
+      const year=Number(m[1]),month=Number(m[2]),day=Number(m[3]);
+      const venueRaw=String(m[4]||"").replace(/^[\s\-–—:：]+|[\s\-–—:：]+$/g,"");
+      const venue=canonicalLiveVenue(venueRaw);
+      if(!venue) continue;
+      const t={year,month,day};
+      const event=await makeOfficialVenueEvent({
+        name:artist,title:artist,venue,
+        start_time:m[6]||null,open_time:m[5]||null,
+        venueText:m[0],venueUrl:url,t,ctx,enrichEnd:liveDateKey(t)===liveDateKey(tokyoParts())
+      });
+      if(event){
+        event.source="CANDY PROMOTION";
+        event.source_url=url;
+        out.push(event);
+      }
+    }
+  }
+
+  // Fallback for markup changes: parse plain text chunks around date/venue/time.
+  if(!out.length){
+    const text=stripHtml(html);
+    const dateRe=/(20\d{2})\/(\d{2})\/(\d{2})[^0-9]{0,20}?/g;
+    const hits=[...text.matchAll(dateRe)];
+    for(let i=0;i<hits.length;i++){
+      const h=hits[i];
+      const start=h.index||0;
+      const end=i+1<hits.length?(hits[i+1].index||text.length):Math.min(text.length,start+500);
+      const chunk=text.slice(start,end);
+      const venue=canonicalLiveVenue(chunk);
+      if(!venue) continue;
+      const tm=chunk.match(/([0-2]\d:[0-5]\d)\s*\/\s*([0-2]\d:[0-5]\d)/);
+      if(!tm) continue;
+      const prev=text.slice(Math.max(0,start-180),start).trim();
+      let name=prev.split(/SOLD OUT|発売中|詳細|\d{1,2}:\d{2}\/\d{1,2}:\d{2}/).pop().trim();
+      if(name.length>100) name=name.slice(-100).trim();
+      if(!name) name="ライブ";
+      const t={year:Number(h[1]),month:Number(h[2]),day:Number(h[3])};
+      const event=await makeOfficialVenueEvent({
+        name,title:name,venue,start_time:tm[2],open_time:tm[1],
+        venueText:chunk,venueUrl:url,t,ctx,enrichEnd:liveDateKey(t)===liveDateKey(tokyoParts())
+      });
+      if(event){
+        event.source="CANDY PROMOTION";
+        event.source_url=url;
+        out.push(event);
+      }
+    }
+  }
+  return out;
+}
+
 async function buildCultureHiroshimaMonthEvents(year,month,ctx){
   const url="https://artscouncil-hiroshima.jp/event/?md="+year+"-"+String(month).padStart(2,"0");
   let html="";
@@ -1111,8 +1174,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v4");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v4");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v5");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v5");
 
   const hit=await cache.match(liveKey);
   if(hit){
@@ -1169,8 +1232,11 @@ async function buildHiroshimaEvents(ctx) {
 
   // Broad monthly source: one fetch per month, filtered to the major venues only.
   const months=[...new Map(days.map(t=>[t.year+"-"+t.month,{year:t.year,month:t.month}])).values()];
-  const cultureMonths=await Promise.all(months.map(m=>buildCultureHiroshimaMonthEvents(m.year,m.month,ctx)));
-  all.push(...cultureMonths.flat());
+  const [cultureMonths,candyEvents]=await Promise.all([
+    Promise.all(months.map(m=>buildCultureHiroshimaMonthEvents(m.year,m.month,ctx))),
+    buildCandyMajorVenueEvents(ctx)
+  ]);
+  all.push(...cultureMonths.flat(),...candyEvents);
 
   // Venue-direct sources add/replace richer start-time details where available.
   for(const t of days){
