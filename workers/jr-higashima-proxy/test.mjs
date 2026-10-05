@@ -1,4 +1,17 @@
 import worker from "./index.mjs";
+import { extractPerformanceSubject } from "./performance-subject.mjs";
+
+const subjectCases = [
+  [{name:"劇団四季『マンマ・ミーア！』",title:"劇団四季『マンマ・ミーア！』"}, "劇団四季", "theater_company"],
+  [{name:"サルゴリラのコントと旅2026",title:"サルゴリラのコントと旅2026"}, "サルゴリラ", "performer"],
+  [{name:"沢田研二 2026 LIVE ! 『freedom 安堵 courage』",title:"沢田研二 2026 LIVE ! 『freedom 安堵 courage』"}, "沢田研二 2026", "artist"],
+  [{name:"PERSONZ",title:"PERSONZ"}, "PERSONZ", "artist"]
+];
+for(const [input,expectedName,expectedType] of subjectCases){
+  const got=extractPerformanceSubject(input);
+  if(got.display_name!==expectedName) throw new Error("subject name "+JSON.stringify({input,got,expectedName}));
+  if(got.display_name_type!==expectedType) throw new Error("subject type "+JSON.stringify({input,got,expectedType}));
+}
 
 const stationPayload = {stations:[
   {info:{code:"A",name:"広島"}},
