@@ -1590,6 +1590,34 @@ function normalizeSportsDemand(e){
     confidence:"high"
   };
 }
+
+function isClearlyOutsideHiroshimaCity(text=""){
+  return /東広島市|廿日市市|呉市|竹原市|三原市|尾道市|福山市|府中市|三次市|庄原市|安芸高田市|江田島市|大竹市|神石高原町|世羅町|北広島町|安芸太田町|坂町|海田町|熊野町|府中町|島根県|山口県|岡山県|愛媛県/i.test(String(text||""));
+}
+function isHiroshimaCityEventLocation(venue="",address="",text=""){
+  const v=String(venue||"");
+  const a=String(address||"");
+  if(isClearlyOutsideHiroshimaCity(v+" "+a)) return false;
+  if(/広島県?広島市|〒\d{3}-\d{4}\s*広島県?広島市/i.test(a)) return true;
+  if(/広島広域公園|ホットスタッフフィールド広島|広島グリーンアリーナ|広島県立総合体育館|エディオンピースウイング|マツダスタジアム|広島城|ひろしまゲートパーク|広島ゲートパーク|平和記念公園|広島国際会議場|広島文化学園HBGホール|JMSアステールプラザ|上野学園ホール|BLUE LIVE HIROSHIMA|広島クラブクアトロ|LIVE VANQUISH|アルパーク|中央公園/i.test(v)) return true;
+  return false;
+}
+function diveInformationBlock(text=""){
+  const s=String(text||"").normalize("NFKC").replace(/\s+/g," ");
+  const i=s.indexOf("INFORMATION");
+  if(i<0) return s;
+  const j=s.indexOf("ACCESS",i+11);
+  return s.slice(i,j>i?j:Math.min(s.length,i+2200));
+}
+function diveRegexEscape(v=""){
+  return String(v).replace(/[.*+?^$()|[\]\\]/g,"\\$&");
+}
+function diveInfoField(block,label,nextLabels=[]){
+  const escaped=diveRegexEscape(label);
+  const stop=nextLabels.length?"(?="+nextLabels.map(diveRegexEscape).join("|")+"|$)":"$";
+  const re=new RegExp(escaped+"\\s*[:：]?\\s*([\\s\\S]{1,220}?)"+stop,"i");
+  return (String(block||"").match(re)||[])[1]?.replace(/\s+/g," ").trim()||"";
+}
 async function buildDiveDemandEvents(ctx){
   const listUrl="https://dive-hiroshima.com/events/";
   let html="";
@@ -1605,30 +1633,43 @@ async function buildDiveDemandEvents(ctx){
   const rows=await Promise.all(unique.map(async link=>{
     let page="";
     try{page=await fetchTextCached(link.url,1800,ctx)}catch{return null}
-    const text=stripHtml(page).normalize("NFKC").replace(/\s+/g," ");
-    if(!/広島市|広島市周辺|中区|南区|西区|東区|安佐南区|安佐北区|佐伯区|安芸区/i.test(text)) return null;
-    if(!/祭り|花火|フェス|スポーツ|大会|音楽|コンサート|マラソン|パレード|イベント/i.test(text)) return null;
-    const date=demandDateFromText(text,today.year);
-    if(!date||date<todayKey||date>cutoff) return null;
-    const endDate=demandEndDateFromText(text,today.year)||date;
+    const full=stripHtml(page).normalize("NFKC").replace(/\s+/g," ");
     const h1=(page.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)||[])[1];
     const title=stripHtml(h1||link.text||"").replace(/\s+/g," ").trim();
     if(!title) return null;
-    const people=demandPeopleFromText(text);
-    const venueMatch=text.match(/(?:会場|開催場所|場所)[：:\s]*([^。]{2,80})/);
-    const venue=venueMatch?venueMatch[1].replace(/(?:住所|アクセス|料金|時間).*$/,"").trim():null;
+
+    const info=diveInformationBlock(full);
+    const period=diveInfoField(info,"開催期間",["開催時間","開催場所","対象者","料金","住所","Webサイト","主催"]);
+    const timeField=diveInfoField(info,"開催時間",["開催場所","対象者","料金","住所","Webサイト","主催"]);
+    const venue=diveInfoField(info,"開催場所",["対象者","料金","お申し込み","住所","Webサイト","主催"]);
+    const address=diveInfoField(info,"住所",["Webサイト","主催","お問い合わせ"]);
+
+    const date=demandDateFromText(period,today.year);
+    if(!date||date<todayKey||date>cutoff) return null;
+    const endDate=demandEndDateFromText(period,today.year)||date;
+    if(!isHiroshimaCityEventLocation(venue,address,info)) return null;
+
+    const people=demandPeopleFromText(full);
+    const eventLike=/祭|フェス|花火|大会|マラソン|パレード|スポーツ|コンサート|ライブ|音楽|神楽|よさこい|フード/i.test(title);
+    const passive=/展覧会|美術館|水族館|ガーデン|花畑|展示|企画展|特別展|ライトアップ|イルミネーション|かき氷/i.test(title);
+    if(!people && (!eventLike||passive)) return null;
+    if(endDate!==date && !people && !/祭|フェス|大会|スポーツ|コンサート|ライブ|音楽/i.test(title)) return null;
+
+    const startTime=demandStartTimeFromText(timeField||info);
+    const endTime=demandEndTimeFromText(timeField||info)
+      ||((String(timeField||"").match(/(?:〜|～|-)\s*([0-2]?\d:[0-5]\d)/)||[])[1]||null);
+    let kind="event";
+    if(/花火/.test(title)) kind="fireworks";
+    else if(/スポーツ|大会|マラソン|運動会/.test(title)) kind="sports_event";
+    else if(/祭|フェス|よさこい|神楽/.test(title)) kind="festival";
+    else if(/コンサート|ライブ|音楽/.test(title)) kind="music_event";
     return {
-      kind:/花火/.test(text)?"fireworks":(/祭り|祭|フェス/.test(text)?"festival":(/スポーツ|大会|マラソン/.test(text)?"sports_event":"event")),
-      demand_group:"free_event",
+      kind,demand_group:"free_event",
       date,end_date:endDate,
-      name:title,detail_name:null,venue,
-      start_time:demandStartTimeFromText(text),
-      end_time:demandEndTimeFromText(text),
-      end_time_estimate:null,
-      people,
-      people_basis:people?"official_page_stated":null,
-      source:"Dive! Hiroshima",
-      source_url:link.url,
+      name:title,detail_name:null,venue:venue||null,address:address||null,
+      start_time:startTime,end_time:endTime,end_time_estimate:null,
+      people,people_basis:people?"official_page_stated":null,
+      source:"Dive! Hiroshima",source_url:link.url,
       confidence:people?"high":"medium"
     };
   }));
