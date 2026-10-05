@@ -5843,9 +5843,10 @@ function renderEventDetail(){
   liveList.innerHTML=upcoming.length?upcoming.map(e=>{
    const ref=e.end_time_estimate||e.end_time_reference||'';
    const tracked=selectedVenueSet.has(e.venue);
+   const displayName=String(e.display_name||e.artist||e.artist_name||e.name||'公演').trim();
    return '<div class="calendar-detail-item live">'+
     '<div class="kind">'+escapeHtml(liveEventDate(e))+(tracked?' / チェック中':'')+'</div>'+
-    '<div class="main">'+escapeHtml(e.name||'ライブ')+'</div>'+
+    '<div class="main">'+escapeHtml(displayName)+'</div>'+
     '<div class="meta">'+escapeHtml((e.start_time?e.start_time+' / ':'')+(e.venue||''))+
       (ref?(' / 過去公演参考 '+escapeHtml(String(ref).slice(0,5))+'頃'):'')+
     '</div></div>';
