@@ -700,14 +700,14 @@ const HIROSHIMA_LIVE_VENUES = [
 ];
 function canonicalLiveVenue(text=""){
   const t=String(text||"");
-  if(/グリーンアリーナ|県立総合体育館.*大アリーナ/i.test(t)) return "広島グリーンアリーナ";
+  if(/グリーンアリーナ|(?:広島)?県立総合体育館/i.test(t)) return "広島グリーンアリーナ";
   if(/上野学園ホール|広島県立文化芸術ホール/i.test(t)) return "上野学園ホール";
   if(/HBGホール|広島文化学園HBG/i.test(t)) return "広島文化学園HBGホール";
   if(/JMS\s*アステールプラザ|アステールプラザ/i.test(t)) return "JMSアステールプラザ";
-  if(/クラブクアトロ|CLUB QUATTRO/i.test(t)) return "広島クラブクアトロ";
+  if(/(?:広島)?クラブクアトロ|CLUB QUATTRO/i.test(t)) return "広島クラブクアトロ";
   if(/BLUE LIVE HIROSHIMA/i.test(t)) return "BLUE LIVE HIROSHIMA";
-  if(/LIVE VANQUISH/i.test(t)) return "LIVE VANQUISH";
-  if(/セカンド.?クラッチ|SECOND CRUTCH/i.test(t)) return "セカンド・クラッチ";
+  if(/(?:広島)?LIVE VANQUISH/i.test(t)) return "LIVE VANQUISH";
+  if(/(?:広島)?セカンド.?クラッチ|SECOND CRUTCH/i.test(t)) return "セカンド・クラッチ";
   if(/Live\s*space\s*Reed|ライブスペース\s*リード|Reed/i.test(t)) return "Live space Reed";
   if(/ALMIGHTY/i.test(t)) return "ALMIGHTY";
   if(/Live\s*Juke|ライブ\s*ジューク/i.test(t)) return "Live Juke";
@@ -933,6 +933,54 @@ async function buildDirectVenueLiveEvents(t,ctx,enrichEnd=true){
   return groups.flat();
 }
 
+async function buildCultureHiroshimaMonthEvents(year,month,ctx){
+  const url="https://artscouncil-hiroshima.jp/event/?md="+year+"-"+String(month).padStart(2,"0");
+  let html="";
+  try{html=await fetchTextCached(url,300,ctx)}catch{return []}
+  const text=stripHtml(html);
+  const headings=[...text.matchAll(/(?:^|\s)([0-3]?\d)日\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)\s+/g)];
+  const found=[];
+  const today=tokyoParts();
+
+  for(let hi=0;hi<headings.length;hi++){
+    const day=Number(headings[hi][1]);
+    if(!day) continue;
+    const start=(headings[hi].index||0)+headings[hi][0].length;
+    const end=hi+1<headings.length?(headings[hi+1].index||text.length):text.length;
+    const block=text.slice(start,end);
+    const dateKey=year+"-"+String(month).padStart(2,"0")+"-"+String(day).padStart(2,"0");
+
+    const parens=[...block.matchAll(/（([^）]{1,120})）/g)];
+    for(const pm of parens){
+      const venue=canonicalLiveVenue(pm[1]);
+      if(!venue) continue;
+      const open=pm.index||0;
+      const prevClose=block.lastIndexOf("）",Math.max(0,open-1));
+      let name=block.slice(prevClose>=0?prevClose+1:0,open).trim();
+      name=name.replace(/^(?:財団主催|こども|映像)\s*/g,"").replace(/\s+/g," ").trim();
+      if(name.length<2){
+        name=block.slice(Math.max(0,open-150),open).replace(/^.*?\s(?=[^\s]{2,80}$)/,"").trim();
+      }
+      if(!name || !looksLikeMusicEvent(name+" "+pm[1])) continue;
+
+      const around=block.slice(Math.max(0,open-220),Math.min(block.length,open+300));
+      const startTime=extractStartTime(around);
+      const t={year,month,day};
+      const enrichEnd=dateKey===liveDateKey(today);
+      const event=await makeOfficialVenueEvent({
+        name,title:name,venue,start_time:startTime,open_time:null,
+        venueText:around,venueUrl:url,t,ctx,enrichEnd
+      });
+      if(event){
+        event.source="カルチャーひろしま";
+        event.source_url=url;
+        found.push(event);
+      }
+    }
+  }
+  return found;
+}
+
 async function buildCultureHiroshimaLiveEvents(t,ctx,enrichEnd=true){
   const url="https://artscouncil-hiroshima.jp/event/?md="+t.year+"-"+String(t.month).padStart(2,"0");
   let html="";
@@ -986,14 +1034,34 @@ async function buildCultureHiroshimaLiveEvents(t,ctx,enrichEnd=true){
   }
   return found;
 }
+function liveNameKey(v=""){
+  return String(v||"").toLowerCase()
+    .replace(/[\s　"'“”‘’「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,"");
+}
 function mergeLiveEvents(rows){
   const out=[];
-  const seen=new Set();
-  for(const e of rows){
-    if(!e) continue;
-    const key=[e.date||"",e.venue||"",e.start_time||"",String(e.name||"").toLowerCase().replace(/\s+/g,"")].join("|");
-    if(seen.has(key)) continue;
-    seen.add(key); out.push(e);
+  for(const e0 of rows){
+    if(!e0) continue;
+    const e={...e0,venue:canonicalLiveVenue(e0.venue)||e0.venue};
+    const nk=liveNameKey(e.name||e.title||"");
+    const idx=out.findIndex(x=>{
+      if(String(x.date||"")!==String(e.date||"")) return false;
+      if(String(x.venue||"")!==String(e.venue||"")) return false;
+      const xk=liveNameKey(x.name||x.title||"");
+      if(nk&&xk&&(nk.includes(xk)||xk.includes(nk))) return true;
+      return !!(x.start_time&&e.start_time&&x.start_time===e.start_time);
+    });
+    if(idx<0){ out.push(e); continue; }
+    const x=out[idx];
+    const richer=(e.start_time&&!x.start_time) || (e.source==="会場公式"&&x.source!=="会場公式");
+    const primary=richer?e:x, secondary=richer?x:e;
+    out[idx]={
+      ...secondary,...primary,
+      open_time:primary.open_time||secondary.open_time||null,
+      start_time:primary.start_time||secondary.start_time||null,
+      end_time_estimate:primary.end_time_estimate||secondary.end_time_estimate||null,
+      end_time_reference:primary.end_time_reference||secondary.end_time_reference||null
+    };
   }
   return out;
 }
@@ -1043,8 +1111,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v3");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v3");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v4");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v4");
 
   const hit=await cache.match(liveKey);
   if(hit){
@@ -1098,19 +1166,30 @@ async function buildHiroshimaEvents(ctx) {
   const today=tokyoParts();
   const days=futureTokyoDays(60);
   const all=[];
+
+  // Broad monthly source: one fetch per month, filtered to the major venues only.
+  const months=[...new Map(days.map(t=>[t.year+"-"+t.month,{year:t.year,month:t.month}])).values()];
+  const cultureMonths=await Promise.all(months.map(m=>buildCultureHiroshimaMonthEvents(m.year,m.month,ctx)));
+  all.push(...cultureMonths.flat());
+
+  // Venue-direct sources add/replace richer start-time details where available.
   for(const t of days){
     const enrichEnd=liveDateKey(t)===liveDateKey(today);
-    const [quattro,direct,culture]=await Promise.all([
+    const [quattro,direct]=await Promise.all([
       buildQuattroEventsForDay(t,ctx,enrichEnd),
-      buildDirectVenueLiveEvents(t,ctx,enrichEnd),
-      buildCultureHiroshimaLiveEvents(t,ctx,enrichEnd)
+      buildDirectVenueLiveEvents(t,ctx,enrichEnd)
     ]);
-    all.push(...quattro,...direct,...culture);
+    all.push(...quattro,...direct);
   }
-  const mergedEvents=mergeLiveEvents(all).sort((a,b)=>
-    String(a.date||"").localeCompare(String(b.date||""))||
-    String(a.start_time||"99:99").localeCompare(String(b.start_time||"99:99"))
-  );
+
+  const todayKey=liveDateKey(today);
+  const endDate=liveDateKey(days[days.length-1]);
+  const mergedEvents=mergeLiveEvents(all)
+    .filter(e=>String(e.date||"")>=todayKey&&String(e.date||"")<=endDate)
+    .sort((a,b)=>
+      String(a.date||"").localeCompare(String(b.date||""))||
+      String(a.start_time||"99:99").localeCompare(String(b.start_time||"99:99"))
+    );
   return {
     ok:true,
     area:"hiroshima",
