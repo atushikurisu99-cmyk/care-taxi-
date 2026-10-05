@@ -737,7 +737,7 @@ function extractStartTime(text=""){
 }
 function todayBlockFromCultureText(text,t){
   const day=String(t.day);
-  const re=new RegExp("(?:^|\\\\s)"+day+"日\\\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)\\\\s+([\\\\s\\\\S]*?)(?=\\\\s+[0-3]?[0-9]日\\\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)|$)");
+  const re=new RegExp("(?:^|\\s)"+day+"日\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)\\s+([\\s\\S]*?)(?=\\s+[0-3]?[0-9]日\\s+(?:月曜日|火曜日|水曜日|木曜日|金曜日|土曜日|日曜日)|$)");
   return String(text||"").match(re)?.[1]||"";
 }
 
@@ -857,7 +857,7 @@ async function buildHbgHallEvents(t,ctx,enrichEnd=true){
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
   const text=stripHtml(html);
   const d=String(t.day);
-  const startRe=new RegExp("(?:^|\\\\s)0?"+d+"\\\\s*\\\\((?:日|月|火|水|木|金|土)\\\\)","i");
+  const startRe=new RegExp("(?:^|\\s)0?"+d+"\\s*\\((?:日|月|火|水|木|金|土)\\)","i");
   const nextRe=/(?:^|\s)0?[1-3]?\d\s*\((?:日|月|火|水|木|金|土)\)/;
   const seg=daySegmentByRegex(text,startRe,nextRe);
   if(!seg||!looksLikeMusicEvent(seg)) return [];
@@ -885,7 +885,7 @@ async function buildBlueLiveEvents(t,ctx,enrichEnd=true){
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
   const text=stripHtml(html);
   const mm=String(t.month).padStart(2,"0"),dd=String(t.day).padStart(2,"0");
-  const startRe=new RegExp(t.year+"\\\\/"+mm+"\\\\/"+dd+"\\\\s*\\\\([A-Za-z]{3}\\\\)","i");
+  const startRe=new RegExp(t.year+"\\/"+mm+"\\/"+dd+"\\s*\\([A-Za-z]{3}\\)","i");
   const nextRe=/\d{4}\/\d{2}\/\d{2}\s*\([A-Za-z]{3}\)/i;
   const seg=daySegmentByRegex(text,startRe,nextRe);
   if(!seg||!looksLikeMusicEvent(seg)||/\[DANCE公演\]|CLOSED EVENT/i.test(seg)) return [];
@@ -907,7 +907,7 @@ async function buildVanquishEvents(t,ctx,enrichEnd=true){
   try{html=await fetchTextCached(url,300,ctx)}catch{return []}
   const text=stripHtml(html);
   const mm=String(t.month).padStart(2,"0"),dd=String(t.day).padStart(2,"0");
-  const startRe=new RegExp(t.year+"\\\\s+"+mm.replace(/^0/,"")+"\\\\."+dd+"\\\\s+[A-Z]{3}","i");
+  const startRe=new RegExp(t.year+"\\s+"+mm.replace(/^0/,"")+"\\."+dd+"\\s+[A-Z]{3}","i");
   const nextRe=/\d{4}\s+\d{1,2}\.\d{2}\s+[A-Z]{3}/i;
   const seg=daySegmentByRegex(text,startRe,nextRe);
   if(!seg||!looksLikeMusicEvent(seg)) return [];
@@ -1043,8 +1043,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v2");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v2");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v3");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v3");
 
   const hit=await cache.match(liveKey);
   if(hit){
