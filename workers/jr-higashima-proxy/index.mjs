@@ -270,23 +270,44 @@ async function buildSanfrecceHomeSchedule(t,ctx){
   return out;
 }
 async function buildDragonfliesHomeSchedule(t,ctx){
-  const url="https://hiroshimadragonflies.com/schedule/calendar/?scheduleYear="+t.year;
-  let html="";
-  try{html=await fetchTextCached(url,900,ctx)}catch{return []}
-  const text=stripHtml(html).normalize("NFKC").replace(/\s+/g," ");
+  const monthKeys=[];
+  for(let i=0;i<3;i++){
+    const d=new Date(Date.UTC(t.year,t.month-1+i,1));
+    monthKeys.push({year:d.getUTCFullYear(),month:d.getUTCMonth()+1});
+  }
   const out=[];
-  const re=/HOME\s+(?:レギュラーシーズン|ポストシーズン|プレシーズン)?\s*(?:Image:\s*)?広島\s+(\d{1,2})\/(\d{1,2})\s*\([^)]*\)\s*([0-2]?\d:[0-5]\d)[\s\S]{0,120}?location_on\s*([^\s][\s\S]{1,60}?)(?=\s+(?:Image:|sports_basketball|試合情報|confirmation_number|チケット|ゲームデー))/g;
-  let m;
-  while((m=re.exec(text))){
-    const month=Number(m[1]),day=Number(m[2]);
-    const venue=String(m[4]||"").replace(/\s+/g," ").trim();
-    if(!/広島グリーンアリーナ|広島サンプラザホール/i.test(venue)) continue;
-    out.push({
-      kind:"basketball",team:"広島ドラゴンフライズ",opponent:null,
-      date:sportDateISO(t.year,month,day),venue,area:"広島市",
-      status:"scheduled",start_time:m[3],end_time:null,end_time_estimate:sportEndEstimate(m[3],130),
-      source:"広島ドラゴンフライズ公式",source_url:url,source_role:"official_fixed_schedule"
-    });
+  for(const mk of monthKeys){
+    const url="https://hiroshimadragonflies.com/schedule/calendar/?month="+mk.month+"&year="+mk.year;
+    let html="";
+    try{html=await fetchTextCached(url,900,ctx)}catch{continue}
+    const text=stripHtml(html).normalize("NFKC").replace(/\s+/g," ");
+    // Current official calendar renders each game as HOME ... time ... location_on<venue>.
+    const re=/HOME\s+(?:Image:\s*)?([^\s][\s\S]{0,35}?)\s+([0-2]?\d:[0-5]\d)\s+location_on\s*([^\s][\s\S]{1,60}?)(?=\s+(?:チケット|AWAY|HOME|\d{1,2}\s|$))/g;
+    let m;
+    while((m=re.exec(text))){
+      const prefix=text.slice(Math.max(0,(m.index||0)-80),m.index||0);
+      const dayMatches=[...prefix.matchAll(/(?:^|\s)(\d{1,2})(?=\s)/g)];
+      const day=Number(dayMatches.at(-1)?.[1]||0);
+      if(!day) continue;
+      const venue=String(m[3]||"").replace(/\s+/g," ").trim();
+      if(!/広島グリーンアリーナ|広島サンプラザホール/i.test(venue)) continue;
+      out.push({
+        kind:"basketball",team:"広島ドラゴンフライズ",
+        opponent:String(m[1]||"").replace(/^Image:\s*/,"").trim()||null,
+        date:sportDateISO(mk.year,mk.month,day),venue,area:"広島市",
+        status:"scheduled",start_time:m[2],end_time:null,end_time_estimate:sportEndEstimate(m[2],130),
+        source:"広島ドラゴンフライズ公式",source_url:url,source_role:"official_fixed_schedule"
+      });
+    }
+  }
+  return mergeDemandSports(out);
+}
+function mergeDemandSports(rows){
+  const seen=new Set(),out=[];
+  for(const x of rows){
+    const k=[x?.date,x?.team,x?.venue,x?.start_time].join("|");
+    if(seen.has(k)) continue;
+    seen.add(k);out.push(x);
   }
   return out;
 }
@@ -1096,9 +1117,9 @@ async function buildIcchOfficialEvents(ctx){
   try{html=await fetchTextCached(url,900,ctx)}catch{return []}
   const out=[];
   let currentYear=tokyoParts().year,currentMonth=null;
-  const parts=html.split(/(<h4[^>]*>[\s\S]*?<\/h4>|<tr[^>]*>[\s\S]*?<\/tr>)/gi);
+  const parts=html.split(/(<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>|<tr[^>]*>[\s\S]*?<\/tr>)/gi);
   for(const part of parts){
-    if(/^<h4/i.test(part)){
+    if(/^<h[1-6]/i.test(part)){
       const h=stripHtml(part).replace(/\s+/g," ");
       currentYear=parseJapaneseEraYear(h)||currentYear;
       const mm=h.match(/(\d{1,2})月/); currentMonth=mm?Number(mm[1]):currentMonth;
@@ -1438,8 +1459,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v8");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v8");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v9");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v9");
 
   const hit=await cache.match(liveKey);
   if(hit){
@@ -1842,7 +1863,7 @@ async function buildHiroshimaDemandEvents(ctx){
 }
 async function getHiroshimaDemandEventsCached(ctx){
   const cache=caches.default;
-  const key=new Request("https://taxi-sales-nav.local/demand/hiroshima/current-v1");
+  const key=new Request("https://taxi-sales-nav.local/demand/hiroshima/current-v2");
   const hit=await cache.match(key);
   if(hit){
     try{return {...await hit.json(),cache_state:"hit"}}catch{}
