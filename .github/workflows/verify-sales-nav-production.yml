@@ -1,0 +1,61 @@
+name: Verify sales-nav production display
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sales-nav-prototype/**"
+      - "workers/jr-higashima-proxy/**"
+      - ".github/workflows/verify-sales-nav-production.yml"
+  workflow_dispatch:
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser verifier
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright
+          npx playwright install --with-deps chromium
+      - name: Verify rendered event names on production
+        run: |
+          node - <<'NODE'
+          const { chromium } = require('playwright');
+          const target='https://atushikurisu99-cmyk.github.io/care-taxi-/sales-nav-prototype/';
+          const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+          const expected=[
+            {date:'2026-10-07',venue:'広島クラブクアトロ',name:'甲斐 心愛'},
+            {date:'2026-10-09',venue:'広島文化学園HBGホール',name:'沢田研二'},
+            {date:'2026-10-09',venue:'JMSアステールプラザ',name:'PERSONZ'}
+          ];
+          const browser=await chromium.launch({headless:true});
+          const page=await browser.newPage();
+          let last=[];
+          let ok=false;
+          for(let attempt=1; attempt<=16; attempt++){
+            await page.goto(target+'?verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
+            await page.waitForTimeout(2500);
+            await page.evaluate(()=>{ if(typeof show==='function') show('eventDetail'); });
+            await page.waitForTimeout(3000);
+            last=await page.locator('#eventDetailLiveList .calendar-detail-item.live').evaluateAll(items=>items.map(el=>({
+              kind:el.querySelector('.kind')?.textContent?.trim()||'',
+              main:el.querySelector('.main')?.textContent?.trim()||'',
+              meta:el.querySelector('.meta')?.textContent?.trim()||''
+            })));
+            console.log('ATTEMPT',attempt,JSON.stringify(last.slice(0,12),null,2));
+            ok=expected.every(x=>last.some(e=>e.kind.includes(x.date)&&e.meta.includes(x.venue)&&e.main===x.name));
+            if(ok) break;
+            await sleep(12000);
+          }
+          await browser.close();
+          if(!ok){
+            throw new Error('production rendered names did not match fixed-field extraction: '+JSON.stringify({expected,last:last.slice(0,20)}));
+          }
+          console.log('PRODUCTION_DISPLAY_OK',JSON.stringify(expected));
+          NODE
