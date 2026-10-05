@@ -1032,6 +1032,59 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
   }];
 }
 
+async function getHiroshimaEventsCached(ctx) {
+  const cache=caches.default;
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good");
+
+  const hit=await cache.match(liveKey);
+  if(hit){
+    try{
+      const payload=await hit.json();
+      return {...payload,cache_state:"hit"};
+    }catch{}
+  }
+
+  let fresh=null;
+  try{
+    fresh=await buildHiroshimaEvents(ctx);
+  }catch(e){
+    fresh=null;
+  }
+
+  if(fresh?.ok && Array.isArray(fresh.events) && fresh.events.length>0){
+    const currentResponse=new Response(JSON.stringify(fresh),{
+      headers:{"content-type":"application/json;charset=UTF-8","cache-control":"public,max-age=1800"}
+    });
+    const backupResponse=new Response(JSON.stringify(fresh),{
+      headers:{"content-type":"application/json;charset=UTF-8","cache-control":"public,max-age=172800"}
+    });
+    ctx?.waitUntil(Promise.all([
+      cache.put(liveKey,currentResponse),
+      cache.put(lastGoodKey,backupResponse)
+    ]));
+    return {...fresh,cache_state:"refreshed"};
+  }
+
+  const lastGood=await cache.match(lastGoodKey);
+  if(lastGood){
+    try{
+      const payload=await lastGood.json();
+      return {...payload,cache_state:"last_good",stale:true};
+    }catch{}
+  }
+
+  return fresh||{
+    ok:true,
+    area:"hiroshima",
+    generated_at:Math.floor(Date.now()/1000),
+    coverage:"upcoming_60_days",
+    range_days:60,
+    cache_state:"empty",
+    events:[]
+  };
+}
+
 async function buildHiroshimaEvents(ctx) {
   const today=tokyoParts();
   const days=futureTokyoDays(60);
@@ -1502,7 +1555,7 @@ export default {
         rule:"過去実績1件は断定・予測に使わず参考時間。複数の同ツアー・同形式実績が揃えば中央値とばらつきから終演目安へ昇格。",
         cases:validateHistoricalDurationCases()
       },200,origin);
-      if (url.pathname === "/api/events/hiroshima") return json(await buildHiroshimaEvents(ctx),200,origin);
+      if (url.pathname === "/api/events/hiroshima") return json(await getHiroshimaEventsCached(ctx),200,origin);
       if (url.pathname === "/api/bus/hiroshima") return json(await buildHiroshimaBus(ctx),200,origin);
       return json({ok:false,error:"not_found"},404,origin);
     } catch (e) {
