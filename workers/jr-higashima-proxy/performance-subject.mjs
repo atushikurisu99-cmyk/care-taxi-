@@ -35,16 +35,34 @@ export function extractPerformanceSubject({name="",title="",venueText=""}={}){
   }
 
   const raw=clean(name||title);
+
+  // "A GUEST: B" のような公演は先頭の主役を採る。
+  const guestLead=raw.match(/^(.{2,60}?)\s+(?:GUEST|ゲスト)\s*[:：]/i);
+  if(guestLead){
+    return {display_name:clean(guestLead[1]),display_name_type:"performer",display_name_source:"guest_lead",event_type};
+  }
+
+  // "Aのコント..." "A 生誕祭" など、公演名に主役が埋め込まれている場合。
   const owner=raw.match(/^(.{2,40}?)(?:の| presents?\b|プレゼンツ)/i);
   if(owner && /落語|漫才|お笑い|コント|寄席|トーク|ライブ/i.test(raw)){
     return {display_name:clean(owner[1]),display_name_type:"performer",display_name_source:"title_owner",event_type};
   }
+  const birthday=raw.match(/^(.{2,40}?)\s*(?:生誕祭|周年記念|記念公演)/);
+  if(birthday){
+    return {display_name:clean(birthday[1]),display_name_type:"performer",display_name_source:"title_owner",event_type};
+  }
 
   if(event_type==="music"||event_type==="classical"||event_type==="multi_artist"){
-    const display_name=raw
+    let display_name=raw
+      .replace(/\s+20\d{2}\s+(?:LIVE|TOUR|CONCERT)\b[\s\S]*$/i,"")
       .replace(/\s+(?:LIVE|TOUR|CONCERT)\b[\s\S]*$/i,"")
       .replace(/\s+(?:ライブ|ツアー|コンサート|リサイタル)\b[\s\S]*$/,"")
       .trim();
+
+    // 同じアーティスト名が先頭で重複しているケースを圧縮する。
+    const dup=display_name.match(/^([^\s　]{2,30})[\s　]+\1(?:[\s　]+(.+))?$/);
+    if(dup) display_name=clean(dup[1]+(dup[2]?" "+dup[2]:""));
+
     if(display_name.length>=2&&display_name.length<=80){
       return {display_name,display_name_type:event_type==="classical"?"ensemble":"artist",display_name_source:"title_prefix",event_type};
     }
