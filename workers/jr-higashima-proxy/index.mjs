@@ -711,6 +711,66 @@ function canonicalLiveVenue(text=""){
   if(/(?:広島)?セカンド.?クラッチ|SECOND CRUTCH/i.test(t)) return "セカンド・クラッチ";
   return "";
 }
+const LAWSON_MAJOR_VENUES = [
+  ["広島グリーンアリーナ","広島グリーンアリーナ"],
+  ["上野学園ホール","上野学園ホール"],
+  ["広島文化学園HBGホール","広島文化学園HBGホール"],
+  ["JMSアステールプラザ","JMSアステールプラザ"],
+  ["広島クラブクアトロ","広島クラブクアトロ"],
+  ["BLUE LIVE HIROSHIMA","BLUE LIVE 広島"],
+  ["LIVE VANQUISH","LIVE VANQUISH"],
+  ["セカンド・クラッチ","広島セカンド・クラッチ"]
+];
+
+function lawsonDisplayName(category, heading){
+  const h=String(heading||"").normalize("NFKC").replace(/\s+/g," ").trim();
+  if(!h) return "";
+  // ローチケ検索結果では「コンサート」の見出しがアーティスト欄として機能する。
+  if(category==="コンサート" || category==="クラシック・オペラ") return h;
+  // 演劇は同じ見出し欄の中で「劇団名『作品名』」という固定表記がある場合だけ劇団名を採る。
+  if(category==="演劇・ステージ・舞台"){
+    const m=h.match(/^(?:〖[^〗]+〗\s*)?([^『「【(（]{2,40}?)(?=『|「|【|\(|（)/);
+    if(m && /劇団|歌劇団|劇場|プロジェクト|カンパニー|COMPANY/i.test(m[1])) return m[1].trim();
+  }
+  return h;
+}
+
+async function buildLawsonMajorVenueEvents(ctx){
+  const out=[];
+  for(const [venue,queryVenue] of LAWSON_MAJOR_VENUES){
+    const url="https://l-tike.com/search/?page=0&pref=34&size=100&vnu="+encodeURIComponent(queryVenue);
+    let html="";
+    try{html=await fetchTextCached(url,900,ctx)}catch{continue}
+    const text=stripHtml(html).normalize("NFKC").replace(/\s+/g," ").trim();
+    const re=/(コンサート|演劇・ステージ・舞台|クラシック・オペラ)\s+(.{1,140}?)\s+公演日[:：]\s*(20\d{2})\/(\d{1,2})\/(\d{1,2})[^\s]*[\s\S]{0,180}?会場[:：]\s*([^（(]{2,100})(?:（広島県\)|\(広島県\))/g;
+    let m;
+    while((m=re.exec(text))){
+      const category=m[1];
+      const heading=String(m[2]||"").trim();
+      const foundVenue=canonicalLiveVenue(m[6]);
+      if(foundVenue!==venue) continue;
+      const displayName=lawsonDisplayName(category,heading);
+      if(!displayName) continue;
+      out.push({
+        kind:"live",
+        date:String(m[3])+"-"+String(m[4]).padStart(2,"0")+"-"+String(m[5]).padStart(2,"0"),
+        name:heading,
+        title:heading,
+        display_name:displayName,
+        display_name_type:category==="演劇・ステージ・舞台"?"theater_company":"artist",
+        display_name_source:"lawson_result_heading",
+        event_type:category==="演劇・ステージ・舞台"?"theater":category==="クラシック・オペラ"?"classical":"music",
+        venue,
+        open_time:null,start_time:null,end_time:null,
+        source:"ローチケ",
+        source_url:url,
+        source_role:"playguide_primary"
+      });
+    }
+  }
+  return out;
+}
+
 function looksLikeMusicEvent(text=""){
   const t=String(text||"");
   if(/コンサート|ライブ|LIVE|tour|ツアー|リサイタル|演奏会|音楽|オーケストラ|バンド|歌|シンガー|アーティスト|ワンマン|対バン|FES|FEST|ROCK|JAZZ|ジャズ|DJ|HIP.?HOP|アイドル/i.test(t)) return true;
@@ -1120,12 +1180,17 @@ function mergeLiveEvents(rows){
     const x=out[idx];
     const richer=(e.start_time&&!x.start_time) || (e.source==="会場公式"&&x.source!=="会場公式");
     const primary=richer?e:x, secondary=richer?x:e;
+    const playguide=[x,e].find(v=>v?.source_role==="playguide_primary"&&v?.display_name);
     out[idx]={
       ...secondary,...primary,
       open_time:primary.open_time||secondary.open_time||null,
       start_time:primary.start_time||secondary.start_time||null,
       end_time_estimate:primary.end_time_estimate||secondary.end_time_estimate||null,
-      end_time_reference:primary.end_time_reference||secondary.end_time_reference||null
+      end_time_reference:primary.end_time_reference||secondary.end_time_reference||null,
+      display_name:playguide?.display_name||primary.display_name||secondary.display_name||null,
+      display_name_type:playguide?.display_name_type||primary.display_name_type||secondary.display_name_type||null,
+      display_name_source:playguide?.display_name_source||primary.display_name_source||secondary.display_name_source||null,
+      event_type:playguide?.event_type||primary.event_type||secondary.event_type||null
     };
   }
   return out;
@@ -1180,8 +1245,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v7");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v7");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v8");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v8");
 
   const hit=await cache.match(liveKey);
   if(hit){
@@ -1238,11 +1303,13 @@ async function buildHiroshimaEvents(ctx) {
 
   // Broad monthly source: one fetch per month, filtered to the major venues only.
   const months=[...new Map(days.map(t=>[t.year+"-"+t.month,{year:t.year,month:t.month}])).values()];
-  const [cultureMonths,candyEvents]=await Promise.all([
+  const [lawsonEvents,cultureMonths,candyEvents]=await Promise.all([
+    buildLawsonMajorVenueEvents(ctx),
     Promise.all(months.map(m=>buildCultureHiroshimaMonthEvents(m.year,m.month,ctx))),
     buildCandyMajorVenueEvents(ctx)
   ]);
-  all.push(...cultureMonths.flat(),...candyEvents);
+  // プレイガイドの固定フォーマットを一次ソースにし、会場・興行元は時刻や裏取りに使う。
+  all.push(...lawsonEvents,...cultureMonths.flat(),...candyEvents);
 
   // Venue-direct sources add/replace richer start-time details where available.
   for(const t of days){
