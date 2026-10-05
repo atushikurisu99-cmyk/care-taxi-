@@ -26,6 +26,7 @@ jobs:
       - name: Verify rendered event names on production
         run: |
           node - <<'NODE'
+          (async()=>{
           const { chromium } = require('playwright');
           const target='https://atushikurisu99-cmyk.github.io/care-taxi-/sales-nav-prototype/';
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
@@ -58,4 +59,5 @@ jobs:
             throw new Error('production rendered names did not match fixed-field extraction: '+JSON.stringify({expected,last:last.slice(0,20)}));
           }
           console.log('PRODUCTION_DISPLAY_OK',JSON.stringify(expected));
+          })().catch(e=>{ console.error(e); process.exit(1); });
           NODE
