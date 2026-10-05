@@ -65,6 +65,13 @@ jobs:
               const tx=await ur.text();
               console.log('UPSTREAM',upstream,ur.status,tx.length,
                 /PERSONZ/.test(tx),/coldrain/i.test(tx),/LIVE VANQUISH/i.test(tx),/セカンド.?クラッチ/i.test(tx));
+              if(upstream.includes('candy-p.com')){
+                const plain=tx.replace(/<[^>]+>/g,' ').replace(/\s+/g,' ').trim();
+                for(const term of ['PERSONZ','眞名子 新','広島セカンド','JMSアステール']){
+                  const p=plain.indexOf(term);
+                  console.log('CANDY_SNIP',term,p,p>=0?plain.slice(Math.max(0,p-220),p+420):'');
+                }
+              }
             } catch(e) {
               console.log('UPSTREAM_ERROR',upstream,String(e?.message||e));
             }
