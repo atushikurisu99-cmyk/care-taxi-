@@ -112,6 +112,83 @@ function summarize(lines) {
   return {line_count:lines.length,total_trains:total,delayed_trains:delayed,delay_buckets:buckets};
 }
 
+const JR_TRAFFIC_INFO_URL=`${BASE}/area_hiroshima_trafficinfo.json`;
+const JR_CAUSE_PATTERNS=[
+  ["動物","動物支障"],
+  ["鹿","動物支障"],
+  ["猪","動物支障"],
+  ["イノシシ","動物支障"],
+  ["人身事故","人身事故"],
+  ["踏切","踏切支障"],
+  ["車両","車両確認"],
+  ["信号","信号トラブル"],
+  ["架線","架線トラブル"],
+  ["倒木","倒木"],
+  ["落石","落石"],
+  ["大雨","大雨"],
+  ["雨量","大雨"],
+  ["強風","強風"],
+  ["雷","雷"],
+  ["雪","降雪"],
+  ["濃霧","濃霧"],
+  ["線路","線路確認"],
+  ["設備","設備確認"],
+  ["お客様","お客様対応"]
+];
+function compactJrCause(text=""){
+  const s=String(text||"").replace(/\s+/g," ").trim();
+  for(const [needle,label] of JR_CAUSE_PATTERNS){
+    if(s.includes(needle)) return label;
+  }
+  const m=s.match(/(?:ため|為)[、。]?/);
+  if(m){
+    const head=s.slice(0,m.index).replace(/^.*?[：:]/,"").trim();
+    if(head&&head.length<=18) return head;
+  }
+  return "";
+}
+function collectTrafficStrings(value,out=[]){
+  if(value==null) return out;
+  if(typeof value==="string"){
+    const s=value.replace(/<[^>]+>/g," ").replace(/\s+/g," ").trim();
+    if(s) out.push(s);
+    return out;
+  }
+  if(Array.isArray(value)){
+    for(const x of value) collectTrafficStrings(x,out);
+    return out;
+  }
+  if(typeof value==="object"){
+    for(const x of Object.values(value)) collectTrafficStrings(x,out);
+  }
+  return out;
+}
+function trafficAlertsFromPayload(payload){
+  const strings=[...new Set(collectTrafficStrings(payload,[]))];
+  const lineNames=["呉線","山陽線","芸備線","可部線","山口線"];
+  const alerts=[];
+  for(const text of strings){
+    const cause=compactJrCause(text);
+    if(!cause) continue;
+    const lines=lineNames.filter(x=>text.includes(x));
+    if(!lines.length) continue;
+    for(const line of lines){
+      const key=line+"|"+cause;
+      if(alerts.some(x=>x.key===key)) continue;
+      alerts.push({key,line,cause,text:text.slice(0,220)});
+    }
+  }
+  return alerts.slice(0,12);
+}
+async function loadHiroshimaTrafficAlerts(ctx){
+  try{
+    const payload=await fetchJsonCached(JR_TRAFFIC_INFO_URL,20,ctx);
+    return trafficAlertsFromPayload(payload);
+  }catch{
+    return [];
+  }
+}
+
 async function fetchTextCached(url, ttl, ctx) {
   const cache = caches.default;
   const key = new Request(url, {method:"GET"});
@@ -1132,22 +1209,25 @@ async function buildHiroshimaBus(ctx) {
 }
 
 async function buildHiroshima(ctx) {
-  const lines = await Promise.all(LINES.map(async ([code,name])=>{
-    const [stationsPayload, positionPayload] = await Promise.all([
-      fetchJsonCached(`${BASE}/${code}_st.json`, 86400, ctx),
-      fetchJsonCached(`${BASE}/${code}.json`, 20, ctx),
-    ]);
-    const stations = stationMap(stationsPayload);
-    const t = trains(positionPayload, stations);
-    return {
-      code,
-      name,
-      update: positionPayload?.update ?? null,
-      station_count: Object.keys(stations).length,
-      train_count: t.length,
-      trains: t,
-    };
-  }));
+  const [lines,trafficAlerts] = await Promise.all([
+    Promise.all(LINES.map(async ([code,name])=>{
+      const [stationsPayload, positionPayload] = await Promise.all([
+        fetchJsonCached(`${BASE}/${code}_st.json`, 86400, ctx),
+        fetchJsonCached(`${BASE}/${code}.json`, 20, ctx),
+      ]);
+      const stations = stationMap(stationsPayload);
+      const t = trains(positionPayload, stations);
+      return {
+        code,
+        name,
+        update: positionPayload?.update ?? null,
+        station_count: Object.keys(stations).length,
+        train_count: t.length,
+        trains: t,
+      };
+    })),
+    loadHiroshimaTrafficAlerts(ctx)
+  ]);
   return {
     ok:true,
     area:"hiroshima",
@@ -1155,6 +1235,7 @@ async function buildHiroshima(ctx) {
     source_host:"www.train-guide.westjr.co.jp",
     cache_seconds:20,
     summary:summarize(lines),
+    traffic_alerts:trafficAlerts,
     lines,
   };
 }
