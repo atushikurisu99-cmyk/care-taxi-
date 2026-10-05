@@ -108,7 +108,7 @@ jobs:
           if(!r.ok) throw new Error('demand api http '+r.status);
           const d=await r.json();
           if(d?.ok!==true || !Array.isArray(d.events)) throw new Error('invalid demand payload');
-          require('fs').writeFileSync('demand-probe.json',JSON.stringify(d,null,2));
+          (await import('node:fs')).writeFileSync('demand-probe.json',JSON.stringify(d,null,2));
           const future=d.events.filter(e=>String(e?.date||'')>='2026-10-06');
           const badConvention=future.filter(e=>e?.demand_group==='convention' && Number(e?.people||0)<100);
           if(badConvention.length) throw new Error('convention threshold regression');
