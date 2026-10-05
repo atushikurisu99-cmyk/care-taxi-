@@ -789,6 +789,7 @@ const HIROSHIMA_LIVE_VENUES = [
   "上野学園ホール",
   "広島文化学園HBGホール",
   "JMSアステールプラザ",
+  "広島国際会議場 フェニックスホール",
   "広島クラブクアトロ",
   "BLUE LIVE HIROSHIMA",
   "LIVE VANQUISH",
@@ -800,6 +801,7 @@ function canonicalLiveVenue(text=""){
   if(/上野学園ホール|広島県立文化芸術ホール/i.test(t)) return "上野学園ホール";
   if(/HBGホール|広島文化学園HBG/i.test(t)) return "広島文化学園HBGホール";
   if(/JMS\s*アステールプラザ|アステールプラザ/i.test(t)) return "JMSアステールプラザ";
+  if(/フェニックスホール|広島国際会議場/i.test(t)) return "広島国際会議場 フェニックスホール";
   if(/(?:広島)?クラブクアトロ|CLUB QUATTRO/i.test(t)) return "広島クラブクアトロ";
   if(/BLUE LIVE HIROSHIMA/i.test(t)) return "BLUE LIVE HIROSHIMA";
   if(/(?:広島)?LIVE VANQUISH/i.test(t)) return "LIVE VANQUISH";
@@ -811,6 +813,7 @@ const LAWSON_MAJOR_VENUES = [
   ["上野学園ホール","上野学園ホール"],
   ["広島文化学園HBGホール","広島文化学園HBGホール"],
   ["JMSアステールプラザ","JMSアステールプラザ"],
+  ["広島国際会議場 フェニックスホール","広島国際会議場 フェニックスホール"],
   ["広島クラブクアトロ","広島クラブクアトロ"],
   ["BLUE LIVE HIROSHIMA","BLUE LIVE 広島"],
   ["LIVE VANQUISH","LIVE VANQUISH"],
@@ -1074,6 +1077,101 @@ async function buildVanquishEvents(t,ctx,enrichEnd=true){
   });
   return event?[event]:[];
 }
+
+function parseJapaneseEraYear(v=""){
+  const m=String(v||"").match(/令和\s*(\d+)年/);
+  return m?2018+Number(m[1]):null;
+}
+function eventTypeFromTitle(name=""){
+  const s=String(name||"");
+  if(/学会|会議|大会|シンポジ|カンファレンス|フォーラム|セミナー|説明会/i.test(s)) return "convention";
+  if(/コンサート|ライブ|演奏会|独演会|クラシック|音楽|歌|ショー/i.test(s)) return "music";
+  if(/スポーツ|プロレス|格闘技|相撲|試合/i.test(s)) return "sports";
+  if(/演劇|舞台|ミュージカル|落語|お笑い|新喜劇/i.test(s)) return "theater";
+  return "event";
+}
+async function buildIcchOfficialEvents(ctx){
+  const url="https://www.pcf.city.hiroshima.jp/icch/event.cgi";
+  let html="";
+  try{html=await fetchTextCached(url,900,ctx)}catch{return []}
+  const out=[];
+  let currentYear=tokyoParts().year,currentMonth=null;
+  const parts=html.split(/(<h4[^>]*>[\s\S]*?<\/h4>|<tr[^>]*>[\s\S]*?<\/tr>)/gi);
+  for(const part of parts){
+    if(/^<h4/i.test(part)){
+      const h=stripHtml(part).replace(/\s+/g," ");
+      currentYear=parseJapaneseEraYear(h)||currentYear;
+      const mm=h.match(/(\d{1,2})月/); currentMonth=mm?Number(mm[1]):currentMonth;
+      continue;
+    }
+    if(!/^<tr/i.test(part)||!currentMonth) continue;
+    const cells=[...part.matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>stripHtml(x[1]).replace(/\s+/g," ").trim());
+    if(cells.length<7) continue;
+    const day=Number(cells[0]); if(!day) continue;
+    const name=cells[2]; if(!name) continue;
+    const start=(cells[5].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null;
+    const end=(cells[6].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null;
+    const t={year:currentYear,month:currentMonth,day};
+    const subject=extractPerformanceSubject({name,title:name,venueText:name});
+    out.push({
+      kind:"live",date:liveDateKey(t),name,title:name,
+      display_name:subject.display_name||name,
+      display_name_type:subject.display_name_type||eventTypeFromTitle(name),
+      display_name_source:"icch_official",
+      event_type:eventTypeFromTitle(name),
+      venue:"広島国際会議場 フェニックスホール",
+      open_time:null,start_time:start,end_time:end,
+      end_time_estimate:end||null,end_time_reference:null,
+      source:"広島国際会議場公式",source_url:url,source_role:"venue_official"
+    });
+  }
+  return out;
+}
+async function buildEplusHiroshimaDiscovery(ctx){
+  const urls=[
+    ["music","https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1"],
+    ["music","https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2"],
+    ["theater","https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"],
+    ["sports","https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima"],
+    ["event","https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"],
+    ["anime","https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"]
+  ];
+  const out=[];
+  for(const [kind,url] of urls){
+    let html="";
+    try{html=await fetchTextCached(url,900,ctx)}catch{continue}
+    const text=stripHtml(html).normalize("NFKC").replace(/\s+/g," ").trim();
+    const hits=[...text.matchAll(/(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)\s+(?:先着|抽選)?\s*/g)];
+    for(let i=0;i<hits.length;i++){
+      const h=hits[i], start=(h.index||0)+h[0].length;
+      const end=i+1<hits.length?(hits[i+1].index||text.length):Math.min(text.length,start+600);
+      const seg=text.slice(start,end);
+      if(!/\(広島県\)/.test(seg)) continue;
+      const venue=canonicalLiveVenue(seg);
+      if(!venue) continue;
+      const vi=seg.indexOf(venue.split(" ")[0]);
+      let name=(vi>0?seg.slice(0,vi):seg.split(/\(広島県\)/)[0]).replace(/受付中|受付終了|予定枚数終了|開演[:：].*$/g,"").trim();
+      if(name.length>140) name=name.slice(0,140).trim();
+      if(!name) continue;
+      const sm=seg.match(/(?:開演|開始|上映開始)[:：]\s*([0-2]?\d:[0-5]\d)/);
+      const om=seg.match(/開場[:：]\s*([0-2]?\d:[0-5]\d)/);
+      const subject=extractPerformanceSubject({name,title:name,venueText:seg});
+      out.push({
+        kind:"live",
+        date:String(h[1])+"-"+String(h[2]).padStart(2,"0")+"-"+String(h[3]).padStart(2,"0"),
+        name,title:name,
+        display_name:subject.display_name||name,
+        display_name_type:subject.display_name_type||kind,
+        display_name_source:"eplus_listing",
+        event_type:kind==="anime"?"music":kind,
+        venue,open_time:om?.[1]||null,start_time:sm?.[1]||null,end_time:null,
+        source:"イープラス",source_url:url,source_role:"playguide_primary"
+      });
+    }
+  }
+  return out;
+}
+
 async function buildDirectVenueLiveEvents(t,ctx,enrichEnd=true){
   const groups=await Promise.all([
     buildGreenArenaEvents(t,ctx,enrichEnd),
@@ -1398,13 +1496,15 @@ async function buildHiroshimaEvents(ctx) {
 
   // Broad monthly source: one fetch per month, filtered to the major venues only.
   const months=[...new Map(days.map(t=>[t.year+"-"+t.month,{year:t.year,month:t.month}])).values()];
-  const [lawsonEvents,cultureMonths,candyEvents]=await Promise.all([
+  const [lawsonEvents,eplusEvents,cultureMonths,candyEvents,icchEvents]=await Promise.all([
     buildLawsonMajorVenueEvents(ctx),
+    buildEplusHiroshimaDiscovery(ctx),
     Promise.all(months.map(m=>buildCultureHiroshimaMonthEvents(m.year,m.month,ctx))),
-    buildCandyMajorVenueEvents(ctx)
+    buildCandyMajorVenueEvents(ctx),
+    buildIcchOfficialEvents(ctx)
   ]);
   // プレイガイドの固定フォーマットを一次ソースにし、会場・興行元は時刻や裏取りに使う。
-  all.push(...lawsonEvents,...cultureMonths.flat(),...candyEvents);
+  all.push(...lawsonEvents,...eplusEvents,...cultureMonths.flat(),...candyEvents,...icchEvents);
 
   // Venue-direct sources add/replace richer start-time details where available.
   for(const t of days){
@@ -1451,6 +1551,7 @@ const TAXI_DEMAND_VENUE_CAPACITY = {
   "上野学園ホール":1730,
   "広島文化学園HBGホール":2001,
   "JMSアステールプラザ":1204,
+  "広島国際会議場 フェニックスホール":1504,
   "BLUE LIVE HIROSHIMA":830,
   "広島クラブクアトロ":800,
   "LIVE VANQUISH":450
