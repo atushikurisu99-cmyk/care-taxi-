@@ -1,4 +1,5 @@
 import GtfsRealtimeBindings from "gtfs-realtime-bindings";
+import { extractPerformanceSubject } from "./performance-subject.mjs";
 
 const BASE = "https://www.train-guide.westjr.co.jp/api/v3";
 const LINES = [
@@ -766,11 +767,16 @@ async function makeOfficialVenueEvent({name,title,venue,start_time,open_time,ven
     end_time_estimate:null,end_time_reference:null,end_time_range_start:null,end_time_range_end:null,
     reference_basis:null,confidence:"none",evidence_count:0,direct_count:0,spread_minutes:null,channels:[]
   };
+  const subject=extractPerformanceSubject({name,title:title||name,venueText:venueText||""});
   return {
     kind:"live",
     date:liveDateKey(t),
     name,
     title:title||name,
+    display_name:subject.display_name,
+    display_name_type:subject.display_name_type,
+    display_name_source:subject.display_name_source,
+    event_type:subject.event_type,
     venue,
     open_time:open_time||null,
     start_time:start_time||null,
@@ -804,7 +810,7 @@ async function buildGreenArenaEvents(t,ctx,enrichEnd=true){
   const hit=dateForms.map(x=>text.indexOf(x)).find(x=>x>=0);
   if(hit==null||hit<0) return [];
   const snippet=text.slice(Math.max(0,hit-260),Math.min(text.length,hit+420)).replace(/\s+/g," ").trim();
-  if(!looksLikeMusicEvent(snippet)) return [];
+  if(!looksLikeMusicEvent(snippet) && !/ミュージカル|劇団|演劇|舞台|歌劇|宝塚|落語|漫才|お笑い|コント|寄席|クラシック|交響楽団|フィルハーモニー|管弦楽|室内楽|バレエ|能楽|文楽/i.test(snippet)) return [];
   const startTime=extractStartTime(snippet);
   let name=snippet.split(/開催日[:：]?/i)[0].trim();
   if(name.length>120) name=name.slice(-120).trim();
@@ -827,7 +833,7 @@ async function buildAsterPlazaEvents(t,ctx,enrichEnd=true){
   const idx=block.indexOf(marker);
   if(idx<0) return [];
   const snippet=block.slice(Math.max(0,idx-260),Math.min(block.length,idx+360)).replace(/\s+/g," ").trim();
-  if(!looksLikeMusicEvent(snippet)) return [];
+  if(!looksLikeMusicEvent(snippet) && !/ミュージカル|劇団|演劇|舞台|歌劇|宝塚|落語|漫才|お笑い|コント|寄席|クラシック|交響楽団|フィルハーモニー|管弦楽|室内楽|バレエ|能楽|文楽/i.test(snippet)) return [];
   const startTime=extractStartTime(snippet);
   let name=snippet.slice(0,Math.max(0,snippet.indexOf(marker))).trim();
   name=name.replace(/^.*?(?:\||　)/,"").trim();
@@ -851,7 +857,7 @@ async function buildHbgHallEvents(t,ctx,enrichEnd=true){
   const startRe=new RegExp("(?:^|\\s)0?"+d+"\\s*\\((?:日|月|火|水|木|金|土)\\)","i");
   const nextRe=/(?:^|\s)0?[1-3]?\d\s*\((?:日|月|火|水|木|金|土)\)/;
   const seg=daySegmentByRegex(text,startRe,nextRe);
-  if(!seg||!looksLikeMusicEvent(seg)) return [];
+  if(!seg||(!looksLikeMusicEvent(seg) && !/ミュージカル|劇団|演劇|舞台|歌劇|宝塚|落語|漫才|お笑い|コント|寄席|クラシック|交響楽団|フィルハーモニー|管弦楽|室内楽|バレエ|能楽|文楽/i.test(seg))) return [];
   const tm=seg.match(/開場\s*([0-2][0-9]:[0-5][0-9])\s*開演\s*([0-2][0-9]:[0-5][0-9])/)
     || seg.match(/開場\s*([0-2][0-9]:[0-5][0-9])[\s\S]{0,30}?開演\s*([0-2][0-9]:[0-5][0-9])/);
   const openTime=tm?.[1]||null,startTime=tm?.[2]||extractStartTime(seg);
@@ -901,7 +907,7 @@ async function buildVanquishEvents(t,ctx,enrichEnd=true){
   const startRe=new RegExp(t.year+"\\s+"+mm.replace(/^0/,"")+"\\."+dd+"\\s+[A-Z]{3}","i");
   const nextRe=/\d{4}\s+\d{1,2}\.\d{2}\s+[A-Z]{3}/i;
   const seg=daySegmentByRegex(text,startRe,nextRe);
-  if(!seg||!looksLikeMusicEvent(seg)) return [];
+  if(!seg||(!looksLikeMusicEvent(seg) && !/ミュージカル|劇団|演劇|舞台|歌劇|宝塚|落語|漫才|お笑い|コント|寄席|クラシック|交響楽団|フィルハーモニー|管弦楽|室内楽|バレエ|能楽|文楽/i.test(seg))) return [];
   const tm=seg.match(/OPEN[：:]\s*([0-2][0-9]:[0-5][0-9])\s*\/\s*([0-2][0-9]:[0-5][0-9])/i);
   const openTime=tm?.[1]||null,startTime=tm?.[2]||extractStartTime(seg);
   let before=(tm?seg.slice(0,tm.index):seg).replace(/\s+/g," ").trim();
@@ -1015,7 +1021,7 @@ async function buildCultureHiroshimaMonthEvents(year,month,ctx){
       if(name.length<2){
         name=block.slice(Math.max(0,open-150),open).replace(/^.*?\s(?=[^\s]{2,80}$)/,"").trim();
       }
-      if(!name || !looksLikeMusicEvent(name+" "+pm[1])) continue;
+      if(!name || (!looksLikeMusicEvent(name+" "+pm[1]) && !/ミュージカル|劇団|演劇|舞台|歌劇|宝塚|落語|漫才|お笑い|コント|寄席|クラシック|交響楽団|フィルハーモニー|管弦楽|室内楽|バレエ|能楽|文楽/i.test(name+" "+pm[1]))) continue;
 
       const around=block.slice(Math.max(0,open-220),Math.min(block.length,open+300));
       const startTime=extractStartTime(around);
@@ -1064,10 +1070,15 @@ async function buildCultureHiroshimaLiveEvents(t,ctx,enrichEnd=true){
       end_time_estimate:null,end_time_reference:null,end_time_range_start:null,end_time_range_end:null,
       reference_basis:null,confidence:"none",evidence_count:0,direct_count:0,spread_minutes:null,channels:[]
     };
+    const subject=extractPerformanceSubject({name,title:name,venueText:snippet});
     found.push({
       kind:"live",
       date:liveDateKey(t),
       name,
+      display_name:subject.display_name,
+      display_name_type:subject.display_name_type,
+      display_name_source:subject.display_name_source,
+      event_type:subject.event_type,
       venue,
       open_time:null,
       start_time:startTime,
@@ -1151,8 +1162,12 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
       start_time:startTime,evidence,venue:"広島クラブクアトロ",title:name,artist:name
     });
   }
+  const subject=extractPerformanceSubject({name,title:name,venueText:seg});
   return [{
-    kind:"live",date:liveDateKey(t),name,venue:"広島クラブクアトロ",
+    kind:"live",date:liveDateKey(t),name,
+    display_name:subject.display_name,display_name_type:subject.display_name_type,
+    display_name_source:subject.display_name_source,event_type:subject.event_type,
+    venue:"広島クラブクアトロ",
     open_time:tm?tm[1]:null,start_time:startTime,end_time:null,
     end_time_estimate:estimate.end_time_estimate,end_time_reference:estimate.end_time_reference,
     end_time_range_start:estimate.end_time_range_start,end_time_range_end:estimate.end_time_range_end,
