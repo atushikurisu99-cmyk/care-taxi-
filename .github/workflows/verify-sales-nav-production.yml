@@ -35,6 +35,11 @@ jobs:
             {date:'2026-10-09',venue:'広島文化学園HBGホール',name:'沢田研二'},
             {date:'2026-10-09',venue:'JMSアステールプラザ',name:'PERSONZ'}
           ];
+          const expectedSports=[
+            {date:'2026-10-10',venue:'広島サンプラザホール',name:'広島ドラゴンフライズ'},
+            {date:'2026-10-24',venue:'エディオンピースウイング広島',name:'サンフレッチェ広島'},
+            {date:'2026-10-31',venue:'広島グリーンアリーナ',name:'広島サンダーズ'}
+          ];
           const browser=await chromium.launch({headless:true});
           const page=await browser.newPage();
           let last=[];
@@ -49,8 +54,15 @@ jobs:
               main:el.querySelector('.main')?.textContent?.trim()||'',
               meta:el.querySelector('.meta')?.textContent?.trim()||''
             })));
-            console.log('ATTEMPT',attempt,JSON.stringify(last.slice(0,12),null,2));
-            ok=expected.every(x=>last.some(e=>e.kind.includes(x.date)&&e.meta.includes(x.venue)&&e.main===x.name));
+            const sports=await page.locator('#eventDetailSportsList .calendar-detail-item').evaluateAll(items=>items.map(el=>({
+              kind:el.querySelector('.kind')?.textContent?.trim()||'',
+              main:el.querySelector('.main')?.textContent?.trim()||'',
+              meta:el.querySelector('.meta')?.textContent?.trim()||''
+            })));
+            console.log('ATTEMPT',attempt,JSON.stringify({live:last.slice(0,12),sports:sports.slice(0,12)},null,2));
+            const liveOk=expected.every(x=>last.some(e=>e.kind.includes(x.date)&&e.meta.includes(x.venue)&&e.main===x.name));
+            const sportsOk=expectedSports.every(x=>sports.some(e=>e.kind.includes(x.date)&&e.meta.includes(x.venue)&&e.main.startsWith(x.name)));
+            ok=liveOk&&sportsOk;
             if(ok) break;
             await sleep(5000);
           }
@@ -58,6 +70,6 @@ jobs:
           if(!ok){
             throw new Error('production rendered names did not match fixed-field extraction: '+JSON.stringify({expected,last:last.slice(0,20)}));
           }
-          console.log('PRODUCTION_DISPLAY_OK',JSON.stringify(expected));
+          console.log('PRODUCTION_DISPLAY_OK',JSON.stringify({live:expected,sports:expectedSports}));
           })().catch(e=>{ console.error(e); process.exit(1); });
           NODE
