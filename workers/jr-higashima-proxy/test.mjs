@@ -4,7 +4,9 @@ import { extractPerformanceSubject } from "./performance-subject.mjs";
 const subjectCases = [
   [{name:"劇団四季『マンマ・ミーア！』",title:"劇団四季『マンマ・ミーア！』"}, "劇団四季", "theater_company"],
   [{name:"サルゴリラのコントと旅2026",title:"サルゴリラのコントと旅2026"}, "サルゴリラ", "performer"],
-  [{name:"沢田研二 2026 LIVE ! 『freedom 安堵 courage』",title:"沢田研二 2026 LIVE ! 『freedom 安堵 courage』"}, "沢田研二 2026", "artist"],
+  [{name:"沢田研二 2026 LIVE ! 『freedom 安堵 courage』",title:"沢田研二 2026 LIVE ! 『freedom 安堵 courage』"}, "沢田研二", "artist"],
+  [{name:"甲斐 心愛 GUEST：岡田 あずみ・久留島 優果 STU48 甲斐心愛スペシャルソロイベント",title:"甲斐 心愛 GUEST：岡田 あずみ・久留島 優果 STU48 甲斐心愛スペシャルソロイベント"}, "甲斐 心愛", "performer"],
+  [{name:"STU48 STU48 4期研究生",title:"STU48 STU48 4期研究生"}, "STU48 4期研究生", "artist"],
   [{name:"PERSONZ",title:"PERSONZ"}, "PERSONZ", "artist"]
 ];
 for(const [input,expectedName,expectedType] of subjectCases){
