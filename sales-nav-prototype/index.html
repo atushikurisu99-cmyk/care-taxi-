@@ -3085,7 +3085,7 @@ function calendarEntriesForDate(key){
  const events=(Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[])
   .filter(e=>liveEventDate(e)===key);
  for(const e of events){
-  const artist=String(e.artist||e.artist_name||e.name||'').trim()||'アーティスト確認中';
+  const artist=String(e.artist||e.artist_name||'').trim()||'アーティスト確認中';
   const endEstimate=e.end_time_estimate||e.end_time_reference||'';
   out.push({
    type:'live',
