@@ -1557,6 +1557,7 @@ html,body{
    <div class="label">スポーツ</div>
    <div id="eventDetailSports" class="value" style="font-size:20px">確認中</div>
    <div id="eventDetailSportsSub" class="sub" style="margin-top:7px">—</div>
+   <div id="eventDetailSportsList" class="list" style="margin-top:12px"></div>
   </div>
  </div>
  <div class="action"><button class="primary secondary" onclick="show('home')">戻る</button></div>
@@ -3971,7 +3972,10 @@ function renderSportsRealtime(){
   renderHomeEventSummary();
   return;
  }
- const sports=(Array.isArray(d.sports)?d.sports:[]).filter(isLocalSportsEvent);
+ const today=localDateValue(new Date());
+ const sports=(Array.isArray(d.sports)?d.sports:[])
+  .filter(isLocalSportsEvent)
+  .filter(x=>String(x.date||today)===today);
  const game=sports[0]||null;
  if(!game){
   if(st) st.textContent='予定なし';
@@ -5829,6 +5833,7 @@ function renderEventDetail(){
  const liveList=document.getElementById('eventDetailLiveList');
  const sports=document.getElementById('eventDetailSports');
  const sportsSub=document.getElementById('eventDetailSportsSub');
+ const sportsList=document.getElementById('eventDetailSportsList');
  const lm=document.getElementById('liveInfoMiddle'),lb=document.getElementById('liveInfoBottom');
  const sm=document.getElementById('sportsInfoMiddle'),sb=document.getElementById('sportsInfoBottom');
  if(live&&lm) live.textContent=lm.textContent||'—';
@@ -5854,6 +5859,26 @@ function renderEventDetail(){
  }
  if(sports&&sm) sports.textContent=sm.textContent||'—';
  if(sportsSub&&sb) sportsSub.textContent=sb.textContent||'—';
+ if(sportsList){
+  const today=localDateValue(new Date());
+  const upcoming=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[])
+   .filter(isLocalSportsEvent)
+   .filter(x=>String(x.date||today)>=today)
+   .sort((a,b)=>String(a.date||'9999-12-31').localeCompare(String(b.date||'9999-12-31'))||
+    String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
+  const label={baseball:'野球',soccer:'サッカー',basketball:'バスケ',volleyball:'バレー'};
+  sportsList.innerHTML=upcoming.length?upcoming.map(x=>{
+   const end=x.end_time||x.end_time_estimate||'';
+   const opponent=x.opponent?(' vs '+x.opponent):'';
+   const main=(x.team||'スポーツ')+opponent;
+   return '<div class="calendar-detail-item '+escapeHtml(calendarSportType(x))+'">'+
+    '<div class="kind">'+escapeHtml(String(x.date||''))+' / '+escapeHtml(label[x.kind]||'スポーツ')+'</div>'+
+    '<div class="main">'+escapeHtml(main)+'</div>'+
+    '<div class="meta">'+escapeHtml((x.start_time?x.start_time+' / ':'')+(x.venue||''))+
+      (end?(' / 終了見込 '+escapeHtml(String(end).slice(0,5))+'頃'):'')+
+    '</div></div>';
+  }).join(''):'<div class="calendar-detail-empty">今後の対象スポーツはありません</div>';
+ }
 }
 function readWeatherCache(){
  try{return JSON.parse(localStorage.getItem('taxi_weather_cache')||'null')}catch(e){return null}
