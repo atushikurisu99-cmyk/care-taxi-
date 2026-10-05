@@ -420,6 +420,7 @@ async function buildHiroshimaSports(ctx) {
     area:"hiroshima",
     generated_at:Math.floor(Date.now()/1000),
     coverage:"today_realtime_plus_60_day_home_schedule",
+    source_counts:{soccer:soccer.length,basketball:basketball.length,volleyball:volleyball.length,baseball_today:carp.status!=="none"?1:0},
     sports:[...(carp.status!=="none"?[carp]:[]),...upcoming],
   };
 }
@@ -1116,23 +1117,23 @@ async function buildIcchOfficialEvents(ctx){
   let html="";
   try{html=await fetchTextCached(url,900,ctx)}catch{return []}
   const out=[];
-  let currentYear=tokyoParts().year,currentMonth=null;
-  const parts=html.split(/(<h[1-6][^>]*>[\s\S]*?<\/h[1-6]>|<tr[^>]*>[\s\S]*?<\/tr>)/gi);
-  for(const part of parts){
-    if(/^<h[1-6]/i.test(part)){
-      const h=stripHtml(part).replace(/\s+/g," ");
-      currentYear=parseJapaneseEraYear(h)||currentYear;
-      const mm=h.match(/(\d{1,2})月/); currentMonth=mm?Number(mm[1]):currentMonth;
-      continue;
-    }
-    if(!/^<tr/i.test(part)||!currentMonth) continue;
-    const cells=[...part.matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>stripHtml(x[1]).replace(/\s+/g," ").trim());
+  const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+  for(const row of rows){
+    const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)]
+      .map(x=>stripHtml(x[1]).replace(/\s+/g," ").trim());
     if(cells.length<7) continue;
     const day=Number(cells[0]); if(!day) continue;
+
+    const prefix=html.slice(Math.max(0,(row.index||0)-12000),row.index||0);
+    const marks=[...prefix.matchAll(/令和\s*(\d+)年\s*(\d{1,2})月のイベント/g)];
+    const mark=marks.at(-1);
+    if(!mark) continue;
+    const year=2018+Number(mark[1]),month=Number(mark[2]);
+
     const name=cells[2]; if(!name) continue;
     const start=(cells[5].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null;
     const end=(cells[6].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null;
-    const t={year:currentYear,month:currentMonth,day};
+    const t={year,month,day};
     const subject=extractPerformanceSubject({name,title:name,venueText:name});
     out.push({
       kind:"live",date:liveDateKey(t),name,title:name,
@@ -1559,6 +1560,7 @@ async function buildHiroshimaEvents(ctx) {
       rule:"当日の公演は終演参考まで取得。将来公演は日付・開演・会場を先に広く収集し、当日になったら終演参考を補完する。"
     },
     venues_covered:HIROSHIMA_LIVE_VENUES,
+    source_counts:{lawson:lawsonEvents.length,eplus:eplusEvents.length,culture:cultureMonths.flat().length,candy:candyEvents.length,icch:icchEvents.length},
     events:mergedEvents,
   };
 }
@@ -1858,6 +1860,7 @@ async function buildHiroshimaDemandEvents(ctx){
     rule:"需要を断定せず、日付・時刻・会場・人数規模・集まりの種類を営業判断材料として返す。",
     people_note:"ticket/sports の人数は実来場者数ではなく会場収容規模の参考。free_event/convention は公式ページに人数記載がある場合のみ数値化。",
     source_counts:counts,
+    upstream_counts:{events:liveFeed?.source_counts||null,sports:sportsFeed?.source_counts||null},
     events:merged
   };
 }
