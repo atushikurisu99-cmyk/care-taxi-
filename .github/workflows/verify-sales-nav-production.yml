@@ -39,7 +39,7 @@ jobs:
           const page=await browser.newPage();
           let last=[];
           let ok=false;
-          for(let attempt=1; attempt<=16; attempt++){
+          for(let attempt=1; attempt<=5; attempt++){
             await page.goto(target+'?verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
             await page.waitForTimeout(2500);
             await page.evaluate(()=>{ if(typeof show==='function') show('eventDetail'); });
@@ -52,7 +52,7 @@ jobs:
             console.log('ATTEMPT',attempt,JSON.stringify(last.slice(0,12),null,2));
             ok=expected.every(x=>last.some(e=>e.kind.includes(x.date)&&e.meta.includes(x.venue)&&e.main===x.name));
             if(ok) break;
-            await sleep(12000);
+            await sleep(5000);
           }
           await browser.close();
           if(!ok){
