@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-NEXT-DATE-CARDS -->
+<!-- BUILD:2026-10-05-CALENDAR-ACQUIRED-EVENTS -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -3079,8 +3079,10 @@ function calendarEntriesForDate(key){
    });
   }
  }
- const today=localDateValue(new Date());
- const events=selectedLiveEventsForDate(key);
+
+ // 通知対象に選んでいない会場も含め、取得済みイベントはカレンダーへ配置。
+ const events=(Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[])
+  .filter(e=>liveEventDate(e)===key);
  for(const e of events){
   const ref=e.end_time_estimate||e.end_time_reference||'';
   out.push({
@@ -3092,22 +3094,23 @@ function calendarEntriesForDate(key){
    raw:e
   });
  }
- if(key===today){
-  const sports=Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[];
-  for(const sp of sports){
-   if(sp.status&&sp.status!=='none'){
-    out.push({
-     type:calendarSportType(sp),
-     text:(sp.start_time?sp.start_time+' ':'')+(sp.venue||sp.team||'スポーツ'),
-     title:sp.team||sp.name||sp.venue||'スポーツ',
-     time:sp.start_time||'',
-     meta:(sp.venue||'')+(sp.status==='ended'&&sp.end_time?((sp.venue?' / ':'')+'終了 '+sp.end_time):''),
-     raw:sp
-    });
-   }
-  }
+
+ const today=localDateValue(new Date());
+ const sports=Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[];
+ for(const sp of sports){
+  const sportDate=String(sp?.date||today);
+  if(sportDate!==key || !sp.status || sp.status==='none') continue;
+  out.push({
+   type:calendarSportType(sp),
+   text:(sp.start_time?sp.start_time+' ':'')+(sp.team||sp.name||sp.venue||'スポーツ'),
+   title:sp.team||sp.name||sp.venue||'スポーツ',
+   time:sp.start_time||'',
+   meta:(sp.venue||'')+(sp.status==='ended'&&sp.end_time?((sp.venue?' / ':'')+'終了 '+sp.end_time):''),
+   raw:sp
+  });
  }
- return out;
+
+ return out.sort((a,b)=>String(a.time||'99:99').localeCompare(String(b.time||'99:99')));
 }
 function calendarDetailDateLabel(key){
  const d=new Date(key+'T00:00:00');
@@ -3941,7 +3944,7 @@ function renderSportsRealtime(){
  renderHomeEventSummary();
  maybeNotifySportsFacts(d);
 }
-async function loadEventSportsRealtime(force=false){
+async async function loadEventSportsRealtime(force=false){
  const now=Date.now();
  if(!force&&eventSportsFetchedAt&&now-eventSportsFetchedAt<30000) return;
  eventSportsFetchedAt=now;
@@ -3970,6 +3973,7 @@ async function loadEventSportsRealtime(force=false){
  }
  renderLiveEvents();
  renderSportsRealtime();
+ if(document.getElementById('calendar')?.classList.contains('active')) renderCalendar();
 }
 
 let busRealtimeData=null;
