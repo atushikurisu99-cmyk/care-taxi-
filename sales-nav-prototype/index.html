@@ -3852,7 +3852,7 @@ function renderHomeEventSummary(){
  }
 
  const today=localDateValue(new Date());
- const liveEvents=allLiveEvents()
+ const liveEvents=selectedLiveEvents()
   .filter(e=>String(liveEventDate(e)||'')>=today)
   .sort((a,b)=>
    String(liveEventDate(a)||'9999-12-31').localeCompare(String(liveEventDate(b)||'9999-12-31'))||
@@ -3874,8 +3874,8 @@ function renderHomeEventSummary(){
 
  const nextEvent=candidates[0]||null;
  if(!nextEvent){
-  hv.textContent='なし';
-  hs.textContent='次のイベントなし';
+  hv.textContent=selectedLiveVenues().length?'なし':'未設定';
+  hs.textContent=selectedLiveVenues().length?'次のイベントなし':'ライブ会場をチェック';
   return;
  }
 
@@ -3899,11 +3899,11 @@ function renderLiveEvents(){
   renderHomeEventSummary();
   return;
  }
- const events=allLiveEventsForDate(localDateValue(new Date()),d);
+ const events=selectedLiveEventsForDate(localDateValue(new Date()),d);
  const e=events[0]||null;
  if(card) card.classList.toggle('state-warn',events.length>0);
- if(st) st.textContent=events.length?events.length+'件':'0件';
- if(mid) mid.textContent=e?.name||'本日のライブなし';
+ if(st) st.textContent=events.length?events.length+'件':(selectedLiveVenues().length?'0件':'未設定');
+ if(mid) mid.textContent=e?.name||(selectedLiveVenues().length?'選択会場のライブなし':'会場未選択');
  if(bot){
   if(e){
    const t=e.start_time?e.start_time+'〜':'時刻確認中';
@@ -5773,14 +5773,16 @@ function renderEventDetail(){
  if(liveSub&&lb) liveSub.textContent=lb.textContent||'—';
  if(liveList){
   const today=localDateValue(new Date());
+  const selectedVenueSet=new Set(selectedLiveVenues());
   const upcoming=allLiveEvents().filter(e=>liveEventDate(e)>=today).sort((a,b)=>
    liveEventDate(a).localeCompare(liveEventDate(b))||
    String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99'))
   );
   liveList.innerHTML=upcoming.length?upcoming.map(e=>{
    const ref=e.end_time_estimate||e.end_time_reference||'';
+   const tracked=selectedVenueSet.has(e.venue);
    return '<div class="calendar-detail-item live">'+
-    '<div class="kind">'+escapeHtml(liveEventDate(e))+'</div>'+
+    '<div class="kind">'+escapeHtml(liveEventDate(e))+(tracked?' / チェック中':'')+'</div>'+
     '<div class="main">'+escapeHtml(e.name||'ライブ')+'</div>'+
     '<div class="meta">'+escapeHtml((e.start_time?e.start_time+' / ':'')+(e.venue||''))+
       (ref?(' / 過去公演参考 '+escapeHtml(String(ref).slice(0,5))+'頃'):'')+
