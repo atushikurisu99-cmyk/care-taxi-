@@ -696,16 +696,7 @@ const HIROSHIMA_LIVE_VENUES = [
   "広島クラブクアトロ",
   "BLUE LIVE HIROSHIMA",
   "LIVE VANQUISH",
-  "セカンド・クラッチ",
-  "Live space Reed",
-  "ALMIGHTY",
-  "Live Juke",
-  "広島Cave-Be",
-  "広島4.14",
-  "Yise",
-  "SIX ONE Live STAR",
-  "広島県民文化センター",
-  "マリモホールディングス東区民文化センター"
+  "セカンド・クラッチ"
 ];
 function canonicalLiveVenue(text=""){
   const t=String(text||"");
@@ -1052,8 +1043,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v2");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v2");
 
   const hit=await cache.match(liveKey);
   if(hit){
