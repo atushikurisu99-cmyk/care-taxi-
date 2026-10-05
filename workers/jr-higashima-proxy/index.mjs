@@ -696,7 +696,16 @@ const HIROSHIMA_LIVE_VENUES = [
   "広島クラブクアトロ",
   "BLUE LIVE HIROSHIMA",
   "LIVE VANQUISH",
-  "セカンド・クラッチ"
+  "セカンド・クラッチ",
+  "Live space Reed",
+  "ALMIGHTY",
+  "Live Juke",
+  "広島Cave-Be",
+  "広島4.14",
+  "Yise",
+  "SIX ONE Live STAR",
+  "広島県民文化センター",
+  "マリモホールディングス東区民文化センター"
 ];
 function canonicalLiveVenue(text=""){
   const t=String(text||"");
@@ -708,11 +717,20 @@ function canonicalLiveVenue(text=""){
   if(/BLUE LIVE HIROSHIMA/i.test(t)) return "BLUE LIVE HIROSHIMA";
   if(/LIVE VANQUISH/i.test(t)) return "LIVE VANQUISH";
   if(/セカンド.?クラッチ|SECOND CRUTCH/i.test(t)) return "セカンド・クラッチ";
+  if(/Live\s*space\s*Reed|ライブスペース\s*リード|Reed/i.test(t)) return "Live space Reed";
+  if(/ALMIGHTY/i.test(t)) return "ALMIGHTY";
+  if(/Live\s*Juke|ライブ\s*ジューク/i.test(t)) return "Live Juke";
+  if(/Cave-?Be/i.test(t)) return "広島Cave-Be";
+  if(/(?:広島)?4\.14/i.test(t)) return "広島4.14";
+  if(/\bYise\b/i.test(t)) return "Yise";
+  if(/SIX\s*ONE\s*Live\s*STAR/i.test(t)) return "SIX ONE Live STAR";
+  if(/広島県民文化センター/i.test(t)) return "広島県民文化センター";
+  if(/東区民文化センター|マリモホールディングス東区民文化センター/i.test(t)) return "マリモホールディングス東区民文化センター";
   return "";
 }
 function looksLikeMusicEvent(text=""){
   const t=String(text||"");
-  if(/コンサート|ライブ|LIVE|tour|ツアー|リサイタル|演奏会|音楽|オーケストラ|バンド|歌|シンガー|アーティスト/i.test(t)) return true;
+  if(/コンサート|ライブ|LIVE|tour|ツアー|リサイタル|演奏会|音楽|オーケストラ|バンド|歌|シンガー|アーティスト|ワンマン|対バン|FES|FEST|ROCK|JAZZ|ジャズ|DJ|HIP.?HOP|アイドル/i.test(t)) return true;
   if(/ミュージカル|演劇|講演|展示|教室|大会|スポーツ|バレエ|ダンス競技|能楽|文楽|映画|セミナー/i.test(t)) return false;
   return false;
 }
