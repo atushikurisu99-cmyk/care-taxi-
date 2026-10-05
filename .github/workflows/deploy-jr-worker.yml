@@ -39,3 +39,41 @@ jobs:
         env:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
+      - name: Verify live event API
+        run: |
+          node - <<'NODE'
+          const url='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima?verify='+Date.now();
+          const allowed=new Set([
+            '広島グリーンアリーナ',
+            '上野学園ホール',
+            '広島文化学園HBGホール',
+            'JMSアステールプラザ',
+            '広島クラブクアトロ',
+            'BLUE LIVE HIROSHIMA',
+            'LIVE VANQUISH',
+            'セカンド・クラッチ'
+          ]);
+          const r=await fetch(url,{headers:{accept:'application/json'}});
+          if(!r.ok) throw new Error('live api http '+r.status);
+          const d=await r.json();
+          if(d?.ok!==true || !Array.isArray(d.events)) throw new Error('invalid live event payload');
+          const bad=[...new Set(d.events.map(x=>x?.venue).filter(v=>v&&!allowed.has(v)))];
+          if(bad.length) throw new Error('unexpected venues: '+bad.join(', '));
+          const byVenue={};
+          for(const e of d.events){
+            const v=e?.venue||'unknown';
+            byVenue[v]=(byVenue[v]||0)+1;
+          }
+          console.log(JSON.stringify({
+            ok:d.ok,
+            cache_state:d.cache_state||null,
+            generated_at:d.generated_at||null,
+            event_count:d.events.length,
+            venues_covered:d.venues_covered||[],
+            events_by_venue:byVenue,
+            first_events:d.events.slice(0,12).map(e=>({
+              date:e.date,name:e.name,venue:e.venue,start_time:e.start_time
+            }))
+          },null,2));
+          NODE
