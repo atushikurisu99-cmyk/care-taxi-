@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-CLEANUP-5 ROAD-GEOMETRY -->
+<!-- BUILD:2026-10-05-JR-CAUSE-COMPACT -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -3621,7 +3621,8 @@ function jrFactsForDriver(d){
  const top=impacts[0]||null;
  const trend=jrTrendText();
  const lines=jrRelatedLines(top);
- return {top,trend,lines};
+ const incident=jrPrimaryIncident(d);
+ return {top,trend,lines,incident};
 }
 function maybeNotifyJrFacts(d){
  if(!d||!canUseFreshSource(d.generated_at,180)) return;
@@ -3640,16 +3641,17 @@ function maybeNotifyJrFacts(d){
  const material=(topMax>=10) || (topMax>=5 && topCount>=2) || severe>0 || moderate>=2;
  if(!material || !top) return;
 
+ const incident=f.incident;
  const body=[
-  top.station?top.station+'周辺':'',
-  topCount?'遅延 '+topCount+'本':'',
-  topMax?'最大 '+topMax+'分':'',
-  f.lines
+  incident?.line||f.lines||'JR',
+  incident?.cause||'',
+  (incident?.max_delay||topMax)?('最大 '+Number(incident?.max_delay||topMax)+'分'):'',
+  top.station?top.station+'周辺':''
  ].filter(Boolean).join(' / ');
  if(!body) return;
 
  const key=[
-  top.station||'',topCount,topMax,severe,moderate,f.lines||''
+  incident?.line||'',incident?.cause||'',Number(incident?.max_delay||topMax),top.station||'',severe,moderate
  ].join('|');
 
  notifyFact('jr',{
@@ -3709,12 +3711,18 @@ function renderJrProbe(){
  let detail='目立つ遅れなし';
  let level='';
  const totalTrains=Number(s.total_trains||0);
+ const incident=ctx.incident;
+ const incidentDelay=Number(incident?.max_delay||0);
  if(stale){
   label='更新待ち';
   detail='データ更新待ち';
  }else if(totalTrains===0){
   label='対象列車なし';
   detail='旅客列車の運行時間外';
+ }else if(delayed>0&&incident){
+  label=incidentDelay?incidentDelay+'分遅れ':'遅れ';
+  detail=[incident.line,incident.cause].filter(Boolean).join(' / ')||incident.line;
+  level=incidentDelay>=15?'state-alert':'state-warn';
  }else if(severe>0){
   label='大きな遅れ';
   detail='15分以上 '+severe+'本 / 全体 '+delayed+'本';
@@ -3739,6 +3747,7 @@ function renderJrProbe(){
  if(hv) hv.textContent=label;
  if(hs){
   if(stale) hs.textContent='データ更新待ち';
+  else if(incident) hs.textContent=[incident.line,incident.cause,incidentDelay?incidentDelay+'分遅れ':''].filter(Boolean).join(' / ');
   else if(top&&Number(top.delayed_trains||0)>0) hs.textContent=(top.station||'駅周辺')+' 最大'+Number(top.max_delay||0)+'分';
   else if(totalTrains===0) hs.textContent='旅客列車の運行時間外';
   else hs.textContent='目立つ遅れなし';
@@ -6002,10 +6011,14 @@ function notifyFact(kind,{level='info',icon='!',title='',body='',key='',sourceTs
 function normalizeJrLivePayload(d){
  if(!d||!Array.isArray(d.lines)) return d;
  const impacts=new Map();
+ const lineImpacts=[];
  for(const line of d.lines){
+  let maxDelay=0,delayedTrains=0;
   for(const tr of (Array.isArray(line.trains)?line.trains:[])){
    const delay=Number(tr.delayMinutes||0);
    if(delay<=0) continue;
+   delayedTrains+=1;
+   maxDelay=Math.max(maxDelay,delay);
    const rawStation=String(tr.positionText||'').trim();
    const station=rawStation.replace(/(?:〜|～)?#+/g,'').replace(/[〜～]+$/,'').trim();
    if(!station || station.includes('#')) continue;
@@ -6015,11 +6028,28 @@ function normalizeJrLivePayload(d){
    if(line.name&&!cur.lines.includes(line.name)) cur.lines.push(line.name);
    impacts.set(station,cur);
   }
+  if(delayedTrains>0){
+   const cause=(Array.isArray(d.traffic_alerts)?d.traffic_alerts:[])
+    .find(x=>String(x?.line||'')===String(line.name||''))?.cause||'';
+   lineImpacts.push({
+    line:String(line.name||line.code||'JR'),
+    delayed_trains:delayedTrains,
+    max_delay:maxDelay,
+    cause:String(cause||'')
+   });
+  }
  }
  d.station_impacts=[...impacts.values()].sort((a,b)=>
    (b.max_delay-a.max_delay)||(b.delayed_trains-a.delayed_trains)
  );
+ d.line_impacts=lineImpacts.sort((a,b)=>
+  (b.max_delay-a.max_delay)||(b.delayed_trains-a.delayed_trains)
+ );
  return d;
+}
+function jrPrimaryIncident(d){
+ const rows=Array.isArray(d?.line_impacts)?d.line_impacts:[];
+ return rows[0]||null;
 }
 function maybeNotifySportsFacts(d){
  if(!d||!canUseFreshSource(d.generated_at,180)) return;
