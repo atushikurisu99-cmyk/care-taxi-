@@ -1442,6 +1442,279 @@ async function buildHiroshimaEvents(ctx) {
   };
 }
 
+
+const TAXI_DEMAND_VENUE_CAPACITY = {
+  "広島グリーンアリーナ":10000,
+  "広島サンプラザホール":6000,
+  "エディオンピースウイング広島":28520,
+  "マツダスタジアム":33000,
+  "上野学園ホール":1730,
+  "広島文化学園HBGホール":2001,
+  "JMSアステールプラザ":1204,
+  "BLUE LIVE HIROSHIMA":830,
+  "広島クラブクアトロ":800,
+  "LIVE VANQUISH":450
+};
+
+function demandVenueCapacity(venue=""){
+  const canonical=canonicalLiveVenue(venue)||String(venue||"").trim();
+  if(TAXI_DEMAND_VENUE_CAPACITY[canonical]) return TAXI_DEMAND_VENUE_CAPACITY[canonical];
+  if(/エディオンピースウイング|Eピース/i.test(venue)) return 28520;
+  if(/マツダ|MAZDA Zoom-Zoom/i.test(venue)) return 33000;
+  if(/グリーンアリーナ|県立総合体育館/i.test(venue)) return 10000;
+  if(/サンプラザ/i.test(venue)) return 6000;
+  return null;
+}
+function demandNumber(v){
+  const n=Number(String(v??"").replace(/,/g,""));
+  return Number.isFinite(n)?n:null;
+}
+function demandPeopleFromText(text=""){
+  const s=stripHtml(String(text||"")).normalize("NFKC").replace(/\s+/g," ");
+  const man=s.match(/(?:来場|参加|観客|入場|動員|延べ)[^。]{0,35}?約?\s*(\d+(?:\.\d+)?)\s*万人/);
+  if(man) return Math.round(Number(man[1])*10000);
+  const direct=s.match(/(?:来場者|参加者|観客|入場者|動員数|延べ)[^。]{0,35}?約?\s*([\d,]{2,})\s*人/);
+  if(direct) return demandNumber(direct[1]);
+  const loose=s.match(/約\s*([\d,]{3,})\s*人/);
+  return loose?demandNumber(loose[1]):null;
+}
+function demandDateFromText(text="", fallbackYear=null){
+  const s=stripHtml(String(text||"")).normalize("NFKC").replace(/\s+/g," ");
+  let m=s.match(/(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日/);
+  if(m) return [m[1],String(m[2]).padStart(2,"0"),String(m[3]).padStart(2,"0")].join("-");
+  m=s.match(/(?:^|\s)(\d{1,2})\/(\d{1,2})(?:\([^)]*\))?/);
+  if(m&&fallbackYear) return [fallbackYear,String(m[1]).padStart(2,"0"),String(m[2]).padStart(2,"0")].join("-");
+  return null;
+}
+function demandEndDateFromText(text="", fallbackYear=null){
+  const s=stripHtml(String(text||"")).normalize("NFKC").replace(/\s+/g," ");
+  const all=[...s.matchAll(/(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日/g)];
+  if(all.length>=2){
+    const m=all[all.length-1];
+    return [m[1],String(m[2]).padStart(2,"0"),String(m[3]).padStart(2,"0")].join("-");
+  }
+  const range=s.match(/(\d{1,2})\/(\d{1,2})[^0-9]{0,12}(?:-|→|〜|～|~)[^0-9]{0,12}(\d{1,2})\/(\d{1,2})/);
+  if(range&&fallbackYear){
+    return [fallbackYear,String(range[3]).padStart(2,"0"),String(range[4]).padStart(2,"0")].join("-");
+  }
+  return null;
+}
+function demandStartTimeFromText(text=""){
+  const s=stripHtml(String(text||"")).normalize("NFKC").replace(/\s+/g," ");
+  const m=s.match(/(?:開始|開演|試合開始|開催時間|START)[^0-9]{0,12}([0-2]?\d:[0-5]\d)/i)
+    || s.match(/([0-2]?\d:[0-5]\d)\s*(?:開始|開演)/i);
+  return m?m[1].padStart(5,"0"):null;
+}
+function demandEndTimeFromText(text=""){
+  const s=stripHtml(String(text||"")).normalize("NFKC").replace(/\s+/g," ");
+  const m=s.match(/(?:終了|終演)[^0-9]{0,12}([0-2]?\d:[0-5]\d)/i)
+    || s.match(/([0-2]?\d:[0-5]\d)\s*(?:終了|終演)/i);
+  return m?m[1].padStart(5,"0"):null;
+}
+function demandEventKey(x){
+  return [
+    String(x?.date||""),
+    liveNameKey(x?.venue||""),
+    liveNameKey(x?.name||x?.display_name||"")
+  ].join("|");
+}
+function mergeDemandEvents(rows){
+  const out=[];
+  const seen=new Map();
+  for(const raw of rows){
+    if(!raw||!raw.date||!raw.name) continue;
+    const e={...raw};
+    const key=demandEventKey(e);
+    const idx=seen.get(key);
+    if(idx==null){
+      seen.set(key,out.length);
+      out.push(e);
+      continue;
+    }
+    const x=out[idx];
+    const sources=[...(Array.isArray(x.sources)?x.sources:[x.source].filter(Boolean)),...(Array.isArray(e.sources)?e.sources:[e.source].filter(Boolean))];
+    const urls=[...(Array.isArray(x.source_urls)?x.source_urls:[x.source_url].filter(Boolean)),...(Array.isArray(e.source_urls)?e.source_urls:[e.source_url].filter(Boolean))];
+    const xPeople=Number(x.people||0), ePeople=Number(e.people||0);
+    out[idx]={
+      ...x,...e,
+      people:Math.max(xPeople,ePeople)||null,
+      people_basis:ePeople>=xPeople?(e.people_basis||x.people_basis):(x.people_basis||e.people_basis),
+      start_time:e.start_time||x.start_time||null,
+      end_time:e.end_time||x.end_time||null,
+      end_time_estimate:e.end_time_estimate||x.end_time_estimate||null,
+      sources:[...new Set(sources)],
+      source_urls:[...new Set(urls)],
+      verification_count:new Set(sources).size
+    };
+  }
+  return out;
+}
+function normalizeLiveDemand(e){
+  const cap=demandVenueCapacity(e?.venue);
+  return {
+    kind:e?.event_type||e?.kind||"ticket",
+    demand_group:"ticket",
+    date:e?.date||null,
+    end_date:e?.date||null,
+    name:e?.display_name||e?.name||"公演",
+    detail_name:e?.name||e?.title||null,
+    venue:e?.venue||null,
+    start_time:e?.start_time||null,
+    end_time:e?.end_time||null,
+    end_time_estimate:e?.end_time_estimate||e?.end_time_reference||null,
+    people:cap,
+    people_basis:cap?"venue_capacity_reference":null,
+    source:e?.source||null,
+    source_url:e?.source_url||null,
+    confidence:e?.source_role==="playguide_primary"?"high":"medium"
+  };
+}
+function normalizeSportsDemand(e){
+  const cap=demandVenueCapacity(e?.venue);
+  const name=[e?.team,e?.opponent?("vs "+e.opponent):null].filter(Boolean).join(" ")||e?.name||"スポーツ";
+  return {
+    kind:e?.kind||"sports",
+    demand_group:"sports",
+    date:e?.date||null,
+    end_date:e?.date||null,
+    name,
+    detail_name:e?.league||null,
+    venue:e?.venue||null,
+    start_time:e?.start_time||null,
+    end_time:e?.end_time||null,
+    end_time_estimate:e?.end_time_estimate||null,
+    people:cap,
+    people_basis:cap?"venue_capacity_reference":null,
+    source:e?.source||null,
+    source_url:e?.source_url||null,
+    confidence:"high"
+  };
+}
+async function buildDiveDemandEvents(ctx){
+  const listUrl="https://dive-hiroshima.com/events/";
+  let html="";
+  try{html=await fetchTextCached(listUrl,1800,ctx)}catch{return []}
+  const today=tokyoParts();
+  const todayKey=liveDateKey(today);
+  const cutoffDate=new Date(todayKey+"T00:00:00+09:00");
+  cutoffDate.setDate(cutoffDate.getDate()+90);
+  const cutoff=cutoffDate.toLocaleDateString("sv-SE",{timeZone:"Asia/Tokyo"});
+  const links=linksFromHtml(html,listUrl)
+    .filter(x=>/dive-hiroshima\.com\/events\/events-[^/?#]+\/?$/i.test(x.url));
+  const unique=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,45);
+  const rows=await Promise.all(unique.map(async link=>{
+    let page="";
+    try{page=await fetchTextCached(link.url,1800,ctx)}catch{return null}
+    const text=stripHtml(page).normalize("NFKC").replace(/\s+/g," ");
+    if(!/広島市|広島市周辺|中区|南区|西区|東区|安佐南区|安佐北区|佐伯区|安芸区/i.test(text)) return null;
+    if(!/祭り|花火|フェス|スポーツ|大会|音楽|コンサート|マラソン|パレード|イベント/i.test(text)) return null;
+    const date=demandDateFromText(text,today.year);
+    if(!date||date<todayKey||date>cutoff) return null;
+    const endDate=demandEndDateFromText(text,today.year)||date;
+    const h1=(page.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)||[])[1];
+    const title=stripHtml(h1||link.text||"").replace(/\s+/g," ").trim();
+    if(!title) return null;
+    const people=demandPeopleFromText(text);
+    const venueMatch=text.match(/(?:会場|開催場所|場所)[：:\s]*([^。]{2,80})/);
+    const venue=venueMatch?venueMatch[1].replace(/(?:住所|アクセス|料金|時間).*$/,"").trim():null;
+    return {
+      kind:/花火/.test(text)?"fireworks":(/祭り|祭|フェス/.test(text)?"festival":(/スポーツ|大会|マラソン/.test(text)?"sports_event":"event")),
+      demand_group:"free_event",
+      date,end_date:endDate,
+      name:title,detail_name:null,venue,
+      start_time:demandStartTimeFromText(text),
+      end_time:demandEndTimeFromText(text),
+      end_time_estimate:null,
+      people,
+      people_basis:people?"official_page_stated":null,
+      source:"Dive! Hiroshima",
+      source_url:link.url,
+      confidence:people?"high":"medium"
+    };
+  }));
+  return rows.filter(Boolean);
+}
+async function buildConventionDemandEvents(ctx){
+  const url="https://www.hiroshimacvb.jp/calendar/";
+  let html="";
+  try{html=await fetchTextCached(url,1800,ctx)}catch{return []}
+  const today=tokyoParts();
+  const todayKey=liveDateKey(today);
+  const cutoffDate=new Date(todayKey+"T00:00:00+09:00");
+  cutoffDate.setDate(cutoffDate.getDate()+120);
+  const cutoff=cutoffDate.toLocaleDateString("sv-SE",{timeZone:"Asia/Tokyo"});
+  const rows=[];
+  const trs=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+  for(const tr of trs){
+    const cells=[...tr[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>stripHtml(x[1]).replace(/\s+/g," ").trim());
+    if(cells.length<4) continue;
+    const [name,venue,period,domesticRaw,overseasRaw]=cells;
+    if(!name||!/20\d{2}|月|\/|-/.test(period||"")) continue;
+    const date=demandDateFromText(period,today.year);
+    if(!date||date<todayKey||date>cutoff) continue;
+    const endDate=demandEndDateFromText(period,today.year)||date;
+    const domestic=demandNumber(domesticRaw)||0;
+    const overseas=demandNumber(overseasRaw)||0;
+    const people=domestic+overseas;
+    if(people<100) continue;
+    rows.push({
+      kind:"convention",demand_group:"convention",
+      date,end_date:endDate,name,detail_name:"コンベンション",venue,
+      start_time:null,end_time:null,end_time_estimate:null,
+      people,people_basis:"official_participants",
+      domestic_people:domestic,overseas_people:overseas,
+      source:"広島観光コンベンションビューロー",source_url:url,confidence:"high"
+    });
+  }
+  return rows;
+}
+async function buildHiroshimaDemandEvents(ctx){
+  const [liveFeed,sportsFeed,diveEvents,conventions]=await Promise.all([
+    getHiroshimaEventsCached(ctx),
+    buildHiroshimaSports(ctx),
+    buildDiveDemandEvents(ctx),
+    buildConventionDemandEvents(ctx)
+  ]);
+  const rows=[
+    ...(Array.isArray(liveFeed?.events)?liveFeed.events.map(normalizeLiveDemand):[]),
+    ...(Array.isArray(sportsFeed?.sports)?sportsFeed.sports.filter(isLocal=>isLocal&&isLocal.status!=="none").map(normalizeSportsDemand):[]),
+    ...diveEvents,
+    ...conventions
+  ];
+  const merged=mergeDemandEvents(rows)
+    .sort((a,b)=>
+      String(a.date||"9999-12-31").localeCompare(String(b.date||"9999-12-31"))||
+      (Number(b.people||0)-Number(a.people||0))||
+      String(a.start_time||"99:99").localeCompare(String(b.start_time||"99:99"))
+    );
+  const counts={ticket:0,sports:0,free_event:0,convention:0};
+  for(const e of merged) counts[e.demand_group]=(counts[e.demand_group]||0)+1;
+  return {
+    ok:true,area:"hiroshima_city",generated_at:Math.floor(Date.now()/1000),
+    purpose:"taxi_driver_demand_facts",
+    rule:"需要を断定せず、日付・時刻・会場・人数規模・集まりの種類を営業判断材料として返す。",
+    people_note:"ticket/sports の人数は実来場者数ではなく会場収容規模の参考。free_event/convention は公式ページに人数記載がある場合のみ数値化。",
+    source_counts:counts,
+    events:merged
+  };
+}
+async function getHiroshimaDemandEventsCached(ctx){
+  const cache=caches.default;
+  const key=new Request("https://taxi-sales-nav.local/demand/hiroshima/current-v1");
+  const hit=await cache.match(key);
+  if(hit){
+    try{return {...await hit.json(),cache_state:"hit"}}catch{}
+  }
+  const fresh=await buildHiroshimaDemandEvents(ctx);
+  if(fresh?.ok){
+    ctx?.waitUntil(cache.put(key,new Response(JSON.stringify(fresh),{
+      headers:{"content-type":"application/json;charset=UTF-8","cache-control":"public,max-age=1800"}
+    })));
+  }
+  return {...fresh,cache_state:"refreshed"};
+}
+
+
 async function fetchProtoCached(url, ttl, ctx) {
   const cache = caches.default;
   const key = new Request(url, {method:"GET"});
@@ -1878,6 +2151,7 @@ export default {
         cases:validateHistoricalDurationCases()
       },200,origin);
       if (url.pathname === "/api/events/hiroshima") return json(await getHiroshimaEventsCached(ctx),200,origin);
+      if (url.pathname === "/api/demand/hiroshima") return json(await getHiroshimaDemandEventsCached(ctx),200,origin);
       if (url.pathname === "/api/bus/hiroshima") return json(await buildHiroshimaBus(ctx),200,origin);
       return json({ok:false,error:"not_found"},404,origin);
     } catch (e) {
