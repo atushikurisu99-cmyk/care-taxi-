@@ -708,15 +708,6 @@ function canonicalLiveVenue(text=""){
   if(/BLUE LIVE HIROSHIMA/i.test(t)) return "BLUE LIVE HIROSHIMA";
   if(/(?:広島)?LIVE VANQUISH/i.test(t)) return "LIVE VANQUISH";
   if(/(?:広島)?セカンド.?クラッチ|SECOND CRUTCH/i.test(t)) return "セカンド・クラッチ";
-  if(/Live\s*space\s*Reed|ライブスペース\s*リード|Reed/i.test(t)) return "Live space Reed";
-  if(/ALMIGHTY/i.test(t)) return "ALMIGHTY";
-  if(/Live\s*Juke|ライブ\s*ジューク/i.test(t)) return "Live Juke";
-  if(/Cave-?Be/i.test(t)) return "広島Cave-Be";
-  if(/(?:広島)?4\.14/i.test(t)) return "広島4.14";
-  if(/\bYise\b/i.test(t)) return "Yise";
-  if(/SIX\s*ONE\s*Live\s*STAR/i.test(t)) return "SIX ONE Live STAR";
-  if(/広島県民文化センター/i.test(t)) return "広島県民文化センター";
-  if(/東区民文化センター|マリモホールディングス東区民文化センター/i.test(t)) return "マリモホールディングス東区民文化センター";
   return "";
 }
 function looksLikeMusicEvent(text=""){
@@ -1174,8 +1165,8 @@ async function buildQuattroEventsForDay(t,ctx,enrichEnd=true){
 
 async function getHiroshimaEventsCached(ctx) {
   const cache=caches.default;
-  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v5");
-  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v5");
+  const liveKey=new Request("https://taxi-sales-nav.local/events/hiroshima/current-v6");
+  const lastGoodKey=new Request("https://taxi-sales-nav.local/events/hiroshima/last-good-v6");
 
   const hit=await cache.match(liveKey);
   if(hit){
