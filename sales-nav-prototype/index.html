@@ -3081,16 +3081,20 @@ function calendarEntriesForDate(key){
  }
 
  // 通知対象に選んでいない会場も含め、取得済みイベントはカレンダーへ配置。
+ // カレンダーではライブタイトルを出さず、アーティスト名を主表示にする。
  const events=(Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[])
   .filter(e=>liveEventDate(e)===key);
  for(const e of events){
-  const ref=e.end_time_estimate||e.end_time_reference||'';
+  const artist=String(e.artist||e.artist_name||e.name||'').trim()||'アーティスト確認中';
+  const endEstimate=e.end_time_estimate||e.end_time_reference||'';
   out.push({
    type:'live',
-   text:(e.start_time?e.start_time+' ':'')+(e.name||'ライブ'),
-   title:e.name||'ライブ',
+   text:artist,
+   title:artist,
    time:e.start_time||'',
-   meta:(e.venue||'')+(ref?((e.venue?' / ':'')+'過去公演参考 '+String(ref).slice(0,5)+'頃'):''),
+   venue:e.venue||'',
+   endEstimate:endEstimate?String(endEstimate).slice(0,5):'',
+   meta:e.venue||'',
    raw:e
   });
  }
@@ -3132,6 +3136,17 @@ function openCalendarDayDetail(key){
   list.innerHTML='<div class="calendar-detail-empty">この日の予定・イベントはありません</div>';
  }else{
   list.innerHTML=entries.map(x=>{
+   if(x.type==='live'){
+    const venue=x.venue?('<div class="meta">'+escapeHtml(x.venue)+'</div>'):'';
+    const startText=x.time?('開演 '+x.time):'開演 --:--';
+    const endText=x.endEstimate?('終演見込 '+x.endEstimate):'終演見込 --:--';
+    return '<div class="calendar-detail-item live">'+
+     '<div class="kind">ライブ</div>'+
+     '<div class="main">'+escapeHtml(x.title||'アーティスト確認中')+'</div>'+
+     venue+
+     '<div class="meta">'+escapeHtml(startText+'　'+endText)+'</div>'+
+    '</div>';
+   }
    const time=x.time?('<div class="meta">'+escapeHtml(x.time)+'</div>'):'';
    const meta=x.meta?('<div class="meta">'+escapeHtml(x.meta)+'</div>'):'';
    return '<div class="calendar-detail-item '+escapeHtml(x.type)+'">'+
