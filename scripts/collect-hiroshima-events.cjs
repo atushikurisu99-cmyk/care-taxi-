@@ -549,14 +549,31 @@ async function main(){
   const sourceOnly=String(process.env.EVENT_SOURCE_ONLY||'').trim();
   const activeSources=sourceOnly?SOURCES.filter(([id])=>id===sourceOnly):SOURCES;
   if(sourceOnly&&!activeSources.length) throw new Error('unknown EVENT_SOURCE_ONLY '+sourceOnly);
+  const establishedSources=new Set(['icch','candy','worker_events','eplus','lawson','pia','dive','sports','cvb']);
   for(const [id,fn] of activeSources){
     const started=Date.now();
     try{
       const rows=await fn(); all.push(...rows);
-      const suspiciousZero=['icch','candy','worker_events','eplus','lawson','pia','dive','sports'].includes(id)&&rows.length===0;
-      health[id]={ok:!suspiciousZero,state:suspiciousZero?'suspicious_zero':'ok',count:rows.length,ms:Date.now()-started};
+      const prevCount=Number(previous?.source_health?.[id]?.count||0);
+      const suspiciousZero=establishedSources.has(id)&&rows.length===0;
+      const suspiciousDrop=prevCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(prevCount*0.35));
+      const state=suspiciousZero?'suspicious_zero':suspiciousDrop?'degraded':'ok';
+      health[id]={
+        ok:!suspiciousZero&&!suspiciousDrop,
+        state,
+        count:rows.length,
+        previous_count:prevCount||null,
+        ms:Date.now()-started,
+        last_success_at:(!suspiciousZero&&!suspiciousDrop)?new Date().toISOString():(previous?.source_health?.[id]?.last_success_at||null)
+      };
     }catch(e){
-      health[id]={ok:false,state:'failure',count:null,ms:Date.now()-started,error:String(e?.message||e).slice(0,240)};
+      health[id]={
+        ok:false,state:'failure',count:null,
+        previous_count:Number(previous?.source_health?.[id]?.count||0)||null,
+        ms:Date.now()-started,
+        last_success_at:previous?.source_health?.[id]?.last_success_at||null,
+        error:String(e?.message||e).slice(0,240)
+      };
     }
   }
   if(sourceOnly){
@@ -578,12 +595,21 @@ async function main(){
     for(const [id,h] of Object.entries(health)){
       if(h.ok&&Number(h.count)>0) continue;
       const labels=new Set(sourceLabelMap[id]||[]);
+      let retained=0;
       for(const old of previous.events){
         if(String(old.date||'')<today) continue;
         if((old.sources||[]).some(s=>labels.has(s)) || labels.has(old.source)){
-          all.push({...old,source:(old.source||[...(old.sources||[])][0]||id),stale_source:true,source_text:'retained after source failure/empty'});
+          all.push({
+            ...old,
+            source:(old.source||[...(old.sources||[])][0]||id),
+            stale_source:true,
+            stale_reason:h.state||'failure',
+            source_text:'retained by source continuity guard'
+          });
+          retained++;
         }
       }
+      health[id].retained_future_count=retained;
     }
   }
   const merged=merge(all).filter(e=>e.date>=today&&e.date<=cutoff).sort((a,b)=>a.date.localeCompare(b.date)||(Number(b.people||0)-Number(a.people||0))||String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
@@ -593,7 +619,7 @@ async function main(){
     e.people_label=e.people==null?null:(e.people_basis==='venue_capacity_reference'?('最大約'+Number(e.people).toLocaleString('ja-JP')+'人規模'):(Number(e.people).toLocaleString('ja-JP')+'人'));
   }
   const payload={ok:true,generated_at:new Date().toISOString(),area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,
-    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗または疑わしい0件では直前の未来予定を保持する'},
+    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比35%未満の急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない'},
     counts:{raw:all.length,merged:merged.length},events:merged.map(({source_text,...e})=>e)};
   await fs.mkdir('sales-nav-prototype/data',{recursive:true});await fs.writeFile(OUT,JSON.stringify(payload,null,2)+'\n');
   console.log(JSON.stringify({health,counts:payload.counts,first:payload.events.slice(0,12).map(x=>({date:x.date,name:x.name,venue:x.venue,people:x.people,source:x.source}))},null,2));
