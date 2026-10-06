@@ -793,12 +793,24 @@ async function main(){
         (String(x?.name||'').includes(String(e.name||''))||String(e.name||'').includes(String(x?.name||''))));
     e.first_seen_at=old?.first_seen_at||old?.last_seen_at||previous?.generated_at||nowIso;
     e.last_seen_at=nowIso;
-    const missing=[];
-    if(e.event_type==='convention'&&Number(e.people||0)<100) missing.push('participants');
-    if(!e.start_time) missing.push('start_time');
-    if(!e.end_time) missing.push('end_time');
-    e.needs_enrichment=missing.length>0;
-    e.enrichment_targets=missing;
+    // Missing values are not fabricated. After the configured public sources
+    // have been checked, explicitly distinguish "not publicly published" from
+    // collector failure.
+    if(e.event_type==='convention'){
+      e.participants_status=Number(e.people||0)>=100?'published':(e.participants_status||'not_published_on_checked_sources');
+    }else{
+      e.participants_status=e.people!=null?'published_or_capacity_reference':'not_applicable_or_not_published';
+    }
+    e.start_time_status=e.start_time?'published':'not_published_on_checked_sources';
+    e.end_time_status=e.end_time?'published':'not_published_on_checked_sources';
+
+    const unresolved=[];
+    if(e.event_type==='convention'&&Number(e.people||0)<100&&e.participants_status!=='not_published_on_checked_sources') unresolved.push('participants');
+    if(!e.start_time&&e.start_time_status!=='not_published_on_checked_sources') unresolved.push('start_time');
+    if(!e.end_time&&e.end_time_status!=='not_published_on_checked_sources') unresolved.push('end_time');
+    e.needs_enrichment=unresolved.length>0;
+    e.enrichment_targets=unresolved;
+    e.public_data_complete=unresolved.length===0;
 
     const official=(e.sources||[]).some(s=>/公式|NPB|Dive! Hiroshima|広島観光コンベンションビューロー/.test(String(s)));
     e.confidence=(Number(e.verification_count||0)>=2?'verified':official?'official':'single_source');
@@ -819,7 +831,7 @@ async function main(){
     sports:{role:'sports_official',cadence:'twice_daily',categories:['sports'],continuity:'retain_on_failure_or_regression'}
   };
   const payload={ok:true,generated_at:nowIso,area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,source_registry:sourceRegistry,
-    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比60%未満への急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない',enrichment_policy:'既存イベントを消さず、不足している人数・開始・終了時刻を後続ソースで補完する'},
+    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比60%未満への急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない',enrichment_policy:'公開値は補完し、公開されていない項目は未公表と明示する。推測値で埋めない'},
     counts:{raw:all.length,merged:merged.length},events:merged.map(({source_text,...e})=>e)};
   const enrichmentSummary={
     participants:payload.events.filter(e=>Array.isArray(e.enrichment_targets)&&e.enrichment_targets.includes('participants')).length,
