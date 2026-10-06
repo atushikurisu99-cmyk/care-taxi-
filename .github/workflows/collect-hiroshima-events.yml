@@ -1,0 +1,64 @@
+name: Collect Hiroshima taxi demand events
+
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 18 * * *"
+    - cron: "17 6 * * *"
+  push:
+    branches: [main]
+    paths:
+      - "scripts/collect-hiroshima-events.cjs"
+      - ".github/workflows/collect-hiroshima-events.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: collect-hiroshima-events
+  cancel-in-progress: true
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Collect sources
+        run: node scripts/collect-hiroshima-events.cjs
+
+      - name: Validate snapshot
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const p=JSON.parse(fs.readFileSync('sales-nav-prototype/data/hiroshima-demand-events.json','utf8'));
+          if(p?.ok!==true||!Array.isArray(p.events)) throw new Error('invalid snapshot');
+          if(!p.source_health||Object.keys(p.source_health).length<5) throw new Error('missing source health');
+          const bad=p.events.filter(x=>!x.date||!x.name||!x.venue);
+          if(bad.length) throw new Error('invalid events '+bad.length);
+          console.log(JSON.stringify({
+            generated_at:p.generated_at,
+            counts:p.counts,
+            health:p.source_health,
+            first:p.events.slice(0,20).map(x=>({
+              date:x.date,name:x.name,venue:x.venue,people:x.people,
+              people_basis:x.people_basis,start_time:x.start_time,end_time:x.end_time,
+              event_type:x.event_type,sources:x.sources
+            }))
+          },null,2));
+          NODE
+
+      - name: Commit updated snapshot
+        run: |
+          if git diff --quiet -- sales-nav-prototype/data/hiroshima-demand-events.json; then
+            echo "No snapshot change"
+            exit 0
+          fi
+          git config user.name "taxi-event-collector[bot]"
+          git config user.email "taxi-event-collector[bot]@users.noreply.github.com"
+          git add sales-nav-prototype/data/hiroshima-demand-events.json
+          git commit -m "Update Hiroshima demand event snapshot"
+          git push
