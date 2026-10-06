@@ -1457,20 +1457,17 @@ html,body{
   </div>
 
   <div class="reservation-field">
-   <div class="form-label">時間指定</div>
-   <div class="form-toggle">
-    <button id="resTimedYes" class="active" type="button" onclick="setReservationTimed(true)">あり</button>
-    <button id="resTimedNo" type="button" onclick="setReservationTimed(false)">なし</button>
-   </div>
-  </div>
-
-  <div class="reservation-field">
    <div class="form-label">日付</div>
    <input id="resDate" class="form-input" type="date">
   </div>
 
+  <div class="reservation-field">
+   <div class="form-label">お名前</div>
+   <input id="resName" class="form-input" type="text" placeholder="任意" autocomplete="off">
+  </div>
+
   <div id="resTimeWrap" class="reservation-field">
-   <div class="form-label">時刻</div>
+   <div class="form-label">時刻 <span class="optional-mark">未定なら空欄でOK</span></div>
    <input id="resTime" class="form-input" type="time">
   </div>
 
@@ -1482,11 +1479,6 @@ html,body{
   <div class="reservation-field">
    <div class="form-label">行き先</div>
    <input id="resDestination" class="form-input" type="text" placeholder="未定なら空欄でOK" autocomplete="off">
-  </div>
-
-  <div class="reservation-field">
-   <div class="form-label">お名前</div>
-   <input id="resName" class="form-input" type="text" placeholder="任意" autocomplete="off">
   </div>
 
   <div class="reservation-field">
@@ -3263,20 +3255,17 @@ function localDateValue(d=new Date()){
 }
 function setReservationTimed(v){
  reservationTimed=!!v;
- document.getElementById('resTimedYes')?.classList.toggle('active',reservationTimed);
- document.getElementById('resTimedNo')?.classList.toggle('active',!reservationTimed);
- document.getElementById('resTimeWrap')?.classList.toggle('hidden',!reservationTimed);
 }
 function openReservationEditor(){
  const ids=['resPickup','resDestination','resName','resPhone','resMemo','resTime'];
  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
  const date=document.getElementById('resDate');if(date)date.value=localDateValue();
- setReservationTimed(true);
+ reservationTimed=false;
  show('reservationEdit');
 }
 function reservationSortKey(r){
  const date=r.date||'9999-12-31';
- const time=r.timed?(r.time||'23:59'):'23:59';
+ const time=r.time||'23:59';
  return date+'T'+time;
 }
 function nextReservation(){
@@ -3319,7 +3308,7 @@ function renderReservations(){
  const empty=document.getElementById('reservationEmpty');
  if(list){
   list.innerHTML=all.map(r=>{
-   const t=r.timed&&r.time?r.time:'時間なし';
+   const t=r.time||'時間未定';
    const dest=r.destination?' → '+escapeHtml(r.destination):'';
    const person=r.name?escapeHtml(r.name):'';
    const status=r.shareStatus||'';
@@ -3366,13 +3355,12 @@ function saveReservation(){
  const time=document.getElementById('resTime')?.value||'';
  const pickup=(document.getElementById('resPickup')?.value||'').trim();
  if(!date){toast('日付を入力してください');return}
- if(reservationTimed&&!time){toast('時刻を入力してください');return}
  if(!pickup){toast('お迎え場所を入力してください');return}
  const r={
   id:'r'+Date.now(),
   date,
-  timed:reservationTimed,
-  time:reservationTimed?time:'',
+  timed:!!time,
+  time:time,
   pickup,
   destination:(document.getElementById('resDestination')?.value||'').trim(),
   name:(document.getElementById('resName')?.value||'').trim(),
@@ -3397,7 +3385,7 @@ function openReservationJob(id){
  if(!r) return;
  currentReservationJobId=id;
  const statusMap={pending:'依頼中',accepted:'承認済み',heading:'迎車中',onboard:'実車中',completed:'完了',cancelled:'キャンセル'};
- document.getElementById('jobTime').textContent=r.timed&&r.time?r.time:'時間なし';
+ document.getElementById('jobTime').textContent=r.time||'時間未定';
  document.getElementById('jobStatus').textContent=statusMap[r.shareStatus]||'予約';
  document.getElementById('jobPickup').textContent=r.pickup||'--';
  document.getElementById('jobDestination').textContent=r.destination||'未定';
@@ -3468,7 +3456,7 @@ function reservationShareText(r){
  const lines=[
   '【予約】',
   '日付: '+(r.date||''),
-  '時間: '+(r.timed?(r.time||'未定'):'時間指定なし'),
+  '時間: '+(r.time||'未定'),
   'お迎え: '+(r.pickup||'')
  ];
  if(r.destination) lines.push('行き先: '+r.destination);
@@ -3484,7 +3472,7 @@ function openReservationShare(id){
  const el=document.getElementById('reservationShareSummary');
  if(el){
   el.innerHTML='<div class="label">共有する予約</div><strong>'+
-   escapeHtml(r.timed&&r.time?r.time:'時間なし')+'　'+escapeHtml(r.pickup)+
+   escapeHtml(r.time||'時間未定')+'　'+escapeHtml(r.pickup)+
    '</strong><div class="sub">'+escapeHtml(r.date)+(r.destination?' → '+escapeHtml(r.destination):'')+'</div>';
  }
  const state=document.getElementById('reservationShareState');
