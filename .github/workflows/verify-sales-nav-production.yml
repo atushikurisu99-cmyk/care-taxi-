@@ -106,10 +106,23 @@ jobs:
             if(!await page.locator('.report-template-fixed').getByText('相互個人タクシー協同組合').isVisible()) throw new Error('Sogo template name missing');
             await page.locator('#monthlyReport .monthly-report-actions button.demo').click();
             await page.waitForTimeout(300);
-            const previewText=await page.locator('#monthlyReportPreview').innerText();
+            const preview=page.locator('#monthlyReportPreview');
+            const previewText=await preview.innerText();
             if(!previewText.includes('相互個人タクシー協同組合')||!previewText.includes('運転日報')||!previewText.includes('広島駅 新幹線口')){
               throw new Error('demo operation data did not reach report preview');
             }
+            if(!await preview.isVisible()) throw new Error('monthly preview did not become visible after demo');
+            await page.locator('#monthlyReportPreviewButton').click();
+            if(await preview.isVisible()) throw new Error('monthly preview did not close');
+            await page.locator('#monthlyReportPreviewButton').click();
+            await page.waitForTimeout(150);
+            if(!await preview.isVisible()) throw new Error('monthly preview button did not open preview');
+            const previewBox=await preview.boundingBox();
+            const vp=page.viewportSize();
+            if(!previewBox||!vp||previewBox.y>=vp.height||previewBox.y+Math.min(previewBox.height,80)<=0){
+              throw new Error('monthly preview opened outside visible viewport: '+JSON.stringify({previewBox,vp}));
+            }
+            await page.screenshot({path:'/tmp/monthly-preview-production.png',fullPage:false});
 
             await page.evaluate(()=>{ if(typeof show==='function') show('eventDetail'); });
             await page.waitForTimeout(3000);
@@ -148,6 +161,7 @@ jobs:
           path: |
             /tmp/prod-verify.json
             /tmp/menu-production.png
+            /tmp/monthly-preview-production.png
           if-no-files-found: ignore
           retention-days: 1
 
