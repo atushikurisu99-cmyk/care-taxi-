@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T08:20:52.520Z",
+  "generated_at": "2026-10-06T08:26:00.304Z",
   "area": "広島市",
   "source_health": {
     "icch": {
@@ -8,80 +8,80 @@
       "state": "ok",
       "count": 29,
       "previous_count": 29,
-      "ms": 941,
-      "last_success_at": "2026-10-06T08:18:14.179Z"
+      "ms": 821,
+      "last_success_at": "2026-10-06T08:23:48.346Z"
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 38,
       "previous_count": 38,
-      "ms": 1407,
-      "last_success_at": "2026-10-06T08:18:15.586Z"
+      "ms": 783,
+      "last_success_at": "2026-10-06T08:23:49.129Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
-      "count": 21,
-      "previous_count": 20,
-      "ms": 7259,
-      "last_success_at": "2026-10-06T08:18:22.845Z"
+      "count": 20,
+      "previous_count": 21,
+      "ms": 11118,
+      "last_success_at": "2026-10-06T08:24:00.247Z"
     },
     "eplus": {
-      "ok": true,
-      "state": "ok",
-      "count": 101,
-      "previous_count": 54,
-      "ms": 55440,
-      "last_success_at": "2026-10-06T08:19:18.285Z"
+      "ok": false,
+      "state": "degraded",
+      "count": 11,
+      "previous_count": 101,
+      "ms": 38350,
+      "last_success_at": "2026-10-06T08:19:18.285Z",
+      "retained_future_count": 100
     },
     "lawson": {
       "ok": true,
       "state": "ok",
       "count": 39,
       "previous_count": 39,
-      "ms": 1592,
-      "last_success_at": "2026-10-06T08:19:19.877Z"
+      "ms": 1220,
+      "last_success_at": "2026-10-06T08:24:39.817Z"
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 43522,
-      "last_success_at": "2026-10-06T08:20:03.399Z"
+      "ms": 31006,
+      "last_success_at": "2026-10-06T08:25:10.823Z"
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
       "previous_count": 3,
-      "ms": 8379,
-      "last_success_at": "2026-10-06T08:20:11.778Z"
+      "ms": 8612,
+      "last_success_at": "2026-10-06T08:25:19.435Z"
     },
     "city_events": {
-      "ok": false,
-      "state": "suspicious_zero",
-      "count": 0,
+      "ok": true,
+      "state": "ok",
+      "count": 3,
       "previous_count": null,
-      "ms": 2629,
-      "last_success_at": null,
-      "retained_future_count": 0
+      "ms": 6606,
+      "last_success_at": "2026-10-06T08:25:26.041Z"
     },
     "published_details": {
       "ok": true,
       "state": "ok",
       "count": 14,
-      "previous_count": null,
+      "previous_count": 14,
       "ms": 1,
-      "last_success_at": "2026-10-06T08:20:14.408Z"
+      "last_success_at": "2026-10-06T08:25:26.042Z"
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
       "previous_count": null,
-      "ms": 1263,
+      "ms": 820,
       "last_success_at": null,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
       "retained_future_count": 0
@@ -91,16 +91,16 @@
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 16195,
-      "last_success_at": "2026-10-06T08:20:31.866Z"
+      "ms": 13286,
+      "last_success_at": "2026-10-06T08:25:40.148Z"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
       "previous_count": 36,
-      "ms": 20644,
-      "last_success_at": "2026-10-06T08:20:52.510Z"
+      "ms": 20147,
+      "last_success_at": "2026-10-06T08:26:00.295Z"
     }
   },
   "source_registry": {
@@ -229,10 +229,10 @@
   },
   "degraded_sources": [
     {
-      "id": "city_events",
-      "state": "suspicious_zero",
+      "id": "eplus",
+      "state": "degraded",
       "error": null,
-      "retained_future_count": 0
+      "retained_future_count": 100
     },
     {
       "id": "cvb",
