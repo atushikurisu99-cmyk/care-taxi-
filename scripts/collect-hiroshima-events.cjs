@@ -717,6 +717,55 @@ async function sourceConventionOfficialEnrichment(){
   return out;
 }
 
+async function sourceNationalConventionOfficial(){
+  // National society / organizer pages catch conventions that venue calendars
+  // omit or publish late. Only official pages are used.
+  const rows=[
+    {
+      name:'第12回日本ウィメンズヘルス・メンズヘルス理学療法学会学術大会',
+      date:'2026-11-28',end_date:'2026-11-29',
+      venue:'広島国際会議場',
+      url:'https://12thjwhmhpt.com/outline/',
+      people:null,people_basis:null
+    },
+    {
+      name:'第13回 日本スポーツ理学療法学会学術大会',
+      date:'2026-12-19',end_date:'2026-12-20',
+      venue:'広島国際会議場',
+      url:'https://www.gakkai.co.jp/jsspt13/data/pdf/shuisho.pdf',
+      people:1300,people_basis:'official_expected_participants'
+    }
+  ];
+  const today=jstDate(),cutoff=addDays(today,120),out=[];
+  for(const row of rows){
+    if(row.end_date<today||row.date>cutoff) continue;
+    let page='';
+    try{ page=await fetchText(row.url,18000); }catch{}
+    const text=norm(page);
+    const detected=officialPeopleFromText(text);
+    const people=row.people||detected.people||null;
+    const basis=row.people_basis||detected.basis||null;
+    const dates=[];
+    for(let d=row.date;;){
+      dates.push(d);
+      if(d===row.end_date) break;
+      d=addDays(d,1);
+      if(d>row.end_date) break;
+    }
+    for(const date of dates){
+      out.push(eventBase({
+        name:row.name,date,end_date:row.end_date,venue:row.venue,
+        source:'全国学会公式',url:row.url,text,
+        kind:'convention',people,people_basis:basis,
+        disable_people_fallback:true
+      }));
+      out[out.length-1].participants_status=people?'published':'not_published_on_checked_sources';
+      out[out.length-1].official_detail_checked=page?1:0;
+    }
+  }
+  return out;
+}
+
 async function sourceSports(){
   const events=[];
   const today=jstDate();
@@ -780,7 +829,7 @@ async function sourceSports(){
 }
 const SOURCES=[
   ['icch',sourceICCH],['candy',sourceCandy],['worker_events',sourceWorkerEvents],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
-  ['dive',sourceDive],['city_events',sourceHiroshimaCityEvents],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['cvb_news',sourceHcvbConferenceNews],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
+  ['dive',sourceDive],['city_events',sourceHiroshimaCityEvents],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['cvb_news',sourceHcvbConferenceNews],['convention_official',sourceConventionOfficialEnrichment],['national_convention',sourceNationalConventionOfficial],['sports',sourceSports]
 ];
 async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={},sourceRows={};
@@ -851,6 +900,7 @@ async function main(){
     cvb:['広島観光コンベンションビューロー'],
     cvb_news:['HCVB開催決定情報'],
     convention_official:['主催者公式'],
+    national_convention:['全国学会公式'],
     sports:['サンフレッチェ広島公式','広島ドラゴンフライズ公式','広島サンダーズ公式','NPB']
   };
   for(const [id,h] of Object.entries(health)){
@@ -925,6 +975,7 @@ async function main(){
     cvb:{role:'convention_bureau',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_stale_publication'},
     cvb_news:{role:'convention_bureau_news',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
     convention_official:{role:'organizer_official',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
+    national_convention:{role:'national_society_official',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
     sports:{role:'sports_official',cadence:'twice_daily',categories:['sports'],continuity:'retain_on_failure_or_regression'}
   };
   const payload={ok:true,generated_at:nowIso,area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,source_registry:sourceRegistry,
