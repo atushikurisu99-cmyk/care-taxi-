@@ -66,6 +66,15 @@ function statedPeople(s=''){
   m=s.match(/(?:来場者|参加者|観客|入場者|動員数|延べ|先着|定員|募集人数|参加予定|参加見込)\D{0,50}約?\s*([\d,]{2,})\s*(?:人|名|席)/); if(m)return int(m[1]);
   return null;
 }
+function crowdPeopleFromText(s=''){
+  const t=norm(s);
+  let m=t.match(/(?:来場者数|来場者|観客数|観客|入場者数|入場者|動員数|動員|参加者数|延べ参加者|延べ来場者)\D{0,50}約?\s*(\d+(?:\.\d+)?)\s*万人/);
+  if(m) return Math.round(Number(m[1])*10000);
+  m=t.match(/(?:来場者数|来場者|観客数|観客|入場者数|入場者|動員数|動員|参加者数|延べ参加者|延べ来場者)\D{0,50}約?\s*([\d,]{2,})\s*(?:人|名)/);
+  if(m) return int(m[1]);
+  return null;
+}
+
 function officialPeopleFromText(s=''){
   const t=norm(s);
   // AXIES and similar plans sometimes split one expected total into several categories.
@@ -438,7 +447,7 @@ async function sourceDive(){
     const address=(info.match(/住所\s*[:：]?\s*([\s\S]{1,120}?)(?=Webサイト|主催|お問い合わせ|$)/)||[])[1]||'';
     const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue+' '+address))continue;
     const passive=/展示|展覧会|美術館|水族館|ライトアップ|イルミネーション|企画展|特別展/.test(h1);
-    const people=statedPeople(full); if(passive&&!people)continue;
+    const people=crowdPeopleFromText(full); if(passive&&!people)continue;
     events.push(eventBase({name:h1,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'Dive! Hiroshima',url,text:info,people,people_basis:people?'official_stated':null,address:norm(address)}));
   } return events;
 }
@@ -466,7 +475,7 @@ async function sourceHiroshimaCityEvents(){
   // appear in the calendar index. Their detail pages are still fetched each run.
   links.push(
     {title:'秋のグリーンフェア2026',url:'https://www.city.hiroshima.lg.jp/living/park-green/1021378/1006063/1026386/1053331.html',date:'2026-10-24',end_date:'2026-11-03',venue:'広島市植物公園',start:'09:00',end:'16:30',kind:'festival'},
-    {title:'ひろしま女子×理工系フェス2026',url:'https://www.city.hiroshima.lg.jp/shisei/kouhou/1004010/1045546/1053270/1053722.html',date:'2026-10-11',venue:'JMSアステールプラザ',start:'12:00',end:'16:00',kind:'festival',people:100,people_basis:'official_minimum_registered'},
+    {title:'ひろしま女子×理工系フェス2026',url:'https://www.city.hiroshima.lg.jp/shisei/kouhou/1004010/1045546/1053270/1053722.html',date:'2026-10-11',venue:'JMSアステールプラザ',start:'12:00',end:'16:00',kind:'festival'},
     {title:'インクルーシブ・スポーツ・フェスタ広島2026',url:'https://www.city.hiroshima.lg.jp/living/fukushi-kaigo/1014921/1025793/1053057.html',date:'2026-11-28',end_date:'2026-11-29',venue:'マエダハウジング東区スポーツセンター ほか',kind:'sports'}
   );
 
@@ -495,7 +504,7 @@ async function sourceHiroshimaCityEvents(){
     }
     if(!venue) continue;
 
-    const detectedPeople=statedPeople(text);
+    const detectedPeople=crowdPeopleFromText(text);
     const people=item.people||detectedPeople||null;
     const largeKeyword=/(祭|まつり|フェス|フェア|花火|マラソン|パレード|大型|スポーツ・レクリエーション)/i.test(title+' '+text.slice(0,1200));
     if(!people&&!largeKeyword) continue;
@@ -606,7 +615,7 @@ async function sourcePublishedEventDetails(){
 }
 
 async function sourceHcvbConferenceNews(){
-  const list='https://www.hiroshimacvb.jp/info/news/conference/';
+  const list='https://www.hiroshimacvb.jp/info/conference/';
   let html=''; try{html=await fetchText(list,18000)}catch{return []}
   const links=[];
   for(const a of html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
@@ -778,7 +787,7 @@ async function main(){
   const sourceOnly=String(process.env.EVENT_SOURCE_ONLY||'').trim();
   const activeSources=sourceOnly?SOURCES.filter(([id])=>id===sourceOnly):SOURCES;
   if(sourceOnly&&!activeSources.length) throw new Error('unknown EVENT_SOURCE_ONLY '+sourceOnly);
-  const establishedSources=new Set(['icch','candy','worker_events','eplus','lawson','pia','dive','city_events','sports','cvb']);
+  const establishedSources=new Set(['icch','candy','worker_events','eplus','lawson','pia','dive','city_events','sports','cvb','cvb_news']);
   for(const [id,fn] of activeSources){
     const started=Date.now();
     try{
