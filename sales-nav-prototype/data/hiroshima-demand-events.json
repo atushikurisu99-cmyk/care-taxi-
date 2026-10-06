@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T05:17:02.823Z",
+  "generated_at": "2026-10-06T05:20:59.432Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -12,56 +12,56 @@
       "ok": true,
       "state": "ok",
       "count": 29,
-      "ms": 986
+      "ms": 1461
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 37,
-      "ms": 1182
+      "ms": 1252
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
-      "ms": 14247
+      "ms": 16922
     },
     "eplus": {
       "ok": true,
       "state": "ok",
       "count": 33,
-      "ms": 19187
+      "ms": 18566
     },
     "lawson": {
       "ok": false,
       "state": "failure",
       "count": null,
-      "ms": 25079,
+      "ms": 25125,
       "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://l-tike.com/search/?pref=34&size=100\nCall log:\n  - navigating to \"https://l-tike.com/search/?pref=34&size=100\", waiting until \"domcontentloaded\"\n"
     },
     "pia": {
       "ok": false,
       "state": "suspicious_zero",
       "count": 0,
-      "ms": 2093
+      "ms": 2162
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
-      "ms": 6049
+      "ms": 1536
     },
     "cvb": {
       "ok": true,
       "state": "ok",
       "count": 0,
-      "ms": 6486
+      "ms": 5867
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
-      "ms": 22200
+      "ms": 20831
     }
   },
   "rules": {
@@ -71,7 +71,7 @@
   },
   "counts": {
     "raw": 158,
-    "merged": 104
+    "merged": 105
   },
   "events": [
     {
@@ -332,6 +332,29 @@
       "verification_count": 1,
       "confidence": "official",
       "people_label": "40,000人"
+    },
+    {
+      "date": "2026-10-11",
+      "end_date": "2026-10-11",
+      "name": "兵動大樹のおしゃべり大好き。 48 広島",
+      "venue": "JMSアステールプラザ",
+      "address": null,
+      "start_time": "13:00",
+      "end_time": null,
+      "event_type": "theater",
+      "people": 1204,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-12",
@@ -962,6 +985,29 @@
       "people_label": "最大約800人規模"
     },
     {
+      "date": "2026-10-28",
+      "end_date": "2026-10-28",
+      "name": "M&Oplaysプロデュース「ブランク」",
+      "venue": "JMSアステールプラザ",
+      "address": null,
+      "start_time": "18:30",
+      "end_time": null,
+      "event_type": "theater",
+      "people": 1204,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,204人規模"
+    },
+    {
       "date": "2026-10-30",
       "end_date": "2026-10-30",
       "name": "丈青生誕祭",
@@ -1133,16 +1179,16 @@
       "address": null,
       "start_time": "14:00",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "theater",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "confidence": "single_source",
@@ -1194,6 +1240,29 @@
       "verification_count": 1,
       "confidence": "official",
       "people_label": null
+    },
+    {
+      "date": "2026-11-03",
+      "end_date": "2026-11-03",
+      "name": "新日本プロレス POWER STRUGGLE ~SUPER Jr. TAG LEAGUE 2026~",
+      "venue": "広島サンプラザホール",
+      "address": null,
+      "start_time": "16:00",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 6000,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2026-11-05",
@@ -1367,16 +1436,16 @@
       "address": null,
       "start_time": "17:00",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "theater",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "confidence": "single_source",
@@ -1803,29 +1872,6 @@
       "people_label": null
     },
     {
-      "date": "2026-12-05",
-      "end_date": "2026-12-05",
-      "name": "HIROSHIMA CONTI-NeW FeS 2026",
-      "venue": "広島グリーンアリーナ",
-      "address": null,
-      "start_time": "11:00",
-      "end_time": null,
-      "event_type": "event",
-      "people": 10000,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
-      ],
-      "verification_count": 1,
-      "confidence": "single_source",
-      "people_label": "最大約10,000人規模"
-    },
-    {
       "date": "2026-12-06",
       "end_date": "2026-12-06",
       "name": "サンフレッチェ広島 vs ヴィッセル神戸",
@@ -1851,47 +1897,26 @@
     {
       "date": "2026-12-06",
       "end_date": "2026-12-06",
-      "name": "HIROSHIMA CONTI-NeW FeS 2026",
-      "venue": "広島グリーンアリーナ",
-      "address": null,
-      "start_time": "11:30",
-      "end_time": null,
-      "event_type": "event",
-      "people": 10000,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
-      ],
-      "verification_count": 1,
-      "confidence": "single_source",
-      "people_label": "最大約10,000人規模"
-    },
-    {
-      "date": "2026-12-06",
-      "end_date": "2026-12-06",
       "name": "清水ミチコ",
       "venue": "広島文化学園HBGホール",
       "address": null,
       "start_time": "16:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "theater",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
-      "source_url": "https://www.candy-p.com/schedule/",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "イープラス"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/"
+        "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約2,001人規模"
     },
     {
@@ -2187,7 +2212,6 @@
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
