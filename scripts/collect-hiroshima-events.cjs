@@ -251,8 +251,10 @@ async function sourceEplus(){
   const events=[];
   for(const [id,kind,base] of bases){
     let lastSignature='';
-    for(let page=1;page<=8;page++){
-      const url=base+'/p'+page;
+    const pageUrls=[base,...Array.from({length:8},(_,i)=>base+'/p'+(i+1))];
+    for(let pageIndex=0;pageIndex<pageUrls.length;pageIndex++){
+      const page=pageIndex;
+      const url=pageUrls[pageIndex];
       let html='';
       try{ html=await fetchTextBrowserFallback(url,22000); }
       catch(e){
@@ -262,7 +264,7 @@ async function sourceEplus(){
       const text=norm(html);
       if(page===1) await saveDebug('eplus-'+id+'.txt',text);
       const signature=text.slice(0,500)+'|'+text.slice(-500);
-      if(page>1 && signature===lastSignature) break;
+      if(pageIndex>0 && signature===lastSignature) continue;
       lastSignature=signature;
 
       const dates=[...text.matchAll(/(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)/g)];
@@ -298,7 +300,7 @@ async function sourceEplus(){
         }));
         pageAccepted++;
       }
-      if(page>1 && pageAccepted===0) break;
+      if(pageIndex>1 && pageAccepted===0) continue;
     }
   }
   return merge(events);
@@ -603,6 +605,51 @@ async function sourcePublishedEventDetails(){
   }));
 }
 
+async function sourceHcvbConferenceNews(){
+  const list='https://www.hiroshimacvb.jp/info/news/conference/';
+  let html=''; try{html=await fetchText(list,18000)}catch{return []}
+  const links=[];
+  for(const a of html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
+    const title=norm(a[2]);
+    if(!/開催が決定|開催決定|会議|学会/i.test(title)) continue;
+    try{
+      const url=new URL(a[1],list).href;
+      if(url.includes('hiroshimacvb.jp/info/')) links.push({title,url});
+    }catch{}
+  }
+  const uniq=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,40);
+  const today=jstDate(),cutoff=addDays(today,730),out=[];
+  for(const item of uniq){
+    let page=''; try{page=await fetchText(item.url,15000)}catch{continue}
+    const text=norm(page);
+    const h1=norm((page.match(/<h[12][^>]*>([\s\S]*?)<\/h[12]>/i)||[])[1]||item.title);
+    const date=dateFrom(text,Number(today.slice(0,4)))||dateFrom(h1,Number(today.slice(0,4)));
+    // Prefer an explicit "YYYY年M月D日～..." future date found in article body.
+    const candidates=[...text.matchAll(/(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日/g)]
+      .map(m=>ymd(m[1],m[2],m[3]))
+      .filter(x=>x>=today&&x<=cutoff)
+      .sort();
+    const startDate=candidates[0]||date;
+    if(!startDate||startDate<today||startDate>cutoff) continue;
+    const endDate=endDateFrom(text,Number(startDate.slice(0,4)))||startDate;
+    const people=statedPeople(text);
+    let venue=null;
+    const vm=text.match(/(?:会場|開催場所)\s*[:：]?\s*([^。]{2,100})/);
+    if(vm) venue=norm(vm[1]);
+    if(!venue){
+      const knownVenue=(text.match(/広島国際会議場|広島コンベンションホール|リーガロイヤルホテル広島|ヒルトン広島|グランドプリンスホテル広島|ホテルグランヴィア広島/)||[])[0];
+      if(knownVenue) venue=knownVenue;
+    }
+    if(!venue) venue='広島市内';
+    out.push(eventBase({
+      name:h1.replace(/｜.*$/,'').trim(),
+      date:startDate,end_date:endDate,venue,source:'HCVB開催決定情報',url:item.url,text,
+      kind:'convention',people,people_basis:people?'official_expected_participants':null
+    }));
+  }
+  return merge(out);
+}
+
 async function sourceConventionOfficialEnrichment(){
   const icch='https://www.pcf.city.hiroshima.jp/icch/event.cgi';
   const html=await fetchText(icch,20000);
@@ -722,7 +769,7 @@ async function sourceSports(){
 }
 const SOURCES=[
   ['icch',sourceICCH],['candy',sourceCandy],['worker_events',sourceWorkerEvents],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
-  ['dive',sourceDive],['city_events',sourceHiroshimaCityEvents],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
+  ['dive',sourceDive],['city_events',sourceHiroshimaCityEvents],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['cvb_news',sourceHcvbConferenceNews],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
 ];
 async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
@@ -773,6 +820,7 @@ async function main(){
     city_events:['広島市公式'],
     published_details:['公式・主催者詳細'],
     cvb:['広島観光コンベンションビューロー'],
+    cvb_news:['HCVB開催決定情報'],
     convention_official:['主催者公式'],
     sports:['サンフレッチェ広島公式','広島ドラゴンフライズ公式','広島サンダーズ公式','NPB']
   };
@@ -841,6 +889,7 @@ async function main(){
     city_events:{role:'municipal_official',cadence:'twice_daily',categories:['festival','event','sports'],continuity:'retain_on_failure_or_regression'},
     published_details:{role:'official_detail_enrichment',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure'},
     cvb:{role:'convention_bureau',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_stale_publication'},
+    cvb_news:{role:'convention_bureau_news',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
     convention_official:{role:'organizer_official',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
     sports:{role:'sports_official',cadence:'twice_daily',categories:['sports'],continuity:'retain_on_failure_or_regression'}
   };
