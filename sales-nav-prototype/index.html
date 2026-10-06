@@ -3117,6 +3117,9 @@ function calendarEntriesForDate(key){
   if(String(e?.date||'')!==key) continue;
   const kind=String(e?.event_type||'event');
   if(!['convention','festival','event'].includes(kind)) continue;
+  // コンベンションは正式仕様どおり参加者100人以上だけ表示。
+  // 人数不明は「100人以上」と確認できないため、収集データには保持しても画面には出さない。
+  if(kind==='convention' && Number(e?.people||0)<100) continue;
   const title=String(e?.name||'イベント').trim();
   if(!title) continue;
 
