@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T08:11:41.226Z",
+  "generated_at": "2026-10-06T08:20:52.520Z",
   "area": "広島市",
   "source_health": {
     "icch": {
@@ -8,63 +8,80 @@
       "state": "ok",
       "count": 29,
       "previous_count": 29,
-      "ms": 872,
-      "last_success_at": "2026-10-06T08:09:07.124Z"
+      "ms": 941,
+      "last_success_at": "2026-10-06T08:18:14.179Z"
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 38,
-      "previous_count": 37,
-      "ms": 1037,
-      "last_success_at": "2026-10-06T08:09:08.161Z"
+      "previous_count": 38,
+      "ms": 1407,
+      "last_success_at": "2026-10-06T08:18:15.586Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
-      "count": 20,
+      "count": 21,
       "previous_count": 20,
-      "ms": 20687,
-      "last_success_at": "2026-10-06T08:09:28.848Z"
+      "ms": 7259,
+      "last_success_at": "2026-10-06T08:18:22.845Z"
     },
     "eplus": {
       "ok": true,
       "state": "ok",
-      "count": 54,
-      "previous_count": 129,
-      "ms": 41887,
-      "last_success_at": "2026-10-06T08:10:10.735Z"
+      "count": 101,
+      "previous_count": 54,
+      "ms": 55440,
+      "last_success_at": "2026-10-06T08:19:18.285Z"
     },
     "lawson": {
       "ok": true,
       "state": "ok",
       "count": 39,
-      "previous_count": 40,
-      "ms": 1392,
-      "last_success_at": "2026-10-06T08:10:12.127Z"
+      "previous_count": 39,
+      "ms": 1592,
+      "last_success_at": "2026-10-06T08:19:19.877Z"
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 45052,
-      "last_success_at": "2026-10-06T08:10:57.179Z"
+      "ms": 43522,
+      "last_success_at": "2026-10-06T08:20:03.399Z"
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
       "previous_count": 3,
-      "ms": 7189,
-      "last_success_at": "2026-10-06T08:11:04.368Z"
+      "ms": 8379,
+      "last_success_at": "2026-10-06T08:20:11.778Z"
+    },
+    "city_events": {
+      "ok": false,
+      "state": "suspicious_zero",
+      "count": 0,
+      "previous_count": null,
+      "ms": 2629,
+      "last_success_at": null,
+      "retained_future_count": 0
+    },
+    "published_details": {
+      "ok": true,
+      "state": "ok",
+      "count": 14,
+      "previous_count": null,
+      "ms": 1,
+      "last_success_at": "2026-10-06T08:20:14.408Z"
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
       "previous_count": null,
-      "ms": 843,
+      "ms": 1263,
       "last_success_at": null,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
       "retained_future_count": 0
@@ -74,16 +91,16 @@
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 14328,
-      "last_success_at": "2026-10-06T08:11:19.539Z"
+      "ms": 16195,
+      "last_success_at": "2026-10-06T08:20:31.866Z"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
       "previous_count": 36,
-      "ms": 21682,
-      "last_success_at": "2026-10-06T08:11:41.221Z"
+      "ms": 20644,
+      "last_success_at": "2026-10-06T08:20:52.510Z"
     }
   },
   "source_registry": {
@@ -159,6 +176,27 @@
       ],
       "continuity": "retain_on_failure_or_regression"
     },
+    "city_events": {
+      "role": "municipal_official",
+      "cadence": "twice_daily",
+      "categories": [
+        "festival",
+        "event",
+        "sports"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "published_details": {
+      "role": "official_detail_enrichment",
+      "cadence": "twice_daily",
+      "categories": [
+        "music",
+        "theater",
+        "sports",
+        "event"
+      ],
+      "continuity": "retain_on_failure"
+    },
     "cvb": {
       "role": "convention_bureau",
       "cadence": "twice_daily",
@@ -185,11 +223,17 @@
     }
   },
   "enrichment_pending": {
-    "participants": 12,
-    "start_time": 17,
-    "end_time": 114
+    "participants": 0,
+    "start_time": 0,
+    "end_time": 0
   },
   "degraded_sources": [
+    {
+      "id": "city_events",
+      "state": "suspicious_zero",
+      "error": null,
+      "retained_future_count": 0
+    },
     {
       "id": "cvb",
       "state": "failure",
