@@ -58,7 +58,7 @@ jobs:
           const history=JSON.parse(fs.readFileSync('sales-nav-prototype/data/hiroshima-demand-source-history.json','utf8'));
           if(!history?.sources||typeof history.sources!=='object') throw new Error('invalid source history snapshot');
           const h=p.source_health||{};
-          const minimums={icch:5,candy:5,dive:1,sports:5,worker_events:5};
+          const minimums={icch:5,candy:5,dive:1,sports:5,worker_events:5,lawson:20,pia:5,eplus:60,city_events:1,published_details:5,convention_official:5};
           for(const [id,min] of Object.entries(minimums)){
             if(h[id]?.ok!==true || Number(h[id]?.count||0)<min){
               throw new Error('source regression '+id+' count='+(h[id]?.count??'null'));
@@ -68,8 +68,31 @@ jobs:
           const venues=new Set(p.events.map(x=>x.venue).filter(Boolean));
           if(venues.size<7) throw new Error('coverage regression: too few venues '+venues.size);
           const groups=new Set(p.events.map(x=>x.event_type).filter(Boolean));
-          for(const needed of ['music','sports','convention']){
+          for(const needed of ['music','sports','convention','festival']){
             if(!groups.has(needed)) throw new Error('coverage regression: missing '+needed);
+          }
+
+          const outside=/廿日市|はつかいち|さくらぴあ|東広島|呉市|福山市|福山|三原|尾道|三次|庄原|江田島|大竹/;
+          const badTitle=/販売終了|予定枚数終了|一般発売|受付中|公演日[:：]|会場[:：]|sports_basketball/;
+          const outsideRows=p.events.filter(x=>outside.test(String(x.name||'')+' '+String(x.venue||'')));
+          if(outsideRows.length) throw new Error('outside-city event leaked: '+outsideRows[0].name);
+          const badTitles=p.events.filter(x=>badTitle.test(String(x.name||'')));
+          if(badTitles.length) throw new Error('ticket metadata leaked into title: '+badTitles[0].name);
+
+          const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\s「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'');
+          for(let i=0;i<p.events.length;i++){
+            for(let j=i+1;j<p.events.length;j++){
+              const a=p.events[i],b=p.events[j];
+              if(a.date!==b.date||a.venue!==b.venue) continue;
+              const an=norm(a.name),bn=norm(b.name);
+              if(an===bn||an.includes(bn)||bn.includes(an)){
+                throw new Error('duplicate event '+a.date+' '+a.venue+' '+a.name+' / '+b.name);
+              }
+            }
+          }
+
+          if(Number(history?.sources?.eplus?.reference_count||0)<100){
+            throw new Error('Eplus best-known reference history missing');
           }
           console.log(JSON.stringify({
             generated_at:p.generated_at,
@@ -93,7 +116,7 @@ jobs:
           fi
           git config user.name "taxi-event-collector[bot]"
           git config user.email "taxi-event-collector[bot]@users.noreply.github.com"
-          git add sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json sales-nav-prototype/data/hiroshima-demand-source-history.json sales-nav-prototype/data/hiroshima-demand-source-history.json
+          git add sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json sales-nav-prototype/data/hiroshima-demand-source-history.json
           git commit -m "Update Hiroshima demand event snapshot"
           if ! git push; then
             echo "Remote changed during collection; rebasing snapshot commit"
