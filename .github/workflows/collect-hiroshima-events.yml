@@ -44,6 +44,13 @@ jobs:
           if(!p.source_health||Object.keys(p.source_health).length<5) throw new Error('missing source health');
           const bad=p.events.filter(x=>!x.date||!x.name||!x.venue);
           if(bad.length) throw new Error('invalid events '+bad.length);
+          const h=p.source_health||{};
+          const minimums={icch:5,candy:5,dive:1,sports:5,worker_events:5};
+          for(const [id,min] of Object.entries(minimums)){
+            if(h[id]?.ok!==true || Number(h[id]?.count||0)<min){
+              throw new Error('source regression '+id+' count='+(h[id]?.count??'null'));
+            }
+          }
           console.log(JSON.stringify({
             generated_at:p.generated_at,
             counts:p.counts,
