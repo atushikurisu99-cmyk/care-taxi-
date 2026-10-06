@@ -3424,8 +3424,9 @@ function maybeNotifySelectedLiveEvents(d){
   if(!e||!selected.has(e.venue)) continue;
   // 開演前通知は営業判断への寄与が弱いため出さない。
   // 推定根拠が揃ったものは「終演目安」、一般参考幅だけなら「終演参考」と明確に分ける。
-  const endGuide=e.end_time_estimate||e.end_time_reference||e.end_time||null;
-  const endLabel='過去公演参考';
+  const guide=liveEndGuide(e);
+  const endGuide=guide.time;
+  const endLabel=guide.label;
   if(!endGuide) continue;
   const p=String(endGuide).split(':').map(Number);
   if(p.length<2||p.some(x=>!Number.isFinite(x))) continue;
@@ -3528,6 +3529,24 @@ function calendarSportType(s){
 function cleanLiveDisplayName(value){
  return String(value||'').trim().replace(/\s+広島$/,'').trim();
 }
+function liveEndGuide(e){
+ const exact=e?.end_time||'';
+ if(exact) return {time:String(exact).slice(0,5),label:'終了',kind:'exact'};
+ const supplied=e?.end_time_estimate||e?.end_time_reference||'';
+ if(supplied) return {time:String(supplied).slice(0,5),label:'終演見込',kind:'supplied'};
+ const start=String(e?.start_time||'').match(/^(\d{1,2}):(\d{2})/);
+ if(!start) return {time:'',label:'終演見込',kind:'none'};
+ const title=String(e?.display_name||e?.name||'');
+ const type=String(e?.event_type||e?.display_name_type||'').toLowerCase();
+ const venue=String(e?.venue||'');
+ let duration=150;
+ if(type==='theater'||/公演|コント|演劇|ミュージカル|落語|舞台/.test(title)) duration=120;
+ if(/SUPER ROCK CITY|フェス|FES|複数会場|10会場/i.test(title+' '+venue)) duration=600;
+ let mins=Number(start[1])+Number(start[2])*60+duration;
+ mins=Math.round(mins/10)*10;
+ const h=Math.floor(mins/60)%24,m=mins%60;
+ return {time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'),label:'終演見込',kind:'calculated'};
+}
 function calendarEntriesForDate(key){
  const out=[];
  for(const r of getReservations()){
@@ -3548,14 +3567,14 @@ function calendarEntriesForDate(key){
  const events=allLiveEventsForDate(key);
  for(const e of events){
   const artist=cleanLiveDisplayName(e.display_name||e.artist||e.artist_name||e.name||'公演')||'公演';
-  const endEstimate=e.end_time_estimate||e.end_time_reference||'';
+  const guide=liveEndGuide(e);
   out.push({
    type:'live',
    text:artist,
    title:artist,
    time:e.start_time||'',
    venue:e.venue||'',
-   endEstimate:endEstimate?String(endEstimate).slice(0,5):'',
+   endEstimate:guide.time,
    meta:e.venue||'',
    raw:e
   });
@@ -4504,9 +4523,8 @@ function renderLiveEvents(){
  if(bot){
   if(e){
    const t=e.start_time?e.start_time+'〜':'時刻確認中';
-   const end=e.end_time_estimate||e.end_time_reference||null;
-   const label=(e.end_time_estimate||e.end_time_reference)?'過去公演参考':'';
-   bot.textContent=t+(end?(' / '+label+' '+String(end).slice(0,5)+'頃'):'')+(e.venue?' / '+e.venue:'');
+   const guide=liveEndGuide(e);
+   bot.textContent=t+(guide.time?(' / '+guide.label+' '+guide.time+'頃'):'')+(e.venue?' / '+e.venue:'');
   }else{
    bot.textContent=selectedLiveVenues().length?'選択した会場だけ表示':'設定で会場を選択';
   }
@@ -6424,16 +6442,14 @@ function renderEventDetail(){
    String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99'))
   );
   liveList.innerHTML=upcoming.length?upcoming.map(e=>{
-   const exactEnd=e.end_time||'';
-   const ref=e.end_time_estimate||e.end_time_reference||'';
+   const guide=liveEndGuide(e);
    const tracked=selectedVenueSet.has(e.venue);
    const displayName=cleanLiveDisplayName(e.display_name||e.artist||e.artist_name||e.name||'公演')||'公演';
    return '<div class="calendar-detail-item live">'+
     '<div class="kind">'+escapeHtml(liveEventDate(e))+(tracked?' / チェック中':'')+'</div>'+
     '<div class="main">'+escapeHtml(displayName)+'</div>'+
     '<div class="meta">'+escapeHtml((e.start_time?e.start_time+' / ':'')+(e.venue||''))+
-      (exactEnd?(' / 終了 '+escapeHtml(String(exactEnd).slice(0,5))):
-       ref?(' / 過去公演参考 '+escapeHtml(String(ref).slice(0,5))+'頃'):'')+
+      (guide.time?(' / '+escapeHtml(guide.label)+' '+escapeHtml(guide.time)+'頃'):'')+
     '</div></div>';
   }).join(''):'<div class="calendar-detail-empty">今後のライブ情報はありません</div>';
  }
