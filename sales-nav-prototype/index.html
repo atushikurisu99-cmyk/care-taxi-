@@ -2916,6 +2916,7 @@ function seedDemoOperationData(){
  const sales=tripRows.reduce((sum,x)=>sum+Number(x.fare||0),0);
  const report={
   id:reportId,dutyId,dateKey,startTs:start,endTs:end,startTime:'17:10',endTime:'23:55',
+  registrationNumber:'広島 300 あ 13-94',
   odometerStart:52340,odometerEnd:52462,sales,receivable:1540,trips:tripRows.length,
   expenses:[
    {id:'demo_fuel',masterId:'exp_fuel',labelSnapshot:'燃料',amount:4200},
