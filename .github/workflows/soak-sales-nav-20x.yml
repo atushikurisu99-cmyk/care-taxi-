@@ -1,0 +1,288 @@
+name: Soak sales-nav 20x release check
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - ".github/workflows/soak-sales-nav-20x.yml"
+
+jobs:
+  soak:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright browsers
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright
+          npx playwright install --with-deps chromium webkit
+      - name: Run 20-cycle cross-device interaction soak
+        run: |
+          node <<'NODE'
+          const { chromium, webkit, devices } = require('playwright');
+          const fs = require('fs');
+          const target = 'https://taxi-sales-nav.pages.dev/';
+          const cycles = 20;
+          const profiles = [
+            {
+              name:'iPhone-SE-Safari',
+              browser:'webkit',
+              context:{ viewport:{width:375,height:667}, isMobile:true, hasTouch:true, deviceScaleFactor:2, userAgent:devices['iPhone SE'].userAgent }
+            },
+            {
+              name:'iPhone-15-Safari',
+              browser:'webkit',
+              context:{ viewport:{width:393,height:852}, isMobile:true, hasTouch:true, deviceScaleFactor:3, userAgent:devices['iPhone 15'].userAgent }
+            },
+            {
+              name:'Android-small-Chrome',
+              browser:'chromium',
+              context:{ viewport:{width:360,height:740}, isMobile:true, hasTouch:true, deviceScaleFactor:3, userAgent:devices['Pixel 5'].userAgent }
+            },
+            {
+              name:'Android-large-Chrome',
+              browser:'chromium',
+              context:{ viewport:{width:412,height:915}, isMobile:true, hasTouch:true, deviceScaleFactor:3, userAgent:devices['Pixel 7'].userAgent }
+            }
+          ];
+          const screenIds = [
+            'home','calendar','analysis','menu','schedule','reservationEdit',
+            'today','busDetail','weatherDetail','jrDetail','eventDetail',
+            'dailyReport','reportEdit','monthlyReport','settings','verify','sales'
+          ];
+          const report = {target,cycles,startedAt:new Date().toISOString(),profiles:[],failures:[]};
+
+          function fail(profile,cycle,step,msg,extra={}) {
+            const item={profile,cycle,step,msg,...extra};
+            report.failures.push(item);
+            console.error('FAIL',JSON.stringify(item));
+          }
+
+          async function preparePage(page){
+            await page.addInitScript(() => {
+              try {
+                localStorage.clear();
+                sessionStorage.clear();
+                localStorage.setItem('taxi_google_auth_app_device_v1','');
+              } catch(e) {}
+              window.__testErrors=[];
+              window.addEventListener('error',e=>window.__testErrors.push('error:'+String(e.message||e.error||'')));
+              window.addEventListener('unhandledrejection',e=>window.__testErrors.push('rejection:'+String(e.reason||'')));
+              navigator.geolocation = navigator.geolocation || {};
+            });
+            await page.route('**/api.open-meteo.com/**', route => route.fulfill({
+              status:200, contentType:'application/json',
+              body:JSON.stringify({
+                current:{temperature_2m:22,weather_code:1,precipitation:0,rain:0,wind_speed_10m:3},
+                hourly:{time:['2026-10-07T21:00'],precipitation_probability:[0],precipitation:[0]},
+                daily:{time:['2026-10-07','2026-10-08','2026-10-09','2026-10-10','2026-10-11','2026-10-12','2026-10-13'],
+                  weather_code:[1,2,3,61,1,1,2],
+                  temperature_2m_max:[25,24,23,22,25,26,24],
+                  temperature_2m_min:[17,16,15,15,17,18,17],
+                  precipitation_probability_max:[10,20,30,60,10,10,20]}
+              })
+            }));
+            await page.on('dialog', async d=>{ try{await d.accept()}catch(e){} });
+          }
+
+          async function assertShell(page,profile,cycle,step='shell'){
+            const nav = page.locator('nav.nav');
+            if(!(await nav.isVisible())) return fail(profile,cycle,step,'bottom nav not visible');
+            const box = await nav.boundingBox();
+            const vp = page.viewportSize();
+            if(!box || !vp) return fail(profile,cycle,step,'nav bounding box unavailable');
+            if(box.y < 0 || box.y + box.height > vp.height + 2)
+              fail(profile,cycle,step,'bottom nav outside viewport',{box,vp});
+            const buttons=page.locator('nav.nav button');
+            if(await buttons.count()!==4) fail(profile,cycle,step,'bottom nav button count != 4',{count:await buttons.count()});
+            for(let i=0;i<4;i++){
+              const b=buttons.nth(i);
+              if(!(await b.isVisible())) fail(profile,cycle,step,'nav button hidden',{index:i});
+              const bb=await b.boundingBox();
+              if(!bb || bb.width<44 || bb.height<44) fail(profile,cycle,step,'nav tap target too small',{index:i,bb});
+            }
+            const bodyScroll=await page.evaluate(()=>({
+              sw:document.documentElement.scrollWidth,
+              cw:document.documentElement.clientWidth,
+              bh:document.body.scrollHeight,
+              ih:innerHeight
+            }));
+            if(bodyScroll.sw>bodyScroll.cw+2) fail(profile,cycle,step,'horizontal overflow',{bodyScroll});
+          }
+
+          async function assertNoJsErrors(page,profile,cycle,step){
+            const errs=await page.evaluate(()=>window.__testErrors||[]);
+            if(errs.length) {
+              fail(profile,cycle,step,'javascript errors',{errs:errs.slice(-10)});
+              await page.evaluate(()=>window.__testErrors=[]);
+            }
+          }
+
+          async function clickAndSettle(locator, page){
+            await locator.scrollIntoViewIfNeeded().catch(()=>{});
+            await locator.click({timeout:5000});
+            await page.waitForTimeout(80);
+          }
+
+          async function coreFlow(page,profile,cycle){
+            await page.goto(target+'?soak='+Date.now()+'-'+cycle,{waitUntil:'domcontentloaded',timeout:30000});
+            await page.waitForTimeout(300);
+            await assertShell(page,profile,cycle,'initial');
+
+            // Bottom tabs: all 4 must switch reliably.
+            for(const targetId of ['home','calendar','analysis','menu']){
+              const btn=page.locator('nav.nav button[data-target="'+targetId+'"]');
+              await clickAndSettle(btn,page);
+              if(!(await page.locator('#'+targetId).evaluate(el=>el.classList.contains('active'))))
+                fail(profile,cycle,'bottom-nav','failed to switch',{targetId});
+              await assertShell(page,profile,cycle,'bottom-nav-'+targetId);
+            }
+
+            // Home -> duty start -> vacant -> ride -> payment -> finish.
+            await page.evaluate(()=>show('home'));
+            await clickAndSettle(page.locator('#dutyMainButton'),page);
+            if(!(await page.locator('#vacant').evaluate(el=>el.classList.contains('active'))))
+              fail(profile,cycle,'duty-start','did not enter vacant');
+            await clickAndSettle(page.locator('#vacant .action .primary'),page);
+            if(!(await page.locator('#ride').evaluate(el=>el.classList.contains('active'))))
+              fail(profile,cycle,'ride-start','did not enter ride');
+            await clickAndSettle(page.locator('#ride .primary.pay'),page);
+            if(!(await page.locator('#payment').evaluate(el=>el.classList.contains('active'))))
+              fail(profile,cycle,'payment','did not enter payment');
+            const payopts=page.locator('#payment .payopt');
+            for(let i=0;i<await payopts.count();i++){
+              await clickAndSettle(payopts.nth(i),page);
+              if(!(await payopts.nth(i).evaluate(el=>el.classList.contains('selected'))))
+                fail(profile,cycle,'payment-method','payment option not selected',{index:i});
+            }
+            await clickAndSettle(page.locator('#disabilityDiscountButton'),page);
+            await clickAndSettle(page.locator('#payment .action .primary'),page);
+            if(!(await page.locator('#vacant').evaluate(el=>el.classList.contains('active'))))
+              fail(profile,cycle,'ride-finish','did not return to vacant');
+
+            // Reservation create: no legacy time-mode toggle, save, list, open job sheet, close.
+            await page.evaluate(()=>show('reservationEdit'));
+            const txt=await page.locator('#reservationEdit').innerText();
+            if(txt.includes('時間指定あり')||txt.includes('時間指定なし')) fail(profile,cycle,'reservation','legacy time mode visible');
+            await page.locator('#resDate').fill('2026-10-20');
+            await page.locator('#resTime').fill('21:30');
+            await page.locator('#resName').fill('テスト太郎');
+            await page.locator('#resPickup').fill('広島駅 新幹線口');
+            await page.locator('#resDestination').fill('八丁堀');
+            await page.locator('#resPhone').fill('09000000000');
+            await page.locator('#resMemo').fill('20回反復テスト');
+            await clickAndSettle(page.locator('#reservationEdit .action .primary').filter({hasText:'保存'}),page);
+            if(!(await page.locator('#schedule').evaluate(el=>el.classList.contains('active'))))
+              fail(profile,cycle,'reservation-save','did not return to schedule');
+            if(await page.locator('#reservationList .reservation-item').count()<1)
+              fail(profile,cycle,'reservation-save','reservation missing');
+            await clickAndSettle(page.locator('#reservationList .reservation-item').first(),page);
+            if(!(await page.locator('#reservationJobLayer').evaluate(el=>el.classList.contains('show'))))
+              fail(profile,cycle,'reservation-job','job sheet not opened');
+            await clickAndSettle(page.locator('#reservationJobSheet .primary.secondary'),page);
+
+            // Settings: notification categories must all be selectable.
+            await page.evaluate(()=>{show('settings');openSettingsSection('notifications')});
+            for(const label of ['JR通知','バス通知','ライブ通知','通知音']){
+              const b=page.locator('#notificationTypeRoot .settings-category').filter({hasText:label});
+              if(!(await b.isVisible())) { fail(profile,cycle,'settings-notify','category not visible',{label}); continue; }
+              await clickAndSettle(b,page);
+              const visible=await page.locator('#settingsNotifications > div:not(.hidden), #settingsNotifications > button:not(.hidden)').count();
+              if(!visible) fail(profile,cycle,'settings-notify','category did not open',{label});
+              await page.evaluate(()=>openNotificationSection('root'));
+            }
+            await page.evaluate(()=>openNotificationSection('bus'));
+            await clickAndSettle(page.locator('#busWard中区'),page);
+            const firstStop=page.locator('#busStopSettingsList .setting-choice').first();
+            if(await firstStop.count()) await clickAndSettle(firstStop,page);
+            await page.evaluate(()=>openNotificationSection('live'));
+            const firstVenue=page.locator('#liveVenueSettingsList .setting-choice').first();
+            if(await firstVenue.count()) await clickAndSettle(firstVenue,page);
+
+            // Monthly report: demo -> preview and all local output buttons must not crash.
+            await page.evaluate(()=>show('monthlyReport'));
+            await clickAndSettle(page.locator('#monthlyReport button.demo'),page);
+            const preview=page.locator('#monthlyReportPreview');
+            if(!(await preview.isVisible())) fail(profile,cycle,'monthly-demo','preview not visible');
+            const ptxt=await preview.innerText();
+            for(const required of ['相互個人タクシー協同組合','運転日報','広島駅 新幹線口'])
+              if(!ptxt.includes(required)) fail(profile,cycle,'monthly-demo','preview missing text',{required});
+            await clickAndSettle(page.locator('#monthlyReport button').filter({hasText:'プレビュー'}),page);
+            await clickAndSettle(page.locator('#monthlyReport button').filter({hasText:'プレビュー'}),page);
+
+            // Render every known screen and check shell/overflow.
+            for(const id of screenIds){
+              await page.evaluate(id=>{ if(typeof show==='function' && document.getElementById(id)) show(id); },id);
+              await page.waitForTimeout(50);
+              const exists=await page.locator('#'+id).count();
+              if(!exists) { fail(profile,cycle,'screen-scan','missing screen',{id}); continue; }
+              await assertShell(page,profile,cycle,'screen-'+id);
+              const active=await page.locator('#'+id).evaluate(el=>el.classList.contains('active'));
+              if(!active) fail(profile,cycle,'screen-scan','screen not active',{id});
+            }
+
+            // Visible button audit: every visible button must have usable size and not be disabled unexpectedly.
+            const audit=await page.evaluate(()=>{
+              const els=[...document.querySelectorAll('button')].filter(el=>{
+                const r=el.getBoundingClientRect(),s=getComputedStyle(el);
+                return s.display!=='none'&&s.visibility!=='hidden'&&r.width>0&&r.height>0;
+              });
+              return els.map((el,i)=>({
+                i,text:(el.innerText||el.getAttribute('aria-label')||'').trim().slice(0,80),
+                w:Math.round(el.getBoundingClientRect().width),h:Math.round(el.getBoundingClientRect().height),
+                disabled:!!el.disabled
+              }));
+            });
+            for(const b of audit){
+              if(b.w<36||b.h<36) fail(profile,cycle,'button-audit','visible button tap target too small',b);
+            }
+
+            await assertNoJsErrors(page,profile,cycle,'end-cycle');
+          }
+
+          for(const profile of profiles){
+            const browserType=profile.browser==='webkit'?webkit:chromium;
+            const browser=await browserType.launch({headless:true});
+            const profileResult={name:profile.name,cycles:[],startedAt:new Date().toISOString()};
+            report.profiles.push(profileResult);
+            for(let cycle=1;cycle<=cycles;cycle++){
+              const context=await browser.newContext(profile.context);
+              await context.grantPermissions(['geolocation'],{origin:'https://taxi-sales-nav.pages.dev'});
+              await context.setGeolocation({latitude:34.3927,longitude:132.4637});
+              const page=await context.newPage();
+              await preparePage(page);
+              const before=report.failures.length;
+              try{
+                await coreFlow(page,profile.name,cycle);
+              }catch(e){
+                fail(profile.name,cycle,'uncaught',String(e&&e.stack||e));
+              }
+              const failures=report.failures.length-before;
+              profileResult.cycles.push({cycle,failures});
+              console.log('CYCLE',profile.name,cycle,'failures',failures);
+              await context.close();
+            }
+            profileResult.finishedAt=new Date().toISOString();
+            await browser.close();
+          }
+          report.finishedAt=new Date().toISOString();
+          fs.writeFileSync('/tmp/soak-report.json',JSON.stringify(report,null,2));
+          console.log('SOAK_SUMMARY',JSON.stringify({
+            profiles:report.profiles.map(p=>({name:p.name,cycles:p.cycles.length,failedCycles:p.cycles.filter(x=>x.failures).length})),
+            totalFailures:report.failures.length
+          },null,2));
+          if(report.failures.length) process.exit(1);
+          NODE
+      - name: Upload soak report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: sales-nav-soak-20x-report
+          path: /tmp/soak-report.json
+          if-no-files-found: error
+          retention-days: 7
