@@ -1,0 +1,52 @@
+name: Test Pia event source
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/collect-hiroshima-events.cjs"
+      - ".github/workflows/test-pia-source.yml"
+
+jobs:
+  test-pia:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install browser fallback
+        run: |
+          npm install --no-save playwright@1.56.0
+          npx playwright install --with-deps chromium
+
+      - name: Run Pia only
+        env:
+          EVENT_SOURCE_ONLY: pia
+        run: node scripts/collect-hiroshima-events.cjs
+
+      - name: Validate Pia result
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const p=JSON.parse(fs.readFileSync('tmp/event-source-debug/pia-result.json','utf8'));
+          if(p?.ok!==true) throw new Error('invalid result');
+          if(p?.health?.pia?.ok!==true) throw new Error('pia unhealthy');
+          if(!Array.isArray(p.events)||p.events.length<5) throw new Error('too few Pia Hiroshima events: '+(p.events?.length||0));
+          console.log(JSON.stringify({
+            health:p.health.pia,
+            count:p.events.length,
+            sample:p.events.slice(0,25).map(x=>({date:x.date,name:x.name,venue:x.venue,type:x.event_type}))
+          },null,2));
+          NODE
+
+      - name: Upload Pia sample
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: pia-source-result
+          path: tmp/event-source-debug
+          if-no-files-found: ignore
+          retention-days: 1
