@@ -23,10 +23,10 @@ button,input{font:inherit}
 .app>header{grid-row:1}
 .app>main{grid-row:2}
 .app>nav{grid-row:3}
-header{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
+header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:10px 14px;border-bottom:1px solid #182531;background:#09131d}
 header:has(.calendar-header-nav.show){padding-right:8px}
-header h1{font-size:21px;margin:0}
-.header-title-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;min-width:0;width:100%}
+header h1{font-size:21px;margin:0;white-space:nowrap}
+.header-title-row{display:grid;grid-template-columns:auto minmax(0,1fr);align-items:center;gap:8px;min-width:0;width:auto;flex:1 1 auto}
 .calendar-header-nav{display:none;grid-template-columns:34px auto 34px;align-items:center;justify-content:center;column-gap:20px;min-width:0;justify-self:end;padding-right:10px}
 .calendar-header-nav.show{display:grid}
 .calendar-header-title{font-size:16px;font-weight:1000;color:#f7f9fb;white-space:nowrap;letter-spacing:.1px}
@@ -40,10 +40,10 @@ header h1{font-size:21px;margin:0}
 header.state-only{justify-content:flex-end}
 header.state-only h1{display:none}
 .badge{font-size:12px;font-weight:800;padding:6px 11px;border-radius:999px;background:#0f2431;border:1px solid #274052}
-.header-state{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:0}
+.header-state{display:flex;flex-direction:column;align-items:flex-end;gap:3px;min-width:max-content;flex:0 0 auto}
 header .badge{
- font-size:17px;font-weight:800;padding:9px 16px;min-width:76px;text-align:center;
- border-radius:999px;line-height:1.1
+ font-size:17px;font-weight:800;padding:9px 15px;min-width:88px;text-align:center;
+ border-radius:999px;line-height:1.1;white-space:nowrap;word-break:keep-all
 }
 .header-duty-meta{font-size:10px;font-weight:700;color:var(--muted);line-height:1.1;white-space:nowrap;padding-right:2px}
 .map-control{height:52px;flex:0 0 52px;display:flex;align-items:center;justify-content:space-between;padding:0 13px;background:#0c1721;border:1px solid #22313d;border-radius:15px}
@@ -1309,6 +1309,13 @@ html,body{
  body.print-monthly-report #monthlyReportPreview .sogo-page:last-child{page-break-after:auto}
  body.print-monthly-report #monthlyReportPreview .sogo-trip,
  body.print-monthly-report #monthlyReportPreview .sogo-inspection{font-size:6.5pt!important}
+}
+
+@media(max-width:360px){
+ header{gap:7px;padding-left:11px;padding-right:11px}
+ header h1{font-size:19px}
+ header .badge{font-size:15px;min-width:82px;padding:8px 12px}
+ .header-duty-meta{font-size:9px}
 }
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
