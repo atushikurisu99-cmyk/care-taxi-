@@ -314,19 +314,38 @@ async function sourceWorkerEvents(){
 }
 
 async function sourcePia(){
-  const url='https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島');
-  const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
-  const re=/(?:一般発売|先行|プリセール|プレリザーブ|抽選)[^／]{0,120}／\s*([^\d]{2,120}?)\s+(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)\s+([^()]{2,100})\s*\(広島県\)/g;
-  for(const m of text.matchAll(re)){
-    let name=norm(m[1]).replace(/^「|」$/g,'').trim();
-    const rawVenue=norm(m[5]);
-    const vi=venueInfo(rawVenue);
-    const venue=vi.name||rawVenue;
-    if(!name||!venue) continue;
-    if(!/広島|グリーンアリーナ|HBG|上野学園|アステール|クアトロ|サンプラザ|フェニックス|BLUE LIVE|VANQUISH|セカンド/.test(venue)) continue;
-    events.push(eventBase({name,date:ymd(m[2],m[3],m[4]),venue,source:'チケットぴあ',url,text:m[0]}));
+  const urls=[
+    'https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島'),
+    'https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島公演')
+  ];
+  const events=[];
+  for(const url of urls){
+    const html=await fetchTextBrowserFallback(url,25000);
+    const text=norm(html);
+    await saveDebug('pia-'+(url.includes('%E5%85%AC%E6%BC%94')?'hiroshima-show':'hiroshima')+'.txt',text);
+
+    // Ticket Pia result pages place each sale line in the form:
+    // "一般発売... ／ GRe4N BOYZ 2026/10/10(土) 広島JMS... (広島県)"
+    const re=/／\s*([^／]{2,180}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,120}?)\s*\(広島県\)/g;
+    for(const m of text.matchAll(re)){
+      let name=norm(m[1])
+        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)[^／]{0,100}?\s+/,'')
+        .replace(/^「|」$/g,'')
+        .trim();
+      const rawVenue=norm(m[5]);
+      if(!name||!rawVenue) continue;
+      const vi=venueInfo(rawVenue);
+      const venue=vi.name||rawVenue;
+
+      // Hiroshima prefecture is not enough; retain only Hiroshima-city venues.
+      if(!inHiroshimaCity(venue)) continue;
+
+      events.push(eventBase({
+        name,date:ymd(m[2],m[3],m[4]),venue,source:'チケットぴあ',url,text:m[0]
+      }));
+    }
   }
-  return events;
+  return merge(events);
 }
 
 async function sourceDive(){
