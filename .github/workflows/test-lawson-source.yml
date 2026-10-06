@@ -1,0 +1,45 @@
+name: Test Lawson event source
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/collect-hiroshima-events.cjs"
+      - ".github/workflows/test-lawson-source.yml"
+
+jobs:
+  test-lawson:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Run Lawson only
+        env:
+          EVENT_SOURCE_ONLY: lawson
+        run: node scripts/collect-hiroshima-events.cjs
+
+      - name: Validate Lawson result
+        run: |
+          node - <<'NODE'
+          const fs=require('fs');
+          const p=JSON.parse(fs.readFileSync('tmp/event-source-debug/lawson-result.json','utf8'));
+          if(p?.ok!==true) throw new Error('invalid result');
+          if(p?.health?.lawson?.ok!==true) throw new Error('lawson unhealthy');
+          if(!Array.isArray(p.events)||p.events.length<5) throw new Error('too few Lawson Hiroshima events: '+(p.events?.length||0));
+          console.log(JSON.stringify({
+            health:p.health.lawson,
+            count:p.events.length,
+            sample:p.events.slice(0,25).map(x=>({date:x.date,name:x.name,venue:x.venue,type:x.event_type}))
+          },null,2));
+          NODE
+
+      - name: Upload Lawson sample
+        uses: actions/upload-artifact@v4
+        with:
+          name: lawson-source-result
+          path: tmp/event-source-debug
+          retention-days: 1
