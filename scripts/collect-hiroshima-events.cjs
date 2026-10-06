@@ -76,9 +76,12 @@ function officialPeopleFromText(s=''){
   }
   // When official registration explicitly says venue capacity has been reached,
   // the published capacity is a valid in-person count proxy.
-  if(/定員|capacity/i.test(t) && /満席|定員に達|reached capacity|registration.*closed/i.test(t)){
-    const cap=t.match(/(?:maximum capacity|定員|capacity)\D{0,30}([\d,]{3,})/i);
-    if(cap) return {people:int(cap[1]),basis:'official_registration_capacity_reached'};
+  if(/満席|定員に達|reached capacity|registration.*closed/i.test(t)){
+    const cap=t.match(/(?:maximum capacity|定員(?:は|:|：)?|capacity(?: is|:)?)[\s　]*([\d,]{2,})\s*(?:人|名|席|delegates)?/i);
+    if(cap){
+      const n=int(cap[1]);
+      if(n && n<10000) return {people:n,basis:'official_registration_capacity_reached'};
+    }
   }
   const p=statedPeople(t);
   return p?{people:p,basis:'official_stated'}:{people:null,basis:null};
@@ -233,7 +236,7 @@ async function sourceCandy(){
   return events;
 }
 async function sourceEplus(){
-  const urls=[
+  const bases=[
     ['live','music','https://eplus.jp/sf/live/chugoku-shikoku/hiroshima'],
     ['play','theater','https://eplus.jp/sf/play/chugoku-shikoku/hiroshima'],
     ['sports','sports','https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima'],
@@ -241,72 +244,74 @@ async function sourceEplus(){
     ['anime','music','https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima']
   ];
   const events=[];
-  for(const [id,kind,url] of urls){
-    let html='';
-    try{ html=await fetchTextBrowserFallback(url,22000); }
-    catch(e){ await saveDebug('eplus-'+id+'-error.txt',String(e?.message||e)); continue; }
-    const text=norm(html);
-    await saveDebug('eplus-'+id+'.txt',text);
-
-    // Eplus currently prints dates with optional whitespace after slash:
-    // "2026/ 10/17(土)" and ranges such as "2026/ 9/19(土) 2026/ 10/12(月・祝)".
-    const dates=[...text.matchAll(/(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)/g)];
-    for(let i=0;i<dates.length;i++){
-      const m=dates[i];
-      const st=(m.index||0)+m[0].length;
-      const en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900);
-      let seg=text.slice(st,en).replace(/^\s*(?:先着|抽選|一般発売|受付中)\s*/,'').trim();
-      const prefCandidates=[seg.indexOf('(広島県)'),seg.indexOf('（広島県）')].filter(x=>x>=0);
-      const prefPos=prefCandidates.length?Math.min(...prefCandidates):-1;
-      if(prefPos<0) continue;
-      const lead=seg.slice(0,prefPos);
-
-      // Only accept a venue token that appears inside this event's own
-      // "title + venue(広島県)" block. Never borrow a venue from the next event.
-      const venueHits=[];
-      for(const [vn,capacity,re] of CAP){
-        const mm=lead.match(re);
-        if(mm) venueHits.push({name:vn,capacity,pos:lead.indexOf(mm[0]),matched:mm[0]});
+  for(const [id,kind,base] of bases){
+    let lastSignature='';
+    for(let page=1;page<=8;page++){
+      const url=base+'/p'+page;
+      let html='';
+      try{ html=await fetchTextBrowserFallback(url,22000); }
+      catch(e){
+        if(page===1) await saveDebug('eplus-'+id+'-error.txt',String(e?.message||e));
+        break;
       }
-      venueHits.sort((a,b)=>a.pos-b.pos);
-      const vh=venueHits[0];
-      if(!vh||vh.pos<0) continue;
+      const text=norm(html);
+      if(page===1) await saveDebug('eplus-'+id+'.txt',text);
+      const signature=text.slice(0,500)+'|'+text.slice(-500);
+      if(page>1 && signature===lastSignature) break;
+      lastSignature=signature;
 
-      let head=lead.slice(0,vh.pos);
-      let name=head
-        .replace(/^(?:先着|抽選|一般発売|受付中|受付終了|予定枚数終了)\s*/g,'')
-        .replace(/\s+(?:先着|抽選|受付中|受付終了|予定枚数終了).*$/g,'')
-        .trim();
-      if(!name || name.length>160) continue;
-
-      const sm=seg.match(/(?:開演|開始|上映開始)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
-      const em=seg.match(/(?:終演|終了)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
-      events.push(eventBase({
-        name,date:ymd(m[1],m[2],m[3]),venue:vh.name,source:'イープラス',url,text:seg,
-        kind,start:sm?.[1]||null,end:em?.[1]||null
-      }));
+      const dates=[...text.matchAll(/(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)/g)];
+      if(!dates.length) break;
+      let pageAccepted=0;
+      for(let i=0;i<dates.length;i++){
+        const m=dates[i];
+        const st=(m.index||0)+m[0].length;
+        const en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900);
+        let seg=text.slice(st,en).replace(/^\s*(?:先着|抽選|一般発売|受付中)\s*/,'').trim();
+        const prefCandidates=[seg.indexOf('(広島県)'),seg.indexOf('（広島県）')].filter(x=>x>=0);
+        const prefPos=prefCandidates.length?Math.min(...prefCandidates):-1;
+        if(prefPos<0) continue;
+        const lead=seg.slice(0,prefPos);
+        const venueHits=[];
+        for(const [vn,capacity,re] of CAP){
+          const mm=lead.match(re);
+          if(mm) venueHits.push({name:vn,capacity,pos:lead.indexOf(mm[0]),matched:mm[0]});
+        }
+        venueHits.sort((a,b)=>a.pos-b.pos);
+        const vh=venueHits[0];
+        if(!vh||vh.pos<0) continue;
+        let name=lead.slice(0,vh.pos)
+          .replace(/^(?:先着|抽選|一般発売|受付中|受付終了|予定枚数終了)\s*/g,'')
+          .replace(/\s+(?:先着|抽選|受付中|受付終了|予定枚数終了).*$/g,'')
+          .trim();
+        if(!name||name.length>160) continue;
+        const sm=seg.match(/(?:開演|開始|上映開始)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
+        const em=seg.match(/(?:終演|終了)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
+        events.push(eventBase({
+          name,date:ymd(m[1],m[2],m[3]),venue:vh.name,source:'イープラス',url,text:seg,
+          kind,start:sm?.[1]||null,end:em?.[1]||null
+        }));
+        pageAccepted++;
+      }
+      if(page>1 && pageAccepted===0) break;
     }
   }
-  return events;
+  return merge(events);
 }
 async function sourceLawson(){
-  // The main l-tike host intermittently fails over HTTP/2 in GitHub Actions.
-  // cdn.l-tike.com serves the same search results as static HTML and is stable
-  // enough for scheduled collection.
-  const urls=[
-    'https://cdn.l-tike.com/search/?pref=34&size=100',
-    'https://cdn.l-tike.com/search/?pref=34&tig=100&size=100'
-  ];
-  const events=[];
-  for(const url of urls){
+  const first='https://cdn.l-tike.com/search/?pref=34&size=100';
+  const queue=[first],seen=new Set(),events=[];
+  while(queue.length && seen.size<8){
+    const url=queue.shift();
+    if(seen.has(url)) continue;
+    seen.add(url);
     const html=await fetchText(url,25000);
     const text=norm(html);
-    await saveDebug('lawson-'+(url.includes('tig=100')?'concert':'all')+'.txt',text);
-
-    // Example:
-    // コンサート キュウソネコカミ 公演日：2026/10/16(金)
-    // 会場：ＬＩＶＥ ＶＡＮＱＵＩＳＨ（広島県）
-    const blocks=[...text.matchAll(/(コンサート|演劇・ステージ・舞台|クラシック・オペラ|スポーツ|イベント)\s+([\s\S]{2,180}?)\s+公演日[:：]\s*(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)[\s\S]{0,260}?会場[:：]\s*([^（(]{2,120})(?:（広島県\)|\(広島県\))/g)];
+    if(seen.size===1){
+      await saveDebug('lawson-all.txt',text);
+      await saveDebug('lawson-first-raw.html',html);
+    }
+    const blocks=[...text.matchAll(/(コンサート|演劇・ステージ・舞台|クラシック・オペラ|スポーツ|イベント(?:・アート・ミュージアム)?)\s+([\s\S]{2,180}?)\s+公演日[:：]\s*(20\d{2})\/(\d{1,2})\/(\d{1,2})(?:\([^)]+\))?[\s\S]{0,260}?会場[:：]\s*([^（(]{2,120})(?:（広島県\)|\(広島県\))/g)];
     for(const m of blocks){
       const category=m[1],name=norm(m[2]).replace(/^(?:先着|抽選|一般発売)\s*/,'').trim();
       const rawVenue=norm(m[6]);
@@ -318,9 +323,20 @@ async function sourceLawson(){
       const kind=category==='スポーツ'?'sports':
                  /演劇|舞台|クラシック|オペラ/.test(category)?'theater':
                  category==='コンサート'?'music':'event';
-      events.push(eventBase({
-        name,date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0],kind
-      }));
+      events.push(eventBase({name,date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0],kind}));
+    }
+    for(const a of html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
+      const label=norm(a[2]),href=a[1];
+      if(!/次|next|[2-9]/i.test(label+href)) continue;
+      if(!/search\//i.test(href) && !/[?&](?:page|p|offset|start)=/i.test(href)) continue;
+      try{
+        const u=new URL(href,url);
+        if(u.hostname!=='cdn.l-tike.com') u.hostname='cdn.l-tike.com';
+        if(!u.searchParams.get('pref')) u.searchParams.set('pref','34');
+        if(!u.searchParams.get('size')) u.searchParams.set('size','100');
+        const s=u.href;
+        if(!seen.has(s)&&!queue.includes(s)) queue.push(s);
+      }catch{}
     }
   }
   return merge(events);
@@ -344,8 +360,6 @@ async function sourceWorkerEvents(){
 }
 
 async function sourcePia(){
-  // PIA venue pages load ticket rows from /pia/rlsInfo.do.
-  // Query that endpoint directly instead of relying on browser-side Ajax.
   const venues=[
     ['広島サンプラザホール','HSSP'],
     ['広島文化学園HBGホール','HRBG'],
@@ -359,60 +373,55 @@ async function sourcePia(){
   ];
   const events=[];
   for(const [fallbackVenue,code] of venues){
-    const endpoints=[
-      'https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd='+encodeURIComponent(code)+'&includeSaleEnd=fuzzy',
-      'https://ticket-search.pia.jp/pia/rlsInfo.do?page=1&venueCd='+encodeURIComponent(code)+'&includeSaleEnd=fuzzy'
-    ];
-    let text='';
-    let usedUrl='';
-    for(const url of endpoints){
-      try{
-        const html=await fetchText(url,20000);
-        const candidate=norm(html);
-        await saveDebug('pia-rls-'+code+'.txt',candidate);
-        if(candidate.length>80 && !/エラー|Error|Not Found/i.test(candidate)){
-          text=candidate; usedUrl=url; break;
+    let emptyStreak=0;
+    for(let page=1;page<=6;page++){
+      const endpoints=[
+        'https://t.pia.jp/pia/rlsInfo.do?page='+page+'&venueCd='+encodeURIComponent(code)+'&includeSaleEnd=fuzzy',
+        'https://ticket-search.pia.jp/pia/rlsInfo.do?page='+page+'&venueCd='+encodeURIComponent(code)+'&includeSaleEnd=fuzzy'
+      ];
+      let text='',usedUrl='';
+      for(const url of endpoints){
+        try{
+          const html=await fetchText(url,20000);
+          const candidate=norm(html);
+          if(page===1) await saveDebug('pia-rls-'+code+'.txt',candidate);
+          if(candidate.length>80&&!/エラー|Error|Not Found/i.test(candidate)){text=candidate;usedUrl=url;break}
+        }catch{}
+      }
+      if(!text){emptyStreak++; if(emptyStreak>=1) break; continue}
+      let added=0;
+      const patterns=[
+        /／\s*([^／]{2,180}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,140}?)\s*\(広島県\)/g,
+        /(?:一般発売|先行|プリセール|プレリザーブ|抽選)\s+([^\d]{2,160}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,140}?)\s*\(広島県\)/g
+      ];
+      for(const re of patterns){
+        for(const m of text.matchAll(re)){
+          let name=norm(m[1])
+            .replace(/^(?:販売終了|販売期間中|予定枚数終了|発売前|発売中|受付中|受付終了)\s*/,'')
+            .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)(?:[^／]{0,100}?)?[／/]\s*/,'')
+            .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)\s*/,'')
+            .trim();
+          if(!name) continue;
+          const rawVenue=norm(m[5]);
+          const vi=venueInfo(rawVenue);
+          const venue=vi.name||fallbackVenue;
+          if(!inHiroshimaCity(venue)) continue;
+          events.push(eventBase({name,date:ymd(m[2],m[3],m[4]),venue,source:'チケットぴあ',url:usedUrl,text:m[0]}));
+          added++;
         }
-      }catch{}
-    }
-    if(!text) continue;
-
-    const re=/／\s*([^／]{2,180}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,140}?)\s*\(広島県\)/g;
-    for(const m of text.matchAll(re)){
-      let name=norm(m[1])
-        .replace(/^(?:販売終了|販売期間中|予定枚数終了|発売前|発売中|受付中|受付終了)\s*/,'')
-        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)(?:[^／]{0,100}?)?[／/]\s*/,'')
-        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)\s*/,'')
-        .trim();
-      if(!name) continue;
-      const rawVenue=norm(m[5]);
-      const vi=venueInfo(rawVenue);
-      const venue=vi.name||fallbackVenue;
-      if(!inHiroshimaCity(venue)) continue;
-      events.push(eventBase({
-        name,date:ymd(m[2],m[3],m[4]),venue,source:'チケットぴあ',url:usedUrl,text:m[0]
-      }));
-    }
-
-    // Ajax response may omit the "／" prefix; accept compact ticket rows too.
-    const compact=/(?:一般発売|先行|プリセール|プレリザーブ|抽選)\s+([^\d]{2,160}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,140}?)\s*\(広島県\)/g;
-    for(const m of text.matchAll(compact)){
-      const name=norm(m[1])
-        .replace(/^(?:販売終了|販売期間中|予定枚数終了|発売前|発売中|受付中|受付終了)\s*/,'')
-        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)(?:[^／]{0,100}?)?[／/]\s*/,'')
-        .trim();
-      if(!name) continue;
-      const vi=venueInfo(norm(m[5]));
-      const venue=vi.name||fallbackVenue;
-      if(!inHiroshimaCity(venue)) continue;
-      events.push(eventBase({
-        name,date:ymd(m[2],m[3],m[4]),venue,source:'チケットぴあ',url:usedUrl,text:m[0]
-      }));
+      }
+      if(!added){
+        emptyStreak++;
+        if(page>1&&emptyStreak>=1) break;
+      }else emptyStreak=0;
+      if(/全\d+件中\d+~\d+件を表示中/.test(text)){
+        const m=text.match(/全(\d+)件中(\d+)~(\d+)件を表示中/);
+        if(m&&Number(m[3])>=Number(m[1])) break;
+      }
     }
   }
   return merge(events);
 }
-
 async function sourceDive(){
   const list='https://dive-hiroshima.com/events/'; const html=await fetchText(list); const links=[...html.matchAll(/href=["']([^"']*\/events\/events-[^"'?#]+\/?)[^"']*["']/gi)].map(m=>new URL(m[1],list).href); const uniq=[...new Set(links)].slice(0,50);const events=[];
   for(const url of uniq){let page;try{page=await fetchText(url)}catch{continue} const full=norm(page); const h1=norm((page.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)||[])[1]||'');if(!h1)continue;
@@ -533,6 +542,10 @@ async function sourceConventionOfficialEnrichment(){
     }
     // Special official facts that are published in stable organizer pages.
     if(/AXIES2026/.test(name)) best={people:1850,basis:'official_expected_participants'};
+    if(/先進パワー半導体分科会第13回講演会/.test(name)){
+      best=date==='2026-11-30'?{people:150,basis:'official_tutorial_capacity'}:{people:null,basis:null};
+    }
+    if(/第69回秋季日本歯周病学会学術大会/.test(name) && best.people===2026) best={people:null,basis:null};
     out.push(eventBase({
       name,date,venue:'広島国際会議場',source:'主催者公式',url:unique[0]||icch,
       text:name,kind:'convention',
