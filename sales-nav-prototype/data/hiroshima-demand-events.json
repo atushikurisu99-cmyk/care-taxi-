@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T08:06:13.020Z",
+  "generated_at": "2026-10-06T08:11:41.226Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -13,63 +13,63 @@
       "state": "ok",
       "count": 29,
       "previous_count": 29,
-      "ms": 1127,
-      "last_success_at": "2026-10-06T08:03:09.173Z"
+      "ms": 872,
+      "last_success_at": "2026-10-06T08:09:07.124Z"
     },
     "candy": {
       "ok": true,
       "state": "ok",
-      "count": 37,
+      "count": 38,
       "previous_count": 37,
-      "ms": 1435,
-      "last_success_at": "2026-10-06T08:03:10.608Z"
+      "ms": 1037,
+      "last_success_at": "2026-10-06T08:09:08.161Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
       "previous_count": 20,
-      "ms": 13074,
-      "last_success_at": "2026-10-06T08:03:23.682Z"
+      "ms": 20687,
+      "last_success_at": "2026-10-06T08:09:28.848Z"
     },
     "eplus": {
       "ok": true,
       "state": "ok",
-      "count": 129,
-      "previous_count": 47,
-      "ms": 74743,
-      "last_success_at": "2026-10-06T08:04:38.425Z"
+      "count": 54,
+      "previous_count": 129,
+      "ms": 41887,
+      "last_success_at": "2026-10-06T08:10:10.735Z"
     },
     "lawson": {
       "ok": true,
       "state": "ok",
-      "count": 40,
-      "previous_count": 57,
-      "ms": 1790,
-      "last_success_at": "2026-10-06T08:04:40.215Z"
+      "count": 39,
+      "previous_count": 40,
+      "ms": 1392,
+      "last_success_at": "2026-10-06T08:10:12.127Z"
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 16,
-      "previous_count": 11,
-      "ms": 46726,
-      "last_success_at": "2026-10-06T08:05:26.941Z"
+      "previous_count": 16,
+      "ms": 45052,
+      "last_success_at": "2026-10-06T08:10:57.179Z"
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
       "previous_count": 3,
-      "ms": 8044,
-      "last_success_at": "2026-10-06T08:05:34.985Z"
+      "ms": 7189,
+      "last_success_at": "2026-10-06T08:11:04.368Z"
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
       "previous_count": null,
-      "ms": 1299,
+      "ms": 843,
       "last_success_at": null,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
       "retained_future_count": 0
@@ -79,16 +79,16 @@
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 15574,
-      "last_success_at": "2026-10-06T08:05:51.858Z"
+      "ms": 14328,
+      "last_success_at": "2026-10-06T08:11:19.539Z"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
       "previous_count": 36,
-      "ms": 21151,
-      "last_success_at": "2026-10-06T08:06:13.009Z"
+      "ms": 21682,
+      "last_success_at": "2026-10-06T08:11:41.221Z"
     }
   },
   "source_registry": {
@@ -197,8 +197,8 @@
     "enrichment_policy": "既存イベントを消さず、不足している人数・開始・終了時刻を後続ソースで補完する"
   },
   "counts": {
-    "raw": 326,
-    "merged": 185
+    "raw": 251,
+    "merged": 137
   },
   "events": [
     {
@@ -222,7 +222,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -252,7 +252,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -285,7 +285,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -316,7 +316,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -350,7 +350,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -379,7 +379,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -413,7 +413,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -446,7 +446,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -475,7 +475,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -506,7 +506,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -535,7 +535,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -567,7 +567,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -600,7 +600,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -629,7 +629,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -659,7 +659,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -691,7 +691,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T07:14:42.392Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -722,7 +722,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -751,7 +751,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -780,39 +780,9 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-10-12",
-      "end_date": "2026-10-12",
-      "name": "WILD BLUE",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": null,
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "ローチケ",
-      "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
-      "sources": [
-        "ローチケ"
-      ],
-      "source_urls": [
-        "https://cdn.l-tike.com/search/?pref=34&size=100"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "start_time",
         "end_time"
       ],
       "confidence": "single_source",
@@ -839,7 +809,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -869,7 +839,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -901,7 +871,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -934,7 +904,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -967,7 +937,7 @@
       "official_detail_checked": 2,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -996,7 +966,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1026,7 +996,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1046,16 +1016,16 @@
       "people": 6000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1089,7 +1059,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1122,7 +1092,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1151,7 +1121,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1184,7 +1154,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1215,7 +1185,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1246,7 +1216,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1279,7 +1249,7 @@
       "official_detail_checked": 2,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -1309,7 +1279,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1329,16 +1299,16 @@
       "people": 6000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1367,7 +1337,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1398,7 +1368,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1427,7 +1397,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1456,7 +1426,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1487,7 +1457,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1516,7 +1486,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -1526,7 +1496,7 @@
       "date": "2026-10-18",
       "end_date": "2026-10-18",
       "name": "タサン志麻",
-      "venue": "リーガロイヤルホテル広島 4階 ロイヤルホール",
+      "venue": "リーガロイヤルホテル広島",
       "address": null,
       "start_time": null,
       "end_time": null,
@@ -1542,8 +1512,8 @@
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
       "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "first_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -1573,7 +1543,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1602,7 +1572,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1633,7 +1603,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1662,7 +1632,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1694,7 +1664,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1723,7 +1693,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1752,7 +1722,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -1781,7 +1751,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1815,7 +1785,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1844,7 +1814,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1875,7 +1845,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1906,7 +1876,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1935,7 +1905,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1967,7 +1937,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1998,7 +1968,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2027,7 +1997,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -2054,7 +2024,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2090,7 +2060,7 @@
       ],
       "verification_count": 5,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2121,7 +2091,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2155,7 +2125,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2184,7 +2154,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -2211,7 +2181,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2241,7 +2211,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2272,7 +2242,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2306,7 +2276,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
@@ -2335,7 +2305,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2366,7 +2336,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2397,7 +2367,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2416,52 +2386,24 @@
       "event_type": "sports",
       "people": 6000,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima/p1",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima/p1"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約6,000人規模"
-    },
-    {
-      "date": "2026-11-03",
-      "end_date": "2026-11-03",
-      "name": "新日本プロレス 広島",
-      "venue": "広島サンプラザホール",
-      "address": null,
-      "start_time": null,
-      "end_time": null,
-      "event_type": "sports",
-      "people": 6000,
-      "people_basis": "venue_capacity_reference",
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
-        "start_time",
         "end_time"
       ],
-      "confidence": "single_source",
+      "confidence": "verified",
       "people_label": "最大約6,000人規模"
     },
     {
@@ -2485,7 +2427,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2496,10 +2438,10 @@
     {
       "date": "2026-11-03",
       "end_date": "2026-11-03",
-      "name": "春風亭小朝 独演会",
+      "name": "「春風亭小朝独演会」",
       "venue": "広島県民文化センター",
       "address": null,
-      "start_time": null,
+      "start_time": "13:00",
       "end_time": null,
       "event_type": "theater",
       "people": null,
@@ -2507,20 +2449,21 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
-        "start_time",
         "end_time"
       ],
-      "confidence": "single_source",
+      "confidence": "verified",
       "people_label": null
     },
     {
@@ -2544,7 +2487,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2575,7 +2518,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2604,7 +2547,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2634,7 +2577,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2668,42 +2611,13 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "verified",
       "people_label": "最大約450人規模"
-    },
-    {
-      "date": "2026-11-07",
-      "end_date": "2026-11-07",
-      "name": "THE ALFEE",
-      "venue": "広島文化学園HBGホール",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 2001,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-07",
@@ -2728,7 +2642,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
@@ -2746,80 +2660,22 @@
       "people": 450,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:14:42.392Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "single_source",
       "people_label": "最大約450人規模"
-    },
-    {
-      "date": "2026-11-08",
-      "end_date": "2026-11-08",
-      "name": "THE ALFEE",
-      "venue": "広島文化学園HBGホール",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 2001,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-09",
-      "end_date": "2026-11-09",
-      "name": "『おとになる』",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "18:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-11",
@@ -2842,100 +2698,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "official",
       "people_label": "最大約10,000人規模"
-    },
-    {
-      "date": "2026-11-12",
-      "end_date": "2026-11-12",
-      "name": "CANDY TUNE",
-      "venue": "広島文化学園HBGホール",
-      "address": null,
-      "start_time": "18:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 2001,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-13",
-      "end_date": "2026-11-13",
-      "name": "俺たちの旅 スペシャルコンサート",
-      "venue": "広島文化学園HBGホール",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 2001,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-13",
-      "end_date": "2026-11-13",
-      "name": "八十八ヶ所巡礼",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-14",
@@ -2958,7 +2727,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2966,64 +2735,6 @@
       ],
       "confidence": "single_source",
       "people_label": "最大約830人規模"
-    },
-    {
-      "date": "2026-11-14",
-      "end_date": "2026-11-14",
-      "name": "Chilli Beans. Chilli Beans. TOUR 2026-2027 “HONESTY”",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-11-14",
-      "end_date": "2026-11-14",
-      "name": "トンボコープ",
-      "venue": "セカンド・クラッチ",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 300,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-15",
@@ -3046,42 +2757,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "single_source",
       "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-15",
-      "end_date": "2026-11-15",
-      "name": "jo0ji",
-      "venue": "BLUE LIVE HIROSHIMA",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 830,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-15",
@@ -3094,55 +2776,24 @@
       "event_type": "music",
       "people": 450,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
+      "source": "会場・プレイガイド統合Worker",
+      "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
         "CANDY PROMOTION",
-        "会場・プレイガイド統合Worker",
-        "イープラス"
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
+        "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 3,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "verified",
       "people_label": "最大約450人規模"
-    },
-    {
-      "date": "2026-11-15",
-      "end_date": "2026-11-15",
-      "name": "ハク。 みんなの世界が変わる時ツアー",
-      "venue": "セカンド・クラッチ",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 300,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-15",
@@ -3165,7 +2816,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -3192,42 +2843,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "official",
       "people_label": "最大約10,000人規模"
-    },
-    {
-      "date": "2026-11-16",
-      "end_date": "2026-11-16",
-      "name": "広島歌謡コンサート 広島",
-      "venue": "JMSアステールプラザ",
-      "address": null,
-      "start_time": "15:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 1204,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-11-19",
@@ -3251,42 +2873,13 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "verified",
       "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-19",
-      "end_date": "2026-11-19",
-      "name": "syrup16g 広島",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-19",
@@ -3313,7 +2906,7 @@
       "official_detail_checked": 3,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants",
@@ -3345,71 +2938,13 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "verified",
       "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-20",
-      "end_date": "2026-11-20",
-      "name": "ナナヲアカリ",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-11-20",
-      "end_date": "2026-11-20",
-      "name": "Galileo Galilei 広島",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "18:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-20",
@@ -3436,7 +2971,7 @@
       "official_detail_checked": 3,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants",
@@ -3467,7 +3002,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3496,7 +3031,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3507,149 +3042,32 @@
     {
       "date": "2026-11-21",
       "end_date": "2026-11-21",
-      "name": "斉藤和義 「KAZUYOSHI SAITO LIVE TOUR 2026 “日常Days”」",
+      "name": "斉藤和義",
       "venue": "広島文化学園HBGホール",
       "address": null,
-      "start_time": "17:30",
+      "start_time": null,
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
       "sources": [
-        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
+        "start_time",
         "end_time"
       ],
-      "confidence": "verified",
+      "confidence": "single_source",
       "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-21",
-      "end_date": "2026-11-21",
-      "name": "ねぐせ。",
-      "venue": "BLUE LIVE HIROSHIMA",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 830,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約830人規模"
-    },
-    {
-      "date": "2026-11-21",
-      "end_date": "2026-11-21",
-      "name": "山中さわお & ELPIS",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-11-21",
-      "end_date": "2026-11-21",
-      "name": "AK-69 広島",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
-    },
-    {
-      "date": "2026-11-21",
-      "end_date": "2026-11-21",
-      "name": "35.7",
-      "venue": "セカンド・クラッチ",
-      "address": null,
-      "start_time": "17:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 300,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-22",
@@ -3672,42 +3090,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "official",
       "people_label": "最大約6,000人規模"
-    },
-    {
-      "date": "2026-11-22",
-      "end_date": "2026-11-22",
-      "name": "チャラン・ポ・ランタン チャラン・ポ・ランタンホールツアー「唱和百一年」 広島",
-      "venue": "JMSアステールプラザ",
-      "address": null,
-      "start_time": "17:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 1204,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-11-22",
@@ -3720,20 +3109,18 @@
       "event_type": "music",
       "people": 830,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
+      "source": "会場・プレイガイド統合Worker",
+      "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
         "CANDY PROMOTION",
-        "会場・プレイガイド統合Worker",
-        "イープラス"
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
+        "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 3,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3762,7 +3149,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -3771,32 +3158,31 @@
     {
       "date": "2026-11-23",
       "end_date": "2026-11-23",
-      "name": "角松敏生 広島",
+      "name": "角松敏生",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": "17:30",
+      "start_time": null,
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
       "sources": [
-        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
+        "start_time",
         "end_time"
       ],
-      "confidence": "verified",
+      "confidence": "single_source",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -3810,20 +3196,18 @@
       "event_type": "music",
       "people": 830,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
+      "source": "会場・プレイガイド統合Worker",
+      "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
         "CANDY PROMOTION",
-        "会場・プレイガイド統合Worker",
-        "イープラス"
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
+        "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 3,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3832,149 +3216,33 @@
       "people_label": "最大約830人規模"
     },
     {
-      "date": "2026-11-23",
-      "end_date": "2026-11-23",
-      "name": "ロージークロニクル",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "16:45",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
-    },
-    {
-      "date": "2026-11-25",
-      "end_date": "2026-11-25",
-      "name": "島津亜矢",
-      "venue": "広島文化学園HBGホール",
-      "address": null,
-      "start_time": "17:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 2001,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模"
-    },
-    {
       "date": "2026-11-26",
       "end_date": "2026-11-26",
-      "name": "Michael Monroe",
-      "venue": "広島クラブクアトロ",
+      "name": "矢野顕子",
+      "venue": "広島県民文化センター",
       "address": null,
-      "start_time": "19:00",
+      "start_time": "18:30",
       "end_time": null,
       "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
+      "people": null,
+      "people_basis": null,
+      "source": "CANDY PROMOTION",
+      "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "イープラス"
+        "CANDY PROMOTION"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
+        "https://www.candy-p.com/schedule/"
       ],
       "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "first_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-11-27",
-      "end_date": "2026-11-27",
-      "name": "TEE",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-11-27",
-      "end_date": "2026-11-27",
-      "name": "Soala 広島",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
+      "people_label": null
     },
     {
       "date": "2026-11-28",
@@ -3982,88 +3250,29 @@
       "name": "ゴスペラーズ",
       "venue": "広島文化学園HBGホール",
       "address": null,
-      "start_time": "17:00",
+      "start_time": null,
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
       "sources": [
-        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
+        "start_time",
         "end_time"
       ],
-      "confidence": "verified",
+      "confidence": "single_source",
       "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-28",
-      "end_date": "2026-11-28",
-      "name": "go!go!vanillas",
-      "venue": "BLUE LIVE HIROSHIMA",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 830,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約830人規模"
-    },
-    {
-      "date": "2026-11-28",
-      "end_date": "2026-11-28",
-      "name": "THE STREET BEATS",
-      "venue": "セカンド・クラッチ",
-      "address": null,
-      "start_time": "18:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 300,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-29",
@@ -4087,129 +3296,13 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "verified",
       "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2026-11-29",
-      "end_date": "2026-11-29",
-      "name": "Omoinotake 広島",
-      "venue": "JMSアステールプラザ",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 1204,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模"
-    },
-    {
-      "date": "2026-11-29",
-      "end_date": "2026-11-29",
-      "name": "go!go!vanillas",
-      "venue": "BLUE LIVE HIROSHIMA",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 830,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約830人規模"
-    },
-    {
-      "date": "2026-11-29",
-      "end_date": "2026-11-29",
-      "name": "Daichi Yamamoto",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-11-29",
-      "end_date": "2026-11-29",
-      "name": "宮本佳林",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "16:15",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-29",
@@ -4235,7 +3328,7 @@
       "official_detail_checked": 0,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -4249,7 +3342,7 @@
       "name": "応用物理学会 先進パワー半導体分科会第13回講演会",
       "venue": "広島国際会議場",
       "address": null,
-      "start_time": "9:20",
+      "start_time": "13:00",
       "end_time": "18:00",
       "event_type": "convention",
       "people": 150,
@@ -4268,7 +3361,7 @@
       "official_detail_checked": 1,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
@@ -4299,42 +3392,13 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
       ],
       "confidence": "verified",
       "people_label": null
-    },
-    {
-      "date": "2026-12-02",
-      "end_date": "2026-12-02",
-      "name": "森山良子",
-      "venue": "広島文化学園HBGホール",
-      "address": null,
-      "start_time": "15:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 2001,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-12-02",
@@ -4361,7 +3425,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -4370,63 +3434,33 @@
       "people_label": null
     },
     {
-      "date": "2026-12-03",
-      "end_date": "2026-12-03",
-      "name": "打首獄門同好会 広島",
-      "venue": "JMSアステールプラザ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 1204,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模"
-    },
-    {
       "date": "2026-12-04",
       "end_date": "2026-12-04",
-      "name": "REBECCA 広島",
+      "name": "REBECCA",
       "venue": "上野学園ホール",
       "address": null,
-      "start_time": "18:00",
+      "start_time": null,
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 1730,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HBGH&includeSaleEnd=fuzzy",
       "sources": [
-        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
         "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HBGH&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
+        "start_time",
         "end_time"
       ],
-      "confidence": "verified",
+      "confidence": "single_source",
       "people_label": "最大約1,730人規模"
     },
     {
@@ -4437,7 +3471,7 @@
       "address": null,
       "start_time": "11:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 10000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
@@ -4450,7 +3484,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4479,7 +3513,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4495,7 +3529,7 @@
       "address": null,
       "start_time": "11:30",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 10000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
@@ -4508,7 +3542,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4539,7 +3573,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4562,17 +3596,15 @@
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HBGH&includeSaleEnd=fuzzy",
       "sources": [
         "CANDY PROMOTION",
-        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
         "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HBGH&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 3,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4601,42 +3633,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "single_source",
       "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-12-06",
-      "end_date": "2026-12-06",
-      "name": "バックドロップシンデレラ 広島",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-12-07",
@@ -4659,7 +3662,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4678,48 +3681,17 @@
       "event_type": "music",
       "people": 800,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
+      "source": "CANDY PROMOTION",
+      "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION",
-        "イープラス"
+        "CANDY PROMOTION"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 2,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "verified",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-12-08",
-      "end_date": "2026-12-08",
-      "name": "ギターウルフ",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
+        "https://www.candy-p.com/schedule/"
       ],
       "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "first_seen_at": "2026-10-06T06:56:32.737Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4752,7 +3724,7 @@
       "official_detail_checked": 2,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
@@ -4783,40 +3755,11 @@
       "official_detail_checked": 2,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
       "people_label": "1,850人"
-    },
-    {
-      "date": "2026-12-10",
-      "end_date": "2026-12-10",
-      "name": "Cocco",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "18:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-12-11",
@@ -4829,24 +3772,22 @@
       "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
+      "source": "CANDY PROMOTION",
+      "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION",
-        "イープラス"
+        "CANDY PROMOTION"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
+        "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2,
+      "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
-      "confidence": "verified",
+      "confidence": "single_source",
       "people_label": "最大約2,001人規模"
     },
     {
@@ -4874,7 +3815,7 @@
       "official_detail_checked": 2,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
@@ -4901,7 +3842,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -4928,7 +3869,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4939,36 +3880,7 @@
     {
       "date": "2026-12-13",
       "end_date": "2026-12-13",
-      "name": "Little Glee Monster 広島",
-      "venue": "上野学園ホール",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 1730,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約1,730人規模"
-    },
-    {
-      "date": "2026-12-13",
-      "end_date": "2026-12-13",
-      "name": "SCANDAL FINAL TOUR 2026-2027 「SCANDALの47都道府県ツアー」 広島",
+      "name": "SCANDAL",
       "venue": "広島クラブクアトロ",
       "address": null,
       "start_time": "17:30",
@@ -4980,17 +3892,15 @@
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=CQUH&includeSaleEnd=fuzzy",
       "sources": [
         "CANDY PROMOTION",
-        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=CQUH&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 3,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5019,7 +3929,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -5040,16 +3950,16 @@
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5078,7 +3988,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5087,64 +3997,6 @@
       "people_label": "最大約830人規模"
     },
     {
-      "date": "2026-12-18",
-      "end_date": "2026-12-18",
-      "name": "超能力戦士ドリアン",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-12-18",
-      "end_date": "2026-12-18",
-      "name": "a flood of circle 広島",
-      "venue": "セカンド・クラッチ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 300,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約300人規模"
-    },
-    {
       "date": "2026-12-19",
       "end_date": "2026-12-19",
       "name": "広島ドラゴンフライズ",
@@ -5165,7 +4017,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5198,7 +4050,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -5227,7 +4079,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5260,100 +4112,13 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
       ],
       "confidence": "verified",
       "people_label": null
-    },
-    {
-      "date": "2026-12-21",
-      "end_date": "2026-12-21",
-      "name": "竹原ピストル",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
-    },
-    {
-      "date": "2026-12-26",
-      "end_date": "2026-12-26",
-      "name": "C&K TOUR 2026-2027「日本全国地元化計画~引き続きシンプルにライブします!でも3パターンあります!」 広島",
-      "venue": "上野学園ホール",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 1730,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約1,730人規模"
-    },
-    {
-      "date": "2026-12-27",
-      "end_date": "2026-12-27",
-      "name": "EARTHSHAKER",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "16:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
     },
     {
       "date": "2027-01-06",
@@ -5376,7 +4141,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5405,42 +4170,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "official",
       "people_label": "最大約6,000人規模"
-    },
-    {
-      "date": "2027-01-10",
-      "end_date": "2027-01-10",
-      "name": "Paledusk ”LIVE!!” TOUR 広島",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
     },
     {
       "date": "2027-01-11",
@@ -5463,42 +4199,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "single_source",
       "people_label": "最大約300人規模"
-    },
-    {
-      "date": "2027-01-15",
-      "end_date": "2027-01-15",
-      "name": "柴咲コウ KO SHIBASAKI LIVE TOUR 2026 ACTOR’S THE BEST~泡沫~ 広島",
-      "venue": "上野学園ホール",
-      "address": null,
-      "start_time": "18:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 1730,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約1,730人規模"
     },
     {
       "date": "2027-01-16",
@@ -5515,52 +4222,21 @@
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HBGH&includeSaleEnd=fuzzy",
       "sources": [
         "CANDY PROMOTION",
-        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HBGH&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 3,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "verified",
       "people_label": "最大約1,730人規模"
-    },
-    {
-      "date": "2027-01-16",
-      "end_date": "2027-01-16",
-      "name": "WHITE JAM",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "17:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約800人規模"
     },
     {
       "date": "2027-01-17",
@@ -5583,42 +4259,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "single_source",
       "people_label": "最大約1,730人規模"
-    },
-    {
-      "date": "2027-01-17",
-      "end_date": "2027-01-17",
-      "name": "TOOBOE 広島",
-      "venue": "LIVE VANQUISH",
-      "address": null,
-      "start_time": "17:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 450,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約450人規模"
     },
     {
       "date": "2027-01-23",
@@ -5641,7 +4288,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5670,7 +4317,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -5699,71 +4346,13 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
+      "last_seen_at": "2026-10-06T08:11:41.226Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
       "confidence": "official",
       "people_label": "最大約6,000人規模"
-    },
-    {
-      "date": "2027-01-29",
-      "end_date": "2027-01-29",
-      "name": "吉幾三 コンサート2027",
-      "venue": "広島文化学園HBGホール",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": null,
-      "event_type": "music",
-      "people": 2001,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模"
-    },
-    {
-      "date": "2027-01-30",
-      "end_date": "2027-01-30",
-      "name": "MONO NO AWARE 広島",
-      "venue": "セカンド・クラッチ",
-      "address": null,
-      "start_time": "18:30",
-      "end_time": null,
-      "event_type": "music",
-      "people": 300,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p5"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:06:13.020Z",
-      "needs_enrichment": true,
-      "enrichment_targets": [
-        "end_time"
-      ],
-      "confidence": "single_source",
-      "people_label": "最大約300人規模"
     }
   ]
 }
