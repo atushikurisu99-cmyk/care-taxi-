@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T04:54:14.545Z",
+  "generated_at": "2026-10-06T04:57:38.246Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -11,97 +11,60 @@
     "icch": {
       "ok": true,
       "count": 29,
-      "ms": 917
+      "ms": 976
     },
     "candy": {
       "ok": true,
       "count": 37,
-      "ms": 975
+      "ms": 1228
+    },
+    "worker_events": {
+      "ok": true,
+      "count": 20,
+      "ms": 17373
     },
     "eplus": {
       "ok": true,
       "count": 0,
-      "ms": 17906
+      "ms": 24018
     },
     "lawson": {
       "ok": false,
       "count": null,
-      "ms": 25106,
+      "ms": 25200,
       "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://l-tike.com/search/?pref=34&size=100\nCall log:\n  - navigating to \"https://l-tike.com/search/?pref=34&size=100\", waiting until \"domcontentloaded\"\n"
     },
     "pia": {
       "ok": true,
       "count": 0,
-      "ms": 1962
+      "ms": 1958
     },
     "dive": {
       "ok": true,
       "count": 3,
-      "ms": 3233
+      "ms": 6337
     },
     "cvb": {
       "ok": true,
       "count": 0,
-      "ms": 6187
+      "ms": 6174
     },
     "sports": {
       "ok": true,
       "count": 27,
-      "ms": 16161
+      "ms": 4607
     }
   },
   "rules": {
     "convention_min_people": 100,
     "display_principle": "需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する",
-    "failure_policy": "取得失敗と0件を分離する"
+    "failure_policy": "取得失敗または疑わしい0件では直前の未来予定を保持する"
   },
   "counts": {
-    "raw": 96,
-    "merged": 71
+    "raw": 116,
+    "merged": 47
   },
   "events": [
-    {
-      "date": "2026-10-08",
-      "end_date": "2026-10-08",
-      "name": "第65回日本鼻科学会総会・学術講演会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:00",
-      "end_time": "19:00",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-09",
-      "end_date": "2026-10-09",
-      "name": "第65回日本鼻科学会総会・学術講演会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:00",
-      "end_time": "19:00",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
     {
       "date": "2026-10-09",
       "end_date": "2026-10-09",
@@ -113,15 +76,16 @@
       "event_type": "music",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-09",
@@ -134,36 +98,16 @@
       "event_type": "music",
       "people": 300,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-10",
-      "end_date": "2026-10-10",
-      "name": "第65回日本鼻科学会総会・学術講演会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:00",
-      "end_time": "19:00",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-11",
@@ -183,27 +127,6 @@
       ],
       "source_urls": [
         "https://dive-hiroshima.com/events/events-100562-26/"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-16",
-      "end_date": "2026-10-16",
-      "name": "第69回秋季日本歯周病学会学術大会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "8:30",
-      "end_time": "17:30",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
@@ -239,15 +162,16 @@
       "event_type": "music",
       "people": 10000,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-17",
@@ -260,36 +184,16 @@
       "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-17",
-      "end_date": "2026-10-17",
-      "name": "第69回秋季日本歯周病学会学術大会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "8:30",
-      "end_time": "17:30",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-18",
@@ -302,36 +206,16 @@
       "event_type": "music",
       "people": 10000,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-18",
-      "end_date": "2026-10-18",
-      "name": "イケ・ポノ・マ・イアパナ 2026 広島公演",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "16:00",
-      "end_time": "19:00",
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-24",
@@ -357,27 +241,6 @@
     {
       "date": "2026-10-24",
       "end_date": "2026-10-24",
-      "name": "合同企業説明会 広島適職フェア",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "11:30",
-      "end_time": "15:00",
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-24",
-      "end_date": "2026-10-24",
       "name": "フラワーカンパニーズ",
       "venue": "広島クラブクアトロ",
       "address": null,
@@ -386,15 +249,16 @@
       "event_type": "music",
       "people": 800,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-25",
@@ -407,36 +271,16 @@
       "event_type": "music",
       "people": 800,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-30",
-      "end_date": "2026-10-30",
-      "name": "2026 平和文化月間オープニングイベント「未来へ響け 平和文化」 ~山下一史氏の指揮による東京混声合唱団・広島大学吹奏楽団コンサート~",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": "20:00",
-      "event_type": "music",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-30",
@@ -453,6 +297,27 @@
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
         "CANDY PROMOTION"
+      ],
+      "source_urls": [
+        "https://www.candy-p.com/schedule/"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-10-30",
+      "end_date": "2026-10-30",
+      "name": "丈青",
+      "venue": "広島クラブクアトロ",
+      "address": null,
+      "start_time": "19:00",
+      "end_time": null,
+      "event_type": "music",
+      "people": 800,
+      "people_basis": "venue_capacity_reference",
+      "source": "会場・プレイガイド統合Worker",
+      "source_url": "https://www.candy-p.com/schedule/",
+      "sources": [
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
@@ -491,36 +356,16 @@
       "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-31",
-      "end_date": "2026-10-31",
-      "name": "音楽の花束〈秋〉~広響名曲コンサート",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "15:00",
-      "end_time": "17:00",
-      "event_type": "music",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-10-31",
@@ -533,15 +378,16 @@
       "event_type": "music",
       "people": 300,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-01",
@@ -567,27 +413,6 @@
     {
       "date": "2026-11-01",
       "end_date": "2026-11-01",
-      "name": "水谷千重子の宴ジョインコンサート2026",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "18:00",
-      "end_time": "20:00",
-      "event_type": "music",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-01",
-      "end_date": "2026-11-01",
       "name": "水谷千重子",
       "venue": "広島国際会議場 フェニックスホール",
       "address": null,
@@ -596,15 +421,16 @@
       "event_type": "music",
       "people": 1504,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-05",
@@ -617,15 +443,16 @@
       "event_type": "music",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-06",
@@ -633,20 +460,21 @@
       "name": "PARCO PRODUCE 2026 髪結いの亭主",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": "17:00",
+      "start_time": "12:00",
       "end_time": null,
       "event_type": "music",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-06",
@@ -659,57 +487,16 @@
       "event_type": "music",
       "people": 450,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-07",
-      "end_date": "2026-11-07",
-      "name": "HOME爆笑スペシャル 桂文珍独演会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "13:00",
-      "end_time": "15:30",
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-15",
-      "end_date": "2026-11-15",
-      "name": "国際フェスタ2026",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "10:00",
-      "end_time": "16:00",
-      "event_type": "festival",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-15",
@@ -722,15 +509,16 @@
       "event_type": "music",
       "people": 450,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-19",
@@ -743,36 +531,16 @@
       "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-19",
-      "end_date": "2026-11-19",
-      "name": "プラスチック成形加工学会 第34回秋季大会 成形加工シンポジア ’26",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": null,
-      "end_time": null,
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-20",
@@ -785,36 +553,16 @@
       "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-20",
-      "end_date": "2026-11-20",
-      "name": "プラスチック成形加工学会 第34回秋季大会 成形加工シンポジア ’26",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": null,
-      "end_time": null,
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-21",
@@ -882,27 +630,6 @@
     {
       "date": "2026-11-22",
       "end_date": "2026-11-22",
-      "name": "広島市民オーケストラ 第30回記念定期演奏会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "14:00",
-      "end_time": "16:00",
-      "event_type": "music",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-22",
-      "end_date": "2026-11-22",
       "name": "杉山清貴",
       "venue": "BLUE LIVE HIROSHIMA",
       "address": null,
@@ -911,13 +638,35 @@
       "event_type": "music",
       "people": 830,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
+      ],
+      "verification_count": 2
+    },
+    {
+      "date": "2026-11-22",
+      "end_date": "2026-11-22",
+      "name": "広島市民オーケストラ 第30回記念定期演奏会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "14:00",
+      "end_time": "16:00",
+      "event_type": "music",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
@@ -932,15 +681,16 @@
       "event_type": "music",
       "people": 830,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-11-29",
@@ -953,99 +703,16 @@
       "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
+      "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-29",
-      "end_date": "2026-11-29",
-      "name": "日本整形外科学会100周年記念事業 市民公開講座in広島",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "10:00",
-      "end_time": "13:00",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-11-30",
-      "end_date": "2026-11-30",
-      "name": "応用物理学会 先進パワー半導体分科会第13回講演会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:20",
-      "end_time": "18:00",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-12-01",
-      "end_date": "2026-12-01",
-      "name": "応用物理学会 先進パワー半導体分科会第13回講演会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:20",
-      "end_time": "18:00",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-12-02",
-      "end_date": "2026-12-02",
-      "name": "応用物理学会 先進パワー半導体分科会第13回講演会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:20",
-      "end_time": "18:00",
-      "event_type": "convention",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
+      "verification_count": 2
     },
     {
       "date": "2026-12-06",
@@ -1153,48 +820,6 @@
       "verification_count": 1
     },
     {
-      "date": "2026-12-09",
-      "end_date": "2026-12-09",
-      "name": "大学 ICT 推進協議会 2026 年度年次大会 (AXIES2026)",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:20",
-      "end_time": "19:00",
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-12-10",
-      "end_date": "2026-12-10",
-      "name": "大学 ICT 推進協議会 2026 年度年次大会 (AXIES2026)",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:20",
-      "end_time": "19:00",
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
       "date": "2026-12-11",
       "end_date": "2026-12-11",
       "name": "松山千春",
@@ -1216,48 +841,6 @@
       "verification_count": 1
     },
     {
-      "date": "2026-12-11",
-      "end_date": "2026-12-11",
-      "name": "大学 ICT 推進協議会 2026 年度年次大会 (AXIES2026)",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:20",
-      "end_time": "19:00",
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-12-12",
-      "end_date": "2026-12-12",
-      "name": "合同企業説明会 広島適職フェア",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "11:30",
-      "end_time": "15:00",
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
       "date": "2026-12-13",
       "end_date": "2026-12-13",
       "name": "サンフレッチェ広島 vs 鹿島アントラーズ",
@@ -1275,27 +858,6 @@
       ],
       "source_urls": [
         "https://www.sanfrecce.co.jp/tickets/schedule"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-12-13",
-      "end_date": "2026-12-13",
-      "name": "RCCテレビ・ひな壇団イベント",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": null,
-      "end_time": null,
-      "event_type": "event",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
@@ -1338,48 +900,6 @@
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-12-19",
-      "end_date": "2026-12-19",
-      "name": "第13回 日本スポーツ理学療法学術大会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:00",
-      "end_time": "18:30",
-      "event_type": "sports",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-12-20",
-      "end_date": "2026-12-20",
-      "name": "第13回 日本スポーツ理学療法学術大会",
-      "venue": "広島国際会議場 フェニックスホール",
-      "address": null,
-      "start_time": "9:00",
-      "end_time": "18:30",
-      "event_type": "sports",
-      "people": 1504,
-      "people_basis": "venue_capacity_reference",
-      "source": "広島国際会議場公式",
-      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
-      "sources": [
-        "広島国際会議場公式"
-      ],
-      "source_urls": [
-        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
