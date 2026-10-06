@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T04:57:38.246Z",
+  "generated_at": "2026-10-06T05:02:25.422Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -11,48 +11,48 @@
     "icch": {
       "ok": true,
       "count": 29,
-      "ms": 976
+      "ms": 1287
     },
     "candy": {
       "ok": true,
       "count": 37,
-      "ms": 1228
+      "ms": 1051
     },
     "worker_events": {
       "ok": true,
-      "count": 20,
-      "ms": 17373
+      "count": 21,
+      "ms": 5973
     },
     "eplus": {
       "ok": true,
       "count": 0,
-      "ms": 24018
+      "ms": 23545
     },
     "lawson": {
       "ok": false,
       "count": null,
-      "ms": 25200,
+      "ms": 25133,
       "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://l-tike.com/search/?pref=34&size=100\nCall log:\n  - navigating to \"https://l-tike.com/search/?pref=34&size=100\", waiting until \"domcontentloaded\"\n"
     },
     "pia": {
       "ok": true,
       "count": 0,
-      "ms": 1958
+      "ms": 1793
     },
     "dive": {
       "ok": true,
       "count": 3,
-      "ms": 6337
+      "ms": 1353
     },
     "cvb": {
       "ok": true,
       "count": 0,
-      "ms": 6174
+      "ms": 5838
     },
     "sports": {
       "ok": true,
       "count": 27,
-      "ms": 4607
+      "ms": 19592
     }
   },
   "rules": {
@@ -61,10 +61,52 @@
     "failure_policy": "取得失敗または疑わしい0件では直前の未来予定を保持する"
   },
   "counts": {
-    "raw": 116,
-    "merged": 47
+    "raw": 117,
+    "merged": 73
   },
   "events": [
+    {
+      "date": "2026-10-07",
+      "end_date": "2026-10-07",
+      "name": "甲斐 心愛",
+      "venue": "広島クラブクアトロ",
+      "address": null,
+      "start_time": "22:45",
+      "end_time": null,
+      "event_type": "music",
+      "people": 800,
+      "people_basis": "venue_capacity_reference",
+      "source": "会場・プレイガイド統合Worker",
+      "source_url": "https://www.club-quattro.com/hiroshima/schedule/?ym=202610",
+      "sources": [
+        "会場・プレイガイド統合Worker"
+      ],
+      "source_urls": [
+        "https://www.club-quattro.com/hiroshima/schedule/?ym=202610"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-10-08",
+      "end_date": "2026-10-08",
+      "name": "第65回日本鼻科学会総会・学術講演会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:00",
+      "end_time": "19:00",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
     {
       "date": "2026-10-09",
       "end_date": "2026-10-09",
@@ -110,6 +152,48 @@
       "verification_count": 2
     },
     {
+      "date": "2026-10-09",
+      "end_date": "2026-10-09",
+      "name": "第65回日本鼻科学会総会・学術講演会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:00",
+      "end_time": "19:00",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-10-10",
+      "end_date": "2026-10-10",
+      "name": "第65回日本鼻科学会総会・学術講演会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:00",
+      "end_time": "19:00",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-10-11",
       "end_date": "2026-10-11",
       "name": "第32回広島市スポーツ・レクリエーションフェスティバル",
@@ -127,6 +211,27 @@
       ],
       "source_urls": [
         "https://dive-hiroshima.com/events/events-100562-26/"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-10-16",
+      "end_date": "2026-10-16",
+      "name": "第69回秋季日本歯周病学会学術大会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "8:30",
+      "end_time": "17:30",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
@@ -196,6 +301,27 @@
       "verification_count": 2
     },
     {
+      "date": "2026-10-17",
+      "end_date": "2026-10-17",
+      "name": "第69回秋季日本歯周病学会学術大会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "8:30",
+      "end_time": "17:30",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-10-18",
       "end_date": "2026-10-18",
       "name": "NEWS",
@@ -216,6 +342,27 @@
         "https://www.candy-p.com/schedule/"
       ],
       "verification_count": 2
+    },
+    {
+      "date": "2026-10-18",
+      "end_date": "2026-10-18",
+      "name": "イケ・ポノ・マ・イアパナ 2026 広島公演",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "16:00",
+      "end_time": "19:00",
+      "event_type": "event",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
     },
     {
       "date": "2026-10-24",
@@ -259,6 +406,27 @@
         "https://www.candy-p.com/schedule/"
       ],
       "verification_count": 2
+    },
+    {
+      "date": "2026-10-24",
+      "end_date": "2026-10-24",
+      "name": "合同企業説明会 広島適職フェア",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "11:30",
+      "end_time": "15:00",
+      "event_type": "event",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
     },
     {
       "date": "2026-10-25",
@@ -321,6 +489,27 @@
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-10-30",
+      "end_date": "2026-10-30",
+      "name": "2026 平和文化月間オープニングイベント「未来へ響け 平和文化」 ~山下一史氏の指揮による東京混声合唱団・広島大学吹奏楽団コンサート~",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "18:00",
+      "end_time": "20:00",
+      "event_type": "music",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
@@ -390,6 +579,27 @@
       "verification_count": 2
     },
     {
+      "date": "2026-10-31",
+      "end_date": "2026-10-31",
+      "name": "音楽の花束〈秋〉~広響名曲コンサート",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "15:00",
+      "end_time": "17:00",
+      "event_type": "music",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-11-01",
       "end_date": "2026-11-01",
       "name": "広島サンダーズ vs 東京GB",
@@ -433,6 +643,27 @@
       "verification_count": 2
     },
     {
+      "date": "2026-11-01",
+      "end_date": "2026-11-01",
+      "name": "水谷千重子の宴ジョインコンサート2026",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "18:00",
+      "end_time": "20:00",
+      "event_type": "music",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-11-05",
       "end_date": "2026-11-05",
       "name": "PARCO PRODUCE 2026 髪結いの亭主",
@@ -440,7 +671,7 @@
       "address": null,
       "start_time": "18:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "theater",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
       "source": "会場・プレイガイド統合Worker",
@@ -462,7 +693,7 @@
       "address": null,
       "start_time": "12:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "theater",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
       "source": "会場・プレイガイド統合Worker",
@@ -499,6 +730,27 @@
       "verification_count": 2
     },
     {
+      "date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "name": "HOME爆笑スペシャル 桂文珍独演会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "13:00",
+      "end_time": "15:30",
+      "event_type": "theater",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-11-15",
       "end_date": "2026-11-15",
       "name": "PassCode",
@@ -519,6 +771,27 @@
         "https://www.candy-p.com/schedule/"
       ],
       "verification_count": 2
+    },
+    {
+      "date": "2026-11-15",
+      "end_date": "2026-11-15",
+      "name": "国際フェスタ2026",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "10:00",
+      "end_time": "16:00",
+      "event_type": "festival",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
     },
     {
       "date": "2026-11-19",
@@ -543,6 +816,27 @@
       "verification_count": 2
     },
     {
+      "date": "2026-11-19",
+      "end_date": "2026-11-19",
+      "name": "プラスチック成形加工学会 第34回秋季大会 成形加工シンポジア ’26",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-11-20",
       "end_date": "2026-11-20",
       "name": "松任谷由実",
@@ -563,6 +857,27 @@
         "https://www.candy-p.com/schedule/"
       ],
       "verification_count": 2
+    },
+    {
+      "date": "2026-11-20",
+      "end_date": "2026-11-20",
+      "name": "プラスチック成形加工学会 第34回秋季大会 成形加工シンポジア ’26",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
     },
     {
       "date": "2026-11-21",
@@ -715,6 +1030,90 @@
       "verification_count": 2
     },
     {
+      "date": "2026-11-29",
+      "end_date": "2026-11-29",
+      "name": "日本整形外科学会100周年記念事業 市民公開講座in広島",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "10:00",
+      "end_time": "13:00",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-11-30",
+      "end_date": "2026-11-30",
+      "name": "応用物理学会 先進パワー半導体分科会第13回講演会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:20",
+      "end_time": "18:00",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-12-01",
+      "end_date": "2026-12-01",
+      "name": "応用物理学会 先進パワー半導体分科会第13回講演会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:20",
+      "end_time": "18:00",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-12-02",
+      "end_date": "2026-12-02",
+      "name": "応用物理学会 先進パワー半導体分科会第13回講演会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:20",
+      "end_time": "18:00",
+      "event_type": "convention",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-12-06",
       "end_date": "2026-12-06",
       "name": "サンフレッチェ広島 vs ヴィッセル神戸",
@@ -820,6 +1219,48 @@
       "verification_count": 1
     },
     {
+      "date": "2026-12-09",
+      "end_date": "2026-12-09",
+      "name": "大学 ICT 推進協議会 2026 年度年次大会 (AXIES2026)",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:20",
+      "end_time": "19:00",
+      "event_type": "event",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-12-10",
+      "end_date": "2026-12-10",
+      "name": "大学 ICT 推進協議会 2026 年度年次大会 (AXIES2026)",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:20",
+      "end_time": "19:00",
+      "event_type": "event",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-12-11",
       "end_date": "2026-12-11",
       "name": "松山千春",
@@ -837,6 +1278,48 @@
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-12-11",
+      "end_date": "2026-12-11",
+      "name": "大学 ICT 推進協議会 2026 年度年次大会 (AXIES2026)",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:20",
+      "end_time": "19:00",
+      "event_type": "event",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-12-12",
+      "end_date": "2026-12-12",
+      "name": "合同企業説明会 広島適職フェア",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "11:30",
+      "end_time": "15:00",
+      "event_type": "event",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
@@ -883,6 +1366,27 @@
       "verification_count": 1
     },
     {
+      "date": "2026-12-13",
+      "end_date": "2026-12-13",
+      "name": "RCCテレビ・ひな壇団イベント",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
       "date": "2026-12-18",
       "end_date": "2026-12-18",
       "name": "マキシマム ザ ホルモン",
@@ -900,6 +1404,48 @@
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-12-19",
+      "end_date": "2026-12-19",
+      "name": "第13回 日本スポーツ理学療法学術大会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:00",
+      "end_time": "18:30",
+      "event_type": "sports",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
+      ],
+      "verification_count": 1
+    },
+    {
+      "date": "2026-12-20",
+      "end_date": "2026-12-20",
+      "name": "第13回 日本スポーツ理学療法学術大会",
+      "venue": "広島国際会議場",
+      "address": null,
+      "start_time": "9:00",
+      "end_time": "18:30",
+      "event_type": "sports",
+      "people": null,
+      "people_basis": null,
+      "source": "広島国際会議場公式",
+      "source_url": "https://www.pcf.city.hiroshima.jp/icch/event.cgi",
+      "sources": [
+        "広島国際会議場公式"
+      ],
+      "source_urls": [
+        "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
       "verification_count": 1
     },
