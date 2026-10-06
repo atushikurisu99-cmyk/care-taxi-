@@ -245,7 +245,7 @@ jobs:
             await assertNoJsErrors(page,profile,cycle,'end-cycle');
           }
 
-          for(const profile of profiles){
+          (async()=>{\n          for(const profile of profiles){
             const browserType=profile.browser==='webkit'?webkit:chromium;
             const browser=await browserType.launch({headless:true});
             const profileResult={name:profile.name,cycles:[],startedAt:new Date().toISOString()};
