@@ -232,8 +232,10 @@ main{position:relative;min-height:0;overflow:hidden}
 .menu-icon.end{color:#ff8f95}
 .menuitem.danger .menu-icon{color:#ff8f95}
 
-.menu-card-compact{padding-top:4px!important;padding-bottom:4px!important}
-.menu-card-compact .menuitem{padding-top:19px;padding-bottom:19px}
+.menu-card-compact{padding-top:4px!important;padding-bottom:4px!important;flex:0 0 auto}
+#menu .content{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;padding-bottom:4px}
+#menu .menuitem{min-height:58px;flex:0 0 auto}
+.menu-card-compact .menuitem{padding-top:16px;padding-bottom:16px}
 .menu-card-compact .menuitem:first-child{border-top:0}
 
 .menuitem:last-child{border-bottom:0}
@@ -2181,6 +2183,10 @@ function show(id){
  if(id==='dailyReport') renderDailyReport();
  if(id==='reportEdit') renderReportEdit();
  if(id==='monthlyReport') renderMonthlyReportCenter();
+ if(id==='menu'){
+  const menuContent=document.querySelector('#menu .content');
+  if(menuContent) menuContent.scrollTop=0;
+ }
  if(id==='settings'){ openSettingsSection('root'); renderNotificationSettings(); renderSalesGoalSettings(); }
  if(id==='ride' || id==='payment') updateRideStartUI(currentRideStart);
  // 生活道路警告は実際の道路判定結果でのみ表示する。デモ自動表示はしない。
