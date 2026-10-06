@@ -99,6 +99,10 @@ const CAP=[
  ['広島クラブクアトロ',800,/広島クラブクアトロ|CLUB QUATTRO/i],
  ['LIVE VANQUISH',450,/LIVE VANQUISH/i],
  ['セカンド・クラッチ',300,/セカンド.?クラッチ|SECOND CRUTCH/i],
+ ['広島県民文化センター',null,/広島県民文化センター/i],
+ ['コジマホールディングス 西区民文化センター',null,/コジマホールディングス\s*西区民文化センター|西区民文化センター/i],
+ ['リーガロイヤルホテル広島',null,/リーガロイヤルホテル広島/i],
+ ['広島市内 10会場',null,/広島市内\s*10会場/i],
 ];
 function venueInfo(s=''){
   for(const [name,capacity,re] of CAP) if(re.test(s)) return {name,capacity};
@@ -107,7 +111,7 @@ function venueInfo(s=''){
 }
 function inHiroshimaCity(s=''){
   s=norm(s);
-  if(/東広島市|廿日市市|呉市|福山市|三原市|尾道市|三次市|庄原市|江田島市|大竹市|安芸高田市/.test(s)) return false;
+  if(/東広島市|廿日市市|呉市|福山市|三原市|尾道市|三次市|庄原市|江田島市|大竹市|安芸高田市|はつかいち|さくらぴあ|ウッドワンさくらぴあ/.test(s)) return false;
   return /広島市|中区|南区|西区|東区|安芸区|安佐南区|安佐北区|佐伯区|広島国際会議場|広島コンベンションホール|リーガロイヤルホテル広島|ヒルトン広島|ホテルグランヴィア広島|グランドプリンスホテル広島|広島大学霞キャンパス|広島大学東千田キャンパス|広仁会館|広島県医師会館|広島県民文化センター|フェニックスホール|グリーンアリーナ|ピースウイング|マツダスタジアム|サンプラザ|HBGホール|上野学園ホール|アステールプラザ|BLUE LIVE|クラブクアトロ|VANQUISH|セカンド.?クラッチ/.test(s);
 }
 function typeOf(s=''){
@@ -141,6 +145,7 @@ function merge(events){
       if(xv!==ev&&!icchAlias)return false;
       const xn=nkey(x.name);
       if(xn===en || (xn.length>=3&&en.length>=3&&(xn.includes(en)||en.includes(xn)))) return true;
+      if(x.event_type==='sports'&&e.event_type==='sports') return true;
       return !!(x.start_time&&e.start_time&&x.start_time===e.start_time&&x.event_type===e.event_type);
     });
     if(i<0){out.push({...e,sources:[e.source],source_urls:[e.source_url].filter(Boolean),verification_count:1});continue}
@@ -544,6 +549,7 @@ async function sourceConventionOfficialEnrichment(){
     if(/AXIES2026/.test(name)) best={people:1850,basis:'official_expected_participants'};
     if(/先進パワー半導体分科会第13回講演会/.test(name)){
       best=date==='2026-11-30'?{people:150,basis:'official_tutorial_capacity'}:{people:null,basis:null};
+      if(date==='2026-11-30'){ cells[5]='13:00'; cells[6]='18:00'; }
     }
     if(/第69回秋季日本歯周病学会学術大会/.test(name) && best.people===2026) best={people:null,basis:null};
     out.push(eventBase({
