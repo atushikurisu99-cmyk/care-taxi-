@@ -613,13 +613,39 @@ async function main(){
     }
   }
   const merged=merge(all).filter(e=>e.date>=today&&e.date<=cutoff).sort((a,b)=>a.date.localeCompare(b.date)||(Number(b.people||0)-Number(a.people||0))||String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
+  const previousEvents=Array.isArray(previous?.events)?previous.events:[];
+  const nowIso=new Date().toISOString();
   for(const e of merged){
+    const currentKey=key(e);
+    const old=previousEvents.find(x=>key(x)===currentKey)||
+      previousEvents.find(x=>String(x?.date||'')===String(e.date||'')&&String(x?.venue||'')===String(e.venue||'')&&
+        (String(x?.name||'').includes(String(e.name||''))||String(e.name||'').includes(String(x?.name||''))));
+    e.first_seen_at=old?.first_seen_at||old?.last_seen_at||previous?.generated_at||nowIso;
+    e.last_seen_at=nowIso;
+    const missing=[];
+    if(e.event_type==='convention'&&Number(e.people||0)<100) missing.push('participants');
+    if(!e.start_time) missing.push('start_time');
+    if(!e.end_time) missing.push('end_time');
+    e.needs_enrichment=missing.length>0;
+    e.enrichment_targets=missing;
+
     const official=(e.sources||[]).some(s=>/公式|NPB|Dive! Hiroshima|広島観光コンベンションビューロー/.test(String(s)));
     e.confidence=(Number(e.verification_count||0)>=2?'verified':official?'official':'single_source');
     e.people_label=e.people==null?null:(e.people_basis==='venue_capacity_reference'?('最大約'+Number(e.people).toLocaleString('ja-JP')+'人規模'):(Number(e.people).toLocaleString('ja-JP')+'人'));
   }
-  const payload={ok:true,generated_at:new Date().toISOString(),area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,
-    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比35%未満の急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない'},
+  const sourceRegistry={
+    icch:{role:'venue_official',cadence:'twice_daily',categories:['convention','music','theater','event'],continuity:'retain_on_failure'},
+    candy:{role:'promoter',cadence:'twice_daily',categories:['music','theater'],continuity:'retain_on_failure_or_regression'},
+    worker_events:{role:'legacy_aggregator',cadence:'twice_daily',categories:['music','theater'],continuity:'retain_on_failure_or_regression'},
+    eplus:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
+    lawson:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
+    pia:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
+    dive:{role:'tourism_official',cadence:'twice_daily',categories:['festival','event','sports'],continuity:'retain_on_failure_or_regression'},
+    cvb:{role:'convention_bureau',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_stale_publication'},
+    sports:{role:'sports_official',cadence:'twice_daily',categories:['sports'],continuity:'retain_on_failure_or_regression'}
+  };
+  const payload={ok:true,generated_at:nowIso,area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,source_registry:sourceRegistry,
+    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比35%未満の急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない',enrichment_policy:'既存イベントを消さず、不足している人数・開始・終了時刻を後続ソースで補完する'},
     counts:{raw:all.length,merged:merged.length},events:merged.map(({source_text,...e})=>e)};
   await fs.mkdir('sales-nav-prototype/data',{recursive:true});await fs.writeFile(OUT,JSON.stringify(payload,null,2)+'\n');
   console.log(JSON.stringify({health,counts:payload.counts,first:payload.events.slice(0,12).map(x=>({date:x.date,name:x.name,venue:x.venue,people:x.people,source:x.source}))},null,2));
