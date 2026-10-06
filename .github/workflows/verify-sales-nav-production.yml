@@ -117,6 +117,35 @@ jobs:
               if(!previewText.includes(required)) throw new Error('monthly preview missing '+required+': '+previewText.slice(0,1200));
             }
             if(!await preview.isVisible()) throw new Error('monthly preview did not become visible after demo');
+            const sheet=page.locator('#monthlyReportPreview .sogo-sheet');
+            const firstPage=page.locator('#monthlyReportPreview .sogo-page').first();
+            const title=page.locator('#monthlyReportPreview .sogo-title').first();
+            const topTable=page.locator('#monthlyReportPreview .sogo-top').first();
+            const tripTable=page.locator('#monthlyReportPreview .sogo-trip').first();
+            const titleBox=await title.boundingBox();
+            const pageBox=await firstPage.boundingBox();
+            const topBox=await topTable.boundingBox();
+            const titleStyle=await title.evaluate(el=>({fontSize:parseFloat(getComputedStyle(el).fontSize),color:getComputedStyle(el).color,display:getComputedStyle(el).display}));
+            const tripRows=await tripTable.locator('tbody tr').count();
+            const firstTripCells=await tripTable.locator('tbody tr').first().locator('td').count();
+            const topFirstRowCells=await topTable.locator('tbody tr').first().locator('td').count();
+            const visibleDemoValues=await firstPage.innerText();
+            if(!titleBox||!pageBox||!topBox||titleBox.width<120||titleBox.height<20||titleStyle.fontSize<24){
+              throw new Error('Sogo title is not visibly laid out: '+JSON.stringify({titleBox,pageBox,topBox,titleStyle}));
+            }
+            if(titleBox.y<pageBox.y||titleBox.y+titleBox.height>topBox.y){
+              throw new Error('Sogo title overlaps or escapes header area: '+JSON.stringify({titleBox,pageBox,topBox}));
+            }
+            if(tripRows!==20||firstTripCells!==9||topFirstRowCells<7){
+              throw new Error('Sogo grid structure broken: '+JSON.stringify({tripRows,firstTripCells,topFirstRowCells}));
+            }
+            for(const value of ['17:10','23:55','52340','52462','広島駅 新幹線口','八丁堀','1,780']){
+              if(!visibleDemoValues.includes(value)) throw new Error('Sogo visible demo value missing: '+value);
+            }
+            const tripFont=await tripTable.locator('tbody td').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
+            if(tripFont<9) throw new Error('Sogo trip text too small: '+tripFont);
+            console.log('SOGO_VISUAL_STRUCTURE_OK',JSON.stringify({titleBox,pageBox,topBox,titleStyle,tripRows,firstTripCells,topFirstRowCells,tripFont}));
+            await page.screenshot({path:'/tmp/monthly-preview-template-v2.png',fullPage:false});
             await page.locator('#monthlyReportPreview .monthly-preview-close').click();
             if(await preview.isVisible()) throw new Error('monthly preview did not close');
             await page.locator('#monthlyReportPreviewButton').click();
@@ -180,6 +209,7 @@ jobs:
             /tmp/prod-verify.json
             /tmp/menu-production.png
             /tmp/monthly-preview-production.png
+            /tmp/monthly-preview-template-v2.png
           if-no-files-found: ignore
           retention-days: 1
 
