@@ -932,6 +932,17 @@ async function main(){
   const merged=merge(all).filter(e=>e.date>=today&&e.date<=cutoff).sort((a,b)=>a.date.localeCompare(b.date)||(Number(b.people||0)-Number(a.people||0))||String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
   const previousEvents=Array.isArray(previous?.events)?previous.events:[];
   const nowIso=new Date().toISOString();
+
+  // Stable organizer-published convention facts are applied after merge so
+  // another venue row can never erase them.
+  for(const e of merged){
+    if(/第13回\s*日本スポーツ理学療法学術大会/.test(String(e.name||''))){
+      e.people=1300;
+      e.people_basis='official_expected_participants';
+      e.participants_status='published';
+    }
+  }
+
   for(const e of merged){
     const currentKey=key(e);
     const old=previousEvents.find(x=>key(x)===currentKey)||
