@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T09:35:14.582Z",
+  "generated_at": "2026-10-06T09:40:07.524Z",
   "area": "広島市",
   "source_health": {
     "icch": {
@@ -8,65 +8,64 @@
       "state": "ok",
       "count": 29,
       "previous_count": 29,
-      "ms": 887,
-      "last_success_at": "2026-10-06T09:32:29.410Z"
+      "ms": 857,
+      "last_success_at": "2026-10-06T09:37:29.653Z"
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 38,
       "previous_count": 38,
-      "ms": 1157,
-      "last_success_at": "2026-10-06T09:32:30.567Z"
+      "ms": 890,
+      "last_success_at": "2026-10-06T09:37:30.543Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
       "previous_count": 20,
-      "ms": 11575,
-      "last_success_at": "2026-10-06T09:32:42.142Z"
+      "ms": 16624,
+      "last_success_at": "2026-10-06T09:37:47.167Z"
     },
     "eplus": {
-      "ok": false,
-      "state": "degraded",
-      "count": 53,
-      "previous_count": 100,
-      "ms": 56790,
-      "last_success_at": "2026-10-06T09:27:58.619Z",
-      "retained_future_count": 99
+      "ok": true,
+      "state": "ok",
+      "count": 36,
+      "previous_count": 53,
+      "ms": 53079,
+      "last_success_at": "2026-10-06T09:38:40.246Z"
     },
     "lawson": {
       "ok": true,
       "state": "ok",
       "count": 39,
       "previous_count": 39,
-      "ms": 1526,
-      "last_success_at": "2026-10-06T09:33:40.458Z"
+      "ms": 1484,
+      "last_success_at": "2026-10-06T09:38:41.730Z"
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 43555,
-      "last_success_at": "2026-10-06T09:34:24.013Z"
+      "ms": 39184,
+      "last_success_at": "2026-10-06T09:39:20.915Z"
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
       "previous_count": 3,
-      "ms": 5173,
-      "last_success_at": "2026-10-06T09:34:29.186Z"
+      "ms": 673,
+      "last_success_at": "2026-10-06T09:39:21.588Z"
     },
     "city_events": {
       "ok": true,
       "state": "ok",
       "count": 3,
       "previous_count": 3,
-      "ms": 5246,
-      "last_success_at": "2026-10-06T09:34:34.432Z"
+      "ms": 4748,
+      "last_success_at": "2026-10-06T09:39:26.336Z"
     },
     "published_details": {
       "ok": true,
@@ -74,25 +73,25 @@
       "count": 14,
       "previous_count": 14,
       "ms": 1,
-      "last_success_at": "2026-10-06T09:34:34.433Z"
+      "last_success_at": "2026-10-06T09:39:26.337Z"
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
       "previous_count": null,
-      "ms": 1011,
+      "ms": 1022,
       "last_success_at": null,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
       "retained_future_count": 0
     },
     "cvb_news": {
-      "ok": false,
-      "state": "suspicious_zero",
+      "ok": true,
+      "state": "ok",
       "count": 0,
       "previous_count": null,
-      "ms": 5709,
-      "last_success_at": "2026-10-06T09:29:01.117Z",
+      "ms": 6802,
+      "last_success_at": "2026-10-06T09:39:34.161Z",
       "retained_future_count": 0
     },
     "convention_official": {
@@ -100,16 +99,16 @@
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 13937,
-      "last_success_at": "2026-10-06T09:34:55.090Z"
+      "ms": 13573,
+      "last_success_at": "2026-10-06T09:39:47.734Z"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
       "previous_count": 36,
-      "ms": 19483,
-      "last_success_at": "2026-10-06T09:35:14.573Z"
+      "ms": 19782,
+      "last_success_at": "2026-10-06T09:40:07.516Z"
     }
   },
   "source_registry": {
@@ -246,21 +245,9 @@
   },
   "degraded_sources": [
     {
-      "id": "eplus",
-      "state": "degraded",
-      "error": null,
-      "retained_future_count": 99
-    },
-    {
       "id": "cvb",
       "state": "failure",
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
-      "retained_future_count": 0
-    },
-    {
-      "id": "cvb_news",
-      "state": "suspicious_zero",
-      "error": null,
       "retained_future_count": 0
     }
   ],
