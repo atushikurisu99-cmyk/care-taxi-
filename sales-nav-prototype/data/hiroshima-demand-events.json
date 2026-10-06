@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T06:00:08.153Z",
+  "generated_at": "2026-10-06T06:04:31.151Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -12,55 +12,56 @@
       "ok": true,
       "state": "ok",
       "count": 29,
-      "ms": 1258
+      "ms": 920
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 37,
-      "ms": 990
+      "ms": 1395
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
-      "ms": 7965
+      "ms": 9884
     },
     "eplus": {
       "ok": true,
       "state": "ok",
-      "count": 40,
-      "ms": 24448
+      "count": 32,
+      "ms": 24141
     },
     "lawson": {
       "ok": true,
       "state": "ok",
-      "count": 57,
-      "ms": 2291
+      "count": 58,
+      "ms": 2651
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 12,
-      "ms": 13738
+      "ms": 21206
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
-      "ms": 5216
+      "ms": 1696
     },
     "cvb": {
-      "ok": true,
-      "state": "ok",
-      "count": 0,
-      "ms": 1007
+      "ok": false,
+      "state": "failure",
+      "count": null,
+      "ms": 1221,
+      "error": "HCVB calendar has no future data; latest published date=2026-07-30"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
-      "ms": 20351
+      "ms": 20255
     }
   },
   "rules": {
@@ -69,8 +70,8 @@
     "failure_policy": "取得失敗または疑わしい0件では直前の未来予定を保持する"
   },
   "counts": {
-    "raw": 234,
-    "merged": 148
+    "raw": 227,
+    "merged": 146
   },
   "events": [
     {
@@ -1595,7 +1596,6 @@
       ],
       "source_urls": [
         "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
       "verification_count": 2,
@@ -1723,29 +1723,6 @@
     {
       "date": "2026-11-03",
       "end_date": "2026-11-03",
-      "name": "新日本プロレス POWER STRUGGLE ~SUPER Jr. TAG LEAGUE 2026~",
-      "venue": "広島サンプラザホール",
-      "address": null,
-      "start_time": "16:00",
-      "end_time": null,
-      "event_type": "sports",
-      "people": 6000,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima"
-      ],
-      "verification_count": 1,
-      "confidence": "single_source",
-      "people_label": "最大約6,000人規模"
-    },
-    {
-      "date": "2026-11-03",
-      "end_date": "2026-11-03",
       "name": "新日本プロレス 広島",
       "venue": "広島サンプラザホール",
       "address": null,
@@ -1788,6 +1765,29 @@
       "verification_count": 1,
       "confidence": "single_source",
       "people_label": "最大約1,204人規模"
+    },
+    {
+      "date": "2026-11-03",
+      "end_date": "2026-11-03",
+      "name": "春風亭小朝 独演会",
+      "venue": "広島県民文化センター",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "theater",
+      "people": null,
+      "people_basis": null,
+      "source": "ローチケ",
+      "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
+      "sources": [
+        "ローチケ"
+      ],
+      "source_urls": [
+        "https://cdn.l-tike.com/search/?pref=34&size=100"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": null
     },
     {
       "date": "2026-11-04",
@@ -2080,17 +2080,16 @@
       "address": null,
       "start_time": "17:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "theater",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "confidence": "single_source",
@@ -2847,29 +2846,6 @@
       "people_label": null
     },
     {
-      "date": "2026-12-05",
-      "end_date": "2026-12-05",
-      "name": "HIROSHIMA CONTI-NeW FeS 2026",
-      "venue": "広島グリーンアリーナ",
-      "address": null,
-      "start_time": "11:00",
-      "end_time": null,
-      "event_type": "event",
-      "people": 10000,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
-      ],
-      "verification_count": 1,
-      "confidence": "single_source",
-      "people_label": "最大約10,000人規模"
-    },
-    {
       "date": "2026-12-06",
       "end_date": "2026-12-06",
       "name": "サンフレッチェ広島 vs ヴィッセル神戸",
@@ -2891,29 +2867,6 @@
       "verification_count": 1,
       "confidence": "official",
       "people_label": "最大約28,520人規模"
-    },
-    {
-      "date": "2026-12-06",
-      "end_date": "2026-12-06",
-      "name": "HIROSHIMA CONTI-NeW FeS 2026",
-      "venue": "広島グリーンアリーナ",
-      "address": null,
-      "start_time": "11:30",
-      "end_time": null,
-      "event_type": "event",
-      "people": 10000,
-      "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
-      "sources": [
-        "イープラス"
-      ],
-      "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
-      ],
-      "verification_count": 1,
-      "confidence": "single_source",
-      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-12-06",
@@ -3235,7 +3188,6 @@
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
