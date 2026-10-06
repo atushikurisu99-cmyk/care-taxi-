@@ -1255,7 +1255,13 @@ html,body{
  padding:64px 10px calc(18px + env(safe-area-inset-bottom));
  overflow:auto;
  -webkit-overflow-scrolling:touch;
- box-shadow:none
+ box-shadow:none;
+ touch-action:pan-x pan-y pinch-zoom
+}
+.monthly-preview-canvas{
+ transform-origin:0 0;
+ width:max-content;
+ min-width:720px
 }
 .monthly-preview-close{
  position:fixed;
@@ -2157,7 +2163,10 @@ html,body{
 <script>
 function preventIosPinchZoom(){
  ['gesturestart','gesturechange','gestureend'].forEach(type=>{
-  document.addEventListener(type,e=>e.preventDefault(),{passive:false});
+  document.addEventListener(type,e=>{
+   if(e.target?.closest?.('#monthlyReportPreview.show')) return;
+   e.preventDefault();
+  },{passive:false});
  });
 }
 preventIosPinchZoom();
@@ -2934,13 +2943,49 @@ function seedDemoOperationData(){
  renderMonthlyReportPreview(true);
  toast('実際の乗務データ構造でデモ日報を作成しました');
 }
+let monthlyPreviewZoom=1;
+function setMonthlyPreviewZoom(scale){
+ const p=document.getElementById('monthlyReportPreview');
+ const canvas=p?.querySelector('.monthly-preview-canvas');
+ if(!p||!canvas)return;
+ monthlyPreviewZoom=Math.max(.7,Math.min(3.2,Number(scale)||1));
+ canvas.style.transform='scale('+monthlyPreviewZoom+')';
+ canvas.style.marginRight=((monthlyPreviewZoom-1)*canvas.scrollWidth)+'px';
+ canvas.style.marginBottom=((monthlyPreviewZoom-1)*canvas.scrollHeight)+'px';
+}
+function initMonthlyPreviewPinch(){
+ const p=document.getElementById('monthlyReportPreview'); if(!p||p.dataset.pinchReady==='1')return;
+ p.dataset.pinchReady='1';
+ let startDist=0,startScale=1;
+ const dist=t=>{
+  const dx=t[0].clientX-t[1].clientX,dy=t[0].clientY-t[1].clientY;
+  return Math.hypot(dx,dy);
+ };
+ p.addEventListener('touchstart',e=>{
+  if(e.touches.length===2){
+   startDist=dist(e.touches);
+   startScale=monthlyPreviewZoom;
+   e.preventDefault();
+  }
+ },{passive:false});
+ p.addEventListener('touchmove',e=>{
+  if(e.touches.length===2&&startDist>0){
+   setMonthlyPreviewZoom(startScale*(dist(e.touches)/startDist));
+   e.preventDefault();
+  }
+ },{passive:false});
+ p.addEventListener('touchend',e=>{if(e.touches.length<2)startDist=0;},{passive:true});
+}
 function renderMonthlyReportPreview(forceShow=true){
  const p=document.getElementById('monthlyReportPreview'); if(!p)return;
  const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
- p.innerHTML='<button type="button" class="monthly-preview-close" onclick="toggleMonthlyReportPreview()">プレビューを閉じる</button>'+monthlyReportTableHtml(monthKey);
+ p.innerHTML='<button type="button" class="monthly-preview-close" onclick="toggleMonthlyReportPreview()">プレビューを閉じる</button><div class="monthly-preview-canvas">'+monthlyReportTableHtml(monthKey)+'</div>';
  if(forceShow){
   p.classList.add('show');
-  p.scrollTop=0;
+  p.scrollTop=0;p.scrollLeft=0;
+  monthlyPreviewZoom=1;
+  setMonthlyPreviewZoom(1);
+  initMonthlyPreviewPinch();
   const btn=document.getElementById('monthlyReportPreviewButton');
   if(btn) btn.textContent='プレビューを閉じる';
  }
