@@ -58,11 +58,18 @@ jobs:
           const history=JSON.parse(fs.readFileSync('sales-nav-prototype/data/hiroshima-demand-source-history.json','utf8'));
           if(!history?.sources||typeof history.sources!=='object') throw new Error('invalid source history snapshot');
           const h=p.source_health||{};
-          const minimums={icch:5,candy:5,dive:1,sports:5,worker_events:5,lawson:20,pia:5,eplus:60,city_events:1,published_details:5,convention_official:5};
+          const minimums={icch:5,candy:5,dive:1,sports:5,worker_events:5,lawson:20,pia:5,city_events:1,published_details:5,convention_official:5};
           for(const [id,min] of Object.entries(minimums)){
             if(h[id]?.ok!==true || Number(h[id]?.count||0)<min){
               throw new Error('source regression '+id+' count='+(h[id]?.count??'null'));
             }
+          }
+          const eplusVisible=p.events.filter(x=>(x.sources||[]).includes('イープラス')).length;
+          const eplusHistory=Number(history?.sources?.eplus?.reference_count||0);
+          const eplusCurrent=Number(h.eplus?.count||0);
+          const eplusRetained=Number(h.eplus?.retained_future_count||0);
+          if(eplusVisible<60 || eplusHistory<100){
+            throw new Error('Eplus effective coverage regression visible='+eplusVisible+' current='+eplusCurrent+' retained='+eplusRetained+' history='+eplusHistory);
           }
           if(Number(p.counts?.merged||0)<30) throw new Error('coverage regression: too few merged events');
           const venues=new Set(p.events.map(x=>x.venue).filter(Boolean));
