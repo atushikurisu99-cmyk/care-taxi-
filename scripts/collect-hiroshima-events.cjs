@@ -3,6 +3,7 @@ const fs = require('node:fs/promises');
 const TZ='Asia/Tokyo';
 const OUT='sales-nav-prototype/data/hiroshima-demand-events.json';
 const STATUS_OUT='sales-nav-prototype/data/hiroshima-demand-source-status.json';
+const HISTORY_OUT='sales-nav-prototype/data/hiroshima-demand-source-history.json';
 const DEBUG_DIR='tmp/event-source-debug';
 async function saveDebug(name,content){
   try{await fs.mkdir(DEBUG_DIR,{recursive:true});await fs.writeFile(DEBUG_DIR+'/'+name,String(content||'').slice(0,300000));}catch{}
@@ -782,9 +783,10 @@ const SOURCES=[
   ['dive',sourceDive],['city_events',sourceHiroshimaCityEvents],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['cvb_news',sourceHcvbConferenceNews],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
 ];
 async function main(){
-  const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
-  let previous=null;
+  const today=jstDate(),cutoff=addDays(today,120),all=[],health={},sourceRows={};
+  let previous=null,sourceHistory={generated_at:null,area:'広島市',sources:{}};
   try{previous=JSON.parse(await fs.readFile(OUT,'utf8'))}catch{previous=null}
+  try{sourceHistory=JSON.parse(await fs.readFile(HISTORY_OUT,'utf8'))}catch{}
   const sourceOnly=String(process.env.EVENT_SOURCE_ONLY||'').trim();
   const activeSources=sourceOnly?SOURCES.filter(([id])=>id===sourceOnly):SOURCES;
   if(sourceOnly&&!activeSources.length) throw new Error('unknown EVENT_SOURCE_ONLY '+sourceOnly);
@@ -806,8 +808,10 @@ async function main(){
         }
       }
       all.push(...rows);
+      sourceRows[id]=rows;
       const suspiciousZero=establishedSources.has(id)&&rows.length===0;
-      const suspiciousDrop=referenceCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(referenceCount*0.60));
+      const ratio=id==='eplus'?0.80:0.60;
+      const suspiciousDrop=referenceCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(referenceCount*ratio));
       const state=suspiciousZero?'suspicious_zero':suspiciousDrop?'degraded':'ok';
       health[id]={
         ok:!suspiciousZero&&!suspiciousDrop,
@@ -819,6 +823,7 @@ async function main(){
         last_success_at:(!suspiciousZero&&!suspiciousDrop)?new Date().toISOString():(previous?.source_health?.[id]?.last_success_at||null)
       };
     }catch(e){
+      sourceRows[id]=[];
       health[id]={
         ok:false,state:'failure',count:null,
         previous_count:Number(previous?.source_health?.[id]?.count||0)||null,
@@ -848,26 +853,31 @@ async function main(){
     convention_official:['主催者公式'],
     sports:['サンフレッチェ広島公式','広島ドラゴンフライズ公式','広島サンダーズ公式','NPB']
   };
-  if(previous?.events){
-    for(const [id,h] of Object.entries(health)){
-      if(h.ok&&Number(h.count)>0) continue;
-      const labels=new Set(sourceLabelMap[id]||[]);
-      let retained=0;
-      for(const old of previous.events){
-        if(String(old.date||'')<today) continue;
-        if((old.sources||[]).some(s=>labels.has(s)) || labels.has(old.source)){
-          all.push({
-            ...old,
-            source:(old.source||[...(old.sources||[])][0]||id),
-            stale_source:true,
-            stale_reason:h.state||'failure',
-            source_text:'retained by source continuity guard'
-          });
-          retained++;
-        }
-      }
-      health[id].retained_future_count=retained;
+  for(const [id,h] of Object.entries(health)){
+    if(h.ok&&Number(h.count)>0) continue;
+    const labels=new Set(sourceLabelMap[id]||[]);
+    let retained=0;
+    const candidates=[
+      ...(Array.isArray(previous?.events)?previous.events:[]),
+      ...(Array.isArray(sourceHistory?.sources?.[id]?.events)?sourceHistory.sources[id].events:[])
+    ];
+    const seenRetain=new Set();
+    for(const old of candidates){
+      if(String(old.date||'')<today) continue;
+      if(!((old.sources||[]).some(s=>labels.has(s)) || labels.has(old.source))) continue;
+      const rk=key(old);
+      if(seenRetain.has(rk)) continue;
+      seenRetain.add(rk);
+      all.push({
+        ...old,
+        source:(old.source||[...(old.sources||[])][0]||id),
+        stale_source:true,
+        stale_reason:h.state||'failure',
+        source_text:'retained by source continuity history'
+      });
+      retained++;
     }
+    health[id].retained_future_count=retained;
   }
   const merged=merge(all).filter(e=>e.date>=today&&e.date<=cutoff).sort((a,b)=>a.date.localeCompare(b.date)||(Number(b.people||0)-Number(a.people||0))||String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
   const previousEvents=Array.isArray(previous?.events)?previous.events:[];
@@ -935,9 +945,22 @@ async function main(){
     degraded_sources:Object.entries(health).filter(([,v])=>v?.state&&v.state!=='ok').map(([id,v])=>({id,state:v.state,error:v.error||null,retained_future_count:v.retained_future_count||0})),
     operational_note:'取得元ごとに独立監視。失敗・急減・公開停止時も他の正常データを継続し、直前の未来予定を保持する。'
   };
+  const nextHistory={...sourceHistory,generated_at:nowIso,area:'広島市',sources:{...(sourceHistory.sources||{})}};
+  for(const [id,h] of Object.entries(health)){
+    if(!h.ok||!Array.isArray(sourceRows[id])||!sourceRows[id].length) continue;
+    const compact=merge(sourceRows[id])
+      .filter(e=>String(e.date||'')>=today)
+      .map(({source_text,...e})=>e);
+    nextHistory.sources[id]={
+      reference_count:Math.max(Number(nextHistory.sources?.[id]?.reference_count||0),Number(h.reference_count||h.count||0)),
+      last_good_generated_at:nowIso,
+      events:compact
+    };
+  }
   await fs.mkdir('sales-nav-prototype/data',{recursive:true});
   await fs.writeFile(OUT,JSON.stringify(payload,null,2)+'\n');
   await fs.writeFile(STATUS_OUT,JSON.stringify(sourceStatus,null,2)+'\n');
+  await fs.writeFile(HISTORY_OUT,JSON.stringify(nextHistory,null,2)+'\n');
   console.log(JSON.stringify({health,counts:payload.counts,enrichment:enrichmentSummary,first:payload.events.slice(0,12).map(x=>({date:x.date,name:x.name,venue:x.venue,people:x.people,source:x.source}))},null,2));
   if(Object.values(health).every(x=>!x.ok)) process.exitCode=2;
   await closeBrowser();
