@@ -261,22 +261,40 @@ async function sourceEplus(){
   return events;
 }
 async function sourceLawson(){
-  const url='https://l-tike.com/search/?pref=34&size=100'; const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
-  await saveDebug('pia.txt',text);
-  await saveDebug('lawson.txt',text);
-  const re=/(コンサート|演劇・ステージ・舞台|クラシック・オペラ|スポーツ|イベント)\s+(.{2,150}?)\s+公演日[:：]\s*(20\d{2})\/(\d{1,2})\/(\d{1,2})[\s\S]{0,220}?会場[:：]\s*([^（(]{2,100})(?:（広島県\)|\(広島県\))/g;
-  for(const m of text.matchAll(re)){const venue=norm(m[6]);if(!inHiroshimaCity(venue))continue;events.push(eventBase({name:m[2],date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0]}));}
-  return events;
-}
-async function sourceWorkerEvents(){
-  const url='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima?collector='+Date.now();
-  const raw=await fetchText(url,25000); const d=JSON.parse(raw); if(d?.ok!==true||!Array.isArray(d.events))throw new Error('invalid worker event feed');
-  return d.events.map(e=>eventBase({
-    name:e.display_name||e.name||e.title,date:e.date,venue:e.venue,source:'会場・プレイガイド統合Worker',url:e.source_url||url,
-    text:[e.name,e.title,e.venue,e.event_type].filter(Boolean).join(' '),kind:e.event_type||null,start:e.start_time||null,end:e.end_time||e.end_time_estimate||null
-  })).filter(e=>e.name&&e.date&&e.venue);
-}
+  // The main l-tike host intermittently fails over HTTP/2 in GitHub Actions.
+  // cdn.l-tike.com serves the same search results as static HTML and is stable
+  // enough for scheduled collection.
+  const urls=[
+    'https://cdn.l-tike.com/search/?pref=34&size=100',
+    'https://cdn.l-tike.com/search/?pref=34&tig=100&size=100'
+  ];
+  const events=[];
+  for(const url of urls){
+    const html=await fetchText(url,25000);
+    const text=norm(html);
+    await saveDebug('lawson-'+(url.includes('tig=100')?'concert':'all')+'.txt',text);
 
+    // Example:
+    // コンサート キュウソネコカミ 公演日：2026/10/16(金)
+    // 会場：ＬＩＶＥ ＶＡＮＱＵＩＳＨ（広島県）
+    const blocks=[...text.matchAll(/(コンサート|演劇・ステージ・舞台|クラシック・オペラ|スポーツ|イベント)\s+([\s\S]{2,180}?)\s+公演日[:：]\s*(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)[\s\S]{0,260}?会場[:：]\s*([^（(]{2,120})(?:（広島県\)|\(広島県\))/g)];
+    for(const m of blocks){
+      const category=m[1],name=norm(m[2]).replace(/^(?:先着|抽選|一般発売)\s*/,'').trim();
+      const rawVenue=norm(m[6]);
+      if(!name||!rawVenue) continue;
+      const vi=venueInfo(rawVenue);
+      const venue=vi.name||rawVenue;
+      if(!inHiroshimaCity(venue)) continue;
+      const kind=category==='スポーツ'?'sports':
+                 /演劇|舞台|クラシック|オペラ/.test(category)?'theater':
+                 category==='コンサート'?'music':'event';
+      events.push(eventBase({
+        name,date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0],kind
+      }));
+    }
+  }
+  return merge(events);
+}
 async function sourcePia(){
   const url='https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島');
   const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
@@ -395,7 +413,10 @@ async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
   let previous=null;
   try{previous=JSON.parse(await fs.readFile(OUT,'utf8'))}catch{previous=null}
-  for(const [id,fn] of SOURCES){
+  const sourceOnly=String(process.env.EVENT_SOURCE_ONLY||'').trim();
+  const activeSources=sourceOnly?SOURCES.filter(([id])=>id===sourceOnly):SOURCES;
+  if(sourceOnly&&!activeSources.length) throw new Error('unknown EVENT_SOURCE_ONLY '+sourceOnly);
+  for(const [id,fn] of activeSources){
     const started=Date.now();
     try{
       const rows=await fn(); all.push(...rows);
@@ -405,6 +426,15 @@ async function main(){
       health[id]={ok:false,state:'failure',count:null,ms:Date.now()-started,error:String(e?.message||e).slice(0,240)};
     }
   }
+  if(sourceOnly){
+    const report={ok:true,source:sourceOnly,generated_at:new Date().toISOString(),health,events:merge(all).map(({source_text,...e})=>e)};
+    await fs.mkdir(DEBUG_DIR,{recursive:true});
+    await fs.writeFile(DEBUG_DIR+'/'+sourceOnly+'-result.json',JSON.stringify(report,null,2)+'\n');
+    console.log(JSON.stringify({source:sourceOnly,health,events:report.events.slice(0,40)},null,2));
+    await closeBrowser();
+    return;
+  }
+
   const sourceLabelMap={
     icch:['広島国際会議場公式'],candy:['CANDY PROMOTION'],worker_events:['会場・プレイガイド統合Worker'],
     eplus:['イープラス'],lawson:['ローチケ'],pia:['チケットぴあ'],dive:['Dive! Hiroshima'],
