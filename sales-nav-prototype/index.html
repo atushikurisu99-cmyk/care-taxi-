@@ -1953,7 +1953,7 @@ html,body{
    <div class="monthly-report-grid">
     <div class="monthly-report-field">
      <label>対象月</label>
-     <input id="monthlyReportMonth" type="month" onchange="renderMonthlyReportCenter()">
+     <input id="monthlyReportMonth" type="month" onchange="monthlyReportDemoState=null;renderMonthlyReportCenter()">
     </div>
     <div class="monthly-report-field">
      <label>ひな型</label>
@@ -2222,6 +2222,15 @@ function ensureCalendarHeaderNav(){
 }
 function show(id){
  hideNotice();hideSafety();
+ const monthlyPreview=document.getElementById('monthlyReportPreview');
+ const monthlyPreviewBtn=document.getElementById('monthlyReportPreviewButton');
+ if(monthlyPreview){
+  monthlyPreview.classList.remove('show');
+  monthlyPreview.innerHTML='';
+  monthlyPreview.scrollTop=0;
+  monthlyPreview.scrollLeft=0;
+ }
+ if(monthlyPreviewBtn) monthlyPreviewBtn.textContent='プレビュー';
  ensureCalendarHeaderNav();
  closeCalendarDayDetail();
  document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
@@ -2704,9 +2713,9 @@ function renderMonthlyReportCenter(){
    :'この月の日報データはまだありません';
  const note=document.getElementById('monthlyReportTemplateNote');
  if(note) note.textContent='相互個人タクシー協同組合の運転日報（1〜20回／21〜30回＋日常点検）を基準に出力します。';
- renderMonthlyReportPreview(false);
 }
 function reportTripsForTemplate(r){
+ if(Array.isArray(r?._demoTrips)) return r._demoTrips.slice().sort((a,b)=>Number(a.pickupTs||0)-Number(b.pickupTs||0)).slice(0,30);
  return getTripRecords()
   .filter(x=>x&&x.dutyId===r?.dutyId&&x.pickupTs)
   .slice().sort((a,b)=>Number(a.pickupTs||0)-Number(b.pickupTs||0))
@@ -2882,9 +2891,20 @@ function sogoDailyReportHtml(r){
   '</div>'+
  '</div>';
 }
+let monthlyReportDemoState=null;
+function monthlyReportBlankReport(monthKey){
+ return {
+  id:'preview_blank',dutyId:'preview_blank',dateKey:'',startTs:0,endTs:0,startTime:'',endTime:'',
+  registrationNumber:'',odometerStart:'',odometerEnd:'',sales:0,receivable:0,trips:0,
+  businessName:'',vehicleNumber:'',inspectorName:'',expenses:[],demoData:false,_previewBlank:true,_demoTrips:[]
+ };
+}
 function monthlyReportTableHtml(monthKey){
+ if(monthlyReportDemoState&&monthlyReportDemoState.monthKey===monthKey){
+  return sogoDailyReportHtml(monthlyReportDemoState.report);
+ }
  const rows=monthlyRows(monthKey);
- if(!rows.length) return '<div class="calendar-detail-empty">この月の日報データはまだありません</div>';
+ if(!rows.length) return sogoDailyReportHtml(monthlyReportBlankReport(monthKey));
  const r=rows.slice().sort((a,b)=>Number(b.startTs||0)-Number(a.startTs||0))[0];
  return sogoDailyReportHtml(r);
 }
@@ -2895,14 +2915,7 @@ function seedDemoOperationData(){
  const dateKey=monthKey+'-07';
  const start=new Date(dateKey+'T17:10:00').getTime();
  const end=new Date(dateKey+'T23:55:00').getTime();
- const dutyId='demo_duty_'+dateKey;
- const reportId='demo_report_'+dateKey;
-
- // 前回の同月デモだけ消して、実データは一切触らない。
- saveTripRecords(getTripRecords().filter(x=>x?.demoData!==true||x?.dateKey!==dateKey));
- saveAnalyticsEvents(getAnalyticsEvents().filter(x=>x?.data?.demoData!==true||x?.data?.dateKey!==dateKey));
- saveDailyReports(getDailyReports().filter(x=>x?.demoData!==true||x?.dateKey!==dateKey));
-
+ const dutyId='demo_preview_'+dateKey;
  const places=[
   ['広島駅 新幹線口','八丁堀',1780,'現金'],
   ['紙屋町','広島駅 南口',1460,'クレジット'],
@@ -2911,50 +2924,37 @@ function seedDemoOperationData(){
   ['広島バスセンター','マツダスタジアム',2140,'現金'],
   ['三川町','広島駅 新幹線口',1540,'タクシーチケット']
  ];
- const tripRows=[];
- const analytics=[];
- analytics.push({schema:ANALYTICS_SCHEMA,id:'demo_ev_start_'+dateKey,t:start,iso:new Date(start).toISOString(),dutyId,type:'duty_start',screen:'vacant',position:null,build:'demo',data:{demoData:true,dateKey,startedAt:start}});
- places.forEach((p,i)=>{
+ const tripRows=places.map((p,i)=>{
   const pickupTs=start+(25+i*55)*60000;
   const dropoffTs=pickupTs+(12+i*2)*60000;
-  const rideId='demo_ride_'+dateKey+'_'+(i+1);
-  tripRows.push({
-   schema:ANALYTICS_SCHEMA,rideId,dutyId,dateKey,demoData:true,
+  return {
+   rideId:'demo_preview_ride_'+(i+1),dutyId,dateKey,demoData:true,
    pickupTs,pickupIso:new Date(pickupTs).toISOString(),
    pickup:{lat:null,lon:null,accuracy:8,address:p[0]},
    dropoffTs,dropoffIso:new Date(dropoffTs).toISOString(),
    dropoff:{lat:null,lon:null,accuracy:9,address:p[1]},
-   vacantSeconds:i?780:null,vacantMeters:i?1400:null,
    fare:p[2],paymentMethod:p[3],passengers:1,disabilityDiscount:false
-  });
-  analytics.push({schema:ANALYTICS_SCHEMA,id:'demo_ev_rs_'+dateKey+'_'+i,t:pickupTs,iso:new Date(pickupTs).toISOString(),dutyId,type:'ride_start',screen:'ride',position:null,build:'demo',data:{demoData:true,dateKey,rideId}});
-  analytics.push({schema:ANALYTICS_SCHEMA,id:'demo_ev_re_'+dateKey+'_'+i,t:dropoffTs,iso:new Date(dropoffTs).toISOString(),dutyId,type:'ride_end',screen:'vacant',position:null,build:'demo',data:{demoData:true,dateKey,rideId,paymentMethod:p[3]}});
+  };
  });
- analytics.push({schema:ANALYTICS_SCHEMA,id:'demo_ev_end_'+dateKey,t:end,iso:new Date(end).toISOString(),dutyId,type:'duty_end',screen:'dailyReport',position:null,build:'demo',data:{demoData:true,dateKey,endedAt:end}});
-
- saveTripRecords([...getTripRecords(),...tripRows]);
- saveAnalyticsEvents([...getAnalyticsEvents(),...analytics]);
-
  const sales=tripRows.reduce((sum,x)=>sum+Number(x.fare||0),0);
  const report={
-  id:reportId,dutyId,dateKey,startTs:start,endTs:end,startTime:'17:10',endTime:'23:55',
+  id:'demo_preview_report_'+dateKey,dutyId,dateKey,startTs:start,endTs:end,startTime:'17:10',endTime:'23:55',
   registrationNumber:'広島 300 あ 13-94',
-  odometerStart:52340,odometerEnd:52462,sales,receivable:1540,trips:tripRows.length,
-  expenses:[
-   {id:'demo_fuel',masterId:'exp_fuel',labelSnapshot:'燃料',amount:4200},
-   {id:'demo_wash',masterId:'exp_wash',labelSnapshot:'洗車',amount:800},
-   {id:'demo_maintenance',masterId:'exp_maintenance',labelSnapshot:'整備',amount:0},
-   {id:'demo_supplies',masterId:'exp_supplies',labelSnapshot:'消耗品',amount:650}
-  ],
-  note:'デモ：実際の乗務データ構造で作成',
-  manual:{odometerStart:false,startTime:false,endTime:false,sales:false,receivable:false,trips:false},
-  status:'saved',createdAt:Date.now(),updatedAt:Date.now(),demoData:true,
-  businessName:'デモ個人タクシー',vehicleNumber:'広島 500 あ 12-34',inspectorName:'デモ'
+  odometerStart:52340,odometerEnd:52462,sales,receivable:4620,trips:tripRows.length,
+  occupiedKm:38,
+  expenses:[],
+  note:'',inspectionNote:'',
+  status:'preview',demoData:true,_demoTrips:tripRows,
+  businessName:'デモ個人タクシー',vehicleNumber:'広島 300 あ 13-94',inspectorName:'デモ点検者'
  };
- saveDailyReports([...getDailyReports(),report]);
- renderMonthlyReportCenter();
- renderMonthlyReportPreview(true);
- toast('実際の乗務データ構造でデモ日報を作成しました');
+ monthlyReportDemoState={monthKey,report};
+ const p=document.getElementById('monthlyReportPreview');
+ if(p){p.classList.remove('show');p.innerHTML='';}
+ const btn=document.getElementById('monthlyReportPreviewButton');
+ if(btn) btn.textContent='プレビュー';
+ const status=document.getElementById('monthlyReportStatus');
+ if(status) status.textContent='デモ数値を準備しました。次に「プレビュー」を押して配置を確認してください。';
+ toast('デモ数値を準備しました');
 }
 let monthlyPreviewZoom=1;
 function setMonthlyPreviewZoom(scale){
