@@ -127,8 +127,16 @@ main{position:relative;min-height:0;overflow:hidden}
  background:#09131d;
  padding:6px 5px calc(6px + env(safe-area-inset-bottom));
  overflow:hidden;
- z-index:20;
- gap:5px
+ z-index:100;
+ gap:5px;
+ position:fixed;
+ left:50%;
+ right:auto;
+ bottom:0;
+ width:min(430px,100%);
+ transform:translateX(-50%);
+ visibility:visible;
+ opacity:1
 }
 .nav button{
  border:0;
