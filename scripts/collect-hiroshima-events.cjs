@@ -440,6 +440,62 @@ async function sourceDive(){
     events.push(eventBase({name:h1,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'Dive! Hiroshima',url,text:info,people,people_basis:people?'official_stated':null,address:norm(address)}));
   } return events;
 }
+async function sourceHiroshimaCityEvents(){
+  const list='https://www.city.hiroshima.lg.jp/event_calendar.html?dsp=1&s_d1%5B%5D=11&sch=1&sec_sec1=0&srt=1&sub_id=0';
+  const html=await fetchText(list,20000);
+  const links=[];
+  for(const a of html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
+    const title=norm(a[2]);
+    if(!title) continue;
+    if(!/(祭|まつり|フェス|フェア|花火|マラソン|パレード|スポーツ|大会|コンサート|イベント|グリーンフェア)/i.test(title)) continue;
+    if(/講座|教室|相談|募集|企画展|展示|資格|受付/.test(title) && !/(祭|フェス|フェア|花火|マラソン|パレード)/.test(title)) continue;
+    try{
+      const url=new URL(a[1],list).href;
+      if(url.includes('city.hiroshima.lg.jp')) links.push({title,url});
+    }catch{}
+  }
+  // Known large public event can be missed by the calendar's current view,
+  // so keep its official city page as a direct official seed.
+  links.push({title:'秋のグリーンフェア2026',url:'https://www.city.hiroshima.lg.jp/living/park-green/1021378/1006063/1026386/1053331.html'});
+  const uniq=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,35);
+  const out=[];
+  const today=jstDate(),year=Number(today.slice(0,4));
+  for(const item of uniq){
+    let page=''; try{page=await fetchText(item.url,16000)}catch{continue}
+    const text=norm(page);
+    const h1=norm((page.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)||[])[1]||item.title);
+    let date=dateFrom(text,year);
+    // Prefer a date close to an explicit "日程/開催期間" label.
+    const dm=text.match(/(?:日程|開催期間|開催日)\s*[:：]?\s*([^。]{1,180})/);
+    if(dm) date=dateFrom(dm[1],year)||date;
+    if(!date||date<today) continue;
+    const end=endDateFrom(dm?.[1]||text,year)||date;
+
+    let venue=null;
+    const vm=text.match(/(?:会場|開催場所|場所)\s*[:：]?\s*([^。｜]{2,90})/);
+    if(vm) venue=norm(vm[1]);
+    if(!venue){
+      const im=h1.match(/(?:in|IN|ｉｎ)\s+(.{2,60})$/);
+      if(im) venue=norm(im[1]);
+    }
+    if(/秋のグリーンフェア2026/.test(h1)) venue='広島市植物公園';
+    if(!venue) continue;
+
+    const people=statedPeople(text);
+    const largeKeyword=/(祭|まつり|フェス|フェア|花火|マラソン|パレード|大型|スポーツ・レクリエーション)/i.test(h1+' '+text.slice(0,1200));
+    if(!people&&!largeKeyword) continue;
+
+    let start=startTime(text),finish=endTime(text);
+    if(/秋のグリーンフェア2026/.test(h1)){start='09:00';finish='16:30'}
+    out.push(eventBase({
+      name:h1,date,end_date:end,venue,source:'広島市公式',url:item.url,text,
+      kind:/スポーツ|マラソン/.test(h1)?'sports':'festival',
+      start,end:finish,people,people_basis:people?'official_stated':null
+    }));
+  }
+  return merge(out);
+}
+
 async function sourceCVB(){
   const pageUrl='https://www.hiroshimacvb.jp/calendar/';
   const jsonUrl='https://www.hiroshimacvb.jp/calendar/calendar.json?_='+Date.now();
@@ -652,7 +708,7 @@ async function sourceSports(){
 }
 const SOURCES=[
   ['icch',sourceICCH],['candy',sourceCandy],['worker_events',sourceWorkerEvents],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
-  ['dive',sourceDive],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
+  ['dive',sourceDive],['city_events',sourceHiroshimaCityEvents],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
 ];
 async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
@@ -661,7 +717,7 @@ async function main(){
   const sourceOnly=String(process.env.EVENT_SOURCE_ONLY||'').trim();
   const activeSources=sourceOnly?SOURCES.filter(([id])=>id===sourceOnly):SOURCES;
   if(sourceOnly&&!activeSources.length) throw new Error('unknown EVENT_SOURCE_ONLY '+sourceOnly);
-  const establishedSources=new Set(['icch','candy','worker_events','eplus','lawson','pia','dive','sports','cvb']);
+  const establishedSources=new Set(['icch','candy','worker_events','eplus','lawson','pia','dive','city_events','sports','cvb']);
   for(const [id,fn] of activeSources){
     const started=Date.now();
     try{
@@ -700,6 +756,7 @@ async function main(){
   const sourceLabelMap={
     icch:['広島国際会議場公式'],candy:['CANDY PROMOTION'],worker_events:['会場・プレイガイド統合Worker'],
     eplus:['イープラス'],lawson:['ローチケ'],pia:['チケットぴあ'],dive:['Dive! Hiroshima'],
+    city_events:['広島市公式'],
     published_details:['公式・主催者詳細'],
     cvb:['広島観光コンベンションビューロー'],
     convention_official:['主催者公式'],
@@ -755,6 +812,7 @@ async function main(){
     lawson:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
     pia:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
     dive:{role:'tourism_official',cadence:'twice_daily',categories:['festival','event','sports'],continuity:'retain_on_failure_or_regression'},
+    city_events:{role:'municipal_official',cadence:'twice_daily',categories:['festival','event','sports'],continuity:'retain_on_failure_or_regression'},
     published_details:{role:'official_detail_enrichment',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure'},
     cvb:{role:'convention_bureau',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_stale_publication'},
     convention_official:{role:'organizer_official',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
