@@ -47,6 +47,36 @@ jobs:
           for(let attempt=1; attempt<=5; attempt++){
             await page.goto(target+'?verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
             await page.waitForTimeout(2500);
+
+            // Core UI contract: reservation time mode removed, notification types are selectable,
+            // and the Hiroshima Sogo template can be populated through demo operation data.
+            await page.evaluate(()=>{ if(typeof show==='function') show('reservationEdit'); });
+            const reservationText=await page.locator('#reservationEdit').innerText();
+            if(reservationText.includes('時間指定')) throw new Error('legacy reservation time-mode toggle still visible');
+            const reservationLabels=await page.locator('#reservationEdit .form-label').allTextContents();
+            const expectedOrder=['日付','お名前','時刻','お迎え場所','行き先'];
+            let lastIndex=-1;
+            for(const label of expectedOrder){
+              const idx=reservationLabels.findIndex((x,i)=>i>lastIndex&&x.includes(label));
+              if(idx<0) throw new Error('reservation field order missing '+label+': '+JSON.stringify(reservationLabels));
+              lastIndex=idx;
+            }
+
+            await page.evaluate(()=>{ show('settings'); openSettingsSection('notifications'); });
+            if(!await page.locator('#notificationTypeRoot').isVisible()) throw new Error('notification type root not visible');
+            await page.locator('#notificationTypeRoot button').filter({hasText:'バス通知'}).click();
+            if(!await page.locator('#notificationSectionBus').isVisible()) throw new Error('bus notification settings not selectable');
+            await page.locator('#busWard中区').click();
+
+            await page.evaluate(()=>{ show('monthlyReport'); });
+            if(!await page.locator('.report-template-fixed').getByText('相互個人タクシー協同組合').isVisible()) throw new Error('Sogo template name missing');
+            await page.locator('#monthlyReport .monthly-report-actions button.demo').click();
+            await page.waitForTimeout(300);
+            const previewText=await page.locator('#monthlyReportPreview').innerText();
+            if(!previewText.includes('相互個人タクシー協同組合')||!previewText.includes('運転日報')||!previewText.includes('広島駅 新幹線口')){
+              throw new Error('demo operation data did not reach report preview');
+            }
+
             await page.evaluate(()=>{ if(typeof show==='function') show('eventDetail'); });
             await page.waitForTimeout(3000);
             last=await page.locator('#eventDetailLiveList .calendar-detail-item.live').evaluateAll(items=>items.map(el=>({
