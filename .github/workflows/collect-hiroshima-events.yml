@@ -71,7 +71,7 @@ jobs:
           if(eplusVisible<60 || eplusHistory<100){
             throw new Error('Eplus effective coverage regression visible='+eplusVisible+' current='+eplusCurrent+' retained='+eplusRetained+' history='+eplusHistory);
           }
-          const sportsPt=p.events.filter(x=>/第13回\s*日本スポーツ理学療法学術大会/.test(String(x.name||'')));
+          const sportsPt=p.events.filter(x=>String(x.name||'').normalize('NFKC').replace(/\s/g,'').includes('第13回日本スポーツ理学療法学術大会'));
           if(sportsPt.length<2 || sportsPt.some(x=>Number(x.people||0)!==1300)){
             throw new Error('sports PT convention participant total missing');
           }
