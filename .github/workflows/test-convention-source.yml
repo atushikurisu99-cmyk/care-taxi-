@@ -1,0 +1,37 @@
+name: Test Convention source
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "scripts/collect-hiroshima-events.cjs"
+      - ".github/workflows/test-convention-source.yml"
+
+jobs:
+  test-convention:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - name: Install browser fallback
+        run: |
+          npm install --no-save playwright@1.56.0
+          npx playwright install --with-deps chromium
+
+      - name: Run convention source only
+        env:
+          EVENT_SOURCE_ONLY: cvb
+        run: node scripts/collect-hiroshima-events.cjs
+
+      - name: Upload convention diagnostics
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: convention-source-result
+          path: tmp/event-source-debug
+          if-no-files-found: ignore
+          retention-days: 1
