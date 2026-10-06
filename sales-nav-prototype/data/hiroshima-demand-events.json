@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T05:02:25.422Z",
+  "generated_at": "2026-10-06T05:07:07.392Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -11,48 +11,48 @@
     "icch": {
       "ok": true,
       "count": 29,
-      "ms": 1287
+      "ms": 872
     },
     "candy": {
       "ok": true,
       "count": 37,
-      "ms": 1051
+      "ms": 979
     },
     "worker_events": {
       "ok": true,
-      "count": 21,
-      "ms": 5973
+      "count": 20,
+      "ms": 8001
     },
     "eplus": {
       "ok": true,
       "count": 0,
-      "ms": 23545
+      "ms": 17725
     },
     "lawson": {
       "ok": false,
       "count": null,
-      "ms": 25133,
+      "ms": 25222,
       "error": "page.goto: net::ERR_HTTP2_PROTOCOL_ERROR at https://l-tike.com/search/?pref=34&size=100\nCall log:\n  - navigating to \"https://l-tike.com/search/?pref=34&size=100\", waiting until \"domcontentloaded\"\n"
     },
     "pia": {
       "ok": true,
       "count": 0,
-      "ms": 1793
+      "ms": 1805
     },
     "dive": {
       "ok": true,
       "count": 3,
-      "ms": 1353
+      "ms": 6709
     },
     "cvb": {
       "ok": true,
       "count": 0,
-      "ms": 5838
+      "ms": 5265
     },
     "sports": {
       "ok": true,
-      "count": 27,
-      "ms": 19592
+      "count": 36,
+      "ms": 20081
     }
   },
   "rules": {
@@ -61,31 +61,10 @@
     "failure_policy": "取得失敗または疑わしい0件では直前の未来予定を保持する"
   },
   "counts": {
-    "raw": 117,
-    "merged": 73
+    "raw": 125,
+    "merged": 80
   },
   "events": [
-    {
-      "date": "2026-10-07",
-      "end_date": "2026-10-07",
-      "name": "甲斐 心愛",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "22:45",
-      "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "会場・プレイガイド統合Worker",
-      "source_url": "https://www.club-quattro.com/hiroshima/schedule/?ym=202610",
-      "sources": [
-        "会場・プレイガイド統合Worker"
-      ],
-      "source_urls": [
-        "https://www.club-quattro.com/hiroshima/schedule/?ym=202610"
-      ],
-      "verification_count": 1
-    },
     {
       "date": "2026-10-08",
       "end_date": "2026-10-08",
@@ -105,7 +84,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-10-09",
@@ -127,7 +108,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-09",
@@ -149,7 +132,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-09",
@@ -170,7 +155,32 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
+    },
+    {
+      "date": "2026-10-10",
+      "end_date": "2026-10-10",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島サンプラザホール",
+      "address": null,
+      "start_time": "14:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 6000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=10&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=10&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2026-10-10",
@@ -191,7 +201,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-10-11",
@@ -212,7 +224,9 @@
       "source_urls": [
         "https://dive-hiroshima.com/events/events-100562-26/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "40,000人"
     },
     {
       "date": "2026-10-16",
@@ -233,7 +247,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-10-17",
@@ -254,7 +270,9 @@
       "source_urls": [
         "https://www.sanfrecce.co.jp/tickets/schedule"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約28,520人規模"
     },
     {
       "date": "2026-10-17",
@@ -276,7 +294,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-10-17",
@@ -298,7 +318,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-10-17",
@@ -319,7 +341,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-10-18",
@@ -341,7 +365,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-10-18",
@@ -362,7 +388,55 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
+    },
+    {
+      "date": "2026-10-19",
+      "end_date": "2026-10-19",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "19:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=10&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=10&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
+    },
+    {
+      "date": "2026-10-21",
+      "end_date": "2026-10-21",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "19:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=10&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=10&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-10-24",
@@ -383,7 +457,9 @@
       "source_urls": [
         "https://www.sanfrecce.co.jp/tickets/schedule"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約28,520人規模"
     },
     {
       "date": "2026-10-24",
@@ -405,7 +481,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-24",
@@ -426,7 +504,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-10-25",
@@ -448,7 +528,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-30",
@@ -458,39 +540,21 @@
       "address": null,
       "start_time": "19:00",
       "end_time": null,
-      "event_type": "music",
-      "people": 800,
-      "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
-      "source_url": "https://www.candy-p.com/schedule/",
-      "sources": [
-        "CANDY PROMOTION"
-      ],
-      "source_urls": [
-        "https://www.candy-p.com/schedule/"
-      ],
-      "verification_count": 1
-    },
-    {
-      "date": "2026-10-30",
-      "end_date": "2026-10-30",
-      "name": "丈青",
-      "venue": "広島クラブクアトロ",
-      "address": null,
-      "start_time": "19:00",
-      "end_time": null,
-      "event_type": "music",
+      "event_type": "festival",
       "people": 800,
       "people_basis": "venue_capacity_reference",
       "source": "会場・プレイガイド統合Worker",
       "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
+        "CANDY PROMOTION",
         "会場・プレイガイド統合Worker"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-30",
@@ -511,7 +575,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-10-31",
@@ -532,7 +598,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-10-31",
@@ -554,7 +622,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-10-31",
@@ -576,7 +646,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-31",
@@ -597,7 +669,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-11-01",
@@ -618,7 +692,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-11-01",
@@ -640,7 +716,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約1,504人規模"
     },
     {
       "date": "2026-11-01",
@@ -661,7 +739,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-11-05",
@@ -683,7 +763,32 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約1,204人規模"
+    },
+    {
+      "date": "2026-11-06",
+      "end_date": "2026-11-06",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "19:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=11&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=11&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-11-06",
@@ -705,7 +810,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-11-06",
@@ -727,7 +834,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-07",
@@ -748,7 +857,32 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
+    },
+    {
+      "date": "2026-11-11",
+      "end_date": "2026-11-11",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "19:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=11&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=11&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-11-15",
@@ -770,7 +904,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-15",
@@ -791,7 +927,32 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
+    },
+    {
+      "date": "2026-11-16",
+      "end_date": "2026-11-16",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "19:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=11&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=11&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-11-19",
@@ -813,7 +974,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-19",
@@ -834,7 +997,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-11-20",
@@ -856,7 +1021,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-20",
@@ -877,7 +1044,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-11-21",
@@ -898,7 +1067,9 @@
       "source_urls": [
         "https://www.sanfrecce.co.jp/tickets/schedule"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約28,520人規模"
     },
     {
       "date": "2026-11-21",
@@ -919,7 +1090,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2026-11-22",
@@ -940,7 +1113,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2026-11-22",
@@ -962,7 +1137,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-22",
@@ -983,7 +1160,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-11-23",
@@ -1005,7 +1184,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-29",
@@ -1027,7 +1208,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-29",
@@ -1048,7 +1231,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-11-30",
@@ -1069,7 +1254,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-01",
@@ -1090,7 +1277,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-02",
@@ -1111,7 +1300,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-06",
@@ -1132,7 +1323,9 @@
       "source_urls": [
         "https://www.sanfrecce.co.jp/tickets/schedule"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約28,520人規模"
     },
     {
       "date": "2026-12-06",
@@ -1153,7 +1346,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-12-06",
@@ -1174,7 +1369,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,730人規模"
     },
     {
       "date": "2026-12-06",
@@ -1195,7 +1392,32 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約800人規模"
+    },
+    {
+      "date": "2026-12-07",
+      "end_date": "2026-12-07",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "19:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=12&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=12&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-12-07",
@@ -1216,7 +1438,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-12-09",
@@ -1226,7 +1450,7 @@
       "address": null,
       "start_time": "9:20",
       "end_time": "19:00",
-      "event_type": "event",
+      "event_type": "convention",
       "people": null,
       "people_basis": null,
       "source": "広島国際会議場公式",
@@ -1237,7 +1461,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-10",
@@ -1247,7 +1473,7 @@
       "address": null,
       "start_time": "9:20",
       "end_time": "19:00",
-      "event_type": "event",
+      "event_type": "convention",
       "people": null,
       "people_basis": null,
       "source": "広島国際会議場公式",
@@ -1258,7 +1484,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-11",
@@ -1279,7 +1507,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-12-11",
@@ -1289,7 +1519,7 @@
       "address": null,
       "start_time": "9:20",
       "end_time": "19:00",
-      "event_type": "event",
+      "event_type": "convention",
       "people": null,
       "people_basis": null,
       "source": "広島国際会議場公式",
@@ -1300,7 +1530,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-12",
@@ -1321,7 +1553,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-13",
@@ -1342,7 +1576,9 @@
       "source_urls": [
         "https://www.sanfrecce.co.jp/tickets/schedule"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約28,520人規模"
     },
     {
       "date": "2026-12-13",
@@ -1363,7 +1599,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-12-13",
@@ -1384,7 +1622,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2026-12-18",
@@ -1405,7 +1645,32 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約830人規模"
+    },
+    {
+      "date": "2026-12-19",
+      "end_date": "2026-12-19",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "14:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=12&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=12&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-12-19",
@@ -1415,7 +1680,7 @@
       "address": null,
       "start_time": "9:00",
       "end_time": "18:30",
-      "event_type": "sports",
+      "event_type": "convention",
       "people": null,
       "people_basis": null,
       "source": "広島国際会議場公式",
@@ -1426,7 +1691,32 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
+    },
+    {
+      "date": "2026-12-20",
+      "end_date": "2026-12-20",
+      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "venue": "広島グリーンアリーナ",
+      "address": null,
+      "start_time": "14:05",
+      "end_time": null,
+      "event_type": "sports",
+      "people": 10000,
+      "people_basis": "venue_capacity_reference",
+      "source": "広島ドラゴンフライズ公式",
+      "source_url": "https://hiroshimadragonflies.com/schedule/list/?month=12&year=2026",
+      "sources": [
+        "広島ドラゴンフライズ公式"
+      ],
+      "source_urls": [
+        "https://hiroshimadragonflies.com/schedule/list/?month=12&year=2026"
+      ],
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-12-20",
@@ -1436,7 +1726,7 @@
       "address": null,
       "start_time": "9:00",
       "end_time": "18:30",
-      "event_type": "sports",
+      "event_type": "convention",
       "people": null,
       "people_basis": null,
       "source": "広島国際会議場公式",
@@ -1447,7 +1737,9 @@
       "source_urls": [
         "https://www.pcf.city.hiroshima.jp/icch/event.cgi"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": null
     },
     {
       "date": "2027-01-06",
@@ -1468,7 +1760,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2027-01-07",
@@ -1489,7 +1783,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2027-01-11",
@@ -1510,7 +1806,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2027-01-16",
@@ -1531,7 +1829,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,730人規模"
     },
     {
       "date": "2027-01-17",
@@ -1552,7 +1852,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,730人規模"
     },
     {
       "date": "2027-01-23",
@@ -1573,7 +1875,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2027-01-23",
@@ -1594,7 +1898,9 @@
       "source_urls": [
         "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2027-01-24",
@@ -1615,7 +1921,9 @@
       "source_urls": [
         "https://www.hiroshima-thunders.com/game/score/2026/index.html"
       ],
-      "verification_count": 1
+      "verification_count": 1,
+      "confidence": "official",
+      "people_label": "最大約6,000人規模"
     }
   ]
 }
