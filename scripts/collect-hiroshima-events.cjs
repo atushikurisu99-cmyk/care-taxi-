@@ -314,35 +314,56 @@ async function sourceWorkerEvents(){
 }
 
 async function sourcePia(){
-  const urls=[
-    'https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島'),
-    'https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島公演')
+  // Keyword search currently returns artist suggestions rather than performances.
+  // Use PIA's stable venue pages for the Hiroshima venues that matter to taxi demand.
+  const venues=[
+    ['広島サンプラザホール','HSSP'],
+    ['広島文化学園HBGホール','HRBG'],
+    ['JMSアステールプラザ','ASTP'],
+    ['広島クラブクアトロ','CQUH'],
+    ['LIVE VANQUISH','LVQS'],
+    ['BLUE LIVE HIROSHIMA','BLIV'],
+    ['広島国際会議場 フェニックスホール','HRKK'],
+    ['上野学園ホール','HBGH'],
+    ['広島グリーンアリーナ','HSG1']
   ];
   const events=[];
-  for(const url of urls){
-    const html=await fetchTextBrowserFallback(url,25000);
+  for(const [fallbackVenue,code] of venues){
+    const url='https://t.pia.jp/pia/venue/venue.do?includeSaleEnd=fuzzy&venueCd='+encodeURIComponent(code);
+    let html='';
+    try{html=await fetchTextBrowserFallback(url,25000)}catch{continue}
     const text=norm(html);
-    await saveDebug('pia-'+(url.includes('%E5%85%AC%E6%BC%94')?'hiroshima-show':'hiroshima')+'.txt',text);
+    await saveDebug('pia-venue-'+code+'.txt',text);
 
-    // Ticket Pia result pages place each sale line in the form:
-    // "一般発売... ／ GRe4N BOYZ 2026/10/10(土) 広島JMS... (広島県)"
-    const re=/／\s*([^／]{2,180}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,120}?)\s*\(広島県\)/g;
+    // Typical listing line:
+    // 一般発売 ／ ARTIST 2026/10/10(土) VENUE (広島県)
+    const re=/／\s*([^／]{2,180}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,140}?)\s*\(広島県\)/g;
     for(const m of text.matchAll(re)){
       let name=norm(m[1])
         .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)[^／]{0,100}?\s+/,'')
-        .replace(/^「|」$/g,'')
         .trim();
+      if(!name) continue;
       const rawVenue=norm(m[5]);
-      if(!name||!rawVenue) continue;
       const vi=venueInfo(rawVenue);
-      const venue=vi.name||rawVenue;
-
-      // Hiroshima prefecture is not enough; retain only Hiroshima-city venues.
+      const venue=vi.name||fallbackVenue;
       if(!inHiroshimaCity(venue)) continue;
-
       events.push(eventBase({
         name,date:ymd(m[2],m[3],m[4]),venue,source:'チケットぴあ',url,text:m[0]
       }));
+    }
+
+    // Some venue pages render a compact "公演期間 / 会場" block.
+    if(!events.some(e=>e.source_url===url)){
+      const heading=(text.match(/^([^|]{2,100}?)-イベント会場/)||[])[1]||fallbackVenue;
+      const dates=[...text.matchAll(/(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)/g)];
+      for(const dm of dates.slice(0,20)){
+        const around=text.slice(Math.max(0,(dm.index||0)-180),Math.min(text.length,(dm.index||0)+260));
+        const nm=(around.match(/(?:一般発売|先行|プリセール|プレリザーブ)\s*(?:[^／]{0,80}／)?\s*([^\d]{2,100}?)\s*20\d{2}\s*\//)||[])[1];
+        if(!nm) continue;
+        events.push(eventBase({
+          name:norm(nm),date:ymd(dm[1],dm[2],dm[3]),venue:fallbackVenue,source:'チケットぴあ',url,text:around
+        }));
+      }
     }
   }
   return merge(events);
