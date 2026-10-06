@@ -1280,6 +1280,36 @@ html,body{
 
 .setting-choice,.settings-category,.settings-tabs button,.settings-chip{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;position:relative;z-index:1}
 .setting-choice:disabled,.settings-tabs button:disabled{opacity:.45;cursor:default}
+
+.report-template-fixed{width:100%;min-height:46px;display:flex;align-items:center;background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff;padding:10px 11px;font-size:15px;font-weight:900}
+.monthly-report-actions button.demo{background:#513f13;border-color:#b69229;color:#fff}
+.sogo-sheet{background:#fff;color:#111;font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;font-size:9px;line-height:1.25}
+.sogo-page{background:#fff;border:1px solid #555;padding:8px;margin:0 0 12px;page-break-after:always}
+.sogo-page:last-child{page-break-after:auto}
+.sogo-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;margin-bottom:5px}
+.sogo-head h3{font-size:17px!important;margin:0!important;text-align:center!important;letter-spacing:.12em}
+.sogo-org{text-align:right;font-size:9px;font-weight:700;white-space:nowrap}
+.sogo-meta{display:grid;grid-template-columns:1.2fr 1.8fr 1fr 1fr;gap:0;margin-bottom:5px;border-top:1px solid #111;border-left:1px solid #111}
+.sogo-meta>div{border-right:1px solid #111;border-bottom:1px solid #111;padding:3px 4px;min-height:24px}
+.sogo-meta b{display:block;font-size:7px;font-weight:700;color:#333;margin-bottom:1px}
+.sogo-trip{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7.5px!important;white-space:normal!important}
+.sogo-trip th,.sogo-trip td{border:1px solid #111!important;padding:2px 3px!important;text-align:center!important;height:18px}
+.sogo-trip th{background:#fff!important;font-weight:800}
+.sogo-trip .place{text-align:left!important;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
+.sogo-summary{display:grid;grid-template-columns:repeat(5,1fr);border-left:1px solid #111;margin-top:5px}
+.sogo-summary>div{border-right:1px solid #111;border-bottom:1px solid #111;border-top:1px solid #111;padding:3px;text-align:center}
+.sogo-summary b{display:block;font-size:7px}
+.sogo-inspection{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7px!important;margin-top:7px;white-space:normal!important}
+.sogo-inspection th,.sogo-inspection td{border:1px solid #111!important;padding:2px!important;text-align:center!important}
+.sogo-inspection .item{text-align:left!important}
+.sogo-note{font-size:7px;margin-top:4px}
+@media print{
+ body.print-monthly-report #monthlyReportPreview .sogo-page{border:0!important;padding:0!important;margin:0!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-page{page-break-after:always}
+ body.print-monthly-report #monthlyReportPreview .sogo-page:last-child{page-break-after:auto}
+ body.print-monthly-report #monthlyReportPreview .sogo-trip,
+ body.print-monthly-report #monthlyReportPreview .sogo-inspection{font-size:6.5pt!important}
+}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -1820,7 +1850,7 @@ html,body{
  <div class="content monthly-report-wrap">
   <div class="monthly-report-card">
    <div class="row"><div><div class="label card-label"><span class="card-label-icon report" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg></span><span>帳票・提出</span></div><h2 style="margin:3px 0 0">月報作成</h2></div><span id="monthlyReportState" class="badge">準備</span></div>
-   <div class="template-note">乗務データは共通で保存し、選んだ組合ひな型へ出力します。まず第一事業団の公開月報をサンプルとして実装します。</div>
+   <div class="template-note">広島版は、相互個人タクシー協同組合の運転日報ひな型から開始します。</div>
   </div>
 
   <div class="monthly-report-card">
@@ -1831,10 +1861,8 @@ html,body{
     </div>
     <div class="monthly-report-field">
      <label>ひな型</label>
-     <select id="monthlyReportTemplate" onchange="saveMonthlyReportSettings();renderMonthlyReportCenter()">
-      <option value="daiichi">第一事業団（月報・暫定対応）</option>
-      <option value="standard">営業ナビ標準</option>
-     </select>
+     <input id="monthlyReportTemplate" type="hidden" value="sogo">
+     <div class="report-template-fixed">相互個人タクシー協同組合</div>
     </div>
    </div>
    <div id="monthlyReportTemplateNote" class="template-note"></div>
@@ -1859,8 +1887,9 @@ html,body{
 
   <div class="monthly-report-card">
    <div class="monthly-report-actions">
+    <button type="button" class="demo" onclick="seedDemoOperationData()">デモ数値</button>
+    <button type="button" onclick="toggleMonthlyReportPreview()">プレビュー</button>
     <button type="button" onclick="syncDailyReportsToGoogleSheets(false)">Google Sheetsへ同期</button>
-    <button type="button" onclick="toggleMonthlyReportPreview()">A4プレビュー</button>
     <button type="button" class="print" onclick="printMonthlyReport()">印刷</button>
     <button type="button" class="main" onclick="downloadMonthlyReportXlsx()">Excelダウンロード</button>
     <button type="button" class="mail" onclick="sendMonthlyReportMail()">メール送信</button>
