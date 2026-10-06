@@ -3,6 +3,20 @@ const fs = require('node:fs/promises');
 const TZ='Asia/Tokyo';
 const OUT='sales-nav-prototype/data/hiroshima-demand-events.json';
 const USER_AGENT='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36 taxi-sales-nav-collector/1.0';
+let browser=null;
+async function browserHtml(url){
+  if(!browser){
+    const {chromium}=require('playwright');
+    browser=await chromium.launch({headless:true});
+  }
+  const page=await browser.newPage({userAgent:USER_AGENT,locale:'ja-JP'});
+  try{
+    await page.goto(url,{waitUntil:'domcontentloaded',timeout:45000});
+    await page.waitForTimeout(3500);
+    return await page.content();
+  } finally { await page.close(); }
+}
+async function closeBrowser(){ if(browser){await browser.close();browser=null;} }
 
 function jstDate(){
   return new Intl.DateTimeFormat('sv-SE',{timeZone:TZ,year:'numeric',month:'2-digit',day:'2-digit'}).format(new Date());
@@ -96,23 +110,38 @@ async function fetchText(url,timeout=20000){
   const ac=new AbortController(); const timer=setTimeout(()=>ac.abort(),timeout);
   try{
     const r=await fetch(url,{signal:ac.signal,redirect:'follow',headers:{'user-agent':USER_AGENT,'accept':'text/html,application/xhtml+xml,application/json;q=0.9,*/*;q=0.8','accept-language':'ja,en;q=0.8'}});
-    const text=await r.text();
+    const buf=Buffer.from(await r.arrayBuffer());
     if(!r.ok) throw new Error('HTTP '+r.status);
-    if(text.length<200) throw new Error('short response '+text.length);
-    return text;
+    if(buf.length<200) throw new Error('short response '+buf.length);
+    const ct=String(r.headers.get('content-type')||'').toLowerCase();
+    let charset=(ct.match(/charset=([^;\s]+)/)||[])[1]||'';
+    const ascii=buf.subarray(0,4000).toString('latin1');
+    if(!charset) charset=(ascii.match(/charset=["']?([^"'\s/>;]+)/i)||[])[1]||'';
+    charset=charset.toLowerCase().replace(/["']/g,'');
+    if(/shift.?jis|sjis|windows-31j|cp932/.test(charset)||/pcf\.city\.hiroshima\.jp/.test(url)){
+      return new TextDecoder('shift_jis').decode(buf);
+    }
+    return new TextDecoder('utf-8').decode(buf);
   }finally{clearTimeout(timer)}
+}
+async function fetchTextBrowserFallback(url,timeout=20000){
+  try{return await fetchText(url,timeout)}catch(e){
+    const html=await browserHtml(url);
+    if(!html||html.length<200) throw e;
+    return html;
+  }
 }
 function eventBase({name,date,venue,source,url,text,kind,start,end,people,people_basis,end_date,address}){
   const vi=venueInfo(venue||text||'');
   return {date,end_date:end_date||date,name:norm(name),venue:vi.name||norm(venue),address:address||null,
-    start_time:start||startTime(text),end_time:end||endTime(text),event_type:kind||typeOf(name+' '+text),
+    start_time:start||startTime(text),end_time:end||endTime(text),event_type:kind||typeOf(name),
     people:people||statedPeople(text)||vi.capacity||null,
     people_basis:people_basis||(statedPeople(text)?'official_stated':vi.capacity?'venue_capacity_reference':null),
     source,source_url:url,source_text:norm(text).slice(0,500)};
 }
 
 async function sourceICCH(){
-  const url='https://www.pcf.city.hiroshima.jp/icch/event.cgi'; const html=await fetchText(url); const events=[];
+  const url='https://www.pcf.city.hiroshima.jp/icch/event.cgi'; let html=await fetchText(url); let events=[];
   const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
   for(const row of rows){
     const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));
@@ -123,32 +152,59 @@ async function sourceICCH(){
     events.push(eventBase({name:cells[2],date,venue:'広島国際会議場 フェニックスホール',source:'広島国際会議場公式',url,
       text:cells.join(' '),start:(cells[5].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null,end:(cells[6].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null}));
   }
+  if(!events.length){
+    try{
+      html=await browserHtml(url);
+      const rows2=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+      for(const row of rows2){
+        const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));
+        if(cells.length<7)continue; const day=Number(cells[0]); if(!day)continue;
+        const prefix=html.slice(Math.max(0,(row.index||0)-14000),row.index||0);
+        const marks=[...prefix.matchAll(/令和\s*(\d+)年\s*(\d{1,2})月のイベント/g)]; const mk=marks.at(-1); if(!mk)continue;
+        const date=ymd(2018+Number(mk[1]),Number(mk[2]),day);
+        events.push(eventBase({name:cells[2],date,venue:'広島国際会議場 フェニックスホール',source:'広島国際会議場公式',url,text:cells.join(' '),
+          start:(cells[5].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null,end:(cells[6].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null}));
+      }
+    }catch{}
+  }
   return events;
 }
 async function sourceCandy(){
-  const url='https://www.candy-p.com/schedule/'; const html=await fetchText(url); const text=norm(html); const events=[];
-  const dates=[...text.matchAll(/(20\d{2})\/(\d{2})\/(\d{2})/g)];
-  for(let i=0;i<dates.length;i++){const m=dates[i],st=m.index||0,en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+700),seg=text.slice(st,en);const vi=venueInfo(seg);if(!vi.name)continue;
-    const before=text.slice(Math.max(0,st-180),st);let name=before.split(/SOLD OUT|発売中|詳細/).pop().trim(); if(name.length>120)name=name.slice(-120);
-    events.push(eventBase({name,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'CANDY PROMOTION',url,text:seg}));
-  } return events;
+  const url='https://www.candy-p.com/schedule/'; const html=await fetchText(url); const events=[];
+  const sections=[...html.matchAll(/<h3[^>]*>([\s\S]*?)<\/h3>([\s\S]*?)(?=<h3[^>]*>|$)/gi)];
+  for(const sec of sections){
+    let artist=norm(sec[1]).replace(/^▼\s*/,'').trim(); if(!artist)continue;
+    const body=norm(sec[2]);
+    const re=/(20\d{2})\/(\d{2})\/(\d{2})[^0-9]{0,24}?([^0-9]{2,120}?)\s+([0-2]\d:[0-5]\d)\s*\/\s*([0-2]\d:[0-5]\d)/g;
+    for(const m of body.matchAll(re)){
+      const vi=venueInfo(m[4]); if(!vi.name)continue;
+      events.push(eventBase({name:artist,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'CANDY PROMOTION',url,text:m[0],kind:'music',start:m[6]}));
+    }
+  }
+  return events;
 }
 async function sourceEplus(){
   const urls=[
-    'https://eplus.jp/sf/live/chugoku-shikoku/hiroshima',
-    'https://eplus.jp/sf/play/chugoku-shikoku/hiroshima',
-    'https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima',
-    'https://eplus.jp/sf/event/chugoku-shikoku/hiroshima',
-    'https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima'
+    ['music','https://eplus.jp/sf/live/chugoku-shikoku/hiroshima'],
+    ['theater','https://eplus.jp/sf/play/chugoku-shikoku/hiroshima'],
+    ['sports','https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima'],
+    ['event','https://eplus.jp/sf/event/chugoku-shikoku/hiroshima'],
+    ['music','https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima']
   ]; const events=[];
-  for(const url of urls){const html=await fetchText(url);const text=norm(html);const dates=[...text.matchAll(/(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)/g)];
-    for(let i=0;i<dates.length;i++){const m=dates[i],st=m.index||0,en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+800),seg=text.slice(st,en);if(!/広島県/.test(seg))continue;const vi=venueInfo(seg);if(!vi.name)continue;
-      let name=seg.slice(m[0].length).split(/開演|開場|会場|\(広島県\)/)[0].replace(/先着|抽選|受付中|受付終了|予定枚数終了/g,' ').trim();if(!name)continue;
-      events.push(eventBase({name,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'イープラス',url,text:seg}));}
+  for(const [kind,url] of urls){
+    const html=await fetchTextBrowserFallback(url,22000);const text=norm(html);
+    const dates=[...text.matchAll(/(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)/g)];
+    for(let i=0;i<dates.length;i++){
+      const m=dates[i],st=m.index||0,en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900),seg=text.slice(st,en);
+      if(!/広島県/.test(seg))continue;const vi=venueInfo(seg);if(!vi.name)continue;
+      let name=seg.slice(m[0].length).split(/開演|開場|会場|\(広島県\)/)[0].replace(/先着|抽選|受付中|受付終了|予定枚数終了/g,' ').trim();
+      if(!name||name.length>150)continue;
+      events.push(eventBase({name,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'イープラス',url,text:seg,kind}));
+    }
   } return events;
 }
 async function sourceLawson(){
-  const url='https://l-tike.com/search/?pref=34&size=100'; const html=await fetchText(url); const text=norm(html); const events=[];
+  const url='https://l-tike.com/search/?pref=34&size=100'; const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
   const re=/(コンサート|演劇・ステージ・舞台|クラシック・オペラ|スポーツ|イベント)\s+(.{2,150}?)\s+公演日[:：]\s*(20\d{2})\/(\d{1,2})\/(\d{1,2})[\s\S]{0,220}?会場[:：]\s*([^（(]{2,100})(?:（広島県\)|\(広島県\))/g;
   for(const m of text.matchAll(re)){const venue=norm(m[6]);if(!inHiroshimaCity(venue))continue;events.push(eventBase({name:m[2],date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0]}));}
   return events;
@@ -167,11 +223,23 @@ async function sourceDive(){
   } return events;
 }
 async function sourceCVB(){
-  const url='https://www.hiroshimacvb.jp/calendar/'; const html=await fetchText(url); const events=[]; const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+  const url='https://www.hiroshimacvb.jp/calendar/'; let html=await fetchText(url); let events=[]; const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
   for(const row of rows){const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));if(cells.length<4)continue;
     const [name,venue,period,domesticRaw,overseasRaw]=cells;const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue))continue;
     const domestic=int(domesticRaw)||0,overseas=int(overseasRaw)||0,people=domestic+overseas;if(people<100)continue;
     events.push(eventBase({name,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'広島観光コンベンションビューロー',url,text:cells.join(' '),kind:'convention',people,people_basis:'official_participants'}));}
+  if(!events.length){
+    try{
+      html=await browserHtml(url);
+      const rows2=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+      for(const row of rows2){
+        const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));if(cells.length<4)continue;
+        const [name,venue,period,domesticRaw,overseasRaw]=cells;const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue))continue;
+        const domestic=int(domesticRaw)||0,overseas=int(overseasRaw)||0,people=domestic+overseas;if(people<100)continue;
+        events.push(eventBase({name,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'広島観光コンベンションビューロー',url,text:cells.join(' '),kind:'convention',people,people_basis:'official_participants'}));
+      }
+    }catch{}
+  }
   return events;
 }
 async function sourceSports(){
@@ -198,5 +266,6 @@ async function main(){
   await fs.mkdir('sales-nav-prototype/data',{recursive:true});await fs.writeFile(OUT,JSON.stringify(payload,null,2)+'\n');
   console.log(JSON.stringify({health,counts:payload.counts,first:payload.events.slice(0,12).map(x=>({date:x.date,name:x.name,venue:x.venue,people:x.people,source:x.source}))},null,2));
   if(Object.values(health).every(x=>!x.ok)) process.exitCode=2;
+  await closeBrowser();
 }
 main().catch(e=>{console.error(e);process.exit(1)});
