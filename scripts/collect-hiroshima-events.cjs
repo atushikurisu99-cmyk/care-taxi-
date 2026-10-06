@@ -415,6 +415,7 @@ async function sourceCVB(){
 
   const today=jstDate();
   const currentYear=Number(today.slice(0,4));
+  let latestPublishedDate=null;
   for(const [yearKey,months] of Object.entries(data||{})){
     const year=Number(String(yearKey).replace(/^y/i,''));
     if(!Number.isFinite(year)||year<currentYear||year>currentYear+1||!months||typeof months!=='object') continue;
@@ -442,8 +443,10 @@ async function sourceCVB(){
         if(people<100) continue;
 
         const date=dateFrom(period,year);
-        if(!date||date<today) continue;
+        if(!date) continue;
         const endDate=endDateFrom(period,year)||date;
+        if(!latestPublishedDate||endDate>latestPublishedDate) latestPublishedDate=endDate;
+        if(date<today) continue;
 
         events.push(eventBase({
           name:title,date,end_date:endDate,venue,
@@ -453,6 +456,12 @@ async function sourceCVB(){
         }));
       }
     }
+  }
+  // An empty future list is not the same as "there are no conventions".
+  // HCVB sometimes publishes only part of the year. Surface that as stale
+  // so the collector retains other/previous sources instead of treating 0 as truth.
+  if(!events.length && latestPublishedDate && latestPublishedDate<today){
+    throw new Error('HCVB calendar has no future data; latest published date='+latestPublishedDate);
   }
   return events;
 }
