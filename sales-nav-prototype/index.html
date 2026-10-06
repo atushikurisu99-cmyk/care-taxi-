@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-05-HOTFIX-JS-PARSE -->
+<!-- BUILD:2026-10-07-SOGO-TEMPLATE-V2 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1329,63 +1329,240 @@ html,body{
 .report-template-fixed{width:100%;min-height:46px;display:flex;align-items:center;background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff;padding:10px 11px;font-size:15px;font-weight:900}
 .monthly-report-actions button.demo{background:#513f13;border-color:#b69229;color:#fff}
 .sogo-sheet{
- background:#fff;color:#111;font-family:"Yu Mincho","Hiragino Mincho ProN","Yu Gothic",serif;
- font-size:8px;line-height:1;min-width:760px
+ background:#fff;
+ color:#111;
+ font-family:"Yu Mincho","Hiragino Mincho ProN","Yu Gothic",serif;
+ font-size:10px;
+ line-height:1.15;
+ width:760px;
+ min-width:760px;
 }
 .sogo-page{
- background:#fff;border:1px solid #111;padding:14px 15px;margin:0 0 12px;
- page-break-after:always;min-height:1060px
+ background:#fff;
+ width:760px;
+ min-height:1075px;
+ border:1.4px solid #111;
+ padding:18px 18px 16px;
+ margin:0 0 18px;
+ page-break-after:always;
+ overflow:hidden;
 }
 .sogo-page:last-child{page-break-after:auto}
-.sogo-title-wrap{position:relative;height:58px;margin-bottom:2px}
-.sogo-title{position:absolute;left:0;right:0;bottom:2px;font-size:25px!important;letter-spacing:.32em;text-align:center!important;margin:0!important;font-weight:700}
-.sogo-org-block{position:absolute;right:0;top:1px;text-align:right;line-height:1.25}
-.sogo-org-block strong{display:block;font-size:11px;font-weight:700}
-.sogo-org-block div{font-size:8.2px}
-.sogo-top,.sogo-trip,.sogo-summary-table,.sogo-inspection,.sogo-alcohol{width:100%;border-collapse:collapse;table-layout:fixed;border-spacing:0}
-.sogo-top td,.sogo-trip th,.sogo-trip td,.sogo-summary-table td,.sogo-inspection th,.sogo-inspection td,.sogo-alcohol td{
- border:1px solid #111!important;vertical-align:middle
+.sogo-title-wrap{
+ min-height:72px;
+ margin:0 0 5px;
+ display:grid;
+ grid-template-columns:165px minmax(0,1fr) 165px;
+ align-items:end;
 }
-.sogo-top td{height:20px;padding:1px 3px!important;font-size:8px;text-align:center!important}
+.sogo-title{
+ grid-column:2;
+ align-self:end;
+ justify-self:center;
+ margin:0 0 4px!important;
+ color:#111!important;
+ font-size:28px!important;
+ font-weight:700;
+ line-height:1;
+ letter-spacing:.34em;
+ white-space:nowrap;
+}
+.sogo-org-block{
+ grid-column:3;
+ align-self:start;
+ justify-self:end;
+ padding-top:3px;
+ text-align:right;
+ color:#111;
+ line-height:1.35;
+ white-space:nowrap;
+}
+.sogo-org-block strong{display:block;font-size:11px;font-weight:700}
+.sogo-org-block div{font-size:9px}
+
+.sogo-top,.sogo-trip,.sogo-summary-table,.sogo-inspection,.sogo-alcohol{
+ width:100%;
+ border-collapse:collapse;
+ table-layout:fixed;
+ border-spacing:0;
+ color:#111;
+}
+.sogo-top td,.sogo-trip th,.sogo-trip td,.sogo-summary-table td,
+.sogo-inspection th,.sogo-inspection td,.sogo-alcohol td{
+ border:1px solid #222!important;
+ vertical-align:middle;
+ color:#111!important;
+ background:#fff!important;
+}
+.sogo-top td{
+ height:30px;
+ padding:3px 5px!important;
+ font-size:10px!important;
+ line-height:1.15;
+ text-align:center!important;
+ white-space:nowrap;
+}
 .sogo-top .left{text-align:left!important}
-.sogo-top .label{font-size:7.4px!important;font-weight:700;white-space:nowrap}
+.sogo-top .label{font-size:9px!important;font-weight:700;white-space:nowrap;color:#111!important}
+
 .sogo-trip{margin-top:-1px}
-.sogo-trip th{height:20px;padding:1px!important;background:#fff!important;font-size:7.1px;line-height:1;font-weight:700;text-align:center!important}
-.sogo-trip td{height:24px;padding:1px 2px!important;font-size:7.1px;line-height:1;text-align:center!important}
-.sogo-trip .place,.sogo-trip .remarks{text-align:left!important;padding-left:3px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sogo-trip th{
+ height:25px;
+ padding:2px 3px!important;
+ font-size:9px!important;
+ line-height:1.05;
+ font-weight:700;
+ text-align:center!important;
+ white-space:nowrap;
+}
+.sogo-trip td{
+ height:29px;
+ padding:2px 4px!important;
+ font-size:9.5px!important;
+ line-height:1.1;
+ text-align:center!important;
+ white-space:nowrap;
+}
+.sogo-trip .place,.sogo-trip .remarks{
+ text-align:left!important;
+ padding-left:5px!important;
+ overflow:hidden;
+ text-overflow:ellipsis;
+}
+.sogo-trip .remarks{font-size:8.8px!important}
+
 .sogo-summary-table{margin-top:-1px}
-.sogo-summary-table td{height:24px;padding:1px 3px!important;font-size:7.4px;text-align:center!important}
-.sogo-summary-table .vlabel{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.08em;width:24px;padding:1px!important}
+.sogo-summary-table td{
+ height:29px;
+ padding:2px 5px!important;
+ font-size:9.5px!important;
+ line-height:1.1;
+ text-align:center!important;
+ white-space:nowrap;
+}
+.sogo-summary-table .vlabel{
+ writing-mode:vertical-rl;
+ text-orientation:upright;
+ letter-spacing:.08em;
+ width:28px;
+ padding:2px!important;
+ font-weight:700;
+}
 .sogo-summary-table .labelcell{font-weight:700}
-.sogo-summary-table .unit{text-align:right!important;padding-right:6px!important}
-.sogo-page-back{padding-top:12px}
-.sogo-inspection-title{display:grid;grid-template-columns:1fr 166px;height:31px;border:1px solid #111;border-bottom:0;margin-top:-1px;align-items:stretch}
-.sogo-inspection-title strong{font-size:18px;letter-spacing:.38em;display:flex;align-items:center;justify-content:center;line-height:1}
-.sogo-inspection-title span{border-left:1px solid #111;display:flex;align-items:center;justify-content:center;font-size:8.5px}
-.sogo-inspection th{height:16px;padding:1px!important;background:#fff!important;font-size:5.8px;line-height:1;text-align:center!important}
-.sogo-inspection td{height:16px;padding:1px!important;font-size:5.9px;line-height:1.02;text-align:center!important}
-.sogo-inspection .cat{writing-mode:vertical-rl;text-orientation:upright;font-size:5.8px;letter-spacing:.05em}
+.sogo-summary-table .unit{text-align:right!important;padding-right:8px!important}
+
+.sogo-page-back{padding-top:16px}
+.sogo-inspection-title{
+ display:grid;
+ grid-template-columns:minmax(0,1fr) 190px;
+ min-height:38px;
+ border:1px solid #222;
+ border-bottom:0;
+ margin-top:-1px;
+ align-items:stretch;
+ color:#111;
+}
+.sogo-inspection-title strong{
+ font-size:19px;
+ letter-spacing:.34em;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ line-height:1;
+}
+.sogo-inspection-title span{
+ border-left:1px solid #222;
+ display:flex;
+ align-items:center;
+ justify-content:center;
+ font-size:9px;
+ white-space:nowrap;
+}
+.sogo-inspection th{
+ height:20px;
+ padding:2px!important;
+ font-size:7.2px!important;
+ line-height:1.05;
+ text-align:center!important;
+}
+.sogo-inspection td{
+ height:20px;
+ padding:2px!important;
+ font-size:7.3px!important;
+ line-height:1.08;
+ text-align:center!important;
+}
+.sogo-inspection .cat{
+ writing-mode:vertical-rl;
+ text-orientation:upright;
+ font-size:7px!important;
+ letter-spacing:.05em;
+}
 .sogo-inspection .point{text-align:center!important}
-.sogo-inspection .detail{text-align:left!important;padding-left:2px!important}
-.sogo-inspection .result{font-size:9px;font-family:sans-serif}
-.sogo-inspection .note-cell{font-size:5.7px;line-height:1.25;text-align:left!important;padding:2px!important}
+.sogo-inspection .detail{text-align:left!important;padding-left:3px!important}
+.sogo-inspection .result{font-size:10px!important;font-family:sans-serif}
+.sogo-inspection .note-cell{
+ font-size:6.8px!important;
+ line-height:1.3;
+ text-align:left!important;
+ padding:4px!important;
+}
 .sogo-alcohol{margin-top:-1px}
-.sogo-alcohol td{height:23px;padding:2px!important;font-size:7.1px;text-align:center!important}
-.sogo-alcohol .alabel{font-size:7.8px;line-height:1.2}
-.sogo-remarks{border:1px solid #111;border-top:0;min-height:90px;padding:5px;font-size:8.2px;text-align:left}
-.sogo-remarks strong{font-size:8.5px}
+.sogo-alcohol td{
+ height:27px;
+ padding:3px!important;
+ font-size:8.5px!important;
+ text-align:center!important;
+}
+.sogo-alcohol .alabel{font-size:8.8px!important;line-height:1.2}
+.sogo-remarks{
+ border:1px solid #222;
+ border-top:0;
+ min-height:96px;
+ padding:7px;
+ font-size:9px;
+ line-height:1.35;
+ text-align:left;
+ color:#111;
+}
+.sogo-remarks strong{font-size:9.5px}
+
 @media(max-width:430px){
- .monthly-report-paper.show .sogo-sheet{min-width:760px}
+ .monthly-report-paper.show .sogo-sheet{width:760px;min-width:760px}
  .monthly-report-paper.show{overflow:auto}
 }
 @media print{
- body.print-monthly-report #monthlyReportPreview .sogo-page{border:0!important;padding:0!important;margin:0!important}
- body.print-monthly-report #monthlyReportPreview .sogo-page{page-break-after:always}
+ @page{size:A4 portrait;margin:7mm}
+ body.print-monthly-report #monthlyReportPreview .monthly-preview-close{display:none!important}
+ body.print-monthly-report #monthlyReportPreview .monthly-preview-canvas{
+  transform:none!important;
+  margin:0!important;
+  width:auto!important;
+  min-width:0!important;
+ }
+ body.print-monthly-report #monthlyReportPreview .sogo-sheet{
+  width:196mm!important;
+  min-width:196mm!important;
+  font-size:9pt!important;
+ }
+ body.print-monthly-report #monthlyReportPreview .sogo-page{
+  width:196mm!important;
+  min-height:283mm!important;
+  border:0!important;
+  padding:0!important;
+  margin:0!important;
+  overflow:hidden!important;
+  page-break-after:always;
+ }
  body.print-monthly-report #monthlyReportPreview .sogo-page:last-child{page-break-after:auto}
- body.print-monthly-report #monthlyReportPreview .sogo-trip,
- body.print-monthly-report #monthlyReportPreview .sogo-inspection{font-size:6.5pt!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-title{font-size:20pt!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-top td{font-size:8pt!important;height:7mm!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-trip th{font-size:7pt!important;height:5.4mm!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-trip td{font-size:7.5pt!important;height:6.2mm!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-summary-table td{font-size:7.5pt!important;height:6.2mm!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-inspection th{font-size:5.4pt!important}
+ body.print-monthly-report #monthlyReportPreview .sogo-inspection td{font-size:5.5pt!important}
 }
-
 @media(max-width:360px){
  header{gap:7px;padding-left:11px;padding-right:11px}
  header h1{font-size:19px}
@@ -2767,7 +2944,7 @@ function sogoFrontHeader(r){
  const reg=r?.registrationNumber||r?.vehicleNumber||'';
  const name=r?.businessName||r?.driverName||'';
  return '<div class="sogo-title-wrap">'+
-  '<h3 class="sogo-title">運 転 日 報</h3>'+
+  '<div aria-hidden="true"></div><div class="sogo-title">運 転 日 報</div>'+
   '<div class="sogo-org-block"><strong>相互個人タクシー協同組合</strong><div>事務所代表　253-2505</div><div>253-2500</div></div>'+
  '</div>'+
  '<table class="sogo-top"><colgroup>'+
@@ -2981,8 +3158,9 @@ function renderMonthlyReportPreview(forceShow=true){
  if(forceShow){
   p.classList.add('show');
   p.scrollTop=0;p.scrollLeft=0;
-  monthlyPreviewZoom=1;
-  setMonthlyPreviewZoom(1);
+  const fit=Math.max(.72,Math.min(1,(p.clientWidth-20)/760));
+  monthlyPreviewZoom=fit;
+  setMonthlyPreviewZoom(fit);
   initMonthlyPreviewPinch();
   const btn=document.getElementById('monthlyReportPreviewButton');
   if(btn) btn.textContent='プレビューを閉じる';
