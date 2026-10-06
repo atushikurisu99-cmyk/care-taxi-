@@ -53,7 +53,7 @@ jobs:
 
       - name: Commit updated snapshot
         run: |
-          if git diff --quiet -- sales-nav-prototype/data/hiroshima-demand-events.json; then
+          if [ -z "$(git status --porcelain -- sales-nav-prototype/data/hiroshima-demand-events.json)" ]; then
             echo "No snapshot change"
             exit 0
           fi
