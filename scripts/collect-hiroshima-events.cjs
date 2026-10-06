@@ -74,7 +74,7 @@ const CAP=[
  ['上野学園ホール',1730,/上野学園ホール|県立文化芸術ホール/i],
  ['広島国際会議場 フェニックスホール',1504,/フェニックスホール/i],
  ['JMSアステールプラザ',1204,/JMSアステール|アステールプラザ/i],
- ['BLUE LIVE HIROSHIMA',830,/BLUE LIVE HIROSHIMA/i],
+ ['BLUE LIVE HIROSHIMA',830,/BLUE\s*LIVE(?:\s*HIROSHIMA|\s*広島)/i],
  ['広島クラブクアトロ',800,/広島クラブクアトロ|CLUB QUATTRO/i],
  ['LIVE VANQUISH',450,/LIVE VANQUISH/i],
  ['セカンド・クラッチ',300,/セカンド.?クラッチ|SECOND CRUTCH/i],
@@ -355,7 +355,9 @@ async function sourcePia(){
     const re=/／\s*([^／]{2,180}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,140}?)\s*\(広島県\)/g;
     for(const m of text.matchAll(re)){
       let name=norm(m[1])
-        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)[^／]{0,100}?\s+/,'')
+        .replace(/^(?:販売終了|販売期間中|予定枚数終了|発売前|発売中|受付中|受付終了)\s*/,'')
+        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)(?:[^／]{0,100}?)?[／/]\s*/,'')
+        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)\s*/,'')
         .trim();
       if(!name) continue;
       const rawVenue=norm(m[5]);
@@ -370,7 +372,10 @@ async function sourcePia(){
     // Ajax response may omit the "／" prefix; accept compact ticket rows too.
     const compact=/(?:一般発売|先行|プリセール|プレリザーブ|抽選)\s+([^\d]{2,160}?)\s+(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)\s+([^()]{2,140}?)\s*\(広島県\)/g;
     for(const m of text.matchAll(compact)){
-      const name=norm(m[1]).trim();
+      const name=norm(m[1])
+        .replace(/^(?:販売終了|販売期間中|予定枚数終了|発売前|発売中|受付中|受付終了)\s*/,'')
+        .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)(?:[^／]{0,100}?)?[／/]\s*/,'')
+        .trim();
       if(!name) continue;
       const vi=venueInfo(norm(m[5]));
       const venue=vi.name||fallbackVenue;
