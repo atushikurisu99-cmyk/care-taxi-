@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T06:50:12.609Z",
+  "generated_at": "2026-10-06T06:53:39.422Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -12,56 +12,56 @@
       "ok": true,
       "state": "ok",
       "count": 29,
-      "ms": 1224
+      "ms": 967
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 37,
-      "ms": 1242
+      "ms": 1074
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
-      "count": 20,
-      "ms": 14311
+      "count": 22,
+      "ms": 601
     },
     "eplus": {
       "ok": true,
       "state": "ok",
-      "count": 12,
-      "ms": 24067
+      "count": 47,
+      "ms": 23842
     },
     "lawson": {
       "ok": true,
       "state": "ok",
       "count": 57,
-      "ms": 2832
+      "ms": 2406
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 11,
-      "ms": 21045
+      "ms": 21380
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
-      "ms": 1427
+      "ms": 5100
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
-      "ms": 1125,
+      "ms": 862,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
-      "ms": 21949
+      "ms": 20427
     }
   },
   "rules": {
@@ -70,8 +70,8 @@
     "failure_policy": "取得失敗または疑わしい0件では直前の未来予定を保持する"
   },
   "counts": {
-    "raw": 205,
-    "merged": 138
+    "raw": 242,
+    "merged": 146
   },
   "events": [
     {
@@ -96,6 +96,31 @@
       "verification_count": 1,
       "confidence": "single_source",
       "people_label": "最大約1,730人規模"
+    },
+    {
+      "date": "2026-10-07",
+      "end_date": "2026-10-07",
+      "name": "STU48 STU48 甲斐心愛スペシャルソロイベント「今宵1番ホットになれる“合言葉”は~?“甲斐心愛”!!!」 STU48広島劇場(",
+      "venue": "広島クラブクアトロ",
+      "address": null,
+      "start_time": "22:45",
+      "end_time": null,
+      "event_type": "music",
+      "people": 800,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "会場・プレイガイド統合Worker",
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://www.club-quattro.com/hiroshima/schedule/?ym=202610",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-08",
@@ -126,27 +151,29 @@
       "name": "沢田研二",
       "venue": "広島文化学園HBGホール",
       "address": null,
-      "start_time": null,
+      "start_time": "17:00",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
       "sources": [
+        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-10-09",
       "end_date": "2026-10-09",
-      "name": "PERSONZ",
+      "name": "PERSONZ 広島",
       "venue": "JMSアステールプラザ",
       "address": null,
       "start_time": "18:30",
@@ -159,15 +186,42 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 3,
+      "verification_count": 4,
       "confidence": "verified",
       "people_label": "最大約1,204人規模"
+    },
+    {
+      "date": "2026-10-09",
+      "end_date": "2026-10-09",
+      "name": "STU48 STU48 4期研究生「さあ 未来を探しに行こうか?」公演 STU48広島劇場(",
+      "venue": "広島クラブクアトロ",
+      "address": null,
+      "start_time": "18:30",
+      "end_time": null,
+      "event_type": "music",
+      "people": 800,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "会場・プレイガイド統合Worker",
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://www.club-quattro.com/hiroshima/schedule/?ym=202610",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-09",
@@ -185,13 +239,15 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 3,
+      "verification_count": 4,
       "confidence": "verified",
       "people_label": "最大約300人規模"
     },
@@ -244,6 +300,31 @@
     {
       "date": "2026-10-10",
       "end_date": "2026-10-10",
+      "name": "GRe4N BOYZ 広島",
+      "venue": "JMSアステールプラザ",
+      "address": null,
+      "start_time": "17:00",
+      "end_time": null,
+      "event_type": "music",
+      "people": 1204,
+      "people_basis": "venue_capacity_reference",
+      "source": "ローチケ",
+      "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
+      "sources": [
+        "イープラス",
+        "ローチケ"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+        "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
+      ],
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約1,204人規模"
+    },
+    {
+      "date": "2026-10-10",
+      "end_date": "2026-10-10",
       "name": "サルゴリラのコントと旅2026",
       "venue": "JMSアステールプラザ",
       "address": null,
@@ -267,33 +348,10 @@
     {
       "date": "2026-10-10",
       "end_date": "2026-10-10",
-      "name": "GRe4N BOYZ",
-      "venue": "JMSアステールプラザ",
-      "address": null,
-      "start_time": null,
-      "end_time": null,
-      "event_type": "music",
-      "people": 1204,
-      "people_basis": "venue_capacity_reference",
-      "source": "ローチケ",
-      "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
-      "sources": [
-        "ローチケ"
-      ],
-      "source_urls": [
-        "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
-      ],
-      "verification_count": 1,
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模"
-    },
-    {
-      "date": "2026-10-10",
-      "end_date": "2026-10-10",
       "name": "coldrain",
       "venue": "BLUE LIVE HIROSHIMA",
       "address": null,
-      "start_time": null,
+      "start_time": "18:00",
       "end_time": null,
       "event_type": "music",
       "people": 830,
@@ -301,13 +359,15 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約830人規模"
     },
     {
@@ -382,10 +442,10 @@
     {
       "date": "2026-10-11",
       "end_date": "2026-10-11",
-      "name": "兵動大樹のおしゃべり大好き。48",
+      "name": "兵動大樹のおしゃべり大好き。 48 広島",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": null,
+      "start_time": "13:00",
       "end_time": null,
       "event_type": "theater",
       "people": 1204,
@@ -393,13 +453,15 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -408,7 +470,7 @@
       "name": "宇都宮隆",
       "venue": "BLUE LIVE HIROSHIMA",
       "address": null,
-      "start_time": null,
+      "start_time": "18:00",
       "end_time": null,
       "event_type": "music",
       "people": 830,
@@ -416,14 +478,62 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
+      ],
+      "verification_count": 2,
+      "confidence": "verified",
+      "people_label": "最大約830人規模"
+    },
+    {
+      "date": "2026-10-12",
+      "end_date": "2026-10-12",
+      "name": "宇都宮隆",
+      "venue": "BLUE LIVE HIROSHIMA",
+      "address": null,
+      "start_time": "17:00",
+      "end_time": null,
+      "event_type": "music",
+      "people": 830,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "confidence": "single_source",
       "people_label": "最大約830人規模"
+    },
+    {
+      "date": "2026-10-12",
+      "end_date": "2026-10-12",
+      "name": "SHE’S",
+      "venue": "広島クラブクアトロ",
+      "address": null,
+      "start_time": "17:30",
+      "end_time": null,
+      "event_type": "music",
+      "people": 800,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-12",
@@ -500,7 +610,7 @@
       "name": "大原櫻子",
       "venue": "広島クラブクアトロ",
       "address": null,
-      "start_time": null,
+      "start_time": "19:00",
       "end_time": null,
       "event_type": "music",
       "people": 800,
@@ -508,22 +618,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-16",
       "end_date": "2026-10-16",
-      "name": "キュウソネコカミ",
+      "name": "キュウソネコカミ 広島",
       "venue": "LIVE VANQUISH",
       "address": null,
-      "start_time": null,
+      "start_time": "19:00",
       "end_time": null,
       "event_type": "music",
       "people": 450,
@@ -531,14 +643,16 @@
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=LVQS&includeSaleEnd=fuzzy",
       "sources": [
+        "イープラス",
         "ローチケ",
         "チケットぴあ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=LVQS&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "confidence": "verified",
       "people_label": "最大約450人規模"
     },
@@ -629,6 +743,7 @@
         "イープラス"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
@@ -664,10 +779,10 @@
     {
       "date": "2026-10-17",
       "end_date": "2026-10-17",
-      "name": "家入レオ",
+      "name": "家入レオ 広島",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": null,
+      "start_time": "18:00",
       "end_time": null,
       "event_type": "music",
       "people": 1204,
@@ -675,24 +790,49 @@
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
       "sources": [
+        "イープラス",
         "ローチケ",
         "チケットぴあ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "confidence": "verified",
       "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-17",
       "end_date": "2026-10-17",
-      "name": "Penthouse",
+      "name": "STU48 STU48 Live Tour 2026",
+      "venue": "BLUE LIVE HIROSHIMA",
+      "address": null,
+      "start_time": "18:00",
+      "end_time": null,
+      "event_type": "music",
+      "people": 830,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約830人規模"
+    },
+    {
+      "date": "2026-10-17",
+      "end_date": "2026-10-17",
+      "name": "Penthouse 広島",
       "venue": "広島クラブクアトロ",
       "address": null,
-      "start_time": null,
+      "start_time": "18:00",
       "end_time": null,
       "event_type": "music",
       "people": 800,
@@ -700,22 +840,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-17",
       "end_date": "2026-10-17",
-      "name": "PEDRO",
+      "name": "PEDRO 広島",
       "venue": "LIVE VANQUISH",
       "address": null,
-      "start_time": null,
+      "start_time": "18:00",
       "end_time": null,
       "event_type": "music",
       "people": 450,
@@ -723,13 +865,15 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約450人規模"
     },
     {
@@ -738,7 +882,7 @@
       "name": "Wienners",
       "venue": "セカンド・クラッチ",
       "address": null,
-      "start_time": null,
+      "start_time": "18:00",
       "end_time": null,
       "event_type": "music",
       "people": 300,
@@ -746,13 +890,15 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約300人規模"
     },
     {
@@ -819,6 +965,7 @@
         "イープラス"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
@@ -828,10 +975,33 @@
     {
       "date": "2026-10-18",
       "end_date": "2026-10-18",
-      "name": "flumpool",
+      "name": "さだまさし",
+      "venue": "広島文化学園HBGホール",
+      "address": null,
+      "start_time": "17:00",
+      "end_time": null,
+      "event_type": "music",
+      "people": 2001,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約2,001人規模"
+    },
+    {
+      "date": "2026-10-18",
+      "end_date": "2026-10-18",
+      "name": "flumpool 広島",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": null,
+      "start_time": "17:00",
       "end_time": null,
       "event_type": "music",
       "people": 1204,
@@ -839,22 +1009,70 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-18",
       "end_date": "2026-10-18",
-      "name": "オレンジスパイニクラブ",
+      "name": "STU48 STU48 Live Tour 2026",
+      "venue": "BLUE LIVE HIROSHIMA",
+      "address": null,
+      "start_time": "16:30",
+      "end_time": null,
+      "event_type": "music",
+      "people": 830,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約830人規模"
+    },
+    {
+      "date": "2026-10-18",
+      "end_date": "2026-10-18",
+      "name": "Novel Core 広島",
+      "venue": "広島クラブクアトロ",
+      "address": null,
+      "start_time": "17:00",
+      "end_time": null,
+      "event_type": "music",
+      "people": 800,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約800人規模"
+    },
+    {
+      "date": "2026-10-18",
+      "end_date": "2026-10-18",
+      "name": "オレンジスパイニクラブ 広島",
       "venue": "セカンド・クラッチ",
       "address": null,
-      "start_time": null,
+      "start_time": "17:00",
       "end_time": null,
       "event_type": "music",
       "people": 300,
@@ -862,13 +1080,15 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約300人規模"
     },
     {
@@ -943,10 +1163,10 @@
     {
       "date": "2026-10-23",
       "end_date": "2026-10-23",
-      "name": "YUMEBANCHI×DUKE企画 『瀬戸内共同戦線』",
+      "name": "YUMEBANCHI×DUKE企画『瀬戸内共同戦線』 広島",
       "venue": "LIVE VANQUISH",
       "address": null,
-      "start_time": null,
+      "start_time": "19:00",
       "end_time": null,
       "event_type": "music",
       "people": 450,
@@ -954,13 +1174,15 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約450人規模"
     },
     {
@@ -1111,7 +1333,7 @@
       "name": "アステールプラザ芸術劇場シリーズ M&Oplaysプロデュース「ブランク」",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": null,
+      "start_time": "18:30",
       "end_time": null,
       "event_type": "theater",
       "people": 1204,
@@ -1119,13 +1341,15 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -1383,6 +1607,7 @@
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
@@ -1847,7 +2072,7 @@
       "address": null,
       "start_time": "17:00",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
@@ -1856,6 +2081,7 @@
         "イープラス"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
@@ -2689,19 +2915,21 @@
       "address": null,
       "start_time": "16:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "theater",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
-      "source_url": "https://www.candy-p.com/schedule/",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "イープラス"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/"
+        "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約2,001人規模"
     },
     {
