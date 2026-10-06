@@ -3992,7 +3992,7 @@ function renderHomeEventSummary(){
  const hv=document.getElementById('homeEventValue');
  const hs=document.getElementById('homeEventSub');
  if(!hv||!hs) return;
- if(!eventRealtimeData&&!sportsRealtimeData){
+ if(!eventRealtimeData&&!sportsRealtimeData&&!demandSnapshotData){
   hv.textContent='取得待ち';
   hs.textContent='ライブ・スポーツを確認中';
   return;
@@ -4034,11 +4034,12 @@ function renderHomeEventSummary(){
 }
 function renderLiveEvents(){
  const d=eventRealtimeData;
+ const hasSnapshotLive=Array.isArray(demandSnapshotData?.events)&&demandSnapshotData.events.some(e=>['music','theater'].includes(String(e?.event_type||'')));
  const st=document.getElementById('liveInfoStatus');
  const mid=document.getElementById('liveInfoMiddle');
  const bot=document.getElementById('liveInfoBottom');
  const card=document.getElementById('liveInfoCard');
- if(!d){
+ if(!d&&!hasSnapshotLive){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='確認中';
   if(bot) bot.textContent='—';
@@ -4064,11 +4065,12 @@ function renderLiveEvents(){
 }
 function renderSportsRealtime(){
  const d=sportsRealtimeData;
+ const hasSnapshotSports=Array.isArray(demandSnapshotData?.events)&&demandSnapshotData.events.some(e=>String(e?.event_type||'')==='sports');
  const st=document.getElementById('sportsInfoStatus');
  const mid=document.getElementById('sportsInfoMiddle');
  const bot=document.getElementById('sportsInfoBottom');
  const card=document.getElementById('sportsInfoCard');
- if(!d){
+ if(!d&&!hasSnapshotSports){
   if(st) st.textContent='取得待ち';
   if(mid) mid.textContent='確認中';
   if(bot) bot.textContent='—';
@@ -4076,8 +4078,7 @@ function renderSportsRealtime(){
   return;
  }
  const today=localDateValue(new Date());
- const sports=(Array.isArray(d.sports)?d.sports:[])
-  .filter(isLocalSportsEvent)
+ const sports=allSportsSchedule()
   .filter(x=>String(x.date||today)===today);
  const game=sports[0]||null;
  if(!game){
