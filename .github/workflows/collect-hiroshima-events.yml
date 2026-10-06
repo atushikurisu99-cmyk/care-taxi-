@@ -92,12 +92,18 @@ jobs:
           if(badTitles.length) throw new Error('ticket metadata leaked into title: '+badTitles[0].name);
 
           const norm=s=>String(s||'').normalize('NFKC').toLowerCase().replace(/[\s「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'');
+          const convNorm=s=>norm(s).replace(/学会学術大会/g,'学術大会');
           for(let i=0;i<p.events.length;i++){
             for(let j=i+1;j<p.events.length;j++){
               const a=p.events[i],b=p.events[j];
               if(a.date!==b.date||a.venue!==b.venue) continue;
               const an=norm(a.name),bn=norm(b.name);
-              if(an===bn||an.includes(bn)||bn.includes(an)){
+              const convDup=a.event_type==='convention'&&b.event_type==='convention'&&(
+                convNorm(a.name)===convNorm(b.name)||
+                convNorm(a.name).includes(convNorm(b.name))||
+                convNorm(b.name).includes(convNorm(a.name))
+              );
+              if(an===bn||an.includes(bn)||bn.includes(an)||convDup){
                 throw new Error('duplicate event '+a.date+' '+a.venue+' '+a.name+' / '+b.name);
               }
             }
