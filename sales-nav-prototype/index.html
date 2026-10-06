@@ -1277,6 +1277,9 @@ html,body{
 .google-auth-actions .connect{background:#f5f7f8;color:#17212a;border-color:#d7dde2}
 .google-auth-detail{font-size:12px;color:#9aabb7;line-height:1.45;overflow-wrap:anywhere}
 
+
+.setting-choice,.settings-category,.settings-tabs button,.settings-chip{touch-action:manipulation;-webkit-tap-highlight-color:transparent;cursor:pointer;position:relative;z-index:1}
+.setting-choice:disabled,.settings-tabs button:disabled{opacity:.45;cursor:default}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -1934,45 +1937,76 @@ html,body{
 
   <div id="settingsNotifications" class="hidden">
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
-   <div class="settings-card">
-   <div class="settings-title">通知設定</div>
-   <div class="settings-note">必要な通知だけ選びます。JRの遅延通知は見せ方を調整中。終電通知は現在地に応じて自動で判定します。</div>
-   <div class="settings-subhead" style="margin-top:12px">通知音デモ</div>
-   <div class="settings-demo-grid" style="margin-top:8px">
-    <button type="button" class="smallbtn" onclick="demoNoticeSound()">ポン♪</button>
-    <button type="button" class="smallbtn" onclick="demoSafetySound()">ピロリン♪</button>
+
+   <div id="notificationTypeRoot">
+    <div class="settings-card">
+     <div class="settings-title">通知設定</div>
+     <div class="settings-note">先に設定する通知の種類を選びます。</div>
+    </div>
+    <button class="settings-category" type="button" onclick="openNotificationSection('jr')">
+     <div class="card-label"><span class="card-label-icon rail" aria-hidden="true">JR</span><span><strong>JR通知</strong><small>終電・運行情報</small></span></div><span>›</span>
+    </button>
+    <button class="settings-category" type="button" onclick="openNotificationSection('bus')">
+     <div class="card-label"><span class="card-label-icon booking" aria-hidden="true">B</span><span><strong>バス通知</strong><small>終バス・方面</small></span></div><span>›</span>
+    </button>
+    <button class="settings-category" type="button" onclick="openNotificationSection('live')">
+     <div class="card-label"><span class="card-label-icon event" aria-hidden="true">♪</span><span><strong>ライブ通知</strong><small>会場ごとに選択</small></span></div><span>›</span>
+    </button>
+    <button class="settings-category" type="button" onclick="openNotificationSection('sound')">
+     <div class="card-label"><span class="card-label-icon settings" aria-hidden="true">♪</span><span><strong>通知音</strong><small>通知音の確認</small></span></div><span>›</span>
+    </button>
    </div>
-   <div class="settings-note" style="margin-top:8px">iPhoneは最初のタップで音声を有効化します。</div>
-  </div>
 
-  <div class="settings-card">
-   <div class="settings-title">JR終電通知</div>
-   <div class="settings-note">現在地の近くにある対象駅について、終電の約15分前と終電時刻の直後だけ自動通知します。進行方向では絞りません。</div>
-   <div class="settings-note" style="margin-top:8px">時刻表を基準にするため、遅延時は実際の列車通過とずれる場合があります。</div>
-  </div>
-
-  <div class="settings-card">
-   <div class="settings-title">バス終バス通知</div>
-   <div class="settings-note">区 → バス停 → 方面の順で選択。選んだ方面の最終バスだけ「約15分前」と「通過」を通知します。</div>
-   <div class="settings-tabs">
-    <button id="busWard中区" type="button" onclick="selectBusWard('中区')">中区</button>
-    <button id="busWard西区" type="button" onclick="selectBusWard('西区')">西区</button>
-    <button id="busWard南区" type="button" onclick="selectBusWard('南区')">南区</button>
+   <div id="notificationSectionJr" class="hidden">
+    <button class="settings-backlink" type="button" onclick="openNotificationSection('root')">‹ 通知設定</button>
+    <div class="settings-card">
+     <div class="settings-title">JR終電通知</div>
+     <div class="settings-note">現在地の近くにある対象駅について、終電の約15分前と終電時刻の直後だけ自動通知します。進行方向では絞りません。</div>
+     <div class="settings-note" style="margin-top:8px">時刻表を基準にするため、遅延時は実際の列車通過とずれる場合があります。</div>
+    </div>
    </div>
-   <div class="settings-subhead" style="margin-top:11px">バス停</div>
-   <div id="busStopSettingsList" class="settings-list"></div>
-   <div class="settings-subhead" style="margin-top:12px">選択中バス停の方面</div>
-   <div id="busDestinationSettings"></div>
-  </div>
 
-  <div class="settings-card">
-   <div class="settings-title">ライブ通知</div>
-   <div class="settings-note">表示・通知したい会場だけ選択します。選んだ会場のライブだけアプリに表示・通知します。</div>
-   <div class="settings-subhead" style="margin-top:11px">会場</div>
-   <div id="liveVenueSettingsList" class="settings-list"></div>
-   <div class="settings-note" style="margin-top:10px">公式情報がない場合は、過去公演の実績を参考情報として表示します。実際の終演を確認できない限り、終演したとは言い切りません。</div>
+   <div id="notificationSectionBus" class="hidden">
+    <button class="settings-backlink" type="button" onclick="openNotificationSection('root')">‹ 通知設定</button>
+    <div class="settings-card">
+     <div class="settings-title">バス終バス通知</div>
+     <div class="settings-note">区 → バス停 → 方面の順で選択。選んだ方面の最終バスだけ「約15分前」と「通過」を通知します。</div>
+     <div class="settings-tabs">
+      <button id="busWard中区" type="button" onclick="selectBusWard('中区')">中区</button>
+      <button id="busWard西区" type="button" onclick="selectBusWard('西区')">西区</button>
+      <button id="busWard南区" type="button" onclick="selectBusWard('南区')">南区</button>
+     </div>
+     <div class="settings-subhead" style="margin-top:11px">バス停</div>
+     <div id="busStopSettingsList" class="settings-list"></div>
+     <div class="settings-subhead" style="margin-top:12px">選択中バス停の方面</div>
+     <div id="busDestinationSettings"></div>
+    </div>
+   </div>
+
+   <div id="notificationSectionLive" class="hidden">
+    <button class="settings-backlink" type="button" onclick="openNotificationSection('root')">‹ 通知設定</button>
+    <div class="settings-card">
+     <div class="settings-title">ライブ通知</div>
+     <div class="settings-note">表示・通知したい会場だけ選択します。選んだ会場のライブだけアプリに表示・通知します。</div>
+     <div class="settings-subhead" style="margin-top:11px">会場</div>
+     <div id="liveVenueSettingsList" class="settings-list"></div>
+     <div class="settings-note" style="margin-top:10px">公式情報がない場合は、過去公演の実績を参考情報として表示します。実際の終演を確認できない限り、終演したとは言い切りません。</div>
+    </div>
+   </div>
+
+   <div id="notificationSectionSound" class="hidden">
+    <button class="settings-backlink" type="button" onclick="openNotificationSection('root')">‹ 通知設定</button>
+    <div class="settings-card">
+     <div class="settings-title">通知音</div>
+     <div class="settings-demo-grid" style="margin-top:8px">
+      <button type="button" class="smallbtn" onclick="demoNoticeSound()">ポン♪</button>
+      <button type="button" class="smallbtn" onclick="demoSafetySound()">ピロリン♪</button>
+     </div>
+     <div class="settings-note" style="margin-top:8px">iPhoneは最初のタップで音声を有効化します。</div>
+    </div>
+   </div>
   </div>
-  </div>
+ </div>
  </div>
  <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
 </section>
@@ -2118,7 +2152,21 @@ function openSettingsSection(section){
  personal.classList.toggle('hidden',section!=='personal');
  notifications.classList.toggle('hidden',section!=='notifications');
  if(section==='personal'){ renderSalesGoalSettings(); refreshGoogleAuthStatus(); }
- if(section==='notifications') renderNotificationSettings();
+ if(section==='notifications'){ openNotificationSection('root'); renderNotificationSettings(); }
+}
+function openNotificationSection(section='root'){
+ const ids={
+  root:'notificationTypeRoot',
+  jr:'notificationSectionJr',
+  bus:'notificationSectionBus',
+  live:'notificationSectionLive',
+  sound:'notificationSectionSound'
+ };
+ for(const id of Object.values(ids)){
+  const el=document.getElementById(id);
+  if(el) el.classList.toggle('hidden',id!==ids[section]);
+ }
+ if(section==='bus'||section==='live') renderNotificationSettings();
 }
 
 const GOOGLE_AUTH_WORKER_URL=APP_LINKS.googleAuthBase;
