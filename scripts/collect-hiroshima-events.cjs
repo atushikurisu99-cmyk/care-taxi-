@@ -209,6 +209,22 @@ async function sourceLawson(){
   for(const m of text.matchAll(re)){const venue=norm(m[6]);if(!inHiroshimaCity(venue))continue;events.push(eventBase({name:m[2],date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0]}));}
   return events;
 }
+async function sourcePia(){
+  const url='https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島');
+  const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
+  const re=/(?:一般発売|先行|プリセール|プレリザーブ|抽選)[^／]{0,120}／\s*([^\d]{2,120}?)\s+(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)\s+([^()]{2,100})\s*\(広島県\)/g;
+  for(const m of text.matchAll(re)){
+    let name=norm(m[1]).replace(/^「|」$/g,'').trim();
+    const rawVenue=norm(m[5]);
+    const vi=venueInfo(rawVenue);
+    const venue=vi.name||rawVenue;
+    if(!name||!venue) continue;
+    if(!/広島|グリーンアリーナ|HBG|上野学園|アステール|クアトロ|サンプラザ|フェニックス|BLUE LIVE|VANQUISH|セカンド/.test(venue)) continue;
+    events.push(eventBase({name,date:ymd(m[2],m[3],m[4]),venue,source:'チケットぴあ',url,text:m[0]}));
+  }
+  return events;
+}
+
 async function sourceDive(){
   const list='https://dive-hiroshima.com/events/'; const html=await fetchText(list); const links=[...html.matchAll(/href=["']([^"']*\/events\/events-[^"'?#]+\/?)[^"']*["']/gi)].map(m=>new URL(m[1],list).href); const uniq=[...new Set(links)].slice(0,50);const events=[];
   for(const url of uniq){let page;try{page=await fetchText(url)}catch{continue} const full=norm(page); const h1=norm((page.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)||[])[1]||'');if(!h1)continue;
@@ -244,16 +260,63 @@ async function sourceCVB(){
 }
 async function sourceSports(){
   const events=[];
-  const specs=[
-    ['サンフレッチェ広島公式','https://www.sanfrecce.co.jp/tickets/schedule','エディオンピースウイング広島',/(\d{1,2})\.(\d{1,2})\s*\[[^\]]+\]\s*([0-2]?\d:[0-5]\d)\s*K\.O\.\s+([\s\S]{1,80}?)(?=\s+[☆★]|\s+販売|\s+\d{1,2}\/\d{1,2}|$)/g,'soccer'],
-    ['広島サンダーズ公式','https://www.hiroshima-thunders.com/game/score/2026/index.html',null,/(\d{1,2})\s+(\d{1,2})\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)\s+([0-2]?\d:[0-5]\d)\s+試合開始[\s\S]{0,80}?広島サンダーズ\s+VS\s+(?:Image:\s*)?([^\s][\s\S]{1,30}?)\s+会場\s+([^（(]{2,60})\s*(?:（広島）|\(広島\))/g,'volleyball']
-  ];
-  const now=new Date();const year=now.getFullYear();
-  for(const [source,url,fixedVenue,re,kind] of specs){const text=norm(await fetchText(url));for(const m of text.matchAll(re)){let mo=Number(m[1]),day=Number(m[2]),venue=fixedVenue,opponent,start;if(kind==='soccer'){start=m[3];opponent=m[4]}else{start=m[3];opponent=m[4];venue=m[5]}if(!inHiroshimaCity(venue))continue;events.push(eventBase({name:(kind==='soccer'?'サンフレッチェ広島':'広島サンダーズ')+' vs '+norm(opponent),date:ymd(year,mo,day),venue,source,url,text:m[0],kind:'sports',start}));}}
+  const today=jstDate();
+  const year=Number(today.slice(0,4)),month=Number(today.slice(5,7));
+
+  // Sanfrecce
+  {
+    const source='サンフレッチェ広島公式',url='https://www.sanfrecce.co.jp/tickets/schedule';
+    const text=norm(await fetchText(url));
+    const re=/(\d{1,2})\.(\d{1,2})\s*\[[^\]]+\]\s*([0-2]?\d:[0-5]\d)\s*K\.O\.\s+([\s\S]{1,80}?)(?=\s+[☆★]|\s+販売|\s+\d{1,2}\/\d{1,2}|$)/g;
+    for(const m of text.matchAll(re)){
+      let y=year,mo=Number(m[1]),d=Number(m[2]); if(mo<month-6)y++;
+      events.push(eventBase({name:'サンフレッチェ広島 vs '+norm(m[4]),date:ymd(y,mo,d),venue:'エディオンピースウイング広島',source,url,text:m[0],kind:'sports',start:m[3]}));
+    }
+  }
+
+  // Hiroshima Dragonflies: read list view because it exposes HOME/AWAY, opponent, time and venue together.
+  for(let offset=0;offset<4;offset++){
+    const dt=new Date(Date.UTC(year,month-1+offset,1)),y=dt.getUTCFullYear(),mo=dt.getUTCMonth()+1;
+    const source='広島ドラゴンフライズ公式',url='https://hiroshimadragonflies.com/schedule/list/?month='+mo+'&year='+y;
+    let text=''; try{text=norm(await fetchText(url))}catch{continue}
+    const re=/HOME\s+(?:レギュラーシーズン|ポストシーズン|プレシーズン)?\s*(?:Image:\s*)?広島\s+広島\s+(\d{1,2})\/(\d{1,2})\s*\([^)]+\)\s*([0-2]?\d:[0-5]\d)\s+location_on\s*([^\s][\s\S]{1,70}?)\s+(?:Image:\s*)?([^\s][\s\S]{0,30}?)\s+(?:sports_basketball|試合情報|confirmation_number)/g;
+    for(const m of text.matchAll(re)){
+      const venue=norm(m[4]),op=norm(m[5]).replace(/^広島\s*/,'');
+      if(!inHiroshimaCity(venue))continue;
+      events.push(eventBase({name:'広島ドラゴンフライズ vs '+op,date:ymd(y,m[1],m[2]),venue,source,url,text:m[0],kind:'sports',start:m[3]}));
+    }
+  }
+
+  // Hiroshima Thunders
+  {
+    const source='広島サンダーズ公式',url='https://www.hiroshima-thunders.com/game/score/2026/index.html';
+    const text=norm(await fetchText(url));
+    const re=/(\d{1,2})\s+(\d{1,2})\s+(?:MON|TUE|WED|THU|FRI|SAT|SUN)\s+([0-2]?\d:[0-5]\d)\s+試合開始[\s\S]{0,80}?広島サンダーズ\s+VS\s+(?:Image:\s*)?([^\s][\s\S]{1,30}?)\s+会場\s+([^（(]{2,60})\s*(?:（広島）|\(広島\))/g;
+    for(const m of text.matchAll(re)){
+      let y=year,mo=Number(m[1]); if(mo<month-6)y++;
+      const venue=norm(m[5]);if(!inHiroshimaCity(venue))continue;
+      events.push(eventBase({name:'広島サンダーズ vs '+norm(m[4]),date:ymd(y,mo,m[2]),venue,source,url,text:m[0],kind:'sports',start:m[3]}));
+    }
+  }
+
+  // NPB future Hiroshima home games at Mazda Stadium.
+  for(let offset=0;offset<2;offset++){
+    const dt=new Date(Date.UTC(year,month-1+offset,1)),y=dt.getUTCFullYear(),mo=dt.getUTCMonth()+1;
+    const source='NPB',url='https://npb.jp/games/'+y+'/schedule_'+String(mo).padStart(2,'0')+'_detail.html';
+    let text='';try{text=norm(await fetchText(url))}catch{continue}
+    const days=[...text.matchAll(/(?:^|\s)(\d{1,2})\/(\d{1,2})（[^）]+）/g)];
+    for(let i=0;i<days.length;i++){
+      const dm=days[i],st=dm.index||0,en=i+1<days.length?(days[i+1].index||text.length):Math.min(text.length,st+1800),seg=text.slice(st,en);
+      const re=/広島\s+(?:\d+\s*-\s*\d+|[-－])\s*([^\s]{1,12})\s+マツダスタジアム\s+([0-2]?\d:[0-5]\d)/g;
+      for(const m of seg.matchAll(re)){
+        events.push(eventBase({name:'広島東洋カープ vs '+norm(m[1]),date:ymd(y,dm[1],dm[2]),venue:'マツダスタジアム',source,url,text:m[0],kind:'sports',start:m[2]}));
+      }
+    }
+  }
   return events;
 }
 const SOURCES=[
-  ['icch',sourceICCH],['candy',sourceCandy],['eplus',sourceEplus],['lawson',sourceLawson],
+  ['icch',sourceICCH],['candy',sourceCandy],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
   ['dive',sourceDive],['cvb',sourceCVB],['sports',sourceSports]
 ];
 async function main(){
