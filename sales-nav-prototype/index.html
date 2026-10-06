@@ -3542,7 +3542,7 @@ function liveEndGuide(e){
  let duration=150;
  if(type==='theater'||/公演|コント|演劇|ミュージカル|落語|舞台/.test(title)) duration=120;
  if(/SUPER ROCK CITY|フェス|FES|複数会場|10会場/i.test(title+' '+venue)) duration=600;
- let mins=Number(start[1])+Number(start[2])*60+duration;
+ let mins=Number(start[1])*60+Number(start[2])+duration;
  mins=Math.round(mins/10)*10;
  const h=Math.floor(mins/60)%24,m=mins%60;
  return {time:String(h).padStart(2,'0')+':'+String(m).padStart(2,'0'),label:'終演見込',kind:'calculated'};
