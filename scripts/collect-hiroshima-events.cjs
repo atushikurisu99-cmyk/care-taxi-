@@ -202,24 +202,54 @@ async function sourceCandy(){
 }
 async function sourceEplus(){
   const urls=[
-    ['music','https://eplus.jp/sf/live/chugoku-shikoku/hiroshima'],
-    ['theater','https://eplus.jp/sf/play/chugoku-shikoku/hiroshima'],
-    ['sports','https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima'],
-    ['event','https://eplus.jp/sf/event/chugoku-shikoku/hiroshima'],
-    ['music','https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima']
-  ]; const events=[];
-  for(const [kind,url] of urls){
-    const html=await fetchTextBrowserFallback(url,22000);const text=norm(html);
-    if(events.length===0) await saveDebug('eplus-'+kind+'.txt',text);
-    const dates=[...text.matchAll(/(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)/g)];
+    ['live','music','https://eplus.jp/sf/live/chugoku-shikoku/hiroshima'],
+    ['play','theater','https://eplus.jp/sf/play/chugoku-shikoku/hiroshima'],
+    ['sports','sports','https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima'],
+    ['event','event','https://eplus.jp/sf/event/chugoku-shikoku/hiroshima'],
+    ['anime','music','https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima']
+  ];
+  const events=[];
+  for(const [id,kind,url] of urls){
+    let html='';
+    try{ html=await fetchTextBrowserFallback(url,22000); }
+    catch(e){ await saveDebug('eplus-'+id+'-error.txt',String(e?.message||e)); continue; }
+    const text=norm(html);
+    await saveDebug('eplus-'+id+'.txt',text);
+
+    // Eplus currently prints dates with optional whitespace after slash:
+    // "2026/ 10/17(土)" and ranges such as "2026/ 9/19(土) 2026/ 10/12(月・祝)".
+    const dates=[...text.matchAll(/(20\d{2})\s*\/\s*(\d{1,2})\s*\/\s*(\d{1,2})\s*\([^)]+\)/g)];
     for(let i=0;i<dates.length;i++){
-      const m=dates[i],st=m.index||0,en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900),seg=text.slice(st,en);
-      if(!/広島県/.test(seg))continue;const vi=venueInfo(seg);if(!vi.name)continue;
-      let name=seg.slice(m[0].length).split(/開演|開場|会場|\(広島県\)/)[0].replace(/先着|抽選|受付中|受付終了|予定枚数終了/g,' ').trim();
-      if(!name||name.length>150)continue;
-      events.push(eventBase({name,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'イープラス',url,text:seg,kind}));
+      const m=dates[i];
+      const st=(m.index||0)+m[0].length;
+      const en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900);
+      let seg=text.slice(st,en).replace(/^\s*(?:先着|抽選|一般発売|受付中)\s*/,'').trim();
+      if(!seg || !/\(広島県\)/.test(seg)) continue;
+
+      const vi=venueInfo(seg);
+      if(!vi.name) continue; // only taxi-relevant known Hiroshima-city venues here
+
+      // Title is the text before the detected venue or before "(広島県)".
+      const venuePos=[
+        seg.indexOf(vi.name),
+        ...CAP.map(([, ,re])=>{ const mm=seg.match(re); return mm?seg.indexOf(mm[0]):-1; })
+      ].filter(x=>x>=0).sort((a,b)=>a-b)[0];
+      let head=(Number.isFinite(venuePos)?seg.slice(0,venuePos):seg.split(/\(広島県\)/)[0]);
+      let name=head
+        .replace(/^(?:先着|抽選|一般発売|受付中|受付終了|予定枚数終了)\s*/g,'')
+        .replace(/\s+(?:先着|抽選|受付中|受付終了|予定枚数終了).*$/g,'')
+        .trim();
+      if(!name || name.length>160) continue;
+
+      const sm=seg.match(/(?:開演|開始|上映開始)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
+      const em=seg.match(/(?:終演|終了)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
+      events.push(eventBase({
+        name,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'イープラス',url,text:seg,
+        kind,start:sm?.[1]||null,end:em?.[1]||null
+      }));
     }
-  } return events;
+  }
+  return events;
 }
 async function sourceLawson(){
   const url='https://l-tike.com/search/?pref=34&size=100'; const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
@@ -356,7 +386,16 @@ async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
   let previous=null;
   try{previous=JSON.parse(await fs.readFile(OUT,'utf8'))}catch{previous=null}
-  for(const [id,fn] of SOURCES){const started=Date.now();try{const rows=await fn();all.push(...rows);health[id]={ok:true,count:rows.length,ms:Date.now()-started};}catch(e){health[id]={ok:false,count:null,ms:Date.now()-started,error:String(e?.message||e).slice(0,240)};}}
+  for(const [id,fn] of SOURCES){
+    const started=Date.now();
+    try{
+      const rows=await fn(); all.push(...rows);
+      const suspiciousZero=['icch','candy','worker_events','eplus','lawson','pia','dive','sports'].includes(id)&&rows.length===0;
+      health[id]={ok:!suspiciousZero,state:suspiciousZero?'suspicious_zero':'ok',count:rows.length,ms:Date.now()-started};
+    }catch(e){
+      health[id]={ok:false,state:'failure',count:null,ms:Date.now()-started,error:String(e?.message||e).slice(0,240)};
+    }
+  }
   const sourceLabelMap={
     icch:['広島国際会議場公式'],candy:['CANDY PROMOTION'],worker_events:['会場・プレイガイド統合Worker'],
     eplus:['イープラス'],lawson:['ローチケ'],pia:['チケットぴあ'],dive:['Dive! Hiroshima'],
