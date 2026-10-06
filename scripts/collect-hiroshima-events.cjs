@@ -44,12 +44,17 @@ function dateFrom(s='',fallbackYear){
   let m=s.match(/(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日/); if(m)return ymd(m[1],m[2],m[3]);
   m=s.match(/(20\d{2})[\/.\-](\d{1,2})[\/.\-](\d{1,2})/); if(m)return ymd(m[1],m[2],m[3]);
   m=s.match(/(?:^|\s)(\d{1,2})[\/.](\d{1,2})(?:\D|$)/); if(m&&fallbackYear)return ymd(fallbackYear,m[1],m[2]);
+  m=s.match(/(\d{1,2})月\s*(\d{1,2})日/); if(m&&fallbackYear)return ymd(fallbackYear,m[1],m[2]);
   return null;
 }
 function endDateFrom(s='',fallbackYear){
   s=norm(s);
   const a=[...s.matchAll(/(20\d{2})年\s*(\d{1,2})月\s*(\d{1,2})日/g)]; if(a.length>1){const m=a.at(-1);return ymd(m[1],m[2],m[3])}
-  const m=s.match(/(\d{1,2})[\/.](\d{1,2})\D{0,10}(?:-|〜|～|~|→)\D{0,10}(\d{1,2})[\/.](\d{1,2})/); if(m&&fallbackYear)return ymd(fallbackYear,m[3],m[4]);
+  let m=s.match(/(\d{1,2})[\/.](\d{1,2})\D{0,10}(?:-|〜|～|~|→)\D{0,10}(\d{1,2})[\/.](\d{1,2})/); if(m&&fallbackYear)return ymd(fallbackYear,m[3],m[4]);
+  const jp=[...s.matchAll(/(\d{1,2})月\s*(\d{1,2})日/g)];
+  if(jp.length>=2&&fallbackYear){const z=jp.at(-1);return ymd(fallbackYear,z[1],z[2]);}
+  m=s.match(/(\d{1,2})月\s*(\d{1,2})日\D{0,10}(?:-|〜|～|~|→)\D{0,10}(\d{1,2})日/);
+  if(m&&fallbackYear)return ymd(fallbackYear,m[1],m[3]);
   return null;
 }
 function startTime(s=''){const m=norm(s).match(/(?:開演|開始|試合開始|START)\D{0,12}([0-2]?\d:[0-5]\d)/i)||norm(s).match(/([0-2]?\d:[0-5]\d)\s*(?:開演|開始)/);return m?m[1].padStart(5,'0'):null}
@@ -392,28 +397,62 @@ async function sourceDive(){
   } return events;
 }
 async function sourceCVB(){
-  const url='https://www.hiroshimacvb.jp/calendar/'; let html=await fetchText(url); let events=[];
-  await saveDebug('cvb-raw.html',html);
-  await saveDebug('cvb-static.txt',norm(html));
-  try{
-    const js=await fetchText('https://www.hiroshimacvb.jp/calendar/js/index.js',12000);
-    await saveDebug('cvb-index.js',js);
-  }catch{} const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
-  for(const row of rows){const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));if(cells.length<4)continue;
-    const [name,venue,period,domesticRaw,overseasRaw]=cells;const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue))continue;
-    const domestic=int(domesticRaw)||0,overseas=int(overseasRaw)||0,people=domestic+overseas;if(people<100)continue;
-    events.push(eventBase({name,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'広島観光コンベンションビューロー',url,text:cells.join(' '),kind:'convention',people,people_basis:'official_participants'}));}
-  if(!events.length){
-    try{
-      html=await browserHtml(url);
-      const rows2=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
-      for(const row of rows2){
-        const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));if(cells.length<4)continue;
-        const [name,venue,period,domesticRaw,overseasRaw]=cells;const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue))continue;
-        const domestic=int(domesticRaw)||0,overseas=int(overseasRaw)||0,people=domestic+overseas;if(people<100)continue;
-        events.push(eventBase({name,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'広島観光コンベンションビューロー',url,text:cells.join(' '),kind:'convention',people,people_basis:'official_participants'}));
+  const pageUrl='https://www.hiroshimacvb.jp/calendar/';
+  const jsonUrl='https://www.hiroshimacvb.jp/calendar/calendar.json?_='+Date.now();
+  const events=[];
+  let raw='';
+  try{raw=await fetchText(jsonUrl,20000)}catch(e){
+    await saveDebug('cvb-json-error.txt',String(e?.message||e));
+    return [];
+  }
+  await saveDebug('cvb-calendar.json',raw);
+
+  let data=null;
+  try{data=JSON.parse(raw)}catch(e){
+    await saveDebug('cvb-json-parse-error.txt',String(e?.message||e)+'\n'+raw.slice(0,2000));
+    return [];
+  }
+
+  const today=jstDate();
+  const currentYear=Number(today.slice(0,4));
+  for(const [yearKey,months] of Object.entries(data||{})){
+    const year=Number(yearKey);
+    if(!Number.isFinite(year)||year<currentYear||year>currentYear+1||!months||typeof months!=='object') continue;
+
+    const seen=new Set();
+    for(const [monthKey,rows] of Object.entries(months)){
+      if(!Array.isArray(rows)) continue;
+      for(const row of rows){
+        if(!row||typeof row!=='object') continue;
+        const entryId=String(row.entry_id||'');
+        const title=norm(row.title||'');
+        const venue=norm(row._place||row.place||'');
+        const period=norm(row.date_str||'');
+        if(!title||!venue||!period) continue;
+
+        const unique=entryId||[title,venue,period].join('|');
+        if(seen.has(unique)) continue;
+        seen.add(unique);
+
+        if(!inHiroshimaCity(venue)) continue;
+
+        const domestic=int(row.join_jp)||0;
+        const overseas=int(row._join)||0;
+        const people=domestic+overseas;
+        if(people<100) continue;
+
+        const date=dateFrom(period,year);
+        if(!date||date<today) continue;
+        const endDate=endDateFrom(period,year)||date;
+
+        events.push(eventBase({
+          name:title,date,end_date:endDate,venue,
+          source:'広島観光コンベンションビューロー',url:pageUrl,
+          text:[title,venue,period,row.category,row.join_jp,row._join,row.countries].filter(Boolean).join(' '),
+          kind:'convention',people,people_basis:'official_participants'
+        }));
       }
-    }catch{}
+    }
   }
   return events;
 }
