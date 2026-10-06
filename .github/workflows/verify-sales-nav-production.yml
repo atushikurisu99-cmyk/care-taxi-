@@ -22,12 +22,12 @@ jobs:
         run: |
           npm init -y >/dev/null 2>&1
           npm install --silent playwright
-          npx playwright install --with-deps chromium
+          npx playwright install --with-deps webkit
       - name: Verify rendered event names on production
         run: |
           node - <<'NODE'
           (async()=>{
-          const { chromium } = require('playwright');
+          const { webkit } = require('playwright');
           const target='https://taxi-sales-nav.pages.dev/';
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
           const expected=[
@@ -40,8 +40,9 @@ jobs:
             {date:'2026-10-31',venue:'広島グリーンアリーナ',name:'広島サンダーズ'},
             {date:'2026-11-21',venue:'広島サンプラザホール',name:'広島サンダーズ'}
           ];
-          const browser=await chromium.launch({headless:true});
-          const page=await browser.newPage();
+          const browser=await webkit.launch({headless:true});
+          const context=await browser.newContext({viewport:{width:393,height:852},isMobile:true,hasTouch:true,deviceScaleFactor:3,userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'});
+          const page=await context.newPage();
           let last=[];
           let ok=false;
           for(let attempt=1; attempt<=5; attempt++){
@@ -119,8 +120,9 @@ jobs:
             if(!await preview.isVisible()) throw new Error('monthly preview button did not open preview');
             const previewBox=await preview.boundingBox();
             const vp=page.viewportSize();
-            if(!previewBox||!vp||previewBox.y>=vp.height||previewBox.y+Math.min(previewBox.height,80)<=0){
-              throw new Error('monthly preview opened outside visible viewport: '+JSON.stringify({previewBox,vp}));
+            const closeVisible=await page.locator('#monthlyReportPreview .monthly-preview-close').isVisible();
+            if(!previewBox||!vp||previewBox.y>1||previewBox.width<vp.width-4||previewBox.height<vp.height-4||!closeVisible){
+              throw new Error('monthly preview is not full-screen visible on iPhone viewport: '+JSON.stringify({previewBox,vp,closeVisible}));
             }
             await page.screenshot({path:'/tmp/monthly-preview-production.png',fullPage:false});
 
