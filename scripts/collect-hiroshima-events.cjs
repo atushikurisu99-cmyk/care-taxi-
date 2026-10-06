@@ -441,56 +441,70 @@ async function sourceDive(){
   } return events;
 }
 async function sourceHiroshimaCityEvents(){
-  const list='https://www.city.hiroshima.lg.jp/event_calendar.html?dsp=1&s_d1%5B%5D=11&sch=1&sec_sec1=0&srt=1&sub_id=0';
-  const html=await fetchText(list,20000);
+  const calendars=[
+    'https://www.city.hiroshima.lg.jp/',
+    'https://www.city.hiroshima.lg.jp/event_calendar.html?dsp=1&s_d1%5B%5D=11&sch=1&sec_sec1=0&srt=1&sub_id=0'
+  ];
   const links=[];
-  for(const a of html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
-    const title=norm(a[2]);
-    if(!title) continue;
-    if(!/(祭|まつり|フェス|フェア|花火|マラソン|パレード|スポーツ|大会|コンサート|イベント|グリーンフェア)/i.test(title)) continue;
-    if(/講座|教室|相談|募集|企画展|展示|資格|受付/.test(title) && !/(祭|フェス|フェア|花火|マラソン|パレード)/.test(title)) continue;
-    try{
-      const url=new URL(a[1],list).href;
-      if(url.includes('city.hiroshima.lg.jp')) links.push({title,url});
-    }catch{}
+  for(const list of calendars){
+    let html=''; try{html=await fetchText(list,20000)}catch{continue}
+    for(const a of html.matchAll(/<a[^>]+href=["']([^"']+)["'][^>]*>([\s\S]*?)<\/a>/gi)){
+      const title=norm(a[2]);
+      if(!title) continue;
+      if(!/(祭|まつり|フェス|フェア|花火|マラソン|パレード|スポーツ|大会|コンサート|イベント|グリーンフェア)/i.test(title)) continue;
+      if(/講座|教室|相談|募集|企画展|展示|資格|受付/.test(title)&&!/(祭|フェス|フェア|花火|マラソン|パレード)/.test(title)) continue;
+      try{
+        const url=new URL(a[1],list).href;
+        if(url.includes('city.hiroshima.lg.jp')) links.push({title,url});
+      }catch{}
+    }
   }
-  // Known large public event can be missed by the calendar's current view,
-  // so keep its official city page as a direct official seed.
-  links.push({title:'秋のグリーンフェア2026',url:'https://www.city.hiroshima.lg.jp/living/park-green/1021378/1006063/1026386/1053331.html'});
-  const uniq=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,35);
+
+  // Direct official seeds cover high-human-flow municipal events that may not
+  // appear in the calendar index. Their detail pages are still fetched each run.
+  links.push(
+    {title:'秋のグリーンフェア2026',url:'https://www.city.hiroshima.lg.jp/living/park-green/1021378/1006063/1026386/1053331.html',date:'2026-10-24',end_date:'2026-11-03',venue:'広島市植物公園',start:'09:00',end:'16:30',kind:'festival'},
+    {title:'ひろしま女子×理工系フェス2026',url:'https://www.city.hiroshima.lg.jp/shisei/kouhou/1004010/1045546/1053270/1053722.html',date:'2026-10-11',venue:'JMSアステールプラザ',start:'12:00',end:'16:00',kind:'festival',people:100,people_basis:'official_minimum_registered'},
+    {title:'インクルーシブ・スポーツ・フェスタ広島2026',url:'https://www.city.hiroshima.lg.jp/living/fukushi-kaigo/1014921/1025793/1053057.html',date:'2026-11-28',end_date:'2026-11-29',venue:'マエダハウジング東区スポーツセンター ほか',kind:'sports'}
+  );
+
+  const uniq=[...new Map(links.map(x=>[x.url,x])).values()].slice(0,50);
   const out=[];
   const today=jstDate(),year=Number(today.slice(0,4));
   for(const item of uniq){
     let page=''; try{page=await fetchText(item.url,16000)}catch{continue}
     const text=norm(page);
-    const h1=norm((page.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)||[])[1]||item.title);
-    let date=dateFrom(text,year);
-    // Prefer a date close to an explicit "日程/開催期間" label.
-    const dm=text.match(/(?:日程|開催期間|開催日)\s*[:：]?\s*([^。]{1,180})/);
-    if(dm) date=dateFrom(dm[1],year)||date;
-    if(!date||date<today) continue;
-    const end=endDateFrom(dm?.[1]||text,year)||date;
+    const rawH1=norm((page.match(/<h1[^>]*>([\s\S]*?)<\/h1>/i)||[])[1]||'');
+    const title=(!rawH1||/^Image:/i.test(rawH1)||rawH1.length>180)?item.title:rawH1;
 
-    let venue=null;
-    const vm=text.match(/(?:会場|開催場所|場所)\s*[:：]?\s*([^。｜]{2,90})/);
-    if(vm) venue=norm(vm[1]);
+    const dm=text.match(/(?:日程|開催期間|開催日|日時)\s*[:：]?\s*([^。]{1,180})/);
+    const date=item.date||dateFrom(dm?.[1]||text,year);
+    if(!date||date<today) continue;
+    const endDate=item.end_date||endDateFrom(dm?.[1]||text,year)||date;
+
+    let venue=item.venue||null;
     if(!venue){
-      const im=h1.match(/(?:in|IN|ｉｎ)\s+(.{2,60})$/);
+      const vm=text.match(/(?:会場|開催場所|場所)\s*[:：]?\s*([^。｜]{2,90})/);
+      if(vm) venue=norm(vm[1]);
+    }
+    if(!venue){
+      const im=title.match(/(?:in|IN|ｉｎ)\s+(.{2,60})$/);
       if(im) venue=norm(im[1]);
     }
-    if(/秋のグリーンフェア2026/.test(h1)) venue='広島市植物公園';
     if(!venue) continue;
 
-    const people=statedPeople(text);
-    const largeKeyword=/(祭|まつり|フェス|フェア|花火|マラソン|パレード|大型|スポーツ・レクリエーション)/i.test(h1+' '+text.slice(0,1200));
+    const detectedPeople=statedPeople(text);
+    const people=item.people||detectedPeople||null;
+    const largeKeyword=/(祭|まつり|フェス|フェア|花火|マラソン|パレード|大型|スポーツ・レクリエーション)/i.test(title+' '+text.slice(0,1200));
     if(!people&&!largeKeyword) continue;
 
-    let start=startTime(text),finish=endTime(text);
-    if(/秋のグリーンフェア2026/.test(h1)){start='09:00';finish='16:30'}
+    const start=item.start||startTime(text);
+    const finish=item.end||endTime(text);
     out.push(eventBase({
-      name:h1,date,end_date:end,venue,source:'広島市公式',url:item.url,text,
-      kind:/スポーツ|マラソン/.test(h1)?'sports':'festival',
-      start,end:finish,people,people_basis:people?'official_stated':null
+      name:title,date,end_date:endDate,venue,source:'広島市公式',url:item.url,text,
+      kind:item.kind||(/スポーツ|マラソン/.test(title)?'sports':'festival'),
+      start,end:finish,people,
+      people_basis:item.people_basis||(detectedPeople?'official_stated':null)
     }));
   }
   return merge(out);
