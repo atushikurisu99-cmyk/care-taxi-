@@ -4142,14 +4142,26 @@ async function loadEventSportsRealtime(force=false){
   if(!r.ok) throw new Error('snapshot http '+r.status);
   return await r.json();
  };
- const [events,sports,demand]=await Promise.allSettled([fetchOne(LIVE_EVENTS_URL),fetchOne(SPORTS_URL),fetchSnapshot()]);
+ const eventsPromise=fetchOne(LIVE_EVENTS_URL);
+ const sportsPromise=fetchOne(SPORTS_URL);
 
- if(demand.status==='fulfilled'&&demand.value?.ok&&Array.isArray(demand.value.events)){
-  demandSnapshotData=demand.value;
-  logAnalyticsEvent('feed_loaded',{feed:'demand-events',source:'snapshot',generatedAt:demand.value.generated_at,count:demand.value.events.length});
- }else{
-  logAnalyticsEvent('feed_error',{feed:'demand-events',message:String(demand.reason||'invalid demand snapshot')});
+ // 同じ配信元の軽量スナップショットを先に表示し、外部Worker待ちで画面を空にしない。
+ try{
+  const demand=await fetchSnapshot();
+  if(demand?.ok&&Array.isArray(demand.events)){
+   demandSnapshotData=demand;
+   logAnalyticsEvent('feed_loaded',{feed:'demand-events',source:'snapshot',generatedAt:demand.generated_at,count:demand.events.length});
+   renderHomeEventSummary();
+   renderEventDetail();
+   if(document.getElementById('calendar')?.classList.contains('active')) renderCalendar();
+  }else{
+   logAnalyticsEvent('feed_error',{feed:'demand-events',message:'invalid demand snapshot'});
+  }
+ }catch(demandError){
+  logAnalyticsEvent('feed_error',{feed:'demand-events',message:String(demandError||'invalid demand snapshot')});
  }
+
+ const [events,sports]=await Promise.allSettled([eventsPromise,sportsPromise]);
 
  if(events.status==='fulfilled'&&events.value?.ok&&Array.isArray(events.value.events)){
   const incoming=events.value;
