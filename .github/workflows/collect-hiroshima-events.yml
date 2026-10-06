@@ -55,6 +55,8 @@ jobs:
           if(bad.length) throw new Error('invalid events '+bad.length);
           const status=JSON.parse(fs.readFileSync('sales-nav-prototype/data/hiroshima-demand-source-status.json','utf8'));
           if(status?.ok!==true||!status.source_health||!status.source_registry) throw new Error('invalid source status snapshot');
+          const history=JSON.parse(fs.readFileSync('sales-nav-prototype/data/hiroshima-demand-source-history.json','utf8'));
+          if(!history?.sources||typeof history.sources!=='object') throw new Error('invalid source history snapshot');
           const h=p.source_health||{};
           const minimums={icch:5,candy:5,dive:1,sports:5,worker_events:5};
           for(const [id,min] of Object.entries(minimums)){
@@ -84,14 +86,14 @@ jobs:
       - name: Commit updated snapshot
         id: snapshot
         run: |
-          if [ -z "$(git status --porcelain -- sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json)" ]; then
+          if [ -z "$(git status --porcelain -- sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json sales-nav-prototype/data/hiroshima-demand-source-history.json)" ]; then
             echo "changed=false" >> "$GITHUB_OUTPUT"
             echo "No snapshot change"
             exit 0
           fi
           git config user.name "taxi-event-collector[bot]"
           git config user.email "taxi-event-collector[bot]@users.noreply.github.com"
-          git add sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json
+          git add sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json sales-nav-prototype/data/hiroshima-demand-source-history.json
           git commit -m "Update Hiroshima demand event snapshot"
           if ! git push; then
             echo "Remote changed during collection; rebasing snapshot commit"
