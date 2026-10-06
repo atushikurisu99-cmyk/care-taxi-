@@ -794,21 +794,27 @@ async function main(){
     try{
       let rows=await fn();
       const prevCount=Number(previous?.source_health?.[id]?.count||0);
-      if(id==='eplus' && prevCount>=20 && rows.length<Math.floor(prevCount*0.60)){
-        try{
-          const retryRows=await fn();
-          if(retryRows.length>rows.length) rows=retryRows;
-        }catch{}
+      const observedReference=Number(previous?.source_health?.[id]?.reference_count||previous?.source_health?.[id]?.previous_count||prevCount||0);
+      const sourceFloor=id==='eplus'?100:0; // verified healthy Hiroshima Eplus run
+      const referenceCount=Math.max(observedReference,sourceFloor,rows.length);
+      if(id==='eplus' && rows.length<Math.floor(referenceCount*0.60)){
+        for(let attempt=0;attempt<2 && rows.length<Math.floor(referenceCount*0.60);attempt++){
+          try{
+            const retryRows=await fn();
+            if(retryRows.length>rows.length) rows=retryRows;
+          }catch{}
+        }
       }
       all.push(...rows);
       const suspiciousZero=establishedSources.has(id)&&rows.length===0;
-      const suspiciousDrop=prevCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(prevCount*0.60));
+      const suspiciousDrop=referenceCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(referenceCount*0.60));
       const state=suspiciousZero?'suspicious_zero':suspiciousDrop?'degraded':'ok';
       health[id]={
         ok:!suspiciousZero&&!suspiciousDrop,
         state,
         count:rows.length,
         previous_count:prevCount||null,
+        reference_count:Math.max(referenceCount,rows.length),
         ms:Date.now()-started,
         last_success_at:(!suspiciousZero&&!suspiciousDrop)?new Date().toISOString():(previous?.source_health?.[id]?.last_success_at||null)
       };
@@ -816,6 +822,7 @@ async function main(){
       health[id]={
         ok:false,state:'failure',count:null,
         previous_count:Number(previous?.source_health?.[id]?.count||0)||null,
+        reference_count:Number(previous?.source_health?.[id]?.reference_count||previous?.source_health?.[id]?.previous_count||previous?.source_health?.[id]?.count||0)||null,
         ms:Date.now()-started,
         last_success_at:previous?.source_health?.[id]?.last_success_at||null,
         error:String(e?.message||e).slice(0,240)
