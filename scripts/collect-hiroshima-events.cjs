@@ -137,6 +137,7 @@ function key(e){return [e.date||'',norm(e.venue||''),norm(e.name||'').replace(/[
 function merge(events){
   const out=[];
   const nkey=s=>norm(s||'').toLowerCase().replace(/[\s「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'');
+  const conventionKey=s=>nkey(s).replace(/学会学術大会/g,'学術大会');
   for(const e of events){
     if(!e?.date||!e?.name||!inHiroshimaCity((e.venue||'')+' '+(e.address||'')+' '+(e.source_text||''))) continue;
     e.name=String(e.name)
@@ -155,6 +156,10 @@ function merge(events){
       if(xv!==ev&&!icchAlias)return false;
       const xn=nkey(x.name);
       if(xn===en || (xn.length>=3&&en.length>=3&&(xn.includes(en)||en.includes(xn)))) return true;
+      if(x.event_type==='convention'&&e.event_type==='convention'){
+        const xc=conventionKey(x.name),ec=conventionKey(e.name);
+        if(xc===ec || (xc.length>=6&&ec.length>=6&&(xc.includes(ec)||ec.includes(xc)))) return true;
+      }
       if(x.event_type==='sports'&&e.event_type==='sports') return true;
       return !!(x.start_time&&e.start_time&&x.start_time===e.start_time&&x.event_type===e.event_type);
     });
