@@ -1329,69 +1329,55 @@ html,body{
 .report-template-fixed{width:100%;min-height:46px;display:flex;align-items:center;background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff;padding:10px 11px;font-size:15px;font-weight:900}
 .monthly-report-actions button.demo{background:#513f13;border-color:#b69229;color:#fff}
 .sogo-sheet{
- background:#fff;color:#111;font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
- font-size:7.6px;line-height:1.05;min-width:760px
+ background:#fff;color:#111;font-family:"Yu Mincho","Hiragino Mincho ProN","Yu Gothic",serif;
+ font-size:8px;line-height:1;min-width:760px
 }
 .sogo-page{
- background:#fff;border:1px solid #111;padding:12px 14px;margin:0 0 12px;
+ background:#fff;border:1px solid #111;padding:14px 15px;margin:0 0 12px;
  page-break-after:always;min-height:1060px
 }
 .sogo-page:last-child{page-break-after:auto}
-.sogo-title-wrap{position:relative;min-height:58px;margin-bottom:5px}
-.sogo-title{font-size:24px!important;letter-spacing:.28em;text-align:center!important;margin:9px 0 0!important;font-weight:700}
-.sogo-org-block{position:absolute;right:0;top:0;text-align:right;font-size:8px;line-height:1.25}
-.sogo-org-block strong{display:block;font-size:11px}
-.sogo-top{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:0;font-size:8px!important;white-space:normal!important}
-.sogo-top td,.sogo-top th{border:1px solid #111!important;padding:2px 4px!important;text-align:center!important;height:21px}
+.sogo-title-wrap{position:relative;height:58px;margin-bottom:2px}
+.sogo-title{position:absolute;left:0;right:0;bottom:2px;font-size:25px!important;letter-spacing:.32em;text-align:center!important;margin:0!important;font-weight:700}
+.sogo-org-block{position:absolute;right:0;top:1px;text-align:right;line-height:1.25}
+.sogo-org-block strong{display:block;font-size:11px;font-weight:700}
+.sogo-org-block div{font-size:8.2px}
+.sogo-top,.sogo-trip,.sogo-summary-table,.sogo-inspection,.sogo-alcohol{width:100%;border-collapse:collapse;table-layout:fixed;border-spacing:0}
+.sogo-top td,.sogo-trip th,.sogo-trip td,.sogo-summary-table td,.sogo-inspection th,.sogo-inspection td,.sogo-alcohol td{
+ border:1px solid #111!important;vertical-align:middle
+}
+.sogo-top td{height:20px;padding:1px 3px!important;font-size:8px;text-align:center!important}
 .sogo-top .left{text-align:left!important}
-.sogo-top .label{font-size:7px!important;color:#111!important;font-weight:700!important;white-space:nowrap}
-.sogo-trip{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7.1px!important;white-space:normal!important;margin-top:-1px}
-.sogo-trip th,.sogo-trip td{border:1px solid #111!important;padding:2px!important;text-align:center!important;height:25px}
-.sogo-trip th{background:#fff!important;font-weight:700}
-.sogo-trip .place{text-align:left!important;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-left:4px!important}
-.sogo-trip .remarks{text-align:left!important}
-.sogo-trip .hm-head{padding:0!important}
-.sogo-trip .hm-head>span{display:inline-block;width:50%;border-left:1px solid #111}
-.sogo-trip .hm-head>span:first-child{border-left:0}
-.sogo-summary-table{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:-1px;font-size:8px!important;white-space:normal!important}
-.sogo-summary-table td{border:1px solid #111!important;padding:2px 4px!important;height:25px;text-align:center!important}
-.sogo-summary-table .vlabel{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.08em;width:24px;padding:2px!important}
-.sogo-summary-table .labelcell{font-weight:700;width:52px}
+.sogo-top .label{font-size:7.4px!important;font-weight:700;white-space:nowrap}
+.sogo-trip{margin-top:-1px}
+.sogo-trip th{height:20px;padding:1px!important;background:#fff!important;font-size:7.1px;line-height:1;font-weight:700;text-align:center!important}
+.sogo-trip td{height:24px;padding:1px 2px!important;font-size:7.1px;line-height:1;text-align:center!important}
+.sogo-trip .place,.sogo-trip .remarks{text-align:left!important;padding-left:3px!important;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sogo-summary-table{margin-top:-1px}
+.sogo-summary-table td{height:24px;padding:1px 3px!important;font-size:7.4px;text-align:center!important}
+.sogo-summary-table .vlabel{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.08em;width:24px;padding:1px!important}
+.sogo-summary-table .labelcell{font-weight:700}
 .sogo-summary-table .unit{text-align:right!important;padding-right:6px!important}
 .sogo-page-back{padding-top:12px}
-.sogo-inspection-title{display:grid;grid-template-columns:1fr 150px;align-items:end;margin-top:3px;border:1px solid #111;border-bottom:0;height:32px}
-.sogo-inspection-title strong{font-size:18px;letter-spacing:.32em;text-align:center}
-.sogo-inspection-title span{height:100%;border-left:1px solid #111;display:flex;align-items:center;justify-content:center;font-size:9px}
-.sogo-inspection{width:100%;border-collapse:collapse;table-layout:fixed;font-size:6.2px!important;white-space:normal!important}
-.sogo-inspection th,.sogo-inspection td{border:1px solid #111!important;padding:1px 2px!important;text-align:center!important;height:17px}
-.sogo-inspection th{background:#fff!important;font-weight:700}
-.sogo-inspection .cat{writing-mode:vertical-rl;text-orientation:upright;font-size:6.2px}
+.sogo-inspection-title{display:grid;grid-template-columns:1fr 166px;height:31px;border:1px solid #111;border-bottom:0;margin-top:-1px;align-items:stretch}
+.sogo-inspection-title strong{font-size:18px;letter-spacing:.38em;display:flex;align-items:center;justify-content:center;line-height:1}
+.sogo-inspection-title span{border-left:1px solid #111;display:flex;align-items:center;justify-content:center;font-size:8.5px}
+.sogo-inspection th{height:16px;padding:1px!important;background:#fff!important;font-size:5.8px;line-height:1;text-align:center!important}
+.sogo-inspection td{height:16px;padding:1px!important;font-size:5.9px;line-height:1.02;text-align:center!important}
+.sogo-inspection .cat{writing-mode:vertical-rl;text-orientation:upright;font-size:5.8px;letter-spacing:.05em}
 .sogo-inspection .point{text-align:center!important}
-.sogo-inspection .detail{text-align:left!important}
-.sogo-inspection .result{font-size:11px;font-weight:700}
-.sogo-inspection-notes{font-size:6.6px;line-height:1.45;text-align:left}
-.sogo-alcohol{width:100%;border-collapse:collapse;table-layout:fixed;font-size:8px!important;margin-top:-1px;white-space:normal!important}
-.sogo-alcohol td{border:1px solid #111!important;padding:3px!important;text-align:center!important;height:24px}
-.sogo-alcohol .alabel{font-size:8px;line-height:1.25}
-.sogo-remarks{border:1px solid #111;border-top:0;min-height:92px;padding:5px;font-size:9px;text-align:left}
-.sogo-remarks strong{font-size:9px}
+.sogo-inspection .detail{text-align:left!important;padding-left:2px!important}
+.sogo-inspection .result{font-size:9px;font-family:sans-serif}
+.sogo-inspection .note-cell{font-size:5.7px;line-height:1.25;text-align:left!important;padding:2px!important}
+.sogo-alcohol{margin-top:-1px}
+.sogo-alcohol td{height:23px;padding:2px!important;font-size:7.1px;text-align:center!important}
+.sogo-alcohol .alabel{font-size:7.8px;line-height:1.2}
+.sogo-remarks{border:1px solid #111;border-top:0;min-height:90px;padding:5px;font-size:8.2px;text-align:left}
+.sogo-remarks strong{font-size:8.5px}
 @media(max-width:430px){
- .monthly-report-paper.show .sogo-sheet{min-width:720px}
+ .monthly-report-paper.show .sogo-sheet{min-width:760px}
  .monthly-report-paper.show{overflow:auto}
 }
-
-.sogo-page table{border-spacing:0}
-.sogo-page th,.sogo-page td{vertical-align:middle}
-.sogo-top td{font-size:8.2px;letter-spacing:.02em}
-.sogo-trip thead th{font-size:7.2px;line-height:1.05}
-.sogo-trip tbody td{font-size:7.3px;line-height:1}
-.sogo-summary-table td{font-size:7.6px;line-height:1.05}
-.sogo-inspection-title strong{line-height:1}
-.sogo-inspection th{font-size:5.9px;line-height:1}
-.sogo-inspection td{font-size:6.1px;line-height:1.03}
-.sogo-inspection .result{font-size:9px}
-.sogo-alcohol td{font-size:7.4px;line-height:1.1}
-.sogo-org-block div{font-size:8.2px}
 @media print{
  body.print-monthly-report #monthlyReportPreview .sogo-page{border:0!important;padding:0!important;margin:0!important}
  body.print-monthly-report #monthlyReportPreview .sogo-page{page-break-after:always}
@@ -2766,10 +2752,10 @@ function sogoTripHeader(){
   '<th rowspan="2" style="width:7%">人員</th>'+
   '<th rowspan="2" style="width:18%">乗車地</th>'+
   '<th rowspan="2" style="width:18%">降車地</th>'+
-  '<th colspan="2" style="width:12%">降車時刻</th>'+
+  '<th colspan="2" style="width:10%">降車時刻</th>'+
   '<th rowspan="2" style="width:12%">現収</th>'+
   '<th rowspan="2" style="width:12%">未収</th>'+
-  '<th rowspan="2" style="width:16%">備考</th>'+
+  '<th rowspan="2" style="width:18%">備考</th>'+
   '</tr><tr><th>時</th><th>分</th></tr></thead>';
 }
 function sogoFrontHeader(r){
@@ -2784,15 +2770,17 @@ function sogoFrontHeader(r){
   '<h3 class="sogo-title">運 転 日 報</h3>'+
   '<div class="sogo-org-block"><strong>相互個人タクシー協同組合</strong><div>事務所代表　253-2505</div><div>253-2500</div></div>'+
  '</div>'+
- '<table class="sogo-top"><tbody>'+
+ '<table class="sogo-top"><colgroup>'+
+  '<col style="width:7%"><col style="width:28%"><col style="width:9%"><col style="width:6%"><col style="width:5%"><col style="width:5%"><col style="width:9%"><col style="width:6%"><col style="width:5%"><col style="width:20%">'+
+ '</colgroup><tbody>'+
   '<tr>'+
-   '<td style="width:43%" class="left">'+escapeHtml(y)+' 年 '+escapeHtml(m)+' 月 '+escapeHtml(day)+' 日 '+escapeHtml(wd)+' 曜日</td>'+
-   '<td style="width:28.5%">出庫　'+escapeHtml(start[0]||'')+' 時　'+escapeHtml(start[1]||'')+' 分</td>'+
-   '<td style="width:28.5%">入庫　'+escapeHtml(end[0]||'')+' 時　'+escapeHtml(end[1]||'')+' 分</td>'+
+   '<td colspan="3" class="left">'+escapeHtml(y)+' 年 '+escapeHtml(m)+' 月 '+escapeHtml(day)+' 日 '+escapeHtml(wd)+' 曜日</td>'+
+   '<td>出庫</td><td>'+escapeHtml(start[0]||'')+'</td><td>時</td><td>'+escapeHtml(start[1]||'')+'</td>'+
+   '<td>入庫</td><td>'+escapeHtml(end[0]||'')+'</td><td>'+escapeHtml(end[1]||'')+' 分</td>'+
   '</tr>'+
   '<tr>'+
-   '<td class="left"><span class="label">登録番号</span>　'+escapeHtml(reg)+'</td>'+
-   '<td colspan="2" class="left"><span class="label">氏名又は名称</span>　'+escapeHtml(name)+'</td>'+
+   '<td><span class="label">登録番号</span></td><td colspan="4" class="left">'+escapeHtml(reg)+'</td>'+
+   '<td colspan="2"><span class="label">氏名又は名称</span></td><td colspan="3" class="left">'+escapeHtml(name)+'</td>'+
   '</tr>'+
  '</tbody></table>';
 }
@@ -2816,62 +2804,59 @@ function sogoSummaryHtml(r){
  '</tbody></table>';
 }
 function sogoInspectionHtml(r){
- const demo=!!r?.demoData;
- const mark=()=>demo?'✓':'';
- const left=[
-  ['制動装置','ブレーキ','踏みしろ、きき具合'],
-  ['','','液量'],
-  ['','','空気圧'],
-  ['','','排気量'],
-  ['','レバー引きしろ','ブレーキレバー'],
-  ['走行装置','タイヤ','空気圧'],
-  ['','','き裂・損傷'],
-  ['','','摩耗'],
-  ['','','溝の深さ'],
-  ['原動機関係','バッテリ','液量'],
-  ['','原動機','冷却水'],
-  ['','','ファンベルト'],
-  ['','','オイル'],
-  ['','','異音'],
-  ['','かかり具合','低速・加速']
+ const demo=!!r?.demoData,mark=()=>demo?'✓':'';
+ const L=[
+  {cat:'制動装置',catRows:5,point:'ブレーキ',pointRows:4,detail:'踏みしろ、きき具合'},
+  {detail:'液量'},{detail:'空気圧'},{detail:'排気量'},
+  {point:'レバー引きしろ',detail:'ブレーキレバー'},
+  {cat:'走行装置',catRows:4,point:'タイヤ',pointRows:4,detail:'空気圧'},
+  {detail:'き裂・損傷'},{detail:'摩耗'},{detail:'溝の深さ'},
+  {cat:'原動機関係',catRows:6,point:'バッテリ',detail:'液量'},
+  {point:'原動機',pointRows:4,detail:'冷却水'},{detail:'ファンベルト'},{detail:'オイル'},{detail:'異音'},
+  {point:'かかり具合',detail:'低速・加速'}
  ];
- const middle=[
-  ['灯火装置','前照灯','点滅の具合、汚れ、損傷'],
-  ['','尾灯','〃'],
-  ['','制動灯','〃'],
-  ['','番号灯','〃'],
-  ['','車幅灯','〃'],
-  ['','駐車灯','〃'],
-  ['','非常点滅表示灯','〃'],
-  ['','方向指示器','〃'],
-  ['防犯装置','防犯灯','〃'],
-  ['保安装置','後写鏡及び反射鏡','写映'],
-  ['','反射器及び自動車登録番号標','汚れ、損傷']
+ const M=[
+  {cat:'灯火装置',catRows:8,point:'前照灯',detail:'点滅の具合、汚れ、損傷'},
+  {point:'尾灯',detail:'〃'},{point:'制動灯',detail:'〃'},{point:'番号灯',detail:'〃'},
+  {point:'車幅灯',detail:'〃'},{point:'駐車灯',detail:'〃'},{point:'非常点滅表示灯',detail:'〃'},{point:'方向指示器',detail:'〃'},
+  {cat:'防犯装置',point:'防犯灯',detail:'〃'},
+  {cat:'保安装置',catRows:2,point:'後写鏡及び反射鏡',detail:'写映'},
+  {point:'反射器及び自動車登録番号標',detail:'汚れ、損傷'}
  ];
- const right=[
-  ['','非常信号用具','電池灯'],
-  ['','ドアー矢印','有・無'],
-  ['','運転免許証','〃'],
-  ['','自動車検査証','〃'],
-  ['','自賠責証明書','〃'],
-  ['','メーター検定証','〃'],
-  ['','写真票','〃'],
-  ['','地図','〃']
+ const R=[
+  {point:'非常信号用具',detail:'電池灯'},
+  {point:'ドアー矢印',detail:'有・無'},
+  {point:'運転免許証',detail:'〃'},
+  {point:'自動車検査証',detail:'〃'},
+  {point:'自賠責証明書',detail:'〃'},
+  {point:'メーター検定証',detail:'〃'},
+  {point:'写真票',detail:'〃'},
+  {point:'地図',detail:'〃'}
  ];
- const n=Math.max(left.length,middle.length,right.length);
- const cell=(x,i)=>'<td class="cat">'+escapeHtml(x[0]||'')+'</td><td class="point">'+escapeHtml(x[1]||'')+'</td><td class="detail">'+escapeHtml(x[2]||'')+'</td><td class="result">'+((x[1]||x[2])?mark():'')+'</td>';
- let rows='';
- for(let i=0;i<n;i++) rows+='<tr>'+cell(left[i]||['','',''],i)+cell(middle[i]||['','',''],i)+cell(right[i]||['','',''],i)+'</tr>';
+ const cells=(arr,i)=>{
+  const x=arr[i]||{};
+  let h='';
+  if(x.cat!==undefined) h+='<td class="cat"'+(x.catRows?' rowspan="'+x.catRows+'"':'')+'>'+escapeHtml(x.cat)+'</td>';
+  if(x.point!==undefined) h+='<td class="point"'+(x.pointRows?' rowspan="'+x.pointRows+'"':'')+'>'+escapeHtml(x.point)+'</td>';
+  h+='<td class="detail">'+escapeHtml(x.detail||'')+'</td><td class="result">'+((x.detail||x.point)?mark():'')+'</td>';
+  return h;
+ };
+ const n=15; let rows='';
+ for(let i=0;i<n;i++) rows+='<tr>'+cells(L,i)+cells(M,i)+cells(R,i)+'</tr>';
  return '<div class="sogo-inspection-title"><strong>日 常 点 検</strong><span>点検者　'+escapeHtml(r?.inspectorName||'')+'</span></div>'+
- '<table class="sogo-inspection"><thead><tr>'+
+ '<table class="sogo-inspection"><colgroup>'+
+  '<col style="width:4%"><col style="width:11%"><col style="width:12%"><col style="width:4%">'+
+  '<col style="width:4%"><col style="width:12%"><col style="width:16%"><col style="width:4%">'+
+  '<col style="width:4%"><col style="width:12%"><col style="width:13%"><col style="width:4%">'+
+ '</colgroup><thead><tr>'+
   '<th>区分</th><th>点検箇所</th><th>点検内容</th><th>良否</th>'+
   '<th>区分</th><th>点検箇所</th><th>点検内容</th><th>良否</th>'+
   '<th>区分</th><th>点検箇所</th><th>点検内容</th><th>良否</th>'+
  '</tr></thead><tbody>'+rows+
- '<tr><td colspan="8" class="detail">前日までに異常があった箇所について確認し、当該箇所に異常がないこと。</td>'+
- '<td colspan="4" class="sogo-inspection-notes">（備考）<br>1．異常のない箇所は記号欄に○印<br>2．異常のある時は左又は右と書いて×印<br>3．異常時の処理を備考欄に記入すること</td></tr>'+
+ '<tr><td colspan="8" class="note-cell">前日までに異常があった箇所について確認し、当該箇所に異常がないこと。</td>'+
+ '<td colspan="4" class="note-cell">（備考）<br>1．異常のない箇所は記号欄に○印<br>2．異常のある時は左又は右と書いて×印<br>3．異常時の処理を備考欄に記入すること</td></tr>'+
  '</tbody></table>'+
- '<table class="sogo-alcohol"><tbody><tr>'+
+ '<table class="sogo-alcohol"><colgroup><col style="width:25%"><col style="width:12%"><col style="width:18%"><col style="width:20%"><col style="width:12%"><col style="width:13%"></colgroup><tbody><tr>'+
   '<td rowspan="2" class="alabel">アルコール検知器<br>使用の有無</td><td>出庫時</td><td>有　'+(demo?'○':'')+'　無</td>'+
   '<td rowspan="2" class="alabel">酒気帯びの有無</td><td>出庫時</td><td>有　無 '+(demo?'○':'')+'</td></tr>'+
  '<tr><td>帰庫時</td><td>有　'+(demo?'○':'')+'　無</td><td>帰庫時</td><td>有　無 '+(demo?'○':'')+'</td></tr></tbody></table>'+
