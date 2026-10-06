@@ -63,7 +63,7 @@ const CAP=[
  ['広島サンプラザホール',6000,/広島サンプラザ/i],
  ['広島文化学園HBGホール',2001,/HBGホール|広島文化学園/i],
  ['上野学園ホール',1730,/上野学園ホール|県立文化芸術ホール/i],
- ['広島国際会議場 フェニックスホール',1504,/フェニックスホール|広島国際会議場/i],
+ ['広島国際会議場 フェニックスホール',1504,/フェニックスホール/i],
  ['JMSアステールプラザ',1204,/JMSアステール|アステールプラザ/i],
  ['BLUE LIVE HIROSHIMA',830,/BLUE LIVE HIROSHIMA/i],
  ['広島クラブクアトロ',800,/広島クラブクアトロ|CLUB QUATTRO/i],
@@ -91,13 +91,22 @@ function typeOf(s=''){
 }
 function key(e){return [e.date||'',norm(e.venue||''),norm(e.name||'').replace(/[\s「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'').slice(0,80)].join('|')}
 function merge(events){
-  const out=[],map=new Map();
+  const out=[];
+  const nkey=s=>norm(s||'').toLowerCase().replace(/[\s「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'');
   for(const e of events){
     if(!e?.date||!e?.name||!inHiroshimaCity((e.venue||'')+' '+(e.address||'')+' '+(e.source_text||''))) continue;
-    const k=key(e),i=map.get(k);
-    if(i==null){map.set(k,out.length);out.push({...e,sources:[e.source],source_urls:[e.source_url].filter(Boolean),verification_count:1});continue}
+    const en=nkey(e.name),ev=nkey(e.venue);
+    const i=out.findIndex(x=>{
+      if(String(x.date)!==String(e.date))return false;
+      const xv=nkey(x.venue);
+      if(xv!==ev)return false;
+      const xn=nkey(x.name);
+      return xn===en || (xn.length>=3&&en.length>=3&&(xn.includes(en)||en.includes(xn)));
+    });
+    if(i<0){out.push({...e,sources:[e.source],source_urls:[e.source_url].filter(Boolean),verification_count:1});continue}
     const x=out[i]; const ss=[...new Set([...(x.sources||[]),e.source].filter(Boolean))];
-    out[i]={...x,...e,
+    const preferName=String(e.name||'').length>String(x.name||'').length?e.name:x.name;
+    out[i]={...x,...e,name:preferName,
       start_time:e.start_time||x.start_time||null,end_time:e.end_time||x.end_time||null,
       people:Math.max(Number(x.people||0),Number(e.people||0))||null,
       people_basis:Number(e.people||0)>=Number(x.people||0)?(e.people_basis||x.people_basis):(x.people_basis||e.people_basis),
@@ -149,7 +158,7 @@ async function sourceICCH(){
     const prefix=html.slice(Math.max(0,(row.index||0)-14000),row.index||0);
     const marks=[...prefix.matchAll(/令和\s*(\d+)年\s*(\d{1,2})月のイベント/g)]; const mk=marks.at(-1); if(!mk)continue;
     const date=ymd(2018+Number(mk[1]),Number(mk[2]),day);
-    events.push(eventBase({name:cells[2],date,venue:'広島国際会議場 フェニックスホール',source:'広島国際会議場公式',url,
+    events.push(eventBase({name:cells[2],date,venue:'広島国際会議場',source:'広島国際会議場公式',url,
       text:cells.join(' '),start:(cells[5].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null,end:(cells[6].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null}));
   }
   if(!events.length){
@@ -162,7 +171,7 @@ async function sourceICCH(){
         const prefix=html.slice(Math.max(0,(row.index||0)-14000),row.index||0);
         const marks=[...prefix.matchAll(/令和\s*(\d+)年\s*(\d{1,2})月のイベント/g)]; const mk=marks.at(-1); if(!mk)continue;
         const date=ymd(2018+Number(mk[1]),Number(mk[2]),day);
-        events.push(eventBase({name:cells[2],date,venue:'広島国際会議場 フェニックスホール',source:'広島国際会議場公式',url,text:cells.join(' '),
+        events.push(eventBase({name:cells[2],date,venue:'広島国際会議場',source:'広島国際会議場公式',url,text:cells.join(' '),
           start:(cells[5].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null,end:(cells[6].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null}));
       }
     }catch{}
@@ -178,7 +187,7 @@ async function sourceCandy(){
     const re=/(20\d{2})\/(\d{2})\/(\d{2})[^0-9]{0,24}?([^0-9]{2,120}?)\s+([0-2]\d:[0-5]\d)\s*\/\s*([0-2]\d:[0-5]\d)/g;
     for(const m of body.matchAll(re)){
       const vi=venueInfo(m[4]); if(!vi.name)continue;
-      events.push(eventBase({name:artist,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'CANDY PROMOTION',url,text:m[0],kind:'music',start:m[6]}));
+      events.push(eventBase({name:artist,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'CANDY PROMOTION',url,text:m[0],kind:(/PARCO|劇|舞台|ミュージカル|落語|お笑い|新喜劇/.test(artist)?'theater':'music'),start:m[6]}));
     }
   }
   return events;
@@ -209,6 +218,15 @@ async function sourceLawson(){
   for(const m of text.matchAll(re)){const venue=norm(m[6]);if(!inHiroshimaCity(venue))continue;events.push(eventBase({name:m[2],date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0]}));}
   return events;
 }
+async function sourceWorkerEvents(){
+  const url='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima?collector='+Date.now();
+  const raw=await fetchText(url,25000); const d=JSON.parse(raw); if(d?.ok!==true||!Array.isArray(d.events))throw new Error('invalid worker event feed');
+  return d.events.map(e=>eventBase({
+    name:e.display_name||e.name||e.title,date:e.date,venue:e.venue,source:'会場・プレイガイド統合Worker',url:e.source_url||url,
+    text:[e.name,e.title,e.venue,e.event_type].filter(Boolean).join(' '),kind:e.event_type||null,start:e.start_time||null,end:e.end_time||e.end_time_estimate||null
+  })).filter(e=>e.name&&e.date&&e.venue);
+}
+
 async function sourcePia(){
   const url='https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島');
   const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
@@ -278,7 +296,7 @@ async function sourceSports(){
   for(let offset=0;offset<4;offset++){
     const dt=new Date(Date.UTC(year,month-1+offset,1)),y=dt.getUTCFullYear(),mo=dt.getUTCMonth()+1;
     const source='広島ドラゴンフライズ公式',url='https://hiroshimadragonflies.com/schedule/list/?month='+mo+'&year='+y;
-    let text=''; try{text=norm(await fetchText(url))}catch{continue}
+    let text=''; try{text=norm(await fetchTextBrowserFallback(url,22000))}catch{continue}
     const re=/HOME\s+(?:レギュラーシーズン|ポストシーズン|プレシーズン)?\s*(?:Image:\s*)?広島\s+広島\s+(\d{1,2})\/(\d{1,2})\s*\([^)]+\)\s*([0-2]?\d:[0-5]\d)\s+location_on\s*([^\s][\s\S]{1,70}?)\s+(?:Image:\s*)?([^\s][\s\S]{0,30}?)\s+(?:sports_basketball|試合情報|confirmation_number)/g;
     for(const m of text.matchAll(re)){
       const venue=norm(m[4]),op=norm(m[5]).replace(/^広島\s*/,'');
@@ -316,15 +334,35 @@ async function sourceSports(){
   return events;
 }
 const SOURCES=[
-  ['icch',sourceICCH],['candy',sourceCandy],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
+  ['icch',sourceICCH],['candy',sourceCandy],['worker_events',sourceWorkerEvents],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
   ['dive',sourceDive],['cvb',sourceCVB],['sports',sourceSports]
 ];
 async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
+  let previous=null;
+  try{previous=JSON.parse(await fs.readFile(OUT,'utf8'))}catch{previous=null}
   for(const [id,fn] of SOURCES){const started=Date.now();try{const rows=await fn();all.push(...rows);health[id]={ok:true,count:rows.length,ms:Date.now()-started};}catch(e){health[id]={ok:false,count:null,ms:Date.now()-started,error:String(e?.message||e).slice(0,240)};}}
+  const sourceLabelMap={
+    icch:['広島国際会議場公式'],candy:['CANDY PROMOTION'],worker_events:['会場・プレイガイド統合Worker'],
+    eplus:['イープラス'],lawson:['ローチケ'],pia:['チケットぴあ'],dive:['Dive! Hiroshima'],
+    cvb:['広島観光コンベンションビューロー'],
+    sports:['サンフレッチェ広島公式','広島ドラゴンフライズ公式','広島サンダーズ公式','NPB']
+  };
+  if(previous?.events){
+    for(const [id,h] of Object.entries(health)){
+      if(h.ok&&Number(h.count)>0) continue;
+      const labels=new Set(sourceLabelMap[id]||[]);
+      for(const old of previous.events){
+        if(String(old.date||'')<today) continue;
+        if((old.sources||[]).some(s=>labels.has(s)) || labels.has(old.source)){
+          all.push({...old,source:(old.source||[...(old.sources||[])][0]||id),stale_source:true,source_text:'retained after source failure/empty'});
+        }
+      }
+    }
+  }
   const merged=merge(all).filter(e=>e.date>=today&&e.date<=cutoff).sort((a,b)=>a.date.localeCompare(b.date)||(Number(b.people||0)-Number(a.people||0))||String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
   const payload={ok:true,generated_at:new Date().toISOString(),area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,
-    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗と0件を分離する'},
+    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗または疑わしい0件では直前の未来予定を保持する'},
     counts:{raw:all.length,merged:merged.length},events:merged.map(({source_text,...e})=>e)};
   await fs.mkdir('sales-nav-prototype/data',{recursive:true});await fs.writeFile(OUT,JSON.stringify(payload,null,2)+'\n');
   console.log(JSON.stringify({health,counts:payload.counts,first:payload.events.slice(0,12).map(x=>({date:x.date,name:x.name,venue:x.venue,people:x.people,source:x.source}))},null,2));
