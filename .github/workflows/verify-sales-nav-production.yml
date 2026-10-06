@@ -63,6 +63,25 @@ jobs:
               throw new Error('home header title overlaps duty state');
             }
 
+            await page.evaluate(()=>{ if(typeof show==='function') show('menu'); });
+            await page.waitForTimeout(250);
+            const menu=page.locator('#menu');
+            if(!await menu.isVisible()) throw new Error('menu screen not visible');
+            const menuItems=page.locator('#menu .menuitem');
+            const menuCount=await menuItems.count();
+            if(menuCount<8) throw new Error('menu items missing: '+menuCount);
+            const menuText=await menu.innerText();
+            for(const label of ['ホーム','本日の営業情報','売上・実績','営業分析','位置・警告検証','日報確認','月報・帳票出力','設定']){
+              if(!menuText.includes(label)) throw new Error('menu label not rendered: '+label);
+            }
+            const menuBox=await menu.boundingBox();
+            const firstMenuBox=await menuItems.first().boundingBox();
+            if(!menuBox||!firstMenuBox||firstMenuBox.width<100||firstMenuBox.height<40){
+              throw new Error('menu rendered area invalid: '+JSON.stringify({menuBox,firstMenuBox,menuCount}));
+            }
+            await page.screenshot({path:'/tmp/menu-production.png',fullPage:false});
+            console.log('MENU_RENDER_OK',JSON.stringify({menuCount,menuBox,firstMenuBox,menuText:menuText.slice(0,500)}));
+
             await page.evaluate(()=>{ if(typeof show==='function') show('reservationEdit'); });
             const reservationText=await page.locator('#reservationEdit').innerText();
             if(reservationText.includes('時間指定')) throw new Error('legacy reservation time-mode toggle still visible');
@@ -124,7 +143,9 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: production-render-snapshot
-          path: /tmp/prod-verify.json
+          path: |
+            /tmp/prod-verify.json
+            /tmp/menu-production.png
           if-no-files-found: ignore
           retention-days: 1
 
