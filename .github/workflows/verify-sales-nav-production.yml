@@ -109,8 +109,9 @@ jobs:
             await page.waitForTimeout(300);
             const preview=page.locator('#monthlyReportPreview');
             const previewText=await preview.innerText();
-            if(!previewText.includes('相互個人タクシー協同組合')||!previewText.includes('運転日報')||!previewText.includes('広島駅 新幹線口')){
-              throw new Error('demo operation data did not reach report preview');
+            console.log('MONTHLY_PREVIEW_TEXT',previewText.slice(0,2500));
+            for(const required of ['相互個人タクシー協同組合','運 転 日 報','乗車地','降車地','日 常 点 検','52340','広島 300 あ 13-94']){
+              if(!previewText.includes(required)) throw new Error('monthly preview missing '+required+': '+previewText.slice(0,1200));
             }
             if(!await preview.isVisible()) throw new Error('monthly preview did not become visible after demo');
             await page.locator('#monthlyReportPreviewButton').click();
