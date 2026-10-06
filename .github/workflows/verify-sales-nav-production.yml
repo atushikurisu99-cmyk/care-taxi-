@@ -76,8 +76,10 @@ jobs:
             }
             const menuBox=await menu.boundingBox();
             const firstMenuBox=await menuItems.first().boundingBox();
-            if(!menuBox||!firstMenuBox||firstMenuBox.width<100||firstMenuBox.height<40){
-              throw new Error('menu rendered area invalid: '+JSON.stringify({menuBox,firstMenuBox,menuCount}));
+            const viewport=page.viewportSize();
+            const menuParent=await menu.evaluate(el=>({parent:el.parentElement?.tagName||'',grand:el.parentElement?.parentElement?.className||''}));
+            if(!menuBox||!firstMenuBox||firstMenuBox.width<100||firstMenuBox.height<40||!viewport||menuBox.y<0||menuBox.y+Math.min(menuBox.height,firstMenuBox.height)>viewport.height||firstMenuBox.y<0||firstMenuBox.y+firstMenuBox.height>viewport.height||menuParent.parent!=='MAIN'){
+              throw new Error('menu not actually visible in app viewport: '+JSON.stringify({menuBox,firstMenuBox,menuCount,viewport,menuParent}));
             }
             await page.screenshot({path:'/tmp/menu-production.png',fullPage:false});
             console.log('MENU_RENDER_OK',JSON.stringify({menuCount,menuBox,firstMenuBox,menuText:menuText.slice(0,500)}));
