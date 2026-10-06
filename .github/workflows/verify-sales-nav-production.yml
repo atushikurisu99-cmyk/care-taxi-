@@ -106,8 +106,11 @@ jobs:
             await page.evaluate(()=>{ show('monthlyReport'); });
             if(!await page.locator('.report-template-fixed').getByText('相互個人タクシー協同組合').isVisible()) throw new Error('Sogo template name missing');
             await page.locator('#monthlyReport .monthly-report-actions button.demo').click();
-            await page.waitForTimeout(300);
+            await page.waitForTimeout(150);
             const preview=page.locator('#monthlyReportPreview');
+            if(await preview.isVisible()) throw new Error('demo button must not open preview automatically');
+            await page.locator('#monthlyReportPreviewButton').click();
+            await page.waitForTimeout(150);
             const previewText=await preview.innerText();
             console.log('MONTHLY_PREVIEW_TEXT',previewText.slice(0,2500));
             for(const required of ['相互個人タクシー協同組合','運 転 日 報','乗車地','降車地','日 常 点 検','52340','広島 300 あ 13-94']){
