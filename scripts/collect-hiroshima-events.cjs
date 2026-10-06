@@ -87,7 +87,7 @@ function venueInfo(s=''){
 function inHiroshimaCity(s=''){
   s=norm(s);
   if(/東広島市|廿日市市|呉市|福山市|三原市|尾道市|三次市|庄原市|江田島市|大竹市|安芸高田市/.test(s)) return false;
-  return /広島市|中区|南区|西区|東区|安芸区|安佐南区|安佐北区|佐伯区|広島国際会議場|フェニックスホール|グリーンアリーナ|ピースウイング|マツダスタジアム|サンプラザ|HBGホール|上野学園ホール|アステールプラザ|BLUE LIVE|クラブクアトロ|VANQUISH|セカンド.?クラッチ/.test(s);
+  return /広島市|中区|南区|西区|東区|安芸区|安佐南区|安佐北区|佐伯区|広島国際会議場|広島コンベンションホール|リーガロイヤルホテル広島|ヒルトン広島|ホテルグランヴィア広島|グランドプリンスホテル広島|広島大学霞キャンパス|広島大学東千田キャンパス|広仁会館|広島県医師会館|広島県民文化センター|フェニックスホール|グリーンアリーナ|ピースウイング|マツダスタジアム|サンプラザ|HBGホール|上野学園ホール|アステールプラザ|BLUE LIVE|クラブクアトロ|VANQUISH|セカンド.?クラッチ/.test(s);
 }
 function typeOf(s=''){
   s=norm(s);
@@ -416,7 +416,7 @@ async function sourceCVB(){
   const today=jstDate();
   const currentYear=Number(today.slice(0,4));
   for(const [yearKey,months] of Object.entries(data||{})){
-    const year=Number(yearKey);
+    const year=Number(String(yearKey).replace(/^y/i,''));
     if(!Number.isFinite(year)||year<currentYear||year>currentYear+1||!months||typeof months!=='object') continue;
 
     const seen=new Set();
