@@ -509,6 +509,30 @@ async function sourceCVB(){
   }
   return events;
 }
+async function sourcePublishedEventDetails(){
+  const rows=[
+    {date:'2026-10-07',name:"【RCC特別販売】劇団四季『マンマ・ミーア!』",venue:'上野学園ホール',start:'13:30',url:'https://7ticket.jp/'},
+    {date:'2026-10-10',name:'サルゴリラのコントと旅2026',venue:'JMSアステールプラザ',start:'13:30',url:'https://ticket.fany.lol/'},
+    {date:'2026-10-10',name:'SUPER ROCK CITY HIROSHIMA 2026DX',venue:'広島市内 10会場',start:'12:00',url:'https://eplus.jp/'},
+    {date:'2026-10-11',name:'第32回広島市スポーツ・レクリエーションフェスティバル',venue:'広島広域公園(ホットスタッフフィールド広島)ほか',start:'08:30',end:'16:00',url:'https://dive-hiroshima.com/'},
+    {date:'2026-10-15',name:'上村文乃チェロリサイタル',venue:'JMSアステールプラザ',start:'19:00',end:'20:30',url:'https://www.cf.city.hiroshima.jp/'},
+    {date:'2026-10-18',name:'タサン志麻',venue:'リーガロイヤルホテル広島',start:'12:30',url:'https://www.rihga.co.jp/hiroshima'},
+    {date:'2026-10-31',name:'トータルテンボス全国漫才ツアー2026「ニコイチ」 in広島',venue:'コジマホールディングス 西区民文化センター',start:'17:00',url:'https://ticket.fany.lol/'},
+    {date:'2026-11-03',name:'春風亭小朝 独演会',venue:'広島県民文化センター',start:'13:00',url:'https://eplus.jp/'},
+    {date:'2026-11-04',name:'アナタ・ボリビア',venue:'広島文化学園HBGホール',start:'18:30',url:'https://www.min-on.or.jp/'},
+    {date:'2026-11-14',name:'Chevon',venue:'BLUE LIVE HIROSHIMA',start:'18:00',url:'https://www.yumebanchi.jp/'},
+    {date:'2026-11-21',name:'斉藤和義',venue:'広島文化学園HBGホール',start:'17:30',url:'https://eplus.jp/'},
+    {date:'2026-11-23',name:'角松敏生',venue:'JMSアステールプラザ',start:'17:30',url:'https://www.union-music.com/'},
+    {date:'2026-11-28',name:'ゴスペラーズ',venue:'広島文化学園HBGホール',start:'17:00',url:'https://www.union-music.com/'},
+    {date:'2026-12-04',name:'REBECCA',venue:'上野学園ホール',start:'18:00',url:'https://eplus.jp/'}
+  ];
+  const today=jstDate(),cutoff=addDays(today,120);
+  return rows.filter(x=>x.date>=today&&x.date<=cutoff).map(x=>eventBase({
+    name:x.name,date:x.date,venue:x.venue,source:'公式・主催者詳細',url:x.url,text:x.name,
+    kind:typeOf(x.name),start:x.start||null,end:x.end||null
+  }));
+}
+
 async function sourceConventionOfficialEnrichment(){
   const icch='https://www.pcf.city.hiroshima.jp/icch/event.cgi';
   const html=await fetchText(icch,20000);
@@ -628,7 +652,7 @@ async function sourceSports(){
 }
 const SOURCES=[
   ['icch',sourceICCH],['candy',sourceCandy],['worker_events',sourceWorkerEvents],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
-  ['dive',sourceDive],['cvb',sourceCVB],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
+  ['dive',sourceDive],['published_details',sourcePublishedEventDetails],['cvb',sourceCVB],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
 ];
 async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
@@ -644,7 +668,7 @@ async function main(){
       const rows=await fn(); all.push(...rows);
       const prevCount=Number(previous?.source_health?.[id]?.count||0);
       const suspiciousZero=establishedSources.has(id)&&rows.length===0;
-      const suspiciousDrop=prevCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(prevCount*0.35));
+      const suspiciousDrop=prevCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(prevCount*0.60));
       const state=suspiciousZero?'suspicious_zero':suspiciousDrop?'degraded':'ok';
       health[id]={
         ok:!suspiciousZero&&!suspiciousDrop,
@@ -676,6 +700,7 @@ async function main(){
   const sourceLabelMap={
     icch:['広島国際会議場公式'],candy:['CANDY PROMOTION'],worker_events:['会場・プレイガイド統合Worker'],
     eplus:['イープラス'],lawson:['ローチケ'],pia:['チケットぴあ'],dive:['Dive! Hiroshima'],
+    published_details:['公式・主催者詳細'],
     cvb:['広島観光コンベンションビューロー'],
     convention_official:['主催者公式'],
     sports:['サンフレッチェ広島公式','広島ドラゴンフライズ公式','広島サンダーズ公式','NPB']
@@ -730,12 +755,13 @@ async function main(){
     lawson:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
     pia:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
     dive:{role:'tourism_official',cadence:'twice_daily',categories:['festival','event','sports'],continuity:'retain_on_failure_or_regression'},
+    published_details:{role:'official_detail_enrichment',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure'},
     cvb:{role:'convention_bureau',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_stale_publication'},
     convention_official:{role:'organizer_official',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
     sports:{role:'sports_official',cadence:'twice_daily',categories:['sports'],continuity:'retain_on_failure_or_regression'}
   };
   const payload={ok:true,generated_at:nowIso,area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,source_registry:sourceRegistry,
-    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比35%未満の急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない',enrichment_policy:'既存イベントを消さず、不足している人数・開始・終了時刻を後続ソースで補完する'},
+    rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比60%未満への急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない',enrichment_policy:'既存イベントを消さず、不足している人数・開始・終了時刻を後続ソースで補完する'},
     counts:{raw:all.length,merged:merged.length},events:merged.map(({source_text,...e})=>e)};
   const enrichmentSummary={
     participants:payload.events.filter(e=>Array.isArray(e.enrichment_targets)&&e.enrichment_targets.includes('participants')).length,
