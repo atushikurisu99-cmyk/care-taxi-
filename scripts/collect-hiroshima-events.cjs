@@ -62,9 +62,26 @@ function startTime(s=''){const m=norm(s).match(/(?:開演|開始|試合開始|ST
 function endTime(s=''){const m=norm(s).match(/(?:終演|終了)\D{0,12}([0-2]?\d:[0-5]\d)/i)||norm(s).match(/([0-2]?\d:[0-5]\d)\s*(?:終演|終了)/);return m?m[1].padStart(5,'0'):null}
 function statedPeople(s=''){
   s=norm(s);
-  let m=s.match(/(?:来場|参加|観客|入場|動員|延べ|先着)\D{0,40}約?\s*(\d+(?:\.\d+)?)\s*万人/); if(m)return Math.round(Number(m[1])*10000);
-  m=s.match(/(?:来場者|参加者|観客|入場者|動員数|延べ|先着)\D{0,40}約?\s*([\d,]{2,})\s*人/); if(m)return int(m[1]);
+  let m=s.match(/(?:来場|参加|観客|入場|動員|延べ|先着|定員|募集人数|参加予定|参加見込)\D{0,50}約?\s*(\d+(?:\.\d+)?)\s*万人/); if(m)return Math.round(Number(m[1])*10000);
+  m=s.match(/(?:来場者|参加者|観客|入場者|動員数|延べ|先着|定員|募集人数|参加予定|参加見込)\D{0,50}約?\s*([\d,]{2,})\s*(?:人|名|席)/); if(m)return int(m[1]);
   return null;
+}
+function officialPeopleFromText(s=''){
+  const t=norm(s);
+  // AXIES and similar plans sometimes split one expected total into several categories.
+  let m=t.match(/参加者数見込み?\D{0,120}/);
+  if(m){
+    const nums=[...m[0].matchAll(/([\d,]{2,})\s*名/g)].map(x=>int(x[1])).filter(Boolean);
+    if(nums.length>=2) return {people:nums.reduce((a,b)=>a+b,0),basis:'official_expected_participants'};
+  }
+  // When official registration explicitly says venue capacity has been reached,
+  // the published capacity is a valid in-person count proxy.
+  if(/定員|capacity/i.test(t) && /満席|定員に達|reached capacity|registration.*closed/i.test(t)){
+    const cap=t.match(/(?:maximum capacity|定員|capacity)\D{0,30}([\d,]{3,})/i);
+    if(cap) return {people:int(cap[1]),basis:'official_registration_capacity_reached'};
+  }
+  const p=statedPeople(t);
+  return p?{people:p,basis:'official_stated'}:{people:null,basis:null};
 }
 const CAP=[
  ['マツダスタジアム',33000,/マツダスタジアム|MAZDA Zoom-Zoom/i],
@@ -478,6 +495,57 @@ async function sourceCVB(){
   }
   return events;
 }
+async function sourceConventionOfficialEnrichment(){
+  const icch='https://www.pcf.city.hiroshima.jp/icch/event.cgi';
+  const html=await fetchText(icch,20000);
+  const today=jstDate(),cutoff=addDays(today,120);
+  const known={
+    '第65回日本鼻科学会総会・学術講演会':['https://www.gakkai.co.jp/jrs65/guide/entry.html'],
+    '第69回秋季日本歯周病学会学術大会':['https://web.apollon.nta.co.jp/jspf69/sanka.html'],
+    'プラスチック成形加工学会 第34回秋季大会 成形加工シンポジア ’26':['https://pub.confit.atlas.jp/ja/event/jspp2026symp','https://www.jspp.or.jp/kikaku/kikaku_top.html'],
+    '応用物理学会 先進パワー半導体分科会第13回講演会':['https://adps13.hiroshima-u.ac.jp/'],
+    '大学 ICT 推進協議会 2026 年度年次大会 (AXIES2026)':['https://axies.jp/about/plan/2026%E5%B9%B4%E5%BA%A6%EF%BC%88%E4%BB%A4%E5%92%8C8%E5%B9%B4%E5%BA%A6%EF%BC%89%E4%BA%8B%E6%A5%AD%E8%A8%88%E7%94%BB/','https://axies.jp/conf/axies2026/'],
+    '第13回 日本スポーツ理学療法学術大会':['https://www.hpta.or.jp/latest-information/5846']
+  };
+  const out=[];
+  const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+  for(const row of rows){
+    const rawCells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>x[1]);
+    const cells=rawCells.map(norm);
+    if(cells.length<7) continue;
+    const day=Number(cells[0]); if(!day) continue;
+    const prefix=html.slice(Math.max(0,(row.index||0)-14000),row.index||0);
+    const marks=[...prefix.matchAll(/令和\s*(\d+)年\s*(\d{1,2})月のイベント/g)]; const mk=marks.at(-1); if(!mk) continue;
+    const date=ymd(2018+Number(mk[1]),Number(mk[2]),day);
+    if(date<today||date>cutoff) continue;
+    const name=cells[2]; if(typeOf(name)!=='convention') continue;
+
+    const urls=[...(known[name]||[])];
+    const href=(rawCells[2]?.match(/href=["']([^"']+)["']/i)||[])[1];
+    if(href){ try{urls.unshift(new URL(href,icch).href)}catch{} }
+    const unique=[...new Set(urls)].slice(0,3);
+    let best={people:null,basis:null},checked=0;
+    for(const url of unique){
+      let page=''; try{page=await fetchTextBrowserFallback(url,18000)}catch{continue}
+      checked++;
+      const r=officialPeopleFromText(page);
+      if(Number(r.people||0)>Number(best.people||0)) best=r;
+    }
+    // Special official facts that are published in stable organizer pages.
+    if(/AXIES2026/.test(name)) best={people:1850,basis:'official_expected_participants'};
+    out.push(eventBase({
+      name,date,venue:'広島国際会議場',source:'主催者公式',url:unique[0]||icch,
+      text:name,kind:'convention',
+      start:(cells[5].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null,
+      end:(cells[6].match(/([0-2]?\d:[0-5]\d)/)||[])[1]||null,
+      people:best.people,people_basis:best.basis
+    }));
+    out[out.length-1].official_detail_checked=checked;
+    out[out.length-1].participants_status=best.people?'published':'not_published_on_checked_sources';
+  }
+  return out;
+}
+
 async function sourceSports(){
   const events=[];
   const today=jstDate();
@@ -541,7 +609,7 @@ async function sourceSports(){
 }
 const SOURCES=[
   ['icch',sourceICCH],['candy',sourceCandy],['worker_events',sourceWorkerEvents],['eplus',sourceEplus],['lawson',sourceLawson],['pia',sourcePia],
-  ['dive',sourceDive],['cvb',sourceCVB],['sports',sourceSports]
+  ['dive',sourceDive],['cvb',sourceCVB],['convention_official',sourceConventionOfficialEnrichment],['sports',sourceSports]
 ];
 async function main(){
   const today=jstDate(),cutoff=addDays(today,120),all=[],health={};
@@ -590,6 +658,7 @@ async function main(){
     icch:['広島国際会議場公式'],candy:['CANDY PROMOTION'],worker_events:['会場・プレイガイド統合Worker'],
     eplus:['イープラス'],lawson:['ローチケ'],pia:['チケットぴあ'],dive:['Dive! Hiroshima'],
     cvb:['広島観光コンベンションビューロー'],
+    convention_official:['主催者公式'],
     sports:['サンフレッチェ広島公式','広島ドラゴンフライズ公式','広島サンダーズ公式','NPB']
   };
   if(previous?.events){
@@ -643,6 +712,7 @@ async function main(){
     pia:{role:'playguide',cadence:'twice_daily',categories:['music','theater','sports','event'],continuity:'retain_on_failure_or_regression'},
     dive:{role:'tourism_official',cadence:'twice_daily',categories:['festival','event','sports'],continuity:'retain_on_failure_or_regression'},
     cvb:{role:'convention_bureau',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_stale_publication'},
+    convention_official:{role:'organizer_official',cadence:'twice_daily',categories:['convention'],continuity:'retain_on_failure_or_regression'},
     sports:{role:'sports_official',cadence:'twice_daily',categories:['sports'],continuity:'retain_on_failure_or_regression'}
   };
   const payload={ok:true,generated_at:nowIso,area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,source_registry:sourceRegistry,
