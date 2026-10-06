@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T09:56:38.224Z",
+  "generated_at": "2026-10-06T10:26:44.156Z",
   "area": "広島市",
   "source_health": {
     "icch": {
@@ -9,8 +9,8 @@
       "count": 29,
       "previous_count": 29,
       "reference_count": 29,
-      "ms": 1042,
-      "last_success_at": "2026-10-06T09:53:14.784Z"
+      "ms": 970,
+      "last_success_at": "2026-10-06T10:21:41.937Z"
     },
     "candy": {
       "ok": true,
@@ -18,26 +18,26 @@
       "count": 38,
       "previous_count": 38,
       "reference_count": 38,
-      "ms": 1274,
-      "last_success_at": "2026-10-06T09:53:16.058Z"
+      "ms": 1313,
+      "last_success_at": "2026-10-06T10:21:43.250Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
-      "count": 20,
+      "count": 21,
       "previous_count": 20,
-      "reference_count": 20,
-      "ms": 7851,
-      "last_success_at": "2026-10-06T09:53:23.909Z"
+      "reference_count": 21,
+      "ms": 4317,
+      "last_success_at": "2026-10-06T10:21:47.567Z"
     },
     "eplus": {
       "ok": true,
       "state": "ok",
-      "count": 101,
-      "previous_count": 79,
-      "reference_count": 101,
-      "ms": 69991,
-      "last_success_at": "2026-10-06T09:54:33.900Z"
+      "count": 131,
+      "previous_count": 101,
+      "reference_count": 131,
+      "ms": 183845,
+      "last_success_at": "2026-10-06T10:24:51.412Z"
     },
     "lawson": {
       "ok": true,
@@ -45,8 +45,8 @@
       "count": 39,
       "previous_count": 39,
       "reference_count": 39,
-      "ms": 1655,
-      "last_success_at": "2026-10-06T09:54:35.555Z"
+      "ms": 1324,
+      "last_success_at": "2026-10-06T10:24:52.736Z"
     },
     "pia": {
       "ok": true,
@@ -54,8 +54,8 @@
       "count": 16,
       "previous_count": 16,
       "reference_count": 16,
-      "ms": 62887,
-      "last_success_at": "2026-10-06T09:55:38.442Z"
+      "ms": 50080,
+      "last_success_at": "2026-10-06T10:25:42.816Z"
     },
     "dive": {
       "ok": true,
@@ -63,8 +63,8 @@
       "count": 3,
       "previous_count": 3,
       "reference_count": 3,
-      "ms": 8134,
-      "last_success_at": "2026-10-06T09:55:46.576Z"
+      "ms": 6000,
+      "last_success_at": "2026-10-06T10:25:48.816Z"
     },
     "city_events": {
       "ok": true,
@@ -72,8 +72,8 @@
       "count": 3,
       "previous_count": 3,
       "reference_count": 3,
-      "ms": 4632,
-      "last_success_at": "2026-10-06T09:55:51.208Z"
+      "ms": 4000,
+      "last_success_at": "2026-10-06T10:25:52.816Z"
     },
     "published_details": {
       "ok": true,
@@ -82,7 +82,7 @@
       "previous_count": 14,
       "reference_count": 14,
       "ms": 1,
-      "last_success_at": "2026-10-06T09:55:51.209Z"
+      "last_success_at": "2026-10-06T10:25:52.817Z"
     },
     "cvb": {
       "ok": false,
@@ -90,7 +90,7 @@
       "count": null,
       "previous_count": null,
       "reference_count": null,
-      "ms": 1156,
+      "ms": 1123,
       "last_success_at": null,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
       "retained_future_count": 0
@@ -101,8 +101,8 @@
       "count": 0,
       "previous_count": null,
       "reference_count": 0,
-      "ms": 7043,
-      "last_success_at": "2026-10-06T09:55:59.408Z",
+      "ms": 7551,
+      "last_success_at": "2026-10-06T10:26:01.491Z",
       "retained_future_count": 0
     },
     "convention_official": {
@@ -111,8 +111,17 @@
       "count": 16,
       "previous_count": 16,
       "reference_count": 16,
-      "ms": 17028,
-      "last_success_at": "2026-10-06T09:56:16.436Z"
+      "ms": 16362,
+      "last_success_at": "2026-10-06T10:26:17.853Z"
+    },
+    "national_convention": {
+      "ok": true,
+      "state": "ok",
+      "count": 4,
+      "previous_count": null,
+      "reference_count": 4,
+      "ms": 5560,
+      "last_success_at": "2026-10-06T10:26:23.413Z"
     },
     "sports": {
       "ok": true,
@@ -120,8 +129,8 @@
       "count": 36,
       "previous_count": 36,
       "reference_count": 36,
-      "ms": 21779,
-      "last_success_at": "2026-10-06T09:56:38.215Z"
+      "ms": 20729,
+      "last_success_at": "2026-10-06T10:26:44.142Z"
     }
   },
   "source_registry": {
@@ -236,6 +245,14 @@
     },
     "convention_official": {
       "role": "organizer_official",
+      "cadence": "twice_daily",
+      "categories": [
+        "convention"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "national_convention": {
+      "role": "national_society_official",
       "cadence": "twice_daily",
       "categories": [
         "convention"
