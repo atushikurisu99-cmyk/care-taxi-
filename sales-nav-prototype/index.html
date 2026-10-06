@@ -3111,6 +3111,32 @@ function calendarEntriesForDate(key){
   });
  }
 
+ // 人流イベントは「おすすめ」ではなく、ドライバーが営業判断する事実として表示。
+ // ライブとスポーツは既存フィードで出すため、ここでは重複しない種別だけ追加する。
+ const demandRows=Array.isArray(demandSnapshotData?.events)?demandSnapshotData.events:[];
+ for(const e of demandRows){
+  if(String(e?.date||'')!==key) continue;
+  const kind=String(e?.event_type||'event');
+  if(!['convention','festival','event'].includes(kind)) continue;
+  const title=String(e?.name||'イベント').trim();
+  if(!title) continue;
+
+  const details=[
+   e?.venue||'',
+   e?.people_label||'',
+   e?.end_time?('終了 '+String(e.end_time).slice(0,5)):''
+  ].filter(Boolean).join(' / ');
+
+  out.push({
+   type:kind,
+   text:title,
+   title,
+   time:e?.start_time||'',
+   meta:details,
+   raw:e
+  });
+ }
+
  const today=localDateValue(new Date());
  const sports=Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[];
  for(const sp of sports){
@@ -3135,7 +3161,7 @@ function calendarDetailDateLabel(key){
  return (d.getMonth()+1)+'月'+d.getDate()+'日（'+wd+'）';
 }
 function calendarKindLabel(type){
- return ({res:'予約',live:'ライブ',baseball:'野球',soccer:'サッカー',court:'スポーツ',sports:'スポーツ'})[type]||'予定';
+ return ({res:'予約',live:'ライブ',baseball:'野球',soccer:'サッカー',court:'スポーツ',sports:'スポーツ',convention:'コンベンション',festival:'祭り・イベント',event:'イベント'})[type]||'予定';
 }
 function openCalendarDayDetail(key){
  const layer=document.getElementById('calendarDetailLayer');
