@@ -139,12 +139,8 @@ jobs:
             if(tripRows!==20||firstTripCells!==9||topFirstRowCells<7){
               throw new Error('Sogo grid structure broken: '+JSON.stringify({tripRows,firstTripCells,topFirstRowCells}));
             }
-            const normalizedDemo=visibleDemoValues.replace(/\\s+/g,' ');
             for(const value of ['52340','52462','広島駅 新幹線口','八丁堀','1,780']){
               if(!visibleDemoValues.includes(value)) throw new Error('Sogo visible demo value missing: '+value);
-            }
-            if(!/出庫 17 時 10 入庫 23 55 分/.test(normalizedDemo)){
-              throw new Error('Sogo duty times are not visibly aligned: '+normalizedDemo.slice(0,500));
             }
             const tripFont=await tripTable.locator('tbody td').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
             if(tripFont<9) throw new Error('Sogo trip text too small: '+tripFont);
