@@ -50,6 +50,19 @@ jobs:
 
             // Core UI contract: reservation time mode removed, notification types are selectable,
             // and the Hiroshima Sogo template can be populated through demo operation data.
+            await page.evaluate(()=>{ if(typeof show==='function') show('home'); });
+            const badgeBox=await page.locator('#badge').boundingBox();
+            const badgeText=await page.locator('#badge').innerText();
+            const badgeLineHeight=await page.locator('#badge').evaluate(el=>parseFloat(getComputedStyle(el).lineHeight));
+            if(!badgeBox||!badgeText.includes('未乗務')||badgeBox.height>badgeLineHeight*2.1){
+              throw new Error('home duty badge is wrapping or missing: '+JSON.stringify({badgeText,badgeBox,badgeLineHeight}));
+            }
+            const titleBox=await page.locator('#title').boundingBox();
+            const stateBox=await page.locator('#homeHeaderState').boundingBox();
+            if(titleBox&&stateBox&&titleBox.x+titleBox.width>stateBox.x){
+              throw new Error('home header title overlaps duty state');
+            }
+
             await page.evaluate(()=>{ if(typeof show==='function') show('reservationEdit'); });
             const reservationText=await page.locator('#reservationEdit').innerText();
             if(reservationText.includes('時間指定')) throw new Error('legacy reservation time-mode toggle still visible');
