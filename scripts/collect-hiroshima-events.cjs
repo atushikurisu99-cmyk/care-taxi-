@@ -2,6 +2,7 @@ const fs = require('node:fs/promises');
 
 const TZ='Asia/Tokyo';
 const OUT='sales-nav-prototype/data/hiroshima-demand-events.json';
+const STATUS_OUT='sales-nav-prototype/data/hiroshima-demand-source-status.json';
 const DEBUG_DIR='tmp/event-source-debug';
 async function saveDebug(name,content){
   try{await fs.mkdir(DEBUG_DIR,{recursive:true});await fs.writeFile(DEBUG_DIR+'/'+name,String(content||'').slice(0,300000));}catch{}
@@ -647,8 +648,25 @@ async function main(){
   const payload={ok:true,generated_at:nowIso,area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,source_registry:sourceRegistry,
     rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗・疑わしい0件・前回比35%未満の急減では直前の未来予定を保持する',source_continuity:'各取得元を独立監視し、正常な取得元まで巻き戻さない',enrichment_policy:'既存イベントを消さず、不足している人数・開始・終了時刻を後続ソースで補完する'},
     counts:{raw:all.length,merged:merged.length},events:merged.map(({source_text,...e})=>e)};
-  await fs.mkdir('sales-nav-prototype/data',{recursive:true});await fs.writeFile(OUT,JSON.stringify(payload,null,2)+'\n');
-  console.log(JSON.stringify({health,counts:payload.counts,first:payload.events.slice(0,12).map(x=>({date:x.date,name:x.name,venue:x.venue,people:x.people,source:x.source}))},null,2));
+  const enrichmentSummary={
+    participants:payload.events.filter(e=>Array.isArray(e.enrichment_targets)&&e.enrichment_targets.includes('participants')).length,
+    start_time:payload.events.filter(e=>Array.isArray(e.enrichment_targets)&&e.enrichment_targets.includes('start_time')).length,
+    end_time:payload.events.filter(e=>Array.isArray(e.enrichment_targets)&&e.enrichment_targets.includes('end_time')).length
+  };
+  const sourceStatus={
+    ok:true,
+    generated_at:nowIso,
+    area:'広島市',
+    source_health:health,
+    source_registry:sourceRegistry,
+    enrichment_pending:enrichmentSummary,
+    degraded_sources:Object.entries(health).filter(([,v])=>v?.state&&v.state!=='ok').map(([id,v])=>({id,state:v.state,error:v.error||null,retained_future_count:v.retained_future_count||0})),
+    operational_note:'取得元ごとに独立監視。失敗・急減・公開停止時も他の正常データを継続し、直前の未来予定を保持する。'
+  };
+  await fs.mkdir('sales-nav-prototype/data',{recursive:true});
+  await fs.writeFile(OUT,JSON.stringify(payload,null,2)+'\n');
+  await fs.writeFile(STATUS_OUT,JSON.stringify(sourceStatus,null,2)+'\n');
+  console.log(JSON.stringify({health,counts:payload.counts,enrichment:enrichmentSummary,first:payload.events.slice(0,12).map(x=>({date:x.date,name:x.name,venue:x.venue,people:x.people,source:x.source}))},null,2));
   if(Object.values(health).every(x=>!x.ok)) process.exitCode=2;
   await closeBrowser();
 }
