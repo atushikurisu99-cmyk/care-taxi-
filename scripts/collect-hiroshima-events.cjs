@@ -2,6 +2,10 @@ const fs = require('node:fs/promises');
 
 const TZ='Asia/Tokyo';
 const OUT='sales-nav-prototype/data/hiroshima-demand-events.json';
+const DEBUG_DIR='tmp/event-source-debug';
+async function saveDebug(name,content){
+  try{await fs.mkdir(DEBUG_DIR,{recursive:true});await fs.writeFile(DEBUG_DIR+'/'+name,String(content||'').slice(0,300000));}catch{}
+}
 const USER_AGENT='Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 Chrome/140 Safari/537.36 taxi-sales-nav-collector/1.0';
 let browser=null;
 async function browserHtml(url){
@@ -206,6 +210,7 @@ async function sourceEplus(){
   ]; const events=[];
   for(const [kind,url] of urls){
     const html=await fetchTextBrowserFallback(url,22000);const text=norm(html);
+    if(events.length===0) await saveDebug('eplus-'+kind+'.txt',text);
     const dates=[...text.matchAll(/(20\d{2})\/(\d{1,2})\/(\d{1,2})\([^)]+\)/g)];
     for(let i=0;i<dates.length;i++){
       const m=dates[i],st=m.index||0,en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900),seg=text.slice(st,en);
@@ -218,6 +223,8 @@ async function sourceEplus(){
 }
 async function sourceLawson(){
   const url='https://l-tike.com/search/?pref=34&size=100'; const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
+  await saveDebug('pia.txt',text);
+  await saveDebug('lawson.txt',text);
   const re=/(コンサート|演劇・ステージ・舞台|クラシック・オペラ|スポーツ|イベント)\s+(.{2,150}?)\s+公演日[:：]\s*(20\d{2})\/(\d{1,2})\/(\d{1,2})[\s\S]{0,220}?会場[:：]\s*([^（(]{2,100})(?:（広島県\)|\(広島県\))/g;
   for(const m of text.matchAll(re)){const venue=norm(m[6]);if(!inHiroshimaCity(venue))continue;events.push(eventBase({name:m[2],date:ymd(m[3],m[4],m[5]),venue,source:'ローチケ',url,text:m[0]}));}
   return events;
@@ -261,7 +268,8 @@ async function sourceDive(){
   } return events;
 }
 async function sourceCVB(){
-  const url='https://www.hiroshimacvb.jp/calendar/'; let html=await fetchText(url); let events=[]; const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
+  const url='https://www.hiroshimacvb.jp/calendar/'; let html=await fetchText(url); let events=[];
+  await saveDebug('cvb-static.txt',norm(html)); const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
   for(const row of rows){const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));if(cells.length<4)continue;
     const [name,venue,period,domesticRaw,overseasRaw]=cells;const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue))continue;
     const domestic=int(domesticRaw)||0,overseas=int(overseasRaw)||0,people=domestic+overseas;if(people<100)continue;
