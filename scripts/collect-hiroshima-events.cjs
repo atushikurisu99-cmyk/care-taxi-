@@ -105,7 +105,9 @@ function merge(events){
     const i=out.findIndex(x=>{
       if(String(x.date)!==String(e.date))return false;
       const xv=nkey(x.venue);
-      if(xv!==ev)return false;
+      const icchAlias=(xv===nkey('広島国際会議場')&&ev===nkey('広島国際会議場 フェニックスホール'))||
+                      (ev===nkey('広島国際会議場')&&xv===nkey('広島国際会議場 フェニックスホール'));
+      if(xv!==ev&&!icchAlias)return false;
       const xn=nkey(x.name);
       if(xn===en || (xn.length>=3&&en.length>=3&&(xn.includes(en)||en.includes(xn)))) return true;
       return !!(x.start_time&&e.start_time&&x.start_time===e.start_time&&x.event_type===e.event_type);
@@ -113,8 +115,9 @@ function merge(events){
     if(i<0){out.push({...e,sources:[e.source],source_urls:[e.source_url].filter(Boolean),verification_count:1});continue}
     const x=out[i]; const ss=[...new Set([...(x.sources||[]),e.source].filter(Boolean))];
     const preferName=String(e.name||'').length>String(x.name||'').length?e.name:x.name;
+    const preferVenue=/フェニックスホール/.test(String(e.venue||''))?e.venue:(/フェニックスホール/.test(String(x.venue||''))?x.venue:(e.venue||x.venue));
     const inferred=typeOf(preferName);
-    out[i]={...x,...e,name:preferName,event_type:inferred!=='event'?inferred:(e.event_type||x.event_type||'event'),
+    out[i]={...x,...e,name:preferName,venue:preferVenue,event_type:inferred!=='event'?inferred:(e.event_type||x.event_type||'event'),
       start_time:e.start_time||x.start_time||null,end_time:e.end_time||x.end_time||null,
       people:Math.max(Number(x.people||0),Number(e.people||0))||null,
       people_basis:Number(e.people||0)>=Number(x.people||0)?(e.people_basis||x.people_basis):(x.people_basis||e.people_basis),
@@ -224,7 +227,8 @@ async function sourceEplus(){
       const st=(m.index||0)+m[0].length;
       const en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900);
       let seg=text.slice(st,en).replace(/^\s*(?:先着|抽選|一般発売|受付中)\s*/,'').trim();
-      const prefPos=seg.indexOf('(広島県)');
+      const prefCandidates=[seg.indexOf('(広島県)'),seg.indexOf('（広島県）')].filter(x=>x>=0);
+      const prefPos=prefCandidates.length?Math.min(...prefCandidates):-1;
       if(prefPos<0) continue;
       const lead=seg.slice(0,prefPos);
 
