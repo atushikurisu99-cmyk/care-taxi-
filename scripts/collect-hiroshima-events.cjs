@@ -82,7 +82,7 @@ function inHiroshimaCity(s=''){
 }
 function typeOf(s=''){
   s=norm(s);
-  if(/学会|会議|シンポジ|カンファレンス|フォーラム|研究会|講演会/.test(s)) return 'convention';
+  if(/学会|学術大会|年次大会|会議|シンポジ|カンファレンス|フォーラム|研究会|講演会/.test(s)) return 'convention';
   if(/野球|サッカー|バスケ|バレー|試合|プロレス|格闘技|スポーツ|マラソン/.test(s)) return 'sports';
   if(/祭|フェス|花火|パレード|フード/.test(s)) return 'festival';
   if(/演劇|舞台|ミュージカル|落語|独演会|お笑い|新喜劇|PARCO PRODUCE/.test(s)) return 'theater';
@@ -103,7 +103,8 @@ function merge(events){
       const xv=nkey(x.venue);
       if(xv!==ev)return false;
       const xn=nkey(x.name);
-      return xn===en || (xn.length>=3&&en.length>=3&&(xn.includes(en)||en.includes(xn)));
+      if(xn===en || (xn.length>=3&&en.length>=3&&(xn.includes(en)||en.includes(xn)))) return true;
+      return !!(x.start_time&&e.start_time&&x.start_time===e.start_time&&x.event_type===e.event_type);
     });
     if(i<0){out.push({...e,sources:[e.source],source_urls:[e.source_url].filter(Boolean),verification_count:1});continue}
     const x=out[i]; const ss=[...new Set([...(x.sources||[]),e.source].filter(Boolean))];
@@ -367,6 +368,11 @@ async function main(){
     }
   }
   const merged=merge(all).filter(e=>e.date>=today&&e.date<=cutoff).sort((a,b)=>a.date.localeCompare(b.date)||(Number(b.people||0)-Number(a.people||0))||String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
+  for(const e of merged){
+    const official=(e.sources||[]).some(s=>/公式|NPB|Dive! Hiroshima|広島観光コンベンションビューロー/.test(String(s)));
+    e.confidence=(Number(e.verification_count||0)>=2?'verified':official?'official':'single_source');
+    e.people_label=e.people==null?null:(e.people_basis==='venue_capacity_reference'?('最大約'+Number(e.people).toLocaleString('ja-JP')+'人規模'):(Number(e.people).toLocaleString('ja-JP')+'人'));
+  }
   const payload={ok:true,generated_at:new Date().toISOString(),area:'広島市',coverage:{from:today,to:cutoff},purpose:'taxi_driver_demand_facts',source_health:health,
     rules:{convention_min_people:100,display_principle:'需要を断定せず、日付・時刻・会場・人数規模・何の集まりかを判断材料として保持する',failure_policy:'取得失敗または疑わしい0件では直前の未来予定を保持する'},
     counts:{raw:all.length,merged:merged.length},events:merged.map(({source_text,...e})=>e)};
