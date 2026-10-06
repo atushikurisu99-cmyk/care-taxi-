@@ -2925,7 +2925,10 @@ const BASE_LIVE_VENUES=[
 function availableLiveVenues(source=eventRealtimeData){
  const dynamic=[
   ...(Array.isArray(source?.venues_covered)?source.venues_covered:[]),
-  ...(Array.isArray(source?.events)?source.events.map(e=>e?.venue):[])
+  ...(Array.isArray(source?.events)?source.events.map(e=>e?.venue):[]),
+  ...(Array.isArray(demandSnapshotData?.events)?demandSnapshotData.events
+    .filter(e=>['music','theater'].includes(String(e?.event_type||'')))
+    .map(e=>e?.venue):[])
  ].filter(Boolean);
  return [...new Set([...BASE_LIVE_VENUES,...dynamic])];
 }
@@ -3848,8 +3851,10 @@ async function loadJrProbeSnapshot(force=false){
 }
 let eventRealtimeData=null;
 let sportsRealtimeData=null;
+let demandSnapshotData=null;
 let eventSportsFetchedAt=0;
 const LIVE_EVENTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima';
+const DEMAND_EVENTS_URL='./data/hiroshima-demand-events.json';
 const SPORTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/sports/hiroshima';
 const EVENT_FEED_CACHE_KEY='taxi_event_feed_cache_v2';
 const SPORTS_FEED_CACHE_KEY='taxi_sports_feed_cache_v2';
@@ -4025,7 +4030,19 @@ async function loadEventSportsRealtime(force=false){
    return await r.json();
   }finally{clearTimeout(timer)}
  };
- const [events,sports]=await Promise.allSettled([fetchOne(LIVE_EVENTS_URL),fetchOne(SPORTS_URL)]);
+ const fetchSnapshot=async()=>{
+  const r=await fetch(DEMAND_EVENTS_URL+'?ts='+now,{cache:'no-store',headers:{'Accept':'application/json'}});
+  if(!r.ok) throw new Error('snapshot http '+r.status);
+  return await r.json();
+ };
+ const [events,sports,demand]=await Promise.allSettled([fetchOne(LIVE_EVENTS_URL),fetchOne(SPORTS_URL),fetchSnapshot()]);
+
+ if(demand.status==='fulfilled'&&demand.value?.ok&&Array.isArray(demand.value.events)){
+  demandSnapshotData=demand.value;
+  logAnalyticsEvent('feed_loaded',{feed:'demand-events',source:'snapshot',generatedAt:demand.value.generated_at,count:demand.value.events.length});
+ }else{
+  logAnalyticsEvent('feed_error',{feed:'demand-events',message:String(demand.reason||'invalid demand snapshot')});
+ }
 
  if(events.status==='fulfilled'&&events.value?.ok&&Array.isArray(events.value.events)){
   const incoming=events.value;
