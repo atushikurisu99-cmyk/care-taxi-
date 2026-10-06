@@ -197,12 +197,12 @@ async function fetchTextBrowserFallback(url,timeout=20000){
     return html;
   }
 }
-function eventBase({name,date,venue,source,url,text,kind,start,end,people,people_basis,end_date,address}){
+function eventBase({name,date,venue,source,url,text,kind,start,end,people,people_basis,end_date,address,disable_people_fallback=false}){
   const vi=venueInfo(venue||text||'');
   return {date,end_date:end_date||date,name:norm(name),venue:vi.name||norm(venue),address:address||null,
     start_time:start||startTime(text),end_time:end||endTime(text),event_type:kind||typeOf(name),
-    people:people||statedPeople(text)||vi.capacity||null,
-    people_basis:people_basis||(statedPeople(text)?'official_stated':vi.capacity?'venue_capacity_reference':null),
+    people:(people!=null?people:(disable_people_fallback?null:(statedPeople(text)||vi.capacity||null))),
+    people_basis:people_basis||(disable_people_fallback?null:(statedPeople(text)?'official_stated':vi.capacity?'venue_capacity_reference':null)),
     source,source_url:url,source_text:norm(text).slice(0,500)};
 }
 
@@ -448,7 +448,7 @@ async function sourceDive(){
     const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue+' '+address))continue;
     const passive=/展示|展覧会|美術館|水族館|ライトアップ|イルミネーション|企画展|特別展/.test(h1);
     const people=crowdPeopleFromText(full); if(passive&&!people)continue;
-    events.push(eventBase({name:h1,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'Dive! Hiroshima',url,text:info,people,people_basis:people?'official_stated':null,address:norm(address)}));
+    events.push(eventBase({name:h1,date:d,end_date:endDateFrom(period,Number(d.slice(0,4)))||d,venue,source:'Dive! Hiroshima',url,text:info,people,people_basis:people?'official_stated':null,address:norm(address),disable_people_fallback:true}));
   } return events;
 }
 async function sourceHiroshimaCityEvents(){
@@ -515,7 +515,8 @@ async function sourceHiroshimaCityEvents(){
       name:title,date,end_date:endDate,venue,source:'広島市公式',url:item.url,text,
       kind:item.kind||(/スポーツ|マラソン/.test(title)?'sports':'festival'),
       start,end:finish,people,
-      people_basis:item.people_basis||(detectedPeople?'official_stated':null)
+      people_basis:item.people_basis||(detectedPeople?'official_stated':null),
+      disable_people_fallback:true
     }));
   }
   return merge(out);
@@ -787,12 +788,19 @@ async function main(){
   const sourceOnly=String(process.env.EVENT_SOURCE_ONLY||'').trim();
   const activeSources=sourceOnly?SOURCES.filter(([id])=>id===sourceOnly):SOURCES;
   if(sourceOnly&&!activeSources.length) throw new Error('unknown EVENT_SOURCE_ONLY '+sourceOnly);
-  const establishedSources=new Set(['icch','candy','worker_events','eplus','lawson','pia','dive','city_events','sports','cvb','cvb_news']);
+  const establishedSources=new Set(['icch','candy','worker_events','eplus','lawson','pia','dive','city_events','sports','cvb']);
   for(const [id,fn] of activeSources){
     const started=Date.now();
     try{
-      const rows=await fn(); all.push(...rows);
+      let rows=await fn();
       const prevCount=Number(previous?.source_health?.[id]?.count||0);
+      if(id==='eplus' && prevCount>=20 && rows.length<Math.floor(prevCount*0.60)){
+        try{
+          const retryRows=await fn();
+          if(retryRows.length>rows.length) rows=retryRows;
+        }catch{}
+      }
+      all.push(...rows);
       const suspiciousZero=establishedSources.has(id)&&rows.length===0;
       const suspiciousDrop=prevCount>=5 && rows.length>0 && rows.length<Math.max(2,Math.floor(prevCount*0.60));
       const state=suspiciousZero?'suspicious_zero':suspiciousDrop?'degraded':'ok';
