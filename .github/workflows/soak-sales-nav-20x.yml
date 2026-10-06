@@ -245,7 +245,8 @@ jobs:
             await assertNoJsErrors(page,profile,cycle,'end-cycle');
           }
 
-          (async()=>{\n          for(const profile of profiles){
+          (async()=>{
+          for(const profile of profiles){
             const browserType=profile.browser==='webkit'?webkit:chromium;
             const browser=await browserType.launch({headless:true});
             const profileResult={name:profile.name,cycles:[],startedAt:new Date().toISOString()};
@@ -277,6 +278,11 @@ jobs:
             totalFailures:report.failures.length
           },null,2));
           if(report.failures.length) process.exit(1);
+          })().catch(e=>{
+            console.error(e);
+            try{fs.writeFileSync('/tmp/soak-report.json',JSON.stringify({...report,fatal:String(e&&e.stack||e)},null,2));}catch(_){}
+            process.exit(1);
+          });
           NODE
       - name: Upload soak report
         if: always()
