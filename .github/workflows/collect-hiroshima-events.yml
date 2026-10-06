@@ -27,6 +27,11 @@ jobs:
         with:
           node-version: "22"
 
+      - name: Install browser fallback
+        run: |
+          npm install --no-save playwright@1.56.0
+          npx playwright install --with-deps chromium
+
       - name: Collect sources
         run: node scripts/collect-hiroshima-events.cjs
 
