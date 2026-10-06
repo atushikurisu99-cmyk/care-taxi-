@@ -3087,6 +3087,9 @@ function calendarSportType(s){
     raw.includes('バレー')||raw.includes('volleyball')||raw.includes('サンダーズ')) return 'court';
  return 'sports';
 }
+function cleanLiveDisplayName(value){
+ return String(value||'').trim().replace(/\s+広島$/,'').trim();
+}
 function calendarEntriesForDate(key){
  const out=[];
  for(const r of getReservations()){
@@ -3106,7 +3109,7 @@ function calendarEntriesForDate(key){
  // カレンダーではライブタイトルを出さず、アーティスト名を主表示にする。
  const events=allLiveEventsForDate(key);
  for(const e of events){
-  const artist=String(e.display_name||e.artist||e.artist_name||'').trim()||String(e.name||'').trim()||'公演';
+  const artist=cleanLiveDisplayName(e.display_name||e.artist||e.artist_name||e.name||'公演')||'公演';
   const endEstimate=e.end_time_estimate||e.end_time_reference||'';
   out.push({
    type:'live',
@@ -5978,7 +5981,7 @@ function renderEventDetail(){
    const exactEnd=e.end_time||'';
    const ref=e.end_time_estimate||e.end_time_reference||'';
    const tracked=selectedVenueSet.has(e.venue);
-   const displayName=String(e.display_name||e.artist||e.artist_name||e.name||'公演').trim();
+   const displayName=cleanLiveDisplayName(e.display_name||e.artist||e.artist_name||e.name||'公演')||'公演';
    return '<div class="calendar-detail-item live">'+
     '<div class="kind">'+escapeHtml(liveEventDate(e))+(tracked?' / チェック中':'')+'</div>'+
     '<div class="main">'+escapeHtml(displayName)+'</div>'+
