@@ -78,7 +78,7 @@ function venueInfo(s=''){
 function inHiroshimaCity(s=''){
   s=norm(s);
   if(/東広島市|廿日市市|呉市|福山市|三原市|尾道市|三次市|庄原市|江田島市|大竹市|安芸高田市/.test(s)) return false;
-  return /広島市|中区|南区|西区|東区|安芸区|安佐南区|安佐北区|佐伯区|フェニックスホール|グリーンアリーナ|ピースウイング|マツダスタジアム|サンプラザ|HBGホール|上野学園ホール|アステールプラザ|BLUE LIVE|クラブクアトロ|VANQUISH|セカンド.?クラッチ/.test(s);
+  return /広島市|中区|南区|西区|東区|安芸区|安佐南区|安佐北区|佐伯区|広島国際会議場|フェニックスホール|グリーンアリーナ|ピースウイング|マツダスタジアム|サンプラザ|HBGホール|上野学園ホール|アステールプラザ|BLUE LIVE|クラブクアトロ|VANQUISH|セカンド.?クラッチ/.test(s);
 }
 function typeOf(s=''){
   s=norm(s);
@@ -296,7 +296,7 @@ async function sourceSports(){
   for(let offset=0;offset<4;offset++){
     const dt=new Date(Date.UTC(year,month-1+offset,1)),y=dt.getUTCFullYear(),mo=dt.getUTCMonth()+1;
     const source='広島ドラゴンフライズ公式',url='https://hiroshimadragonflies.com/schedule/list/?month='+mo+'&year='+y;
-    let text=''; try{text=norm(await fetchTextBrowserFallback(url,22000))}catch{continue}
+    let text=''; try{text=norm(await browserHtml(url))}catch{continue}
     const re=/HOME\s+(?:レギュラーシーズン|ポストシーズン|プレシーズン)?\s*(?:Image:\s*)?広島\s+広島\s+(\d{1,2})\/(\d{1,2})\s*\([^)]+\)\s*([0-2]?\d:[0-5]\d)\s+location_on\s*([^\s][\s\S]{1,70}?)\s+(?:Image:\s*)?([^\s][\s\S]{0,30}?)\s+(?:sports_basketball|試合情報|confirmation_number)/g;
     for(const m of text.matchAll(re)){
       const venue=norm(m[4]),op=norm(m[5]).replace(/^広島\s*/,'');
