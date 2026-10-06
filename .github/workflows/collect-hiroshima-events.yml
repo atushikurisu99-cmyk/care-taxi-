@@ -51,6 +51,13 @@ jobs:
               throw new Error('source regression '+id+' count='+(h[id]?.count??'null'));
             }
           }
+          if(Number(p.counts?.merged||0)<30) throw new Error('coverage regression: too few merged events');
+          const venues=new Set(p.events.map(x=>x.venue).filter(Boolean));
+          if(venues.size<7) throw new Error('coverage regression: too few venues '+venues.size);
+          const groups=new Set(p.events.map(x=>x.event_type).filter(Boolean));
+          for(const needed of ['music','sports','convention']){
+            if(!groups.has(needed)) throw new Error('coverage regression: missing '+needed);
+          }
           console.log(JSON.stringify({
             generated_at:p.generated_at,
             counts:p.counts,
