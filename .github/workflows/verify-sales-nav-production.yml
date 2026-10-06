@@ -59,7 +59,9 @@ jobs:
               main:el.querySelector('.main')?.textContent?.trim()||'',
               meta:el.querySelector('.meta')?.textContent?.trim()||''
             })));
-            console.log('ATTEMPT',attempt,JSON.stringify({live:last.slice(0,12),sports:sports.slice(0,12)},null,2));
+            const snapshot={attempt,live:last.slice(0,30),sports:sports.slice(0,30)};
+            require('fs').writeFileSync('/tmp/prod-verify.json',JSON.stringify(snapshot,null,2));
+            console.log('ATTEMPT',attempt,JSON.stringify(snapshot,null,2));
             const liveOk=expected.every(x=>last.some(e=>e.kind.includes(x.date)&&e.meta.includes(x.venue)&&e.main===x.name));
             const sportsOk=expectedSports.every(x=>sports.some(e=>e.kind.includes(x.date)&&e.meta.includes(x.venue)&&e.main.startsWith(x.name)));
             ok=liveOk&&sportsOk;
@@ -73,3 +75,13 @@ jobs:
           console.log('PRODUCTION_DISPLAY_OK',JSON.stringify({live:expected,sports:expectedSports}));
           })().catch(e=>{ console.error(e); process.exit(1); });
           NODE
+
+      - name: Upload production render snapshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-render-snapshot
+          path: /tmp/prod-verify.json
+          if-no-files-found: ignore
+          retention-days: 1
+
