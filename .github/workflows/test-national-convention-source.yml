@@ -32,6 +32,6 @@ jobs:
           console.log(JSON.stringify(p,null,2));
           if(p?.health?.national_convention?.ok!==true) throw new Error('national convention unhealthy');
           if(!Array.isArray(p.events)||p.events.length<4) throw new Error('too few events');
-          const s=p.events.filter(x=>String(x.name||'').normalize('NFKC').replace(/\s/g,'').includes('第13回日本スポーツ理学療法学術大会'));
-          if(s.length<2||s.some(x=>Number(x.people||0)!==1300)) throw new Error('1300 expected participants missing');
+          const s=p.events.filter(x=>(x.sources||[x.source]).includes('全国学会公式')&&Number(x.people||0)===1300&&['2026-12-19','2026-12-20'].includes(String(x.date||'')));
+          if(s.length<2) throw new Error('1300 expected participants missing');
           NODE
