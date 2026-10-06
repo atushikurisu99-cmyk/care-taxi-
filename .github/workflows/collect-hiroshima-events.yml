@@ -105,11 +105,18 @@ jobs:
         if: steps.snapshot.outputs.changed == 'true'
         run: |
           node - <<'NODE'
-          const expected=require('./sales-nav-prototype/data/hiroshima-demand-events.json');
+          const fs=await import('node:fs');
+          const expected=JSON.parse(fs.readFileSync('./sales-nav-prototype/data/hiroshima-demand-events.json','utf8'));
           const url='https://taxi-sales-nav.pages.dev/data/hiroshima-demand-events.json?ts='+Date.now();
-          const r=await fetch(url,{headers:{accept:'application/json'}});
-          if(!r.ok) throw new Error('production snapshot http '+r.status);
-          const got=await r.json();
+          let got=null;
+          for(let i=0;i<6;i++){
+            const r=await fetch(url+'&try='+i,{headers:{accept:'application/json'}});
+            if(r.ok){
+              got=await r.json();
+              if(String(got?.generated_at)===String(expected.generated_at)) break;
+            }
+            await new Promise(resolve=>setTimeout(resolve,5000));
+          }
           if(got?.ok!==true||!Array.isArray(got.events)) throw new Error('invalid production snapshot');
           if(String(got.generated_at)!==String(expected.generated_at)) throw new Error('production snapshot is stale');
           console.log(JSON.stringify({generated_at:got.generated_at,count:got.events.length},null,2));
