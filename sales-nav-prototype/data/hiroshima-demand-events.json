@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T06:07:41.865Z",
+  "generated_at": "2026-10-06T06:50:12.609Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -12,56 +12,56 @@
       "ok": true,
       "state": "ok",
       "count": 29,
-      "ms": 956
+      "ms": 1224
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 37,
-      "ms": 1217
+      "ms": 1242
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
-      "ms": 11596
+      "ms": 14311
     },
     "eplus": {
       "ok": true,
       "state": "ok",
-      "count": 20,
-      "ms": 17232
+      "count": 12,
+      "ms": 24067
     },
     "lawson": {
       "ok": true,
       "state": "ok",
-      "count": 58,
-      "ms": 3429
+      "count": 57,
+      "ms": 2832
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 11,
-      "ms": 18095
+      "ms": 21045
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
-      "ms": 6532
+      "ms": 1427
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
-      "ms": 1361,
+      "ms": 1125,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
-      "ms": 21181
+      "ms": 21949
     }
   },
   "rules": {
@@ -70,8 +70,8 @@
     "failure_policy": "取得失敗または疑わしい0件では直前の未来予定を保持する"
   },
   "counts": {
-    "raw": 214,
-    "merged": 139
+    "raw": 205,
+    "merged": 138
   },
   "events": [
     {
@@ -221,7 +221,7 @@
     {
       "date": "2026-10-10",
       "end_date": "2026-10-10",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島サンプラザホール",
       "address": null,
       "start_time": "14:05",
@@ -382,10 +382,10 @@
     {
       "date": "2026-10-11",
       "end_date": "2026-10-11",
-      "name": "兵動大樹のおしゃべり大好き。 48 広島",
+      "name": "兵動大樹のおしゃべり大好き。48",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": "13:00",
+      "start_time": null,
       "end_time": null,
       "event_type": "theater",
       "people": 1204,
@@ -393,15 +393,13 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
-        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 2,
-      "confidence": "verified",
+      "verification_count": 1,
+      "confidence": "single_source",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -527,7 +525,7 @@
       "address": null,
       "start_time": null,
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 450,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
@@ -666,12 +664,12 @@
     {
       "date": "2026-10-17",
       "end_date": "2026-10-17",
-      "name": "販売停止(この公演は販売再開待ちです) 一般発売./家入レオ",
+      "name": "家入レオ",
       "venue": "JMSアステールプラザ",
       "address": null,
       "start_time": null,
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
@@ -899,7 +897,7 @@
     {
       "date": "2026-10-19",
       "end_date": "2026-10-19",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "19:05",
@@ -922,7 +920,7 @@
     {
       "date": "2026-10-21",
       "end_date": "2026-10-21",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "19:05",
@@ -1113,7 +1111,7 @@
       "name": "アステールプラザ芸術劇場シリーズ M&Oplaysプロデュース「ブランク」",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": "18:30",
+      "start_time": null,
       "end_time": null,
       "event_type": "theater",
       "people": 1204,
@@ -1121,15 +1119,13 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
-        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 2,
-      "confidence": "verified",
+      "verification_count": 1,
+      "confidence": "single_source",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -1387,7 +1383,6 @@
         "ローチケ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
@@ -1541,29 +1536,6 @@
     {
       "date": "2026-11-03",
       "end_date": "2026-11-03",
-      "name": "鶴 公演日: 2026/11/3(火) 会場: 広島CAVE-BE(広島県) 販売方法 先着 一般発売 受付期間 発売中 2026/7/4(土) 10:00 ~ 2026/11/1(日) 23:59 申込/詳細 お申し込みはこちら 演劇・ステージ・舞台 マルゲリータ男とキャンパスガール~JARUJARU CONTE TOUR 2026AW~",
-      "venue": "JMSアステールプラザ",
-      "address": null,
-      "start_time": null,
-      "end_time": null,
-      "event_type": "music",
-      "people": 1204,
-      "people_basis": "venue_capacity_reference",
-      "source": "ローチケ",
-      "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
-      "sources": [
-        "ローチケ"
-      ],
-      "source_urls": [
-        "https://cdn.l-tike.com/search/?pref=34&size=100"
-      ],
-      "verification_count": 1,
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模"
-    },
-    {
-      "date": "2026-11-03",
-      "end_date": "2026-11-03",
       "name": "春風亭小朝 独演会",
       "venue": "広島県民文化センター",
       "address": null,
@@ -1634,7 +1606,7 @@
     {
       "date": "2026-11-06",
       "end_date": "2026-11-06",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "19:05",
@@ -1755,7 +1727,7 @@
     {
       "date": "2026-11-11",
       "end_date": "2026-11-11",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "19:05",
@@ -1875,7 +1847,7 @@
       "address": null,
       "start_time": "17:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
@@ -1884,7 +1856,6 @@
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
@@ -1989,7 +1960,7 @@
     {
       "date": "2026-11-16",
       "end_date": "2026-11-16",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "19:05",
@@ -2226,7 +2197,7 @@
       "address": null,
       "start_time": null,
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
@@ -2438,7 +2409,7 @@
       "address": null,
       "start_time": null,
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
@@ -2718,21 +2689,19 @@
       "address": null,
       "start_time": "16:00",
       "end_time": null,
-      "event_type": "theater",
+      "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
+      "source": "CANDY PROMOTION",
+      "source_url": "https://www.candy-p.com/schedule/",
       "sources": [
-        "CANDY PROMOTION",
-        "イープラス"
+        "CANDY PROMOTION"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
+        "https://www.candy-p.com/schedule/"
       ],
-      "verification_count": 2,
-      "confidence": "verified",
+      "verification_count": 1,
+      "confidence": "single_source",
       "people_label": "最大約2,001人規模"
     },
     {
@@ -2784,7 +2753,7 @@
     {
       "date": "2026-12-07",
       "end_date": "2026-12-07",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "19:05",
@@ -2973,7 +2942,7 @@
       "address": null,
       "start_time": "17:30",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 800,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
@@ -3063,7 +3032,7 @@
     {
       "date": "2026-12-19",
       "end_date": "2026-12-19",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "14:05",
@@ -3109,7 +3078,7 @@
     {
       "date": "2026-12-20",
       "end_date": "2026-12-20",
-      "name": "広島ドラゴンフライズ vs sports_basketball",
+      "name": "広島ドラゴンフライズ",
       "venue": "広島グリーンアリーナ",
       "address": null,
       "start_time": "14:05",
@@ -3229,7 +3198,7 @@
       "address": null,
       "start_time": "18:00",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 1730,
       "people_basis": "venue_capacity_reference",
       "source": "チケットぴあ",
