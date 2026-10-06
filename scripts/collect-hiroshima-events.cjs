@@ -85,7 +85,7 @@ function typeOf(s=''){
   if(/学会|会議|シンポジ|カンファレンス|フォーラム|研究会|講演会/.test(s)) return 'convention';
   if(/野球|サッカー|バスケ|バレー|試合|プロレス|格闘技|スポーツ|マラソン/.test(s)) return 'sports';
   if(/祭|フェス|花火|パレード|フード/.test(s)) return 'festival';
-  if(/演劇|舞台|ミュージカル|落語|お笑い|新喜劇/.test(s)) return 'theater';
+  if(/演劇|舞台|ミュージカル|落語|独演会|お笑い|新喜劇|PARCO PRODUCE/.test(s)) return 'theater';
   if(/コンサート|ライブ|LIVE|音楽|演奏会|リサイタル|オーケストラ|歌|ツアー/.test(s)) return 'music';
   return 'event';
 }
@@ -95,6 +95,8 @@ function merge(events){
   const nkey=s=>norm(s||'').toLowerCase().replace(/[\s「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'');
   for(const e of events){
     if(!e?.date||!e?.name||!inHiroshimaCity((e.venue||'')+' '+(e.address||'')+' '+(e.source_text||''))) continue;
+    e.name=String(e.name).replace(/^▼\s*/,'').replace(/^▽\s*/,'').trim();
+    if(!e.name) continue;
     const en=nkey(e.name),ev=nkey(e.venue);
     const i=out.findIndex(x=>{
       if(String(x.date)!==String(e.date))return false;
@@ -106,7 +108,8 @@ function merge(events){
     if(i<0){out.push({...e,sources:[e.source],source_urls:[e.source_url].filter(Boolean),verification_count:1});continue}
     const x=out[i]; const ss=[...new Set([...(x.sources||[]),e.source].filter(Boolean))];
     const preferName=String(e.name||'').length>String(x.name||'').length?e.name:x.name;
-    out[i]={...x,...e,name:preferName,
+    const inferred=typeOf(preferName);
+    out[i]={...x,...e,name:preferName,event_type:inferred!=='event'?inferred:(e.event_type||x.event_type||'event'),
       start_time:e.start_time||x.start_time||null,end_time:e.end_time||x.end_time||null,
       people:Math.max(Number(x.people||0),Number(e.people||0))||null,
       people_basis:Number(e.people||0)>=Number(x.people||0)?(e.people_basis||x.people_basis):(x.people_basis||e.people_basis),
