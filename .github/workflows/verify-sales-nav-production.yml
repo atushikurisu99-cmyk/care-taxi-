@@ -31,14 +31,14 @@ jobs:
           const target='https://atushikurisu99-cmyk.github.io/care-taxi-/sales-nav-prototype/';
           const sleep=ms=>new Promise(r=>setTimeout(r,ms));
           const expected=[
-            {date:'2026-10-07',venue:'広島クラブクアトロ',name:'甲斐 心愛'},
             {date:'2026-10-09',venue:'広島文化学園HBGホール',name:'沢田研二'},
-            {date:'2026-10-09',venue:'JMSアステールプラザ',name:'PERSONZ'}
+            {date:'2026-10-17',venue:'広島サンプラザホール',name:'After the Rain'},
+            {date:'2026-10-17',venue:'広島グリーンアリーナ',name:'NEWS'}
           ];
           const expectedSports=[
-            {date:'2026-10-10',venue:'広島サンプラザホール',name:'広島ドラゴンフライズ'},
-            {date:'2026-10-24',venue:'エディオンピースウイング広島',name:'サンフレッチェ広島'},
-            {date:'2026-10-31',venue:'広島グリーンアリーナ',name:'広島サンダーズ'}
+            {date:'2026-10-17',venue:'エディオンピースウイング広島',name:'サンフレッチェ広島'},
+            {date:'2026-10-31',venue:'広島グリーンアリーナ',name:'広島サンダーズ'},
+            {date:'2026-11-21',venue:'広島サンプラザホール',name:'広島サンダーズ'}
           ];
           const browser=await chromium.launch({headless:true});
           const page=await browser.newPage();
