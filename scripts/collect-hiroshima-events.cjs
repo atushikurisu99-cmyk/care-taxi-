@@ -300,11 +300,14 @@ async function sourceSports(){
     const dt=new Date(Date.UTC(year,month-1+offset,1)),y=dt.getUTCFullYear(),mo=dt.getUTCMonth()+1;
     const source='広島ドラゴンフライズ公式',url='https://hiroshimadragonflies.com/schedule/list/?month='+mo+'&year='+y;
     let text=''; try{text=norm(await browserHtml(url))}catch{continue}
-    const re=/HOME\s+(?:レギュラーシーズン|ポストシーズン|プレシーズン)?\s*(?:Image:\s*)?広島\s+広島\s+(\d{1,2})\/(\d{1,2})\s*\([^)]+\)\s*([0-2]?\d:[0-5]\d)\s+location_on\s*([^\s][\s\S]{1,70}?)\s+(?:Image:\s*)?([^\s][\s\S]{0,30}?)\s+(?:sports_basketball|試合情報|confirmation_number)/g;
+    const re=/HOME[\s\S]{0,160}?(\d{1,2})\/(\d{1,2})\s*\([^)]+\)\s*([0-2]?\d:[0-5]\d)[\s\S]{0,90}?location_on\s*([\s\S]{2,90}?)(?=\s+(?:Image:|sports_basketball|試合情報|confirmation_number|チケット))/g;
     for(const m of text.matchAll(re)){
-      const venue=norm(m[4]),op=norm(m[5]).replace(/^広島\s*/,'');
+      const venue=norm(m[4]).replace(/\s+$/,'');
       if(!inHiroshimaCity(venue))continue;
-      events.push(eventBase({name:'広島ドラゴンフライズ vs '+op,date:ymd(y,m[1],m[2]),venue,source,url,text:m[0],kind:'sports',start:m[3]}));
+      const tail=text.slice((m.index||0)+m[0].length,Math.min(text.length,(m.index||0)+m[0].length+100));
+      const op=norm((tail.match(/(?:Image:\s*)?([^\s]{1,24})\s+(?:sports_basketball|試合情報|confirmation_number)/)||[])[1]||'');
+      const label=op?('広島ドラゴンフライズ vs '+op):'広島ドラゴンフライズ';
+      events.push(eventBase({name:label,date:ymd(y,m[1],m[2]),venue,source,url,text:m[0]+' '+tail,kind:'sports',start:m[3]}));
     }
   }
 
