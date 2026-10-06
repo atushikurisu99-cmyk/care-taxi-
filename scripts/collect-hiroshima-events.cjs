@@ -333,6 +333,7 @@ async function sourcePia(){
     let html='';
     try{html=await fetchTextBrowserFallback(url,25000)}catch{continue}
     const text=norm(html);
+    if(code==='HSSP') await saveDebug('pia-venue-HSSP-raw.html',html);
     await saveDebug('pia-venue-'+code+'.txt',text);
 
     // Typical listing line:
