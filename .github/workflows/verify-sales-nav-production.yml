@@ -114,11 +114,23 @@ jobs:
               if(!previewText.includes(required)) throw new Error('monthly preview missing '+required+': '+previewText.slice(0,1200));
             }
             if(!await preview.isVisible()) throw new Error('monthly preview did not become visible after demo');
-            await page.locator('#monthlyReportPreviewButton').click();
+            await page.locator('#monthlyReportPreview .monthly-preview-close').click();
             if(await preview.isVisible()) throw new Error('monthly preview did not close');
             await page.locator('#monthlyReportPreviewButton').click();
             await page.waitForTimeout(150);
             if(!await preview.isVisible()) throw new Error('monthly preview button did not open preview');
+
+            await page.evaluate(()=>{ if(typeof openCalendarDayDetail==='function') openCalendarDayDetail('2026-10-09'); });
+            await page.waitForTimeout(150);
+            const liveCards=page.locator('#calendarDetailList .calendar-detail-item.live');
+            const liveCount=await liveCards.count();
+            if(liveCount<1) throw new Error('no live cards for 2026-10-09');
+            const liveTexts=await liveCards.allInnerTexts();
+            if(liveTexts.some(t=>t.includes('終演見込 --:--'))) throw new Error('live end estimate still missing: '+JSON.stringify(liveTexts));
+            const personz=liveTexts.find(t=>t.includes('PERSONZ'))||'';
+            if(!personz.includes('終演見込 21:00')) throw new Error('PERSONZ end estimate wrong: '+personz);
+            console.log('LIVE_END_ESTIMATE_OK',JSON.stringify(liveTexts.slice(0,8)));
+            await page.evaluate(()=>{ if(typeof closeCalendarDayDetail==='function') closeCalendarDayDetail(); });
             const previewBox=await preview.boundingBox();
             const vp=page.viewportSize();
             const closeVisible=await page.locator('#monthlyReportPreview .monthly-preview-close').isVisible();
