@@ -93,7 +93,7 @@ jobs:
           fi
           git config user.name "taxi-event-collector[bot]"
           git config user.email "taxi-event-collector[bot]@users.noreply.github.com"
-          git add sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json sales-nav-prototype/data/hiroshima-demand-source-history.json
+          git add sales-nav-prototype/data/hiroshima-demand-events.json sales-nav-prototype/data/hiroshima-demand-source-status.json sales-nav-prototype/data/hiroshima-demand-source-history.json sales-nav-prototype/data/hiroshima-demand-source-history.json
           git commit -m "Update Hiroshima demand event snapshot"
           if ! git push; then
             echo "Remote changed during collection; rebasing snapshot commit"
