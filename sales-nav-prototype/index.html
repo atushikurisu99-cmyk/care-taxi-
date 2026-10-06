@@ -2954,7 +2954,7 @@ function selectedLiveVenues(){
 }
 function selectedLiveEvents(source=eventRealtimeData){
  const selected=new Set(selectedLiveVenues());
- const events=Array.isArray(source?.events)?source.events:[];
+ const events=allLiveEvents(source);
  if(!selected.size) return [];
  return events.filter(e=>e&&selected.has(e.venue));
 }
@@ -3094,8 +3094,7 @@ function calendarEntriesForDate(key){
 
  // 通知対象に選んでいない会場も含め、取得済みイベントはカレンダーへ配置。
  // カレンダーではライブタイトルを出さず、アーティスト名を主表示にする。
- const events=(Array.isArray(eventRealtimeData?.events)?eventRealtimeData.events:[])
-  .filter(e=>liveEventDate(e)===key);
+ const events=allLiveEventsForDate(key);
  for(const e of events){
   const artist=String(e.display_name||e.artist||e.artist_name||'').trim()||String(e.name||'').trim()||'公演';
   const endEstimate=e.end_time_estimate||e.end_time_reference||'';
@@ -3138,7 +3137,7 @@ function calendarEntriesForDate(key){
  }
 
  const today=localDateValue(new Date());
- const sports=Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[];
+ const sports=allSportsSchedule();
  for(const sp of sports){
   const sportDate=String(sp?.date||today);
   if(sportDate!==key || !sp.status || sp.status==='none') continue;
@@ -3917,11 +3916,77 @@ function isLocalSportsEvent(x){
  const area=String(x.area||x.city||x.location||'');
  return HIROSHIMA_SPORTS_VENUE_RE.test(venue)||/広島市/i.test(area);
 }
+function eventMergeKey(e){
+ const clean=v=>String(v||'').toLowerCase().replace(/[\s　"'“”‘’「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'');
+ return [String(e?.date||''),clean(e?.venue||''),String(e?.start_time||''),clean(e?.display_name||e?.name||'').slice(0,80)].join('|');
+}
 function allLiveEvents(source=eventRealtimeData){
- return (Array.isArray(source?.events)?source.events:[]).filter(e=>e&&e.venue&&liveEventDate(e));
+ const worker=(Array.isArray(source?.events)?source.events:[])
+  .filter(e=>e&&e.venue&&liveEventDate(e));
+ const snapshot=(Array.isArray(demandSnapshotData?.events)?demandSnapshotData.events:[])
+  .filter(e=>['music','theater'].includes(String(e?.event_type||''))&&e?.date&&e?.venue)
+  .map(e=>({
+   ...e,
+   kind:'live',
+   display_name:e.name||'公演',
+   display_name_type:e.event_type||'music',
+   end_time_estimate:null,
+   end_time_reference:null,
+   source_role:'demand_snapshot'
+  }));
+ const out=[];
+ for(const e of [...worker,...snapshot]){
+  const key=eventMergeKey(e);
+  const same=out.findIndex(x=>{
+   if(eventMergeKey(x)===key) return true;
+   if(String(x.date||'')!==String(e.date||'')) return false;
+   if(String(x.venue||'')!==String(e.venue||'')) return false;
+   if(x.start_time&&e.start_time&&String(x.start_time)===String(e.start_time)){
+    const a=String(x.display_name||x.name||''),b=String(e.display_name||e.name||'');
+    return a.includes(b)||b.includes(a);
+   }
+   return false;
+  });
+  if(same<0){out.push(e);continue}
+  const x=out[same];
+  const workerFirst=x.source_role!=='demand_snapshot';
+  out[same]=workerFirst
+   ?{...e,...x,end_time:x.end_time||e.end_time||null}
+   :{...x,...e,end_time:e.end_time||x.end_time||null};
+ }
+ return out;
 }
 function allLiveEventsForDate(key,source=eventRealtimeData){
  return allLiveEvents(source).filter(e=>liveEventDate(e)===key);
+}
+function allSportsSchedule(){
+ const realtime=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[])
+  .filter(isLocalSportsEvent);
+ const snapshot=(Array.isArray(demandSnapshotData?.events)?demandSnapshotData.events:[])
+  .filter(e=>String(e?.event_type||'')==='sports'&&e?.date&&e?.venue)
+  .map(e=>({
+   kind:'sports',
+   team:e.name||'スポーツ',
+   name:e.name||'スポーツ',
+   opponent:null,
+   date:e.date,
+   venue:e.venue,
+   area:'広島市',
+   status:'scheduled',
+   start_time:e.start_time||null,
+   end_time:e.end_time||null,
+   end_time_estimate:e.end_time||null,
+   source:e.source||'人流イベント収集'
+  }));
+ const out=[];
+ for(const e of [...realtime,...snapshot]){
+  const k=[String(e.date||''),String(e.venue||''),String(e.start_time||''),String(e.team||e.name||'').replace(/\s+/g,'')].join('|');
+  if(out.some(x=>[String(x.date||''),String(x.venue||''),String(x.start_time||''),String(x.team||x.name||'').replace(/\s+/g,'')].join('|')===k)) continue;
+  const sameTime=out.findIndex(x=>String(x.date||'')===String(e.date||'')&&String(x.venue||'')===String(e.venue||'')&&x.start_time&&e.start_time&&String(x.start_time)===String(e.start_time));
+  if(sameTime>=0) continue;
+  out.push(e);
+ }
+ return out;
 }
 function renderHomeEventSummary(){
  const hv=document.getElementById('homeEventValue');
@@ -3941,8 +4006,7 @@ function renderHomeEventSummary(){
    String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99'))
   );
 
- const sports=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[])
-  .filter(isLocalSportsEvent)
+ const sports=allSportsSchedule()
   .filter(x=>x.status!=='ended')
   .map(x=>({...x,date:x.date||today}));
 
@@ -5897,6 +5961,7 @@ function renderEventDetail(){
    String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99'))
   );
   liveList.innerHTML=upcoming.length?upcoming.map(e=>{
+   const exactEnd=e.end_time||'';
    const ref=e.end_time_estimate||e.end_time_reference||'';
    const tracked=selectedVenueSet.has(e.venue);
    const displayName=String(e.display_name||e.artist||e.artist_name||e.name||'公演').trim();
@@ -5904,7 +5969,8 @@ function renderEventDetail(){
     '<div class="kind">'+escapeHtml(liveEventDate(e))+(tracked?' / チェック中':'')+'</div>'+
     '<div class="main">'+escapeHtml(displayName)+'</div>'+
     '<div class="meta">'+escapeHtml((e.start_time?e.start_time+' / ':'')+(e.venue||''))+
-      (ref?(' / 過去公演参考 '+escapeHtml(String(ref).slice(0,5))+'頃'):'')+
+      (exactEnd?(' / 終了 '+escapeHtml(String(exactEnd).slice(0,5))):
+       ref?(' / 過去公演参考 '+escapeHtml(String(ref).slice(0,5))+'頃'):'')+
     '</div></div>';
   }).join(''):'<div class="calendar-detail-empty">今後のライブ情報はありません</div>';
  }
@@ -5912,8 +5978,7 @@ function renderEventDetail(){
  if(sportsSub&&sb) sportsSub.textContent=sb.textContent||'—';
  if(sportsList){
   const today=localDateValue(new Date());
-  const upcoming=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[])
-   .filter(isLocalSportsEvent)
+  const upcoming=allSportsSchedule()
    .filter(x=>String(x.date||today)>=today)
    .sort((a,b)=>String(a.date||'9999-12-31').localeCompare(String(b.date||'9999-12-31'))||
     String(a.start_time||'99:99').localeCompare(String(b.start_time||'99:99')));
