@@ -295,6 +295,24 @@ async function sourceLawson(){
   }
   return merge(events);
 }
+async function sourceWorkerEvents(){
+  const url='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima?collector='+Date.now();
+  const raw=await fetchText(url,25000);
+  const d=JSON.parse(raw);
+  if(d?.ok!==true||!Array.isArray(d.events)) throw new Error('invalid worker event feed');
+  return d.events.map(e=>eventBase({
+    name:e.display_name||e.name||e.title,
+    date:e.date,
+    venue:e.venue,
+    source:'会場・プレイガイド統合Worker',
+    url:e.source_url||url,
+    text:[e.name,e.title,e.venue,e.event_type].filter(Boolean).join(' '),
+    kind:e.event_type||null,
+    start:e.start_time||null,
+    end:e.end_time||e.end_time_estimate||null
+  })).filter(e=>e.name&&e.date&&e.venue);
+}
+
 async function sourcePia(){
   const url='https://t.pia.jp/pia/search_all.do?kw='+encodeURIComponent('広島');
   const html=await fetchTextBrowserFallback(url,25000); const text=norm(html); const events=[];
