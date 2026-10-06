@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T08:26:00.304Z",
+  "generated_at": "2026-10-06T09:29:43.690Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -13,65 +13,64 @@
       "state": "ok",
       "count": 29,
       "previous_count": 29,
-      "ms": 821,
-      "last_success_at": "2026-10-06T08:23:48.346Z"
+      "ms": 1265,
+      "last_success_at": "2026-10-06T09:26:30.635Z"
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 38,
       "previous_count": 38,
-      "ms": 783,
-      "last_success_at": "2026-10-06T08:23:49.129Z"
+      "ms": 735,
+      "last_success_at": "2026-10-06T09:26:31.370Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
-      "previous_count": 21,
-      "ms": 11118,
-      "last_success_at": "2026-10-06T08:24:00.247Z"
+      "previous_count": 20,
+      "ms": 19721,
+      "last_success_at": "2026-10-06T09:26:51.091Z"
     },
     "eplus": {
-      "ok": false,
-      "state": "degraded",
-      "count": 11,
-      "previous_count": 101,
-      "ms": 38350,
-      "last_success_at": "2026-10-06T08:19:18.285Z",
-      "retained_future_count": 100
+      "ok": true,
+      "state": "ok",
+      "count": 100,
+      "previous_count": 11,
+      "ms": 67528,
+      "last_success_at": "2026-10-06T09:27:58.619Z"
     },
     "lawson": {
       "ok": true,
       "state": "ok",
       "count": 39,
       "previous_count": 39,
-      "ms": 1220,
-      "last_success_at": "2026-10-06T08:24:39.817Z"
+      "ms": 1489,
+      "last_success_at": "2026-10-06T09:28:00.108Z"
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 31006,
-      "last_success_at": "2026-10-06T08:25:10.823Z"
+      "ms": 46884,
+      "last_success_at": "2026-10-06T09:28:46.992Z"
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
       "previous_count": 3,
-      "ms": 8612,
-      "last_success_at": "2026-10-06T08:25:19.435Z"
+      "ms": 6410,
+      "last_success_at": "2026-10-06T09:28:53.402Z"
     },
     "city_events": {
       "ok": true,
       "state": "ok",
       "count": 3,
-      "previous_count": null,
-      "ms": 6606,
-      "last_success_at": "2026-10-06T08:25:26.041Z"
+      "previous_count": 3,
+      "ms": 6317,
+      "last_success_at": "2026-10-06T09:28:59.719Z"
     },
     "published_details": {
       "ok": true,
@@ -79,16 +78,25 @@
       "count": 14,
       "previous_count": 14,
       "ms": 1,
-      "last_success_at": "2026-10-06T08:25:26.042Z"
+      "last_success_at": "2026-10-06T09:28:59.720Z"
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
       "previous_count": null,
-      "ms": 820,
+      "ms": 835,
       "last_success_at": null,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
+      "retained_future_count": 0
+    },
+    "cvb_news": {
+      "ok": true,
+      "state": "ok",
+      "count": 0,
+      "previous_count": null,
+      "ms": 562,
+      "last_success_at": "2026-10-06T09:29:01.117Z",
       "retained_future_count": 0
     },
     "convention_official": {
@@ -96,16 +104,16 @@
       "state": "ok",
       "count": 16,
       "previous_count": 16,
-      "ms": 13286,
-      "last_success_at": "2026-10-06T08:25:40.148Z"
+      "ms": 13334,
+      "last_success_at": "2026-10-06T09:29:14.451Z"
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
       "previous_count": 36,
-      "ms": 20147,
-      "last_success_at": "2026-10-06T08:26:00.295Z"
+      "ms": 29231,
+      "last_success_at": "2026-10-06T09:29:43.682Z"
     }
   },
   "source_registry": {
@@ -210,6 +218,14 @@
       ],
       "continuity": "retain_on_failure_or_stale_publication"
     },
+    "cvb_news": {
+      "role": "convention_bureau_news",
+      "cadence": "twice_daily",
+      "categories": [
+        "convention"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
     "convention_official": {
       "role": "organizer_official",
       "cadence": "twice_daily",
@@ -235,7 +251,7 @@
     "enrichment_policy": "公開値は補完し、公開されていない項目は未公表と明示する。推測値で埋めない"
   },
   "counts": {
-    "raw": 325,
+    "raw": 314,
     "merged": 176
   },
   "events": [
@@ -262,7 +278,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -293,7 +309,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -301,9 +317,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-08",
@@ -330,7 +344,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -353,24 +367,24 @@
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
       "sources": [
+        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-10-09",
@@ -388,15 +402,17 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 3,
+      "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -404,9 +420,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-09",
@@ -429,7 +443,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -437,9 +451,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-09",
@@ -457,15 +469,17 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 3,
+      "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -473,9 +487,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-09",
@@ -502,7 +514,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -532,7 +544,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -565,7 +577,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -589,24 +601,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-10",
@@ -622,24 +634,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-10-10",
@@ -664,7 +676,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -699,7 +711,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -731,7 +743,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -759,12 +771,12 @@
         "ローチケ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1",
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T07:14:42.392Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -772,9 +784,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-11",
@@ -790,24 +800,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-10-11",
@@ -830,7 +840,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:20:52.520Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -861,7 +871,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -869,9 +879,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-10-12",
@@ -894,7 +902,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -902,9 +910,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-14",
@@ -927,7 +933,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "not_published_on_checked_sources",
       "end_time_status": "not_published_on_checked_sources",
@@ -960,7 +966,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -984,24 +990,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-16",
@@ -1017,16 +1023,18 @@
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=LVQS&includeSaleEnd=fuzzy",
       "sources": [
+        "イープラス",
         "ローチケ",
         "チケットぴあ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=LVQS&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1034,9 +1042,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-10-16",
@@ -1063,7 +1069,7 @@
       "official_detail_checked": 2,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -1093,7 +1099,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1125,7 +1131,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1147,16 +1153,16 @@
       "people": 6000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1164,9 +1170,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約6,000人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2026-10-17",
@@ -1194,7 +1198,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1218,16 +1222,18 @@
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
       "sources": [
+        "イープラス",
         "ローチケ",
         "チケットぴあ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1235,9 +1241,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-17",
@@ -1260,7 +1264,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1268,9 +1272,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-10-17",
@@ -1286,16 +1288,18 @@
       "source": "チケットぴあ",
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=CQUH&includeSaleEnd=fuzzy",
       "sources": [
+        "イープラス",
         "ローチケ",
         "チケットぴあ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100",
         "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=CQUH&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1303,9 +1307,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-17",
@@ -1321,24 +1323,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-10-17",
@@ -1354,24 +1356,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-17",
@@ -1398,7 +1400,7 @@
       "official_detail_checked": 2,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -1429,7 +1431,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1451,16 +1453,16 @@
       "people": 6000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1468,9 +1470,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約6,000人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2026-10-18",
@@ -1493,7 +1493,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1501,9 +1501,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-10-18",
@@ -1519,24 +1517,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-18",
@@ -1559,7 +1557,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1567,9 +1565,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-10-18",
@@ -1592,7 +1588,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1600,9 +1596,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-18",
@@ -1618,24 +1612,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-18",
@@ -1660,7 +1654,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T08:06:13.020Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1691,7 +1685,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -1722,7 +1716,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1753,7 +1747,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1777,24 +1771,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p1",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-10-24",
@@ -1817,7 +1811,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1851,7 +1845,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1859,9 +1853,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-24",
@@ -1884,7 +1876,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -1892,9 +1884,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-24",
@@ -1917,7 +1907,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:20:52.520Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -1948,7 +1938,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -1972,24 +1962,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-25",
@@ -2007,15 +1997,17 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 3,
+      "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2023,9 +2015,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-25",
@@ -2048,7 +2038,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2056,9 +2046,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-10-25",
@@ -2074,24 +2062,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-28",
@@ -2111,12 +2099,12 @@
         "ローチケ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1",
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2124,9 +2112,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-10-30",
@@ -2149,7 +2135,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2157,9 +2143,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-10-30",
@@ -2185,7 +2169,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2193,9 +2177,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-30",
@@ -2211,24 +2193,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-10-30",
@@ -2251,7 +2233,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -2282,7 +2264,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2308,17 +2290,19 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ",
         "チケットぴあ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100",
         "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HRBG&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 4,
+      "verification_count": 5,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2326,9 +2310,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-10-31",
@@ -2344,24 +2326,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-10-31",
@@ -2379,15 +2361,17 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 3,
+      "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2395,9 +2379,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-10-31",
@@ -2420,7 +2402,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -2453,7 +2435,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2484,7 +2466,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2512,12 +2494,12 @@
         "ローチケ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima/p1",
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2525,9 +2507,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-01",
@@ -2555,7 +2535,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -2579,24 +2559,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-01",
@@ -2612,24 +2592,24 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "confidence": "verified",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-01",
@@ -2645,49 +2625,16 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
-        "ローチケ"
-      ],
-      "source_urls": [
-        "https://cdn.l-tike.com/search/?pref=34&size=100"
-      ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
-      "participants_status": "published_or_capacity_reference",
-      "start_time_status": "published",
-      "end_time_status": "not_published_on_checked_sources",
-      "needs_enrichment": false,
-      "enrichment_targets": [],
-      "public_data_complete": true,
-      "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
-    },
-    {
-      "date": "2026-11-03",
-      "end_date": "2026-11-03",
-      "name": "新日本プロレス POWER STRUGGLE ~SUPER Jr. TAG LEAGUE 2026~",
-      "venue": "広島サンプラザホール",
-      "address": null,
-      "start_time": "16:00",
-      "end_time": null,
-      "event_type": "sports",
-      "people": 6000,
-      "people_basis": "venue_capacity_reference",
-      "source": "ローチケ",
-      "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
-      "sources": [
         "イープラス",
         "ローチケ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/sports/chugoku-shikoku/hiroshima/p1",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2695,9 +2642,38 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約6,000人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
+    },
+    {
+      "date": "2026-11-03",
+      "end_date": "2026-11-03",
+      "name": "新日本プロレス 広島",
+      "venue": "広島サンプラザホール",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "sports",
+      "people": 6000,
+      "people_basis": "venue_capacity_reference",
+      "source": "ローチケ",
+      "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
+      "sources": [
+        "ローチケ"
+      ],
+      "source_urls": [
+        "https://cdn.l-tike.com/search/?pref=34&size=100"
+      ],
+      "verification_count": 1,
+      "first_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
+      "participants_status": "published_or_capacity_reference",
+      "start_time_status": "not_published_on_checked_sources",
+      "end_time_status": "not_published_on_checked_sources",
+      "needs_enrichment": false,
+      "enrichment_targets": [],
+      "public_data_complete": true,
+      "confidence": "single_source",
+      "people_label": "最大約6,000人規模"
     },
     {
       "date": "2026-11-03",
@@ -2720,7 +2696,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2728,9 +2704,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-03",
@@ -2751,13 +2725,13 @@
         "公式・主催者詳細"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1",
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100",
         "https://eplus.jp/"
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2765,9 +2739,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": null,
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": null
     },
     {
       "date": "2026-11-04",
@@ -2792,7 +2764,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2824,7 +2796,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2855,7 +2827,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2887,7 +2859,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2913,15 +2885,17 @@
       "sources": [
         "CANDY PROMOTION",
         "会場・プレイガイド統合Worker",
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p2",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 3,
+      "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2929,9 +2903,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-07",
@@ -2954,7 +2926,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -2962,9 +2934,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-07",
@@ -2989,7 +2959,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -3011,16 +2981,16 @@
       "people": 450,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T07:14:42.392Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3028,9 +2998,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-08",
@@ -3053,7 +3021,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3061,9 +3029,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-09",
@@ -3086,7 +3052,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3094,9 +3060,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-11",
@@ -3119,7 +3083,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3150,7 +3114,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3158,9 +3122,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-13",
@@ -3183,7 +3145,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3191,9 +3153,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-13",
@@ -3216,7 +3176,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3224,9 +3184,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-14",
@@ -3251,7 +3209,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3282,7 +3240,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3290,9 +3248,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-14",
@@ -3315,7 +3271,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3323,9 +3279,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-15",
@@ -3335,21 +3289,20 @@
       "address": null,
       "start_time": "17:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "theater",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima/p1",
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3357,9 +3310,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-15",
@@ -3382,7 +3333,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3390,9 +3341,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-15",
@@ -3418,7 +3367,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3426,9 +3375,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-15",
@@ -3451,7 +3398,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3459,9 +3406,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-15",
@@ -3484,7 +3429,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -3515,7 +3460,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3546,7 +3491,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3554,9 +3499,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-11-19",
@@ -3580,7 +3523,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3611,7 +3554,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3619,9 +3562,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-19",
@@ -3648,7 +3589,7 @@
       "official_detail_checked": 3,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "not_published_on_checked_sources",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
@@ -3679,7 +3620,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3710,7 +3651,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3718,9 +3659,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-20",
@@ -3743,7 +3682,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3751,9 +3690,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-20",
@@ -3780,7 +3717,7 @@
       "official_detail_checked": 3,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "not_published_on_checked_sources",
       "end_time_status": "not_published_on_checked_sources",
       "needs_enrichment": false,
@@ -3810,7 +3747,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3841,7 +3778,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3865,16 +3802,18 @@
       "source": "公式・主催者詳細",
       "source_url": "https://eplus.jp/",
       "sources": [
+        "イープラス",
         "チケットぴあ",
         "公式・主催者詳細"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
         "https://eplus.jp/"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3882,9 +3821,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-21",
@@ -3907,7 +3844,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3915,9 +3852,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-21",
@@ -3940,7 +3875,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3948,9 +3883,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-21",
@@ -3973,7 +3906,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -3981,9 +3914,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-21",
@@ -4006,7 +3937,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4014,9 +3945,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-22",
@@ -4039,7 +3968,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4070,7 +3999,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4078,9 +4007,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-11-22",
@@ -4106,7 +4033,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4114,9 +4041,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-22",
@@ -4139,7 +4064,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -4163,16 +4088,18 @@
       "source": "公式・主催者詳細",
       "source_url": "https://www.union-music.com/",
       "sources": [
+        "イープラス",
         "チケットぴあ",
         "公式・主催者詳細"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p3",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
         "https://www.union-music.com/"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4180,9 +4107,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-11-23",
@@ -4208,7 +4133,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4216,9 +4141,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-23",
@@ -4241,7 +4164,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4249,9 +4172,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-25",
@@ -4274,7 +4195,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4282,9 +4203,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-26",
@@ -4307,7 +4226,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4315,9 +4234,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-26",
@@ -4342,7 +4259,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T08:06:13.020Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4350,9 +4267,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": null,
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": null
     },
     {
       "date": "2026-11-27",
@@ -4375,7 +4290,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4383,9 +4298,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-27",
@@ -4408,7 +4321,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4416,9 +4329,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-28",
@@ -4434,16 +4345,18 @@
       "source": "公式・主催者詳細",
       "source_url": "https://www.union-music.com/",
       "sources": [
+        "イープラス",
         "チケットぴあ",
         "公式・主催者詳細"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
         "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
         "https://www.union-music.com/"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4451,9 +4364,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-28",
@@ -4476,7 +4387,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4484,9 +4395,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-28",
@@ -4509,7 +4418,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4517,9 +4426,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約300人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約300人規模"
     },
     {
       "date": "2026-11-28",
@@ -4542,7 +4449,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:20:52.520Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "not_published_on_checked_sources",
       "end_time_status": "not_published_on_checked_sources",
@@ -4574,7 +4481,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4605,7 +4512,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4613,9 +4520,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-11-29",
@@ -4638,7 +4543,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4646,9 +4551,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約830人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-29",
@@ -4671,7 +4574,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4679,9 +4582,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-11-29",
@@ -4704,7 +4605,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4712,9 +4613,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-29",
@@ -4740,7 +4639,7 @@
       "official_detail_checked": 0,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -4774,7 +4673,7 @@
       "official_detail_checked": 1,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -4808,7 +4707,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -4838,7 +4737,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4846,9 +4745,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-12-02",
@@ -4875,7 +4772,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -4905,7 +4802,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4913,9 +4810,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約1,204人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,204人規模"
     },
     {
       "date": "2026-12-04",
@@ -4931,16 +4826,18 @@
       "source": "公式・主催者詳細",
       "source_url": "https://eplus.jp/",
       "sources": [
+        "イープラス",
         "チケットぴあ",
         "公式・主催者詳細"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
         "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HBGH&includeSaleEnd=fuzzy",
         "https://eplus.jp/"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T07:59:29.659Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4948,9 +4845,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約1,730人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,730人規模"
     },
     {
       "date": "2026-12-05",
@@ -4969,12 +4864,11 @@
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima/p1",
         "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -4982,9 +4876,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約10,000人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-12-06",
@@ -5007,7 +4899,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5034,12 +4926,11 @@
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima/p1",
         "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5047,9 +4938,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約10,000人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約10,000人規模"
     },
     {
       "date": "2026-12-06",
@@ -5063,18 +4952,18 @@
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
         "CANDY PROMOTION",
         "イープラス"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
-        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5082,9 +4971,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-12-06",
@@ -5101,15 +4988,17 @@
       "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HBGH&includeSaleEnd=fuzzy",
       "sources": [
         "CANDY PROMOTION",
+        "イープラス",
         "チケットぴあ"
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima/p4",
         "https://t.pia.jp/pia/rlsInfo.do?page=2&venueCd=HBGH&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 2,
+      "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5117,9 +5006,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約1,730人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,730人規模"
     },
     {
       "date": "2026-12-06",
@@ -5142,7 +5029,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5173,7 +5060,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5181,9 +5068,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約450人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-12-07",
@@ -5206,7 +5091,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5239,7 +5124,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5247,9 +5132,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-12-08",
@@ -5272,7 +5155,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5280,9 +5163,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-12-09",
@@ -5309,7 +5190,7 @@
       "official_detail_checked": 2,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -5343,7 +5224,7 @@
       "official_detail_checked": 2,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -5373,7 +5254,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5381,9 +5262,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約800人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約800人規模"
     },
     {
       "date": "2026-12-11",
@@ -5408,7 +5287,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5416,9 +5295,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "verified",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-12-11",
@@ -5445,7 +5322,7 @@
       "official_detail_checked": 2,
       "participants_status": "published",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -5475,7 +5352,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "published",
       "end_time_status": "published",
@@ -5506,7 +5383,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5537,7 +5414,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T08:11:41.226Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5545,9 +5422,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約1,730人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約1,730人規模"
     },
     {
       "date": "2026-12-13",
@@ -5572,7 +5447,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5603,7 +5478,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "not_applicable_or_not_published",
       "start_time_status": "not_published_on_checked_sources",
       "end_time_status": "not_published_on_checked_sources",
@@ -5625,17 +5500,16 @@
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima/p1",
-        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima/p1"
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5643,9 +5517,7 @@
       "enrichment_targets": [],
       "public_data_complete": true,
       "confidence": "single_source",
-      "people_label": "最大約2,001人規模",
-      "stale_source": true,
-      "stale_reason": "degraded"
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-12-18",
@@ -5668,7 +5540,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5699,7 +5571,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5734,7 +5606,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -5764,7 +5636,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5799,7 +5671,7 @@
       "official_detail_checked": 1,
       "participants_status": "not_published_on_checked_sources",
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "start_time_status": "published",
       "end_time_status": "published",
       "needs_enrichment": false,
@@ -5829,7 +5701,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5860,7 +5732,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5891,7 +5763,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5924,7 +5796,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5955,7 +5827,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -5986,7 +5858,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -6017,7 +5889,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
@@ -6048,7 +5920,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T08:26:00.304Z",
+      "last_seen_at": "2026-10-06T09:29:43.690Z",
       "participants_status": "published_or_capacity_reference",
       "start_time_status": "published",
       "end_time_status": "not_published_on_checked_sources",
