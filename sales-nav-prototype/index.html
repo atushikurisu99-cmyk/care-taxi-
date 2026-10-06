@@ -1322,26 +1322,57 @@ html,body{
 
 .report-template-fixed{width:100%;min-height:46px;display:flex;align-items:center;background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff;padding:10px 11px;font-size:15px;font-weight:900}
 .monthly-report-actions button.demo{background:#513f13;border-color:#b69229;color:#fff}
-.sogo-sheet{background:#fff;color:#111;font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;font-size:9px;line-height:1.25}
-.sogo-page{background:#fff;border:1px solid #555;padding:8px;margin:0 0 12px;page-break-after:always}
+.sogo-sheet{
+ background:#fff;color:#111;font-family:"Yu Gothic","Hiragino Kaku Gothic ProN",Meiryo,sans-serif;
+ font-size:8px;line-height:1.12;min-width:720px
+}
+.sogo-page{
+ background:#fff;border:1px solid #111;padding:10px 12px;margin:0 0 12px;
+ page-break-after:always;min-height:1010px
+}
 .sogo-page:last-child{page-break-after:auto}
-.sogo-head{display:grid;grid-template-columns:1fr auto 1fr;align-items:end;margin-bottom:5px}
-.sogo-head h3{font-size:17px!important;margin:0!important;text-align:center!important;letter-spacing:.12em}
-.sogo-org{text-align:right;font-size:9px;font-weight:700;white-space:nowrap}
-.sogo-meta{display:grid;grid-template-columns:1.2fr 1.8fr 1fr 1fr;gap:0;margin-bottom:5px;border-top:1px solid #111;border-left:1px solid #111}
-.sogo-meta>div{border-right:1px solid #111;border-bottom:1px solid #111;padding:3px 4px;min-height:24px}
-.sogo-meta b{display:block;font-size:7px;font-weight:700;color:#333;margin-bottom:1px}
-.sogo-trip{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7.5px!important;white-space:normal!important}
-.sogo-trip th,.sogo-trip td{border:1px solid #111!important;padding:2px 3px!important;text-align:center!important;height:18px}
-.sogo-trip th{background:#fff!important;font-weight:800}
-.sogo-trip .place{text-align:left!important;overflow:hidden;white-space:nowrap;text-overflow:ellipsis}
-.sogo-summary{display:grid;grid-template-columns:repeat(5,1fr);border-left:1px solid #111;margin-top:5px}
-.sogo-summary>div{border-right:1px solid #111;border-bottom:1px solid #111;border-top:1px solid #111;padding:3px;text-align:center}
-.sogo-summary b{display:block;font-size:7px}
-.sogo-inspection{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7px!important;margin-top:7px;white-space:normal!important}
-.sogo-inspection th,.sogo-inspection td{border:1px solid #111!important;padding:2px!important;text-align:center!important}
-.sogo-inspection .item{text-align:left!important}
-.sogo-note{font-size:7px;margin-top:4px}
+.sogo-title-wrap{position:relative;min-height:54px;margin-bottom:5px}
+.sogo-title{font-size:26px!important;letter-spacing:.28em;text-align:center!important;margin:9px 0 0!important;font-weight:700}
+.sogo-org-block{position:absolute;right:0;top:0;text-align:right;font-size:10px;line-height:1.35}
+.sogo-org-block strong{display:block;font-size:12px}
+.sogo-top{width:100%;border-collapse:collapse;table-layout:fixed;margin-bottom:0;font-size:8px!important;white-space:normal!important}
+.sogo-top td,.sogo-top th{border:1px solid #111!important;padding:2px 4px!important;text-align:center!important;height:23px}
+.sogo-top .left{text-align:left!important}
+.sogo-top .label{font-size:7px!important;color:#111!important;font-weight:700!important;white-space:nowrap}
+.sogo-trip{width:100%;border-collapse:collapse;table-layout:fixed;font-size:7.5px!important;white-space:normal!important;margin-top:-1px}
+.sogo-trip th,.sogo-trip td{border:1px solid #111!important;padding:2px!important;text-align:center!important;height:27px}
+.sogo-trip th{background:#fff!important;font-weight:700}
+.sogo-trip .place{text-align:left!important;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;padding-left:4px!important}
+.sogo-trip .remarks{text-align:left!important}
+.sogo-trip .hm-head{padding:0!important}
+.sogo-trip .hm-head>span{display:inline-block;width:50%;border-left:1px solid #111}
+.sogo-trip .hm-head>span:first-child{border-left:0}
+.sogo-summary-table{width:100%;border-collapse:collapse;table-layout:fixed;margin-top:-1px;font-size:8px!important;white-space:normal!important}
+.sogo-summary-table td{border:1px solid #111!important;padding:2px 4px!important;height:28px;text-align:center!important}
+.sogo-summary-table .vlabel{writing-mode:vertical-rl;text-orientation:upright;letter-spacing:.08em;width:24px;padding:2px!important}
+.sogo-summary-table .labelcell{font-weight:700;width:52px}
+.sogo-summary-table .unit{text-align:right!important;padding-right:6px!important}
+.sogo-page-back{padding-top:12px}
+.sogo-inspection-title{display:grid;grid-template-columns:1fr 150px;align-items:end;margin-top:3px;border:1px solid #111;border-bottom:0;height:35px}
+.sogo-inspection-title strong{font-size:20px;letter-spacing:.32em;text-align:center}
+.sogo-inspection-title span{height:100%;border-left:1px solid #111;display:flex;align-items:center;justify-content:center;font-size:9px}
+.sogo-inspection{width:100%;border-collapse:collapse;table-layout:fixed;font-size:6.7px!important;white-space:normal!important}
+.sogo-inspection th,.sogo-inspection td{border:1px solid #111!important;padding:1px 2px!important;text-align:center!important;height:18px}
+.sogo-inspection th{background:#fff!important;font-weight:700}
+.sogo-inspection .cat{writing-mode:vertical-rl;text-orientation:upright;font-size:6.2px}
+.sogo-inspection .point{text-align:center!important}
+.sogo-inspection .detail{text-align:left!important}
+.sogo-inspection .result{font-size:11px;font-weight:700}
+.sogo-inspection-notes{font-size:6.6px;line-height:1.45;text-align:left}
+.sogo-alcohol{width:100%;border-collapse:collapse;table-layout:fixed;font-size:8px!important;margin-top:-1px;white-space:normal!important}
+.sogo-alcohol td{border:1px solid #111!important;padding:3px!important;text-align:center!important;height:24px}
+.sogo-alcohol .alabel{font-size:9px;line-height:1.35}
+.sogo-remarks{border:1px solid #111;border-top:0;min-height:92px;padding:5px;font-size:9px;text-align:left}
+.sogo-remarks strong{font-size:10px}
+@media(max-width:430px){
+ .monthly-report-paper.show .sogo-sheet{min-width:720px}
+ .monthly-report-paper.show{overflow:auto}
+}
 @media print{
  body.print-monthly-report #monthlyReportPreview .sogo-page{border:0!important;padding:0!important;margin:0!important}
  body.print-monthly-report #monthlyReportPreview .sogo-page{page-break-after:always}
@@ -2668,76 +2699,165 @@ function reportTemplatePlace(point){
  const v=String(point?.address||'').trim();
  return isCoordFallbackLabel(v)?'':v;
 }
+function sogoCashColumns(x){
+ const fare=Math.max(0,Math.round(Number(x?.fare)||0));
+ if(!x||!fare) return {cash:'',receivable:''};
+ const method=String(x.paymentMethod||'').trim();
+ return method==='現金'?{cash:fare.toLocaleString('ja-JP'),receivable:''}:{cash:'',receivable:fare.toLocaleString('ja-JP')};
+}
 function sogoTripRows(r,from,to){
  const trips=reportTripsForTemplate(r);
  let html='';
  for(let n=from;n<=to;n++){
   const x=trips[n-1]||null;
+  const hm=x?reportTemplateHm(x.dropoffTs):'';
+  const parts=hm?hm.split(':'):['',''];
+  const money=sogoCashColumns(x);
+  const people=x?(x.passengers??(x.demoData?1:'')):'';
+  const remarks=x?(x.remarks||x.paymentMethod||''):'';
   html+='<tr>'+
    '<td>'+n+'</td>'+
-   '<td>'+escapeHtml(x?reportTemplateHm(x.pickupTs):'')+'</td>'+
-   '<td>'+escapeHtml(x?reportTemplateHm(x.dropoffTs):'')+'</td>'+
+   '<td>'+escapeHtml(people)+'</td>'+
    '<td class="place">'+escapeHtml(x?reportTemplatePlace(x.pickup):'')+'</td>'+
    '<td class="place">'+escapeHtml(x?reportTemplatePlace(x.dropoff):'')+'</td>'+
-   '<td>'+escapeHtml(x&&x.fare!=null?Math.round(Number(x.fare)||0).toLocaleString('ja-JP'):'')+'</td>'+
-   '<td>'+escapeHtml(x?.paymentMethod||'')+'</td>'+
+   '<td>'+escapeHtml(parts[0])+'</td>'+
+   '<td>'+escapeHtml(parts[1])+'</td>'+
+   '<td>'+escapeHtml(money.cash)+'</td>'+
+   '<td>'+escapeHtml(money.receivable)+'</td>'+
+   '<td class="remarks">'+escapeHtml(remarks)+'</td>'+
   '</tr>';
  }
  return html;
 }
+function sogoTripHeader(){
+ return '<thead><tr>'+
+  '<th rowspan="2" style="width:5%">回数</th>'+
+  '<th rowspan="2" style="width:6%">人員</th>'+
+  '<th rowspan="2" style="width:17%">乗車地</th>'+
+  '<th rowspan="2" style="width:17%">降車地</th>'+
+  '<th colspan="2" style="width:11%">降車時刻</th>'+
+  '<th rowspan="2" style="width:12%">現収</th>'+
+  '<th rowspan="2" style="width:12%">未収</th>'+
+  '<th rowspan="2" style="width:20%">備考</th>'+
+  '</tr><tr><th>時</th><th>分</th></tr></thead>';
+}
+function sogoFrontHeader(r){
+ const d=r?.dateKey?new Date(r.dateKey+'T12:00:00'):null;
+ const y=d?d.getFullYear():'',m=d?d.getMonth()+1:'',day=d?d.getDate():'';
+ const wd=d?['日','月','火','水','木','金','土'][d.getDay()]:'';
+ const start=String(r?.startTime||'').split(':');
+ const end=String(r?.endTime||'').split(':');
+ const reg=r?.registrationNumber||r?.vehicleNumber||'';
+ const name=r?.businessName||r?.driverName||'';
+ return '<div class="sogo-title-wrap">'+
+  '<h3 class="sogo-title">運 転 日 報</h3>'+
+  '<div class="sogo-org-block"><strong>相互個人タクシー協同組合</strong><div>事務所代表　253-2505</div><div>253-2500</div></div>'+
+ '</div>'+
+ '<table class="sogo-top"><colgroup><col style="width:42%"><col style="width:29%"><col style="width:29%"></colgroup><tbody>'+
+  '<tr><td class="left">'+escapeHtml(y)+' 年 '+escapeHtml(m)+' 月 '+escapeHtml(day)+' 日 '+escapeHtml(wd)+' 曜日</td>'+
+  '<td>出庫　'+escapeHtml(start[0]||'')+' 時　'+escapeHtml(start[1]||'')+' 分</td>'+
+  '<td>入庫　'+escapeHtml(end[0]||'')+' 時　'+escapeHtml(end[1]||'')+' 分</td></tr>'+
+  '<tr><td class="left"><span class="label">登録番号</span>　'+escapeHtml(reg)+'</td>'+
+  '<td colspan="2" class="left"><span class="label">氏名又は名称</span>　'+escapeHtml(name)+'</td></tr>'+
+ '</tbody></table>';
+}
+function sogoSummaryHtml(r){
+ const trips=reportTripsForTemplate(r);
+ const km=reportTravelKm(r);
+ const sales=trips.reduce((sum,x)=>sum+Math.max(0,Number(x.fare)||0),0) || Math.max(0,Number(r?.sales)||0);
+ const cash=trips.filter(x=>String(x.paymentMethod||'')==='現金').reduce((s,x)=>s+Math.max(0,Number(x.fare)||0),0);
+ const receivable=Math.max(0,sales-cash);
+ const people=trips.reduce((s,x)=>s+(Number(x.passengers)||1),0);
+ return '<table class="sogo-summary-table"><tbody>'+
+  '<tr><td rowspan="3" class="vlabel">走行粁</td><td class="labelcell">入庫</td><td class="unit">'+escapeHtml(r?.odometerEnd??'')+' キロ</td>'+
+      '<td class="labelcell">乗車粁</td><td class="unit">'+escapeHtml(r?.occupiedKm??'')+' キロ</td>'+
+      '<td class="labelcell">現収</td><td class="unit">'+escapeHtml(cash?cash.toLocaleString('ja-JP'):'')+' 円</td></tr>'+
+  '<tr><td class="labelcell">出庫</td><td class="unit">'+escapeHtml(r?.odometerStart??'')+' キロ</td>'+
+      '<td class="labelcell">運送回数</td><td class="unit">'+escapeHtml(r?.trips||trips.length||'')+' 回</td>'+
+      '<td class="labelcell">未収</td><td class="unit">'+escapeHtml(receivable?receivable.toLocaleString('ja-JP'):'')+' 円</td></tr>'+
+  '<tr><td class="labelcell">差引</td><td class="unit">'+escapeHtml(km??'')+' キロ</td>'+
+      '<td class="labelcell">輸送人員</td><td class="unit">'+escapeHtml(people||'')+' 人</td>'+
+      '<td class="labelcell">合計</td><td class="unit">'+escapeHtml(sales?sales.toLocaleString('ja-JP'):'')+' 円</td></tr>'+
+ '</tbody></table>';
+}
 function sogoInspectionHtml(r){
  const demo=!!r?.demoData;
- const checks=[
-  ['ブレーキ','ペダルの踏みしろ・ブレーキの効き'],
-  ['ブレーキ','ブレーキ液量'],
-  ['ブレーキ','駐車ブレーキ・レバーの引きしろ'],
-  ['タイヤ','空気圧'],
-  ['タイヤ','亀裂及び損傷'],
-  ['タイヤ','異状な摩耗'],
-  ['タイヤ','溝の深さ'],
-  ['バッテリ','液量'],
-  ['原動機','冷却水の量'],
-  ['原動機','ファン・ベルトの張り具合・損傷'],
-  ['原動機','エンジン・オイルの量'],
-  ['原動機','かかり具合・異音'],
-  ['原動機','低速及び加速の状態'],
-  ['灯火装置及び方向指示器','点灯・点滅具合、汚れ及び損傷'],
-  ['ウォッシャ・ワイパー','液量・噴射状態／払拭状態'],
-  ['運行中の異状','異状がないこと']
+ const left=[
+  ['制動装置','ブレーキ','踏みしろ、きき具合'],
+  ['','ブレーキ','液量'],
+  ['','ブレーキ','空気圧'],
+  ['','ブレーキ','排気量'],
+  ['','レバー引きしろ','ブレーキ'],
+  ['走行装置','タイヤ','空気圧'],
+  ['','タイヤ','き裂・損傷'],
+  ['','タイヤ','摩耗'],
+  ['','タイヤ','溝の深さ'],
+  ['原動機関係','バッテリ','液量'],
+  ['','原動機','冷却水'],
+  ['','原動機','ファンベルト'],
+  ['','原動機','オイル'],
+  ['','原動機','異音'],
+  ['','かかり具合','低速・加速']
  ];
- return '<table class="sogo-inspection"><thead><tr><th style="width:27%">点検箇所</th><th>点検内容</th><th style="width:12%">結果</th></tr></thead><tbody>'+
-  checks.map(x=>'<tr><td class="item">'+escapeHtml(x[0])+'</td><td class="item">'+escapeHtml(x[1])+'</td><td>'+(demo?'レ':'')+'</td></tr>').join('')+
-  '<tr><td colspan="2" class="item">点検した人</td><td>'+escapeHtml(r?.inspectorName||'')+'</td></tr>'+
-  '</tbody></table><div class="sogo-note">印　レ：良　×：否　—：該当なし</div>';
+ const mid=[
+  ['灯火装置','前照灯','点灯・損傷'],
+  ['','尾灯','〃'],
+  ['','制動灯','〃'],
+  ['','番号灯','〃'],
+  ['','車幅灯','〃'],
+  ['','駐車灯','〃'],
+  ['','非常点滅表示灯','〃'],
+  ['','方向指示器','〃'],
+  ['防犯装置','防犯灯','〃'],
+  ['保安装置','後写鏡及び反射鏡','写映'],
+  ['','反射器及び自動車登録番号標','汚れ、損傷']
+ ];
+ const right=[
+  ['非常信号用具','発炎筒','有・無'],
+  ['ドアー矢印','','有・無'],
+  ['運転免許証','','有・無'],
+  ['自動車検査証','','有・無'],
+  ['自賠責証明書','','有・無'],
+  ['メーター検定証','','有・無'],
+  ['写真票','','有・無'],
+  ['地図','','有・無']
+ ];
+ const n=Math.max(left.length,mid.length,right.length);
+ let rows='';
+ for(let i=0;i<n;i++){
+  const a=left[i]||['','',''],b=mid[i]||['','',''],d=right[i]||['','',''];
+  rows+='<tr>'+
+   '<td class="cat">'+escapeHtml(a[0])+'</td><td class="point">'+escapeHtml(a[1])+'</td><td class="detail">'+escapeHtml(a[2])+'</td><td class="result">'+(a[1]?(demo?'✓':''):'')+'</td>'+
+   '<td class="cat">'+escapeHtml(b[0])+'</td><td class="point">'+escapeHtml(b[1])+'</td><td class="detail">'+escapeHtml(b[2])+'</td><td class="result">'+(b[1]?(demo?'✓':''):'')+'</td>'+
+   '<td class="cat">'+escapeHtml(d[0])+'</td><td class="point">'+escapeHtml(d[1])+'</td><td class="detail">'+escapeHtml(d[2])+'</td><td class="result">'+(d[0]?(demo?'✓':''):'')+'</td>'+
+  '</tr>';
+ }
+ return '<div class="sogo-inspection-title"><strong>日 常 点 検</strong><span>点検者　'+escapeHtml(r?.inspectorName||'')+'</span></div>'+
+ '<table class="sogo-inspection"><thead><tr>'+
+  '<th>区分</th><th>点検箇所</th><th>点検内容</th><th>良否</th>'+
+  '<th>区分</th><th>点検箇所</th><th>点検内容</th><th>良否</th>'+
+  '<th>区分</th><th>点検箇所</th><th>点検内容</th><th>良否</th>'+
+ '</tr></thead><tbody>'+rows+
+ '<tr><td colspan="8" class="detail">前日までに異常があった箇所について確認し、当該箇所に異常がないこと</td><td colspan="4" class="sogo-inspection-notes">（備考）<br>1．異常のない箇所は記号欄に○印<br>2．異常のある時は左又は右と書いて×印<br>3．異常時の処理を備考欄に記入すること</td></tr>'+
+ '</tbody></table>'+
+ '<table class="sogo-alcohol"><tbody><tr>'+
+  '<td rowspan="2" class="alabel">アルコール検知器<br>使用の有無</td><td>出庫時</td><td>有　'+(demo?'○':'')+'　無</td>'+
+  '<td rowspan="2" class="alabel">酒気帯びの有無</td><td>出庫時</td><td>有　無 '+(demo?'○':'')+'</td></tr>'+
+ '<tr><td>帰庫時</td><td>有　'+(demo?'○':'')+'　無</td><td>帰庫時</td><td>有　無 '+(demo?'○':'')+'</td></tr></tbody></table>'+
+ '<div class="sogo-remarks"><strong>備考欄</strong><div style="margin-top:6px">'+escapeHtml(r?.inspectionNote||'')+'</div></div>';
 }
 function sogoDailyReportHtml(r){
  if(!r) return '<div class="calendar-detail-empty">日報データがありません</div>';
- const date=String(r.dateKey||'').replaceAll('-','/');
- const km=reportTravelKm(r);
- const trips=reportTripsForTemplate(r);
- const tripFare=trips.reduce((sum,x)=>sum+Math.max(0,Number(x.fare)||0),0);
- const sales=Math.max(Number(r.sales)||0,tripFare);
- const name=r.businessName||'';
- const vehicle=r.vehicleNumber||'';
- const meta='<div class="sogo-meta">'+
-  '<div><b>日付</b>'+escapeHtml(date)+'</div>'+
-  '<div><b>氏名又は名称</b>'+escapeHtml(name)+'</div>'+
-  '<div><b>車番</b>'+escapeHtml(vehicle)+'</div>'+
-  '<div><b>乗務</b>'+escapeHtml((r.startTime||'')+'〜'+(r.endTime||''))+'</div>'+
- '</div>';
- const head='<div class="sogo-head"><div></div><h3>運転日報</h3><div class="sogo-org">相互個人タクシー協同組合</div></div>';
- const columns='<thead><tr><th style="width:4%">回</th><th style="width:8%">乗車時刻</th><th style="width:8%">降車時刻</th><th>乗車地</th><th>降車地</th><th style="width:9%">運賃</th><th style="width:10%">支払</th></tr></thead>';
- const summary='<div class="sogo-summary">'+
-  '<div><b>出庫km</b>'+escapeHtml(r.odometerStart??'')+'</div>'+
-  '<div><b>入庫km</b>'+escapeHtml(r.odometerEnd??'')+'</div>'+
-  '<div><b>走行km</b>'+escapeHtml(km??'')+'</div>'+
-  '<div><b>営業収入</b>'+escapeHtml(Math.round(sales).toLocaleString('ja-JP'))+'</div>'+
-  '<div><b>乗車回数</b>'+escapeHtml(r.trips||trips.length||'')+'</div>'+
- '</div>';
  return '<div class="sogo-sheet">'+
-  '<div class="sogo-page">'+head+meta+'<table class="sogo-trip">'+columns+'<tbody>'+sogoTripRows(r,1,20)+'</tbody></table>'+summary+'</div>'+
-  '<div class="sogo-page">'+head+meta+'<table class="sogo-trip">'+columns+'<tbody>'+sogoTripRows(r,21,30)+'</tbody></table>'+
-   '<h3 style="margin:8px 0 3px!important">日常点検</h3>'+sogoInspectionHtml(r)+'</div>'+
+  '<div class="sogo-page">'+
+    sogoFrontHeader(r)+
+    '<table class="sogo-trip">'+sogoTripHeader()+'<tbody>'+sogoTripRows(r,1,20)+'</tbody></table>'+
+    sogoSummaryHtml(r)+
+  '</div>'+
+  '<div class="sogo-page sogo-page-back">'+
+    '<table class="sogo-trip">'+sogoTripHeader()+'<tbody>'+sogoTripRows(r,21,30)+'</tbody></table>'+
+    sogoInspectionHtml(r)+
+  '</div>'+
  '</div>';
 }
 function monthlyReportTableHtml(monthKey){
@@ -2783,7 +2903,7 @@ function seedDemoOperationData(){
    dropoffTs,dropoffIso:new Date(dropoffTs).toISOString(),
    dropoff:{lat:null,lon:null,accuracy:9,address:p[1]},
    vacantSeconds:i?780:null,vacantMeters:i?1400:null,
-   fare:p[2],paymentMethod:p[3],disabilityDiscount:false
+   fare:p[2],paymentMethod:p[3],passengers:1,disabilityDiscount:false
   });
   analytics.push({schema:ANALYTICS_SCHEMA,id:'demo_ev_rs_'+dateKey+'_'+i,t:pickupTs,iso:new Date(pickupTs).toISOString(),dutyId,type:'ride_start',screen:'ride',position:null,build:'demo',data:{demoData:true,dateKey,rideId}});
   analytics.push({schema:ANALYTICS_SCHEMA,id:'demo_ev_re_'+dateKey+'_'+i,t:dropoffTs,iso:new Date(dropoffTs).toISOString(),dutyId,type:'ride_end',screen:'vacant',position:null,build:'demo',data:{demoData:true,dateKey,rideId,paymentMethod:p[3]}});
