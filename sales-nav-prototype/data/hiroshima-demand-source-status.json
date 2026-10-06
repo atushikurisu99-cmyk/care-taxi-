@@ -1,0 +1,185 @@
+{
+  "ok": true,
+  "generated_at": "2026-10-06T07:23:09.772Z",
+  "area": "広島市",
+  "source_health": {
+    "icch": {
+      "ok": true,
+      "state": "ok",
+      "count": 29,
+      "previous_count": 29,
+      "ms": 986,
+      "last_success_at": "2026-10-06T07:21:45.077Z"
+    },
+    "candy": {
+      "ok": true,
+      "state": "ok",
+      "count": 37,
+      "previous_count": 37,
+      "ms": 1419,
+      "last_success_at": "2026-10-06T07:21:46.496Z"
+    },
+    "worker_events": {
+      "ok": true,
+      "state": "ok",
+      "count": 20,
+      "previous_count": 20,
+      "ms": 10719,
+      "last_success_at": "2026-10-06T07:21:57.215Z"
+    },
+    "eplus": {
+      "ok": true,
+      "state": "ok",
+      "count": 47,
+      "previous_count": 35,
+      "ms": 26586,
+      "last_success_at": "2026-10-06T07:22:23.801Z"
+    },
+    "lawson": {
+      "ok": true,
+      "state": "ok",
+      "count": 57,
+      "previous_count": 57,
+      "ms": 2706,
+      "last_success_at": "2026-10-06T07:22:26.507Z"
+    },
+    "pia": {
+      "ok": true,
+      "state": "ok",
+      "count": 11,
+      "previous_count": 11,
+      "ms": 21637,
+      "last_success_at": "2026-10-06T07:22:48.144Z"
+    },
+    "dive": {
+      "ok": true,
+      "state": "ok",
+      "count": 3,
+      "previous_count": 3,
+      "ms": 856,
+      "last_success_at": "2026-10-06T07:22:49.000Z"
+    },
+    "cvb": {
+      "ok": false,
+      "state": "failure",
+      "count": null,
+      "previous_count": null,
+      "ms": 1441,
+      "last_success_at": null,
+      "error": "HCVB calendar has no future data; latest published date=2026-07-30",
+      "retained_future_count": 0
+    },
+    "sports": {
+      "ok": true,
+      "state": "ok",
+      "count": 36,
+      "previous_count": 36,
+      "ms": 19325,
+      "last_success_at": "2026-10-06T07:23:09.766Z"
+    }
+  },
+  "source_registry": {
+    "icch": {
+      "role": "venue_official",
+      "cadence": "twice_daily",
+      "categories": [
+        "convention",
+        "music",
+        "theater",
+        "event"
+      ],
+      "continuity": "retain_on_failure"
+    },
+    "candy": {
+      "role": "promoter",
+      "cadence": "twice_daily",
+      "categories": [
+        "music",
+        "theater"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "worker_events": {
+      "role": "legacy_aggregator",
+      "cadence": "twice_daily",
+      "categories": [
+        "music",
+        "theater"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "eplus": {
+      "role": "playguide",
+      "cadence": "twice_daily",
+      "categories": [
+        "music",
+        "theater",
+        "sports",
+        "event"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "lawson": {
+      "role": "playguide",
+      "cadence": "twice_daily",
+      "categories": [
+        "music",
+        "theater",
+        "sports",
+        "event"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "pia": {
+      "role": "playguide",
+      "cadence": "twice_daily",
+      "categories": [
+        "music",
+        "theater",
+        "sports",
+        "event"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "dive": {
+      "role": "tourism_official",
+      "cadence": "twice_daily",
+      "categories": [
+        "festival",
+        "event",
+        "sports"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    },
+    "cvb": {
+      "role": "convention_bureau",
+      "cadence": "twice_daily",
+      "categories": [
+        "convention"
+      ],
+      "continuity": "retain_on_failure_or_stale_publication"
+    },
+    "sports": {
+      "role": "sports_official",
+      "cadence": "twice_daily",
+      "categories": [
+        "sports"
+      ],
+      "continuity": "retain_on_failure_or_regression"
+    }
+  },
+  "enrichment_pending": {
+    "participants": 16,
+    "start_time": 39,
+    "end_time": 123
+  },
+  "degraded_sources": [
+    {
+      "id": "cvb",
+      "state": "failure",
+      "error": "HCVB calendar has no future data; latest published date=2026-07-30",
+      "retained_future_count": 0
+    }
+  ],
+  "operational_note": "取得元ごとに独立監視。失敗・急減・公開停止時も他の正常データを継続し、直前の未来予定を保持する。"
+}

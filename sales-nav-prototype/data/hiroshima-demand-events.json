@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T07:14:42.392Z",
+  "generated_at": "2026-10-06T07:23:09.772Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -13,63 +13,63 @@
       "state": "ok",
       "count": 29,
       "previous_count": 29,
-      "ms": 1154,
-      "last_success_at": "2026-10-06T07:13:17.827Z"
+      "ms": 986,
+      "last_success_at": "2026-10-06T07:21:45.077Z"
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 37,
       "previous_count": 37,
-      "ms": 1158,
-      "last_success_at": "2026-10-06T07:13:18.985Z"
+      "ms": 1419,
+      "last_success_at": "2026-10-06T07:21:46.496Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
       "previous_count": 20,
-      "ms": 9494,
-      "last_success_at": "2026-10-06T07:13:28.479Z"
+      "ms": 10719,
+      "last_success_at": "2026-10-06T07:21:57.215Z"
     },
     "eplus": {
       "ok": true,
       "state": "ok",
-      "count": 35,
-      "previous_count": 11,
-      "ms": 18078,
-      "last_success_at": "2026-10-06T07:13:46.557Z"
+      "count": 47,
+      "previous_count": 35,
+      "ms": 26586,
+      "last_success_at": "2026-10-06T07:22:23.801Z"
     },
     "lawson": {
       "ok": true,
       "state": "ok",
       "count": 57,
       "previous_count": 57,
-      "ms": 2352,
-      "last_success_at": "2026-10-06T07:13:48.909Z"
+      "ms": 2706,
+      "last_success_at": "2026-10-06T07:22:26.507Z"
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 11,
       "previous_count": 11,
-      "ms": 22706,
-      "last_success_at": "2026-10-06T07:14:11.615Z"
+      "ms": 21637,
+      "last_success_at": "2026-10-06T07:22:48.144Z"
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
       "previous_count": 3,
-      "ms": 7475,
-      "last_success_at": "2026-10-06T07:14:19.090Z"
+      "ms": 856,
+      "last_success_at": "2026-10-06T07:22:49.000Z"
     },
     "cvb": {
       "ok": false,
       "state": "failure",
       "count": null,
       "previous_count": null,
-      "ms": 1136,
+      "ms": 1441,
       "last_success_at": null,
       "error": "HCVB calendar has no future data; latest published date=2026-07-30",
       "retained_future_count": 0
@@ -79,8 +79,8 @@
       "state": "ok",
       "count": 36,
       "previous_count": 36,
-      "ms": 22161,
-      "last_success_at": "2026-10-06T07:14:42.387Z"
+      "ms": 19325,
+      "last_success_at": "2026-10-06T07:23:09.766Z"
     }
   },
   "source_registry": {
@@ -181,8 +181,8 @@
     "enrichment_policy": "既存イベントを消さず、不足している人数・開始・終了時刻を後続ソースで補完する"
   },
   "counts": {
-    "raw": 228,
-    "merged": 145
+    "raw": 240,
+    "merged": 146
   },
   "events": [
     {
@@ -206,7 +206,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -236,7 +236,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -265,7 +265,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -296,7 +296,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -330,7 +330,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -359,7 +359,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -393,7 +393,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -422,7 +422,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -451,7 +451,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -482,7 +482,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -511,7 +511,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -543,7 +543,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -572,7 +572,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -601,7 +601,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -631,7 +631,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -643,10 +643,10 @@
     {
       "date": "2026-10-11",
       "end_date": "2026-10-11",
-      "name": "兵動大樹のおしゃべり大好き。48",
+      "name": "兵動大樹のおしゃべり大好き。 48 広島",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": null,
+      "start_time": "13:00",
       "end_time": null,
       "event_type": "theater",
       "people": 1204,
@@ -654,20 +654,21 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
-      "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "verification_count": 2,
+      "first_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
-        "start_time",
         "end_time"
       ],
-      "confidence": "single_source",
+      "confidence": "verified",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -693,7 +694,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -722,7 +723,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -751,7 +752,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -780,7 +781,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -810,7 +811,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -840,7 +841,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -872,7 +873,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -905,7 +906,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -934,7 +935,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -963,7 +964,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -993,7 +994,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1013,16 +1014,17 @@
       "people": 6000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1054,7 +1056,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1087,7 +1089,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1116,7 +1118,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1147,7 +1149,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1178,7 +1180,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1209,7 +1211,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1238,7 +1240,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -1268,7 +1270,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1288,16 +1290,17 @@
       "people": 6000,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1326,7 +1329,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1357,7 +1360,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1386,7 +1389,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1415,7 +1418,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1446,7 +1449,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1475,7 +1478,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -1502,7 +1505,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1531,7 +1534,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1562,7 +1565,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1591,7 +1594,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1621,7 +1624,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1650,7 +1653,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -1677,7 +1680,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -1710,7 +1713,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1739,7 +1742,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -1754,7 +1757,7 @@
       "name": "アステールプラザ芸術劇場シリーズ M&Oplaysプロデュース「ブランク」",
       "venue": "JMSアステールプラザ",
       "address": null,
-      "start_time": null,
+      "start_time": "18:30",
       "end_time": null,
       "event_type": "theater",
       "people": 1204,
@@ -1762,20 +1765,21 @@
       "source": "ローチケ",
       "source_url": "https://cdn.l-tike.com/search/?pref=34&size=100",
       "sources": [
+        "イープラス",
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
-        "start_time",
         "end_time"
       ],
-      "confidence": "single_source",
+      "confidence": "verified",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -1800,7 +1804,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1829,7 +1833,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -1859,7 +1863,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -1886,7 +1890,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1918,7 +1922,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -1947,7 +1951,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -1980,7 +1984,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2009,7 +2013,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -2036,7 +2040,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2066,7 +2070,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2092,12 +2096,13 @@
         "ローチケ"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
         "https://cdn.l-tike.com/search/?pref=34&size=100"
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2131,7 +2136,7 @@
       ],
       "verification_count": 4,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
@@ -2158,7 +2163,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2188,7 +2193,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2218,7 +2223,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2248,7 +2253,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2277,7 +2282,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2307,7 +2312,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2337,7 +2342,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2368,7 +2373,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2397,7 +2402,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2427,7 +2432,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2459,7 +2464,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2490,11 +2495,40 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "verified",
       "people_label": "最大約1,504人規模"
+    },
+    {
+      "date": "2026-11-07",
+      "end_date": "2026-11-07",
+      "name": "あらき 広島",
+      "venue": "LIVE VANQUISH",
+      "address": null,
+      "start_time": "16:30",
+      "end_time": null,
+      "event_type": "music",
+      "people": 450,
+      "people_basis": "venue_capacity_reference",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
+      "sources": [
+        "イープラス"
+      ],
+      "source_urls": [
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
+      ],
+      "verification_count": 1,
+      "first_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
+      "needs_enrichment": true,
+      "enrichment_targets": [
+        "end_time"
+      ],
+      "confidence": "single_source",
+      "people_label": "最大約450人規模"
     },
     {
       "date": "2026-11-11",
@@ -2517,7 +2551,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2546,7 +2580,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2576,7 +2610,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2606,7 +2640,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2636,7 +2670,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2653,7 +2687,7 @@
       "address": null,
       "start_time": "17:00",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
@@ -2662,11 +2696,12 @@
         "イープラス"
       ],
       "source_urls": [
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
         "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2695,7 +2730,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2728,7 +2763,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2757,7 +2792,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2787,7 +2822,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -2814,7 +2849,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2843,7 +2878,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2874,7 +2909,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2903,7 +2938,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants",
@@ -2935,7 +2970,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -2964,7 +2999,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -2994,7 +3029,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3024,7 +3059,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants",
@@ -3055,7 +3090,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3084,7 +3119,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3115,7 +3150,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3145,7 +3180,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3175,7 +3210,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3205,7 +3240,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3235,7 +3270,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3265,7 +3300,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3294,7 +3329,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3327,7 +3362,7 @@
       ],
       "verification_count": 3,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3356,7 +3391,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -3385,7 +3420,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3416,7 +3451,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3445,7 +3480,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3475,7 +3510,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -3506,7 +3541,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3535,7 +3570,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -3564,7 +3599,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -3593,7 +3628,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -3622,7 +3657,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -3651,7 +3686,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3680,7 +3715,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3709,7 +3744,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3725,25 +3760,27 @@
       "address": null,
       "start_time": "16:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "theater",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
-      "source_url": "https://www.candy-p.com/schedule/",
+      "source": "イープラス",
+      "source_url": "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "イープラス"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/"
+        "https://www.candy-p.com/schedule/",
+        "https://eplus.jp/sf/play/chugoku-shikoku/hiroshima"
       ],
-      "verification_count": 1,
+      "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
       ],
-      "confidence": "single_source",
+      "confidence": "verified",
       "people_label": "最大約2,001人規模"
     },
     {
@@ -3767,7 +3804,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3796,7 +3833,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3825,7 +3862,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3854,7 +3891,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3883,7 +3920,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -3912,7 +3949,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -3941,7 +3978,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -3970,7 +4007,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -3999,7 +4036,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": false,
       "enrichment_targets": [],
       "confidence": "official",
@@ -4026,7 +4063,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4057,7 +4094,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4086,7 +4123,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "start_time",
@@ -4103,20 +4140,21 @@
       "address": null,
       "start_time": "18:30",
       "end_time": null,
-      "event_type": "event",
+      "event_type": "music",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
       "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
+      "source_url": "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima",
       "sources": [
         "イープラス"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima"
+        "https://eplus.jp/sf/event/chugoku-shikoku/hiroshima",
+        "https://eplus.jp/sf/anime/chugoku-shikoku/hiroshima"
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4145,7 +4183,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4174,7 +4212,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4203,7 +4241,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -4232,7 +4270,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4261,7 +4299,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "participants"
@@ -4290,7 +4328,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4319,7 +4357,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4348,7 +4386,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4379,7 +4417,7 @@
       ],
       "verification_count": 2,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4408,7 +4446,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4437,7 +4475,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4466,7 +4504,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
@@ -4495,7 +4533,7 @@
       ],
       "verification_count": 1,
       "first_seen_at": "2026-10-06T06:56:32.737Z",
-      "last_seen_at": "2026-10-06T07:14:42.392Z",
+      "last_seen_at": "2026-10-06T07:23:09.772Z",
       "needs_enrichment": true,
       "enrichment_targets": [
         "end_time"
