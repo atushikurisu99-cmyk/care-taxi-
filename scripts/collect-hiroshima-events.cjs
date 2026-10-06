@@ -104,7 +104,12 @@ function merge(events){
   const nkey=s=>norm(s||'').toLowerCase().replace(/[\s「」『』【】()（）・!！?？:：,，.。\-ー〜～]/g,'');
   for(const e of events){
     if(!e?.date||!e?.name||!inHiroshimaCity((e.venue||'')+' '+(e.address||'')+' '+(e.source_text||''))) continue;
-    e.name=String(e.name).replace(/^▼\s*/,'').replace(/^▽\s*/,'').trim();
+    e.name=String(e.name)
+      .replace(/^▼\s*/,'')
+      .replace(/^▽\s*/,'')
+      .replace(/^(?:販売終了|販売期間中|予定枚数終了|販売停止[^\s]*|発売中|受付中|受付終了)\s*/,'')
+      .replace(/^(?:一般発売|先行|プリセール|プレリザーブ|抽選)(?:[^／/]{0,80})?[／/]\s*/,'')
+      .trim();
     if(!e.name) continue;
     const en=nkey(e.name),ev=nkey(e.venue);
     const i=out.findIndex(x=>{
@@ -122,7 +127,8 @@ function merge(events){
     const preferName=String(e.name||'').length>String(x.name||'').length?e.name:x.name;
     const preferVenue=/フェニックスホール/.test(String(e.venue||''))?e.venue:(/フェニックスホール/.test(String(x.venue||''))?x.venue:(e.venue||x.venue));
     const inferred=typeOf(preferName);
-    out[i]={...x,...e,name:preferName,venue:preferVenue,event_type:inferred!=='event'?inferred:(e.event_type||x.event_type||'event'),
+    const specificType=[inferred,e.event_type,x.event_type].find(t=>t&&t!=='event')||'event';
+    out[i]={...x,...e,name:preferName,venue:preferVenue,event_type:specificType,
       start_time:e.start_time||x.start_time||null,end_time:e.end_time||x.end_time||null,
       people:Math.max(Number(x.people||0),Number(e.people||0))||null,
       people_basis:Number(e.people||0)>=Number(x.people||0)?(e.people_basis||x.people_basis):(x.people_basis||e.people_basis),
@@ -287,6 +293,7 @@ async function sourceLawson(){
       const category=m[1],name=norm(m[2]).replace(/^(?:先着|抽選|一般発売)\s*/,'').trim();
       const rawVenue=norm(m[6]);
       if(!name||!rawVenue) continue;
+      if(name.length>120||/公演日[:：]|会場[:：]|販売方法|申込\/詳細/.test(name)) continue;
       const vi=venueInfo(rawVenue);
       const venue=vi.name||rawVenue;
       if(!inHiroshimaCity(venue)) continue;
@@ -496,7 +503,8 @@ async function sourceSports(){
       const venue=norm(m[4]).replace(/\s+$/,'');
       if(!inHiroshimaCity(venue))continue;
       const tail=text.slice((m.index||0)+m[0].length,Math.min(text.length,(m.index||0)+m[0].length+100));
-      const op=norm((tail.match(/(?:Image:\s*)?([^\s]{1,24})\s+(?:sports_basketball|試合情報|confirmation_number)/)||[])[1]||'');
+      let op=norm((tail.match(/(?:Image:\s*)?([^\s]{1,24})\s+(?:sports_basketball|試合情報|confirmation_number)/)||[])[1]||'');
+      if(/^sports_basketball$/i.test(op)) op='';
       const label=op?('広島ドラゴンフライズ vs '+op):'広島ドラゴンフライズ';
       events.push(eventBase({name:label,date:ymd(y,m[1],m[2]),venue,source,url,text:m[0]+' '+tail,kind:'sports',start:m[3]}));
     }
