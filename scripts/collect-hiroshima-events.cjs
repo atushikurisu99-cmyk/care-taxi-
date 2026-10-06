@@ -224,17 +224,22 @@ async function sourceEplus(){
       const st=(m.index||0)+m[0].length;
       const en=i+1<dates.length?(dates[i+1].index||text.length):Math.min(text.length,st+900);
       let seg=text.slice(st,en).replace(/^\s*(?:先着|抽選|一般発売|受付中)\s*/,'').trim();
-      if(!seg || !/\(広島県\)/.test(seg)) continue;
+      const prefPos=seg.indexOf('(広島県)');
+      if(prefPos<0) continue;
+      const lead=seg.slice(0,prefPos);
 
-      const vi=venueInfo(seg);
-      if(!vi.name) continue; // only taxi-relevant known Hiroshima-city venues here
+      // Only accept a venue token that appears inside this event's own
+      // "title + venue(広島県)" block. Never borrow a venue from the next event.
+      const venueHits=[];
+      for(const [vn,capacity,re] of CAP){
+        const mm=lead.match(re);
+        if(mm) venueHits.push({name:vn,capacity,pos:lead.indexOf(mm[0]),matched:mm[0]});
+      }
+      venueHits.sort((a,b)=>a.pos-b.pos);
+      const vh=venueHits[0];
+      if(!vh||vh.pos<0) continue;
 
-      // Title is the text before the detected venue or before "(広島県)".
-      const venuePos=[
-        seg.indexOf(vi.name),
-        ...CAP.map(([, ,re])=>{ const mm=seg.match(re); return mm?seg.indexOf(mm[0]):-1; })
-      ].filter(x=>x>=0).sort((a,b)=>a-b)[0];
-      let head=(Number.isFinite(venuePos)?seg.slice(0,venuePos):seg.split(/\(広島県\)/)[0]);
+      let head=lead.slice(0,vh.pos);
       let name=head
         .replace(/^(?:先着|抽選|一般発売|受付中|受付終了|予定枚数終了)\s*/g,'')
         .replace(/\s+(?:先着|抽選|受付中|受付終了|予定枚数終了).*$/g,'')
@@ -244,7 +249,7 @@ async function sourceEplus(){
       const sm=seg.match(/(?:開演|開始|上映開始)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
       const em=seg.match(/(?:終演|終了)\s*[:：]\s*([0-2]?\d:[0-5]\d)/);
       events.push(eventBase({
-        name,date:ymd(m[1],m[2],m[3]),venue:vi.name,source:'イープラス',url,text:seg,
+        name,date:ymd(m[1],m[2],m[3]),venue:vh.name,source:'イープラス',url,text:seg,
         kind,start:sm?.[1]||null,end:em?.[1]||null
       }));
     }
