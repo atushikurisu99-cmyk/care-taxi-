@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-06T05:50:37.420Z",
+  "generated_at": "2026-10-06T05:57:53.677Z",
   "area": "広島市",
   "coverage": {
     "from": "2026-10-06",
@@ -12,55 +12,55 @@
       "ok": true,
       "state": "ok",
       "count": 29,
-      "ms": 938
+      "ms": 935
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 37,
-      "ms": 1033
+      "ms": 1238
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
       "count": 20,
-      "ms": 8304
+      "ms": 16921
     },
     "eplus": {
       "ok": true,
       "state": "ok",
       "count": 40,
-      "ms": 23844
+      "ms": 20838
     },
     "lawson": {
       "ok": true,
       "state": "ok",
       "count": 57,
-      "ms": 2260
+      "ms": 2729
     },
     "pia": {
-      "ok": false,
-      "state": "suspicious_zero",
-      "count": 0,
-      "ms": 2198
+      "ok": true,
+      "state": "ok",
+      "count": 12,
+      "ms": 13111
     },
     "dive": {
       "ok": true,
       "state": "ok",
       "count": 3,
-      "ms": 2238
+      "ms": 6970
     },
     "cvb": {
       "ok": true,
       "state": "ok",
       "count": 0,
-      "ms": 5568
+      "ms": 6726
     },
     "sports": {
       "ok": true,
       "state": "ok",
       "count": 36,
-      "ms": 20156
+      "ms": 20499
     }
   },
   "rules": {
@@ -69,8 +69,8 @@
     "failure_policy": "取得失敗または疑わしい0件では直前の未来予定を保持する"
   },
   "counts": {
-    "raw": 222,
-    "merged": 140
+    "raw": 234,
+    "merged": 148
   },
   "events": [
     {
@@ -145,24 +145,26 @@
     {
       "date": "2026-10-09",
       "end_date": "2026-10-09",
-      "name": "沢田研二",
+      "name": "販売終了 一般発売/沢田研二",
       "venue": "広島文化学園HBGホール",
       "address": null,
       "start_time": "17:00",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "イープラス",
-      "source_url": "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
       "sources": [
-        "イープラス"
+        "イープラス",
+        "チケットぴあ"
       ],
       "source_urls": [
-        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima"
+        "https://eplus.jp/sf/live/chugoku-shikoku/hiroshima",
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約2,001人規模"
     },
     {
@@ -525,6 +527,29 @@
       "people_label": "最大約800人規模"
     },
     {
+      "date": "2026-10-14",
+      "end_date": "2026-10-14",
+      "name": "予定枚数終了 一般発売/Kizuna-絆-広島公演",
+      "venue": "JMSアステールプラザ",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 1204,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,204人規模"
+    },
+    {
       "date": "2026-10-15",
       "end_date": "2026-10-15",
       "name": "上村文乃チェロリサイタル",
@@ -595,6 +620,29 @@
       ],
       "verification_count": 2,
       "confidence": "verified",
+      "people_label": "最大約450人規模"
+    },
+    {
+      "date": "2026-10-16",
+      "end_date": "2026-10-16",
+      "name": "予定枚数終了 一般発売【広島公演】/キュウソネコカミ",
+      "venue": "LIVE VANQUISH",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 450,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=LVQS&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=LVQS&includeSaleEnd=fuzzy"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
       "people_label": "最大約450人規模"
     },
     {
@@ -740,6 +788,52 @@
       ],
       "verification_count": 2,
       "confidence": "verified",
+      "people_label": "最大約1,204人規模"
+    },
+    {
+      "date": "2026-10-17",
+      "end_date": "2026-10-17",
+      "name": "販売終了 一般発売/家入レオ",
+      "venue": "JMSアステールプラザ",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 1204,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,204人規模"
+    },
+    {
+      "date": "2026-10-17",
+      "end_date": "2026-10-17",
+      "name": "販売停止(この公演は販売再開待ちです) 一般発売./家入レオ",
+      "venue": "JMSアステールプラザ",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 1204,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -1537,6 +1631,29 @@
     {
       "date": "2026-11-01",
       "end_date": "2026-11-01",
+      "name": "予定枚数終了 一般発売/水谷千重子",
+      "venue": "広島国際会議場 フェニックスホール",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 1504,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRKK&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRKK&includeSaleEnd=fuzzy"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,504人規模"
+    },
+    {
+      "date": "2026-11-01",
+      "end_date": "2026-11-01",
       "name": "木村カエラ",
       "venue": "広島クラブクアトロ",
       "address": null,
@@ -1885,6 +2002,29 @@
       "verification_count": 1,
       "confidence": "single_source",
       "people_label": "最大約2,001人規模"
+    },
+    {
+      "date": "2026-11-14",
+      "end_date": "2026-11-14",
+      "name": "予定枚数終了 一般発売/Chevon",
+      "venue": "BLUE LIVE HIROSHIMA",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 830,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=BLIV&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=BLIV&includeSaleEnd=fuzzy"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約830人規模"
     },
     {
       "date": "2026-11-14",
@@ -2286,24 +2426,26 @@
     {
       "date": "2026-11-21",
       "end_date": "2026-11-21",
-      "name": "斉藤和義",
+      "name": "予定枚数終了 一般発売【広島公演】/斉藤和義",
       "venue": "広島文化学園HBGホール",
       "address": null,
       "start_time": null,
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 2001,
       "people_basis": "venue_capacity_reference",
-      "source": "ローチケ",
-      "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
       "sources": [
-        "ローチケ"
+        "ローチケ",
+        "チケットぴあ"
       ],
       "source_urls": [
-        "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
+        "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約2,001人規模"
     },
     {
@@ -2496,24 +2638,26 @@
     {
       "date": "2026-11-23",
       "end_date": "2026-11-23",
-      "name": "角松敏生",
+      "name": "予定枚数終了 一般発売/角松敏生",
       "venue": "JMSアステールプラザ",
       "address": null,
       "start_time": null,
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 1204,
       "people_basis": "venue_capacity_reference",
-      "source": "ローチケ",
-      "source_url": "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy",
       "sources": [
-        "ローチケ"
+        "ローチケ",
+        "チケットぴあ"
       ],
       "source_urls": [
-        "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100"
+        "https://cdn.l-tike.com/search/?pref=34&tig=100&size=100",
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=ASTP&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約1,204人規模"
     },
     {
@@ -2562,6 +2706,29 @@
       "verification_count": 1,
       "confidence": "single_source",
       "people_label": "最大約800人規模"
+    },
+    {
+      "date": "2026-11-28",
+      "end_date": "2026-11-28",
+      "name": "予定枚数終了 一般発売【広島公演】/ゴスペラーズ",
+      "venue": "広島文化学園HBGホール",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 2001,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HRBG&includeSaleEnd=fuzzy"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約2,001人規模"
     },
     {
       "date": "2026-11-29",
@@ -3006,24 +3173,26 @@
     {
       "date": "2026-12-13",
       "end_date": "2026-12-13",
-      "name": "SCANDAL",
+      "name": "予定枚数終了 一般発売【広島公演】/SCANDAL",
       "venue": "広島クラブクアトロ",
       "address": null,
       "start_time": "17:30",
       "end_time": null,
-      "event_type": "music",
+      "event_type": "event",
       "people": 800,
       "people_basis": "venue_capacity_reference",
-      "source": "CANDY PROMOTION",
-      "source_url": "https://www.candy-p.com/schedule/",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=CQUH&includeSaleEnd=fuzzy",
       "sources": [
-        "CANDY PROMOTION"
+        "CANDY PROMOTION",
+        "チケットぴあ"
       ],
       "source_urls": [
-        "https://www.candy-p.com/schedule/"
+        "https://www.candy-p.com/schedule/",
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=CQUH&includeSaleEnd=fuzzy"
       ],
-      "verification_count": 1,
-      "confidence": "single_source",
+      "verification_count": 2,
+      "confidence": "verified",
       "people_label": "最大約800人規模"
     },
     {
@@ -3275,6 +3444,29 @@
       ],
       "source_urls": [
         "https://www.candy-p.com/schedule/"
+      ],
+      "verification_count": 1,
+      "confidence": "single_source",
+      "people_label": "最大約1,730人規模"
+    },
+    {
+      "date": "2027-01-16",
+      "end_date": "2027-01-16",
+      "name": "予定枚数終了 一般発売 /HY",
+      "venue": "上野学園ホール",
+      "address": null,
+      "start_time": null,
+      "end_time": null,
+      "event_type": "event",
+      "people": 1730,
+      "people_basis": "venue_capacity_reference",
+      "source": "チケットぴあ",
+      "source_url": "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HBGH&includeSaleEnd=fuzzy",
+      "sources": [
+        "チケットぴあ"
+      ],
+      "source_urls": [
+        "https://t.pia.jp/pia/rlsInfo.do?page=1&venueCd=HBGH&includeSaleEnd=fuzzy"
       ],
       "verification_count": 1,
       "confidence": "single_source",
