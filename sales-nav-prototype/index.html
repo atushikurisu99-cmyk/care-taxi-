@@ -1905,7 +1905,7 @@ html,body{
   <div class="monthly-report-card">
    <div class="monthly-report-actions">
     <button type="button" class="demo" onclick="seedDemoOperationData()">デモ数値</button>
-    <button type="button" onclick="toggleMonthlyReportPreview()">プレビュー</button>
+    <button id="monthlyReportPreviewButton" type="button" onclick="toggleMonthlyReportPreview()">プレビュー</button>
     <button type="button" onclick="syncDailyReportsToGoogleSheets(false)">Google Sheetsへ同期</button>
     <button type="button" class="print" onclick="printMonthlyReport()">印刷</button>
     <button type="button" class="main" onclick="downloadMonthlyReportXlsx()">Excelダウンロード</button>
@@ -2788,12 +2788,26 @@ function renderMonthlyReportPreview(forceShow=true){
  const p=document.getElementById('monthlyReportPreview'); if(!p)return;
  const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
  p.innerHTML=monthlyReportTableHtml(monthKey);
- if(forceShow)p.classList.add('show');
+ if(forceShow){
+  p.classList.add('show');
+  const btn=document.getElementById('monthlyReportPreviewButton');
+  if(btn) btn.textContent='プレビューを閉じる';
+  requestAnimationFrame(()=>setTimeout(()=>{
+   try{p.scrollIntoView({behavior:'smooth',block:'start'});}catch(e){p.scrollIntoView();}
+  },40));
+ }
 }
 function toggleMonthlyReportPreview(){
  const p=document.getElementById('monthlyReportPreview');if(!p)return;
- if(p.classList.contains('show'))p.classList.remove('show');
- else renderMonthlyReportPreview(true);
+ const btn=document.getElementById('monthlyReportPreviewButton');
+ if(p.classList.contains('show')){
+  p.classList.remove('show');
+  if(btn) btn.textContent='プレビュー';
+  const wrap=document.querySelector('#monthlyReport .monthly-report-wrap');
+  if(wrap) wrap.scrollTop=0;
+ }else{
+  renderMonthlyReportPreview(true);
+ }
 }
 
 function printMonthlyReport(){
