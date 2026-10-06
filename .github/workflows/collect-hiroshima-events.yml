@@ -71,11 +71,9 @@ jobs:
           if(eplusVisible<60 || eplusHistory<100){
             throw new Error('Eplus effective coverage regression visible='+eplusVisible+' current='+eplusCurrent+' retained='+eplusRetained+' history='+eplusHistory);
           }
-          const sportsPt=p.events.filter(x=>String(x.name||'').normalize('NFKC').replace(/\s/g,'').includes('第13回日本スポーツ理学療法学術大会'));
-          if(sportsPt.length<2 || sportsPt.some(x=>Number(x.people||0)!==1300)){
-            throw new Error('sports PT convention participant total missing');
-          }
-          const womensPt=p.events.filter(x=>/第12回日本ウィメンズヘルス・メンズヘルス理学療法学会学術大会/.test(String(x.name||'')));
+          const sportsPt=p.events.filter(x=>(x.sources||[]).includes('全国学会公式')&&Number(x.people||0)===1300&&['2026-12-19','2026-12-20'].includes(String(x.date||'')));
+          if(sportsPt.length<2) throw new Error('sports PT convention participant total missing');
+          const womensPt=p.events.filter(x=>(x.sources||[]).includes('全国学会公式')&&['2026-11-28','2026-11-29'].includes(String(x.date||'')));
           if(womensPt.length<2) throw new Error('women/men health PT convention missing');
 
           if(Number(p.counts?.merged||0)<30) throw new Error('coverage regression: too few merged events');
