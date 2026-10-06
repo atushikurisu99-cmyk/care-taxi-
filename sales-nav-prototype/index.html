@@ -2043,6 +2043,16 @@ preventIosPinchZoom();
 })();
 
 const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',dailyReport:'日報入力',reportEdit:'日報編集',monthlyReport:'月報・帳票出力',menu:'メニュー'};
+const APP_LINKS=Object.freeze({
+ googleAuthBase:'https://taxi-google-auth.atushi-works.workers.dev',
+ jrApiBase:'https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api',
+ demandSnapshot:'./data/hiroshima-demand-events.json',
+ monthlyReportSource:'https://kojin1-or-jp.prm-ssl.jp/useful.html',
+ gsiRoadBase:'https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/',
+ weatherForecast:'https://api.open-meteo.com/v1/forecast',
+ reverseNominatim:'https://nominatim.openstreetmap.org/reverse',
+ reverseBigDataCloud:'https://api.bigdatacloud.net/data/reverse-geocode-client'
+});
 let nt,st;
 function stateLabelFor(id){
  if(id==='ride') return '実車中';
@@ -2119,7 +2129,7 @@ function openSettingsSection(section){
  if(section==='notifications') renderNotificationSettings();
 }
 
-const GOOGLE_AUTH_WORKER_URL='https://taxi-google-auth.atushi-works.workers.dev';
+const GOOGLE_AUTH_WORKER_URL=APP_LINKS.googleAuthBase;
 const LEGACY_GOOGLE_AUTH_TOKEN_KEY='taxi_google_auth_session_v2';
 const GOOGLE_AUTH_APP_DEVICE_KEY='taxi_google_auth_app_device_v1';
 const GOOGLE_AUTH_ACTIVE_PAIR_KEY='taxi_google_auth_active_pair_v1';
@@ -2450,7 +2460,7 @@ async function sendGoogleTestMail(){
 }
 
 const MONTHLY_REPORT_SETTINGS_KEY='taxi_monthly_report_settings_v1';
-const MONTHLY_REPORT_SOURCE_URL='https://kojin1-or-jp.prm-ssl.jp/useful.html';
+const MONTHLY_REPORT_SOURCE_URL=APP_LINKS.monthlyReportSource;
 
 function monthKeyNow(){
  const d=new Date(); return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0');
@@ -3553,8 +3563,8 @@ function checkReservationAutoJob(){
 let jrProbeData=null;
 let jrProbeFetchedAt=0;
 let jrProbeSource='none';
-const JR_WORKER_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/jr/hiroshima';
-const JR_LAST_TRAIN_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/jr/last-trains/hiroshima';
+const JR_WORKER_URL=APP_LINKS.jrApiBase+'/jr/hiroshima';
+const JR_LAST_TRAIN_URL=APP_LINKS.jrApiBase+'/jr/last-trains/hiroshima';
 let jrLastTrainData=null;
 let jrLastTrainFetchedAt=0;
 
@@ -3881,9 +3891,9 @@ let eventRealtimeData=null;
 let sportsRealtimeData=null;
 let demandSnapshotData=null;
 let eventSportsFetchedAt=0;
-const LIVE_EVENTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/events/hiroshima';
-const DEMAND_EVENTS_URL='https://raw.githubusercontent.com/atushikurisu99-cmyk/care-taxi-/main/sales-nav-prototype/data/hiroshima-demand-events.json';
-const SPORTS_URL='https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api/sports/hiroshima';
+const LIVE_EVENTS_URL=APP_LINKS.jrApiBase+'/events/hiroshima';
+const DEMAND_EVENTS_URL=APP_LINKS.demandSnapshot;
+const SPORTS_URL=APP_LINKS.jrApiBase+'/sports/hiroshima';
 const EVENT_FEED_CACHE_KEY='taxi_event_feed_cache_v2';
 const SPORTS_FEED_CACHE_KEY='taxi_sports_feed_cache_v2';
 const EVENT_FEED_CACHE_MAX_AGE_MS=48*60*60*1000;
@@ -5352,7 +5362,7 @@ async function fetchGsiRoadTile(z,x,y){
   gsiRoadTileCache.set(key,v);
   return v;
  }
- const p=fetch('https://cyberjapandata.gsi.go.jp/xyz/experimental_rdcl/'+key+'.geojson',{cache:'force-cache'})
+ const p=fetch(APP_LINKS.gsiRoadBase+key+'.geojson',{cache:'force-cache'})
   .then(r=>r.ok?r.json():null)
   .then(d=>d&&Array.isArray(d.features)?d.features:[])
   .catch(()=>[]);
@@ -6016,7 +6026,7 @@ async function updateCurrentWeather(pos,force=false){
  }
  weatherCurrentFetchBusy=true;
  const lat=pos.coords.latitude,lon=pos.coords.longitude;
- const url='https://api.open-meteo.com/v1/forecast?latitude='+encodeURIComponent(lat)+
+ const url=APP_LINKS.weatherForecast+'?latitude='+encodeURIComponent(lat)+
   '&longitude='+encodeURIComponent(lon)+
   '&current=temperature_2m,weather_code,precipitation,rain,wind_speed_10m'+
   '&hourly=precipitation_probability,precipitation&forecast_hours=12&timezone=Asia%2FTokyo';
@@ -6480,7 +6490,7 @@ async function reverseGeocode(lat,lon){
  const cached=readGeocodeCache(lat,lon);
  if(cached) return cached;
 
- const n='https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=18&addressdetails=1&accept-language=ja';
+ const n=APP_LINKS.reverseNominatim+'?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=18&addressdetails=1&accept-language=ja';
  try{
   const d=await fetchJsonWithTimeout(n,4500);
   const label=shortPlaceLabel(d);
@@ -6490,7 +6500,7 @@ async function reverseGeocode(lat,lon){
   }
  }catch(e){}
 
- const b='https://api.bigdatacloud.net/data/reverse-geocode-client?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&localityLanguage=ja';
+ const b=APP_LINKS.reverseBigDataCloud+'?latitude='+encodeURIComponent(lat)+'&longitude='+encodeURIComponent(lon)+'&localityLanguage=ja';
  try{
   const d=await fetchJsonWithTimeout(b,4500);
   const label=shortPlaceLabelFallback(d);
