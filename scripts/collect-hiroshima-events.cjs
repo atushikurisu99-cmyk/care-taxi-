@@ -393,6 +393,7 @@ async function sourceDive(){
 }
 async function sourceCVB(){
   const url='https://www.hiroshimacvb.jp/calendar/'; let html=await fetchText(url); let events=[];
+  await saveDebug('cvb-raw.html',html);
   await saveDebug('cvb-static.txt',norm(html)); const rows=[...html.matchAll(/<tr[^>]*>([\s\S]*?)<\/tr>/gi)];
   for(const row of rows){const cells=[...row[1].matchAll(/<t[dh][^>]*>([\s\S]*?)<\/t[dh]>/gi)].map(x=>norm(x[1]));if(cells.length<4)continue;
     const [name,venue,period,domesticRaw,overseasRaw]=cells;const d=dateFrom(period,new Date().getFullYear());if(!d||!inHiroshimaCity(venue))continue;
