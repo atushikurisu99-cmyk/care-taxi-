@@ -3093,7 +3093,7 @@ function sogoFrontSvg(r){
   [106,342,1707],[205,342,1707],[400,342,1707],[596,342,1707],[752,342,1707],[940,342,1707],[1128,342,1707],
   [142,1707,1910],[270,1707,1910],[556,1707,1910],[704,1707,1910],[992,1707,1910],[1114,1707,1910]
  ];
- const TRACE_LINE_LIMIT=3;
+ const TRACE_LINE_LIMIT=4;
  const traceSegments=[
   ...tracedH.map((a,i)=>({id:'H'+String(i+1).padStart(2,'0'),x1:X(a[1]),y1:Y(a[0]),x2:X(a[2]),y2:Y(a[0])})),
   ...tracedV.map((a,i)=>({id:'V'+String(i+1).padStart(2,'0'),x1:X(a[0]),y1:Y(a[1]),x2:X(a[0]),y2:Y(a[2])})),
