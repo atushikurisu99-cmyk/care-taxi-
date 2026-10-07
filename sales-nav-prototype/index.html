@@ -5905,11 +5905,32 @@ let infoReturn='home';
 let dutyFallback={active:false,start:0};
 function getDutyState(){
  try{
-  const active=localStorage.getItem('taxi_duty_active')==='1';
-  const start=Number(localStorage.getItem('taxi_duty_start')||0);
-  if(active&&start>0) dutyFallback={active:true,start};
-  else if(!active) dutyFallback={active:false,start:0};
-  return {active,start};
+  const activeStored=localStorage.getItem('taxi_duty_active')==='1';
+  let start=Number(localStorage.getItem('taxi_duty_start')||0);
+
+  // 古い/壊れた値が秒単位で残っている場合はミリ秒へ正規化する。
+  if(start>=1000000000 && start<100000000000){
+   start*=1000;
+   localStorage.setItem('taxi_duty_start',String(start));
+  }
+
+  // 2020年以前、未来すぎる値、0/NaNは壊れた乗務状態として解除する。
+  const minValid=Date.UTC(2020,0,1);
+  const maxValid=Date.now()+5*60*1000;
+  const validStart=Number.isFinite(start)&&start>=minValid&&start<=maxValid;
+  const active=activeStored&&validStart;
+
+  if(active){
+   dutyFallback={active:true,start};
+   return {active:true,start};
+  }
+
+  if(activeStored&&!validStart){
+   localStorage.removeItem('taxi_duty_active');
+   localStorage.removeItem('taxi_duty_start');
+  }
+  dutyFallback={active:false,start:0};
+  return {active:false,start:0};
  }catch(e){
   return dutyFallback;
  }
@@ -5941,7 +5962,7 @@ function renderDutyUI(){
  if(dutyMeta){
   dutyMeta.textContent=d.active
    ? new Date(d.start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'開始 · '+formatDuration(Date.now()-d.start)
-   : '乗務開始前';
+   : '';
  }
  if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
  if(vs) vs.textContent=d.active?formatDuration(Date.now()-d.start):'未乗務';
