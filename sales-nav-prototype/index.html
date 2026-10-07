@@ -3076,17 +3076,18 @@ function sogoSvgLine(id,x1,y1,x2,y2,kind='normal'){
 function sogoSvgText(x,y,v,cls='cell',anchor='middle',extra=''){
  return '<text class="sogo-svg-text '+cls+'" x="'+x+'" y="'+y+'" text-anchor="'+anchor+'" '+extra+'>'+sogoSvgEsc(v)+'</text>';
 }
-function sogoSvgTextFit(x,y,v,cls='cell',anchor='middle',maxWidth=0,fontSize=14,extra=''){
+function sogoSvgTextFit(x,y,v,cls='cell',anchor='middle',maxWidth=0,fontSize=14,extra='',minFontSize=10){
  const raw=v==null?'':String(v);
  let units=0;
  for(const ch of raw){
   units+=(/[\x00-\x7F]/.test(ch)?0.58:1);
  }
- const attrs=[];
- if(maxWidth>0&&units*fontSize>maxWidth){
-  attrs.push('textLength="'+Math.max(1,maxWidth).toFixed(1)+'"');
-  attrs.push('lengthAdjust="spacingAndGlyphs"');
+ let actual=fontSize;
+ if(maxWidth>0&&units>0){
+  const estimated=units*fontSize;
+  if(estimated>maxWidth) actual=Math.max(minFontSize,fontSize*(maxWidth/estimated));
  }
+ const attrs=['style="font-size:'+actual.toFixed(2)+'px"'];
  if(extra) attrs.push(extra);
  return sogoSvgText(x,y,raw,cls,anchor,attrs.join(' '));
 }
@@ -3134,7 +3135,7 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1392),Y(192),'253-2500','org small','end');
 
  const yDate=Y((230+287)/2),yReg=Y((287+342)/2),yHead=Y(356);
- text+=sogoSvgText(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start');
+ text+=sogoSvgTextFit(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start',X(580-55),15,'',12);
  text+=sogoSvgText(X((595+724)/2),yDate,'出庫','top');
  text+=sogoSvgText(X(770),yDate,start[0]||'','top');
  text+=sogoSvgText(X(835),yDate,'時','top');
@@ -3186,17 +3187,17 @@ function sogoFrontSvg(r){
 
  text+=sogoSvgText(X(82),Y((1707+1910)/2),'走行粁','summary v','middle','transform="rotate(-90 '+X(82)+' '+Y((1707+1910)/2)+')"');
  ['入庫','出庫','差引'].forEach((v,i)=>text+=sogoSvgText(X((141+270)/2),sumY[i],v,'summary'));
- text+=sogoSvgText(X(545),sumY[0],(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end');
- text+=sogoSvgText(X(545),sumY[1],(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end');
- text+=sogoSvgText(X(545),sumY[2],(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end');
+ text+=sogoSvgTextFit(X(545),sumY[0],(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end',X(545-280),13,'',11);
+ text+=sogoSvgTextFit(X(545),sumY[1],(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end',X(545-280),13,'',11);
+ text+=sogoSvgTextFit(X(545),sumY[2],(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end',X(545-280),13,'',11);
  ['乗車粁','運送回数','輸送人員'].forEach((v,i)=>text+=sogoSvgText(X((556+704)/2),sumY[i],v,'summary'));
- text+=sogoSvgText(X(980),sumY[0],(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end');
- text+=sogoSvgText(X(980),sumY[1],(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end');
- text+=sogoSvgText(X(980),sumY[2],(people||'')+(people?' 人':''),'summary value','end');
+ text+=sogoSvgTextFit(X(980),sumY[0],(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end',X(980-715),13,'',11);
+ text+=sogoSvgTextFit(X(980),sumY[1],(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end',X(980-715),13,'',11);
+ text+=sogoSvgTextFit(X(980),sumY[2],(people||'')+(people?' 人':''),'summary value','end',X(980-715),13,'',11);
  ['現収','未収','合計'].forEach((v,i)=>text+=sogoSvgText(X((991+1114)/2),sumY[i],v,'summary'));
- text+=sogoSvgText(X(1390),sumY[0],(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end');
- text+=sogoSvgText(X(1390),sumY[1],(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end');
- text+=sogoSvgText(X(1390),sumY[2],(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end');
+ text+=sogoSvgTextFit(X(1390),sumY[0],(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end',X(1390-1125),13,'',11);
+ text+=sogoSvgTextFit(X(1390),sumY[1],(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end',X(1390-1125),13,'',11);
+ text+=sogoSvgTextFit(X(1390),sumY[2],(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end',X(1390-1125),13,'',11);
  text+=sogoSvgText(X(70),Y((1910+2011)/2),'休憩','summary','start');
  text+=sogoSvgText(X(150),Y((1910+2011)/2),'：','summary');
  text+=sogoSvgText(X(245),Y((1910+2011)/2),'～','summary');
