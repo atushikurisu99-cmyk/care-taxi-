@@ -67,7 +67,8 @@ jobs:
             await page.evaluate(()=>{ if(typeof show==='function') show('menu'); });
             await page.waitForTimeout(250);
             const menu=page.locator('#menu');
-            if(!await menu.isVisible()) throw new Error('menu screen not visible');
+            const menuActive=await menu.evaluate(el=>el.classList.contains('active'));
+            if(!menuActive) throw new Error('menu screen did not become active');
             const menuItems=page.locator('#menu .menuitem');
             const menuCount=await menuItems.count();
             if(menuCount<8) throw new Error('menu items missing: '+menuCount);
