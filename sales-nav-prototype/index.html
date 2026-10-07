@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-PERIOD-PIE-AXIS-V7 -->
+<!-- BUILD:2026-10-08-ANALYSIS-DETAIL-HEADER-PIE-V8 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -309,6 +309,11 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-factor-stat{background:#0a141d;border:1px solid #21313d;border-radius:10px;padding:8px 7px;text-align:left;min-width:0}
 .analysis-factor-stat span{display:block;font-size:10px;color:#8294a1;white-space:nowrap}
 .analysis-factor-stat strong{display:block;font-size:16px;color:#fff;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.analysis-factor-pickup{margin:8px 0 10px;padding:10px;background:#0a141d;border:1px solid #21313d;border-radius:12px}
+.analysis-factor-pickup-title{font-size:13px;font-weight:900;color:#dfe8ee;margin-bottom:9px}
+.analysis-pickup-wrap-detail{grid-template-columns:118px minmax(0,1fr);gap:10px}
+.analysis-pickup-wrap-detail .analysis-pie{width:116px;height:116px}
+.analysis-pickup-wrap-detail .analysis-pie:after{inset:28px}
 .analysis-factor-list{display:flex;flex-direction:column;gap:0}
 .analysis-factor-row{display:grid;grid-template-columns:68px minmax(0,1fr);gap:8px;padding:8px 0;border-top:1px solid #1e2d38}
 .analysis-factor-row:first-child{border-top:0}
@@ -2265,6 +2270,13 @@ html,body{
     <button type="button" class="analysis-factor-close" onclick="closeAnalysisDayDetail()" aria-label="閉じる">×</button>
    </div>
    <div id="analysisFactorSummary" class="analysis-factor-summary"></div>
+   <div class="analysis-factor-pickup">
+    <div class="analysis-factor-pickup-title">この日の乗車場所</div>
+    <div class="analysis-pickup-wrap analysis-pickup-wrap-detail">
+     <div id="analysisDayPickupPie" class="analysis-pie"><div class="analysis-pie-center">乗車場所<br>割合</div></div>
+     <div id="analysisDayPickupLegend" class="analysis-pickup-legend"></div>
+    </div>
+   </div>
    <div id="analysisFactorList" class="analysis-factor-list"></div>
   </div>
  </div>
@@ -3843,7 +3855,6 @@ function completedDutyDaysThisMonth(){
 let analysisSelectedDateKey='';
 let analysisPeriodMode='10d';
 const ANALYSIS_PERIOD_MODES=[
- {id:'day',label:'1日',summary:'日合計'},
  {id:'week',label:'1週間',summary:'週合計'},
  {id:'10d',label:'10日間',summary:'10日合計'},
  {id:'month',label:'1か月',summary:'月合計'}
@@ -3881,7 +3892,7 @@ function cycleAnalysisPeriod(delta){
  renderSimpleSalesAnalysis();
 }
 function analysisUpdatePeriodHeader(){
- const mode=ANALYSIS_PERIOD_MODES.find(x=>x.id===analysisPeriodMode)||ANALYSIS_PERIOD_MODES[2];
+ const mode=ANALYSIS_PERIOD_MODES.find(x=>x.id===analysisPeriodMode)||ANALYSIS_PERIOD_MODES[1];
  const label=document.getElementById('analysisPeriodLabel');
  if(label)label.textContent=mode.label;
  const totalLabel=document.getElementById('analysisTotalLabel');
@@ -3921,8 +3932,7 @@ function analysisPeriodRange(){
  const lastKey=rows.length?rows[rows.length-1].dateKey:localDateValue();
  const end=analysisDateObj(lastKey);
  let start=new Date(end);
- if(analysisPeriodMode==='day'){}
- else if(analysisPeriodMode==='week') start.setDate(start.getDate()-6);
+ if(analysisPeriodMode==='week') start.setDate(start.getDate()-6);
  else if(analysisPeriodMode==='10d') start.setDate(start.getDate()-9);
  else if(analysisPeriodMode==='month') start=new Date(end.getFullYear(),end.getMonth(),1,12,0,0);
  return {from:analysisDayKey(start),to:analysisDayKey(end)};
@@ -4099,6 +4109,49 @@ function renderAnalysisPickupPie(){
   '<span class="analysis-pickup-name">'+escapeHtml(x.name)+'</span><span class="analysis-pickup-pct">'+(x.empty?'—':x.pct+'%')+'</span></div>'
  ).join('');
 }
+function renderAnalysisDayPickupPie(dateKey){
+ const pie=document.getElementById('analysisDayPickupPie');
+ const legend=document.getElementById('analysisDayPickupLegend');
+ if(!pie||!legend)return;
+ let rows=[];
+ if(analysisUseDemo()){
+  const seed=ANALYSIS_DEMO_ROWS.findIndex(x=>x.dateKey===dateKey);
+  const variants=[
+   [{name:'広島駅',pct:38},{name:'八丁堀',pct:25},{name:'流川周辺',pct:19},{name:'その他',pct:18}],
+   [{name:'八丁堀',pct:34},{name:'広島駅',pct:28},{name:'紙屋町・本通',pct:22},{name:'その他',pct:16}],
+   [{name:'広島駅',pct:31},{name:'流川周辺',pct:27},{name:'八丁堀',pct:24},{name:'その他',pct:18}]
+  ];
+  rows=variants[(seed<0?0:seed)%variants.length].map(x=>({...x}));
+ }else{
+  const r=analysisReports().find(x=>x.dateKey===dateKey);
+  const trips=r?analysisTripsForReport(r):[];
+  const counts=new Map();
+  for(const t of trips){
+   const name=analysisPickupArea(t.pickup?.address);
+   counts.set(name,(counts.get(name)||0)+1);
+  }
+  const total=[...counts.values()].reduce((a,b)=>a+b,0);
+  rows=[...counts.entries()].map(([name,count])=>({name,pct:total?Math.round(count/total*100):0,count}))
+    .sort((a,b)=>b.pct-a.pct);
+  if(rows.length>4){
+   const top=rows.slice(0,3),other=rows.slice(3).reduce((sum,x)=>sum+x.pct,0);
+   rows=[...top,{name:'その他',pct:other}];
+  }
+ }
+ if(!rows.length)rows=[{name:'データなし',pct:100,empty:true}];
+ const colors=['#4b95ff','#49a775','#f0b94b','#9a7cff','#ef7189'];
+ let acc=0,parts=[];
+ for(let i=0;i<rows.length;i++){
+  const start=acc,end=Math.min(100,acc+Math.max(0,Number(rows[i].pct)||0));
+  parts.push(colors[i%colors.length]+' '+start+'% '+end+'%');acc=end;
+ }
+ if(acc<100)parts.push('#20303c '+acc+'% 100%');
+ pie.style.background='conic-gradient('+parts.join(',')+')';
+ legend.innerHTML=rows.map((x,i)=>
+  '<div class="analysis-pickup-row"><span class="analysis-pickup-dot" style="background:'+colors[i%colors.length]+'"></span>'+
+  '<span class="analysis-pickup-name">'+escapeHtml(x.name)+'</span><span class="analysis-pickup-pct">'+(x.empty?'—':x.pct+'%')+'</span></div>'
+ ).join('');
+}
 function analysisNoticeFactors(dateKey){
  const out={jr:[],weather:[],event:[]};
  for(const ev of getAnalyticsEvents()){
@@ -4116,10 +4169,18 @@ function analysisOutOfPrefectureTrips(trips){
  const re=/(山口県|岡山県|島根県|鳥取県|愛媛県|香川県|福岡県|大阪府|兵庫県|東京都|京都府)/;
  return trips.filter(x=>re.test(String(x.dropoff?.address||'')));
 }
+function setAnalysisHeaderDetailMode(isDetail){
+ const nav=document.getElementById('analysisHeaderNav');
+ if(!nav)return;
+ const onAnalysis=document.getElementById('analysis')?.classList.contains('active');
+ nav.classList.toggle('show',onAnalysis&&!isDetail);
+ nav.setAttribute('aria-hidden',onAnalysis&&!isDetail?'false':'true');
+}
 function closeAnalysisDayDetail(){
  analysisSelectedDateKey='';
  const card=document.getElementById('analysisFactorCard');
  if(card)card.classList.remove('show');
+ setAnalysisHeaderDetailMode(false);
  renderAnalysisDaily();
 }
 function analysisDetailDateKeys(){
@@ -4139,6 +4200,7 @@ function renderAnalysisDayNav(){
 }
 function openAnalysisDayDetail(dateKey){
  analysisSelectedDateKey=dateKey;
+ setAnalysisHeaderDetailMode(true);
  renderAnalysisDaily();
  const card=document.getElementById('analysisFactorCard');if(!card)return;
  const demo=analysisUseDemo(),demoRow=demo?ANALYSIS_DEMO_ROWS.find(x=>x.dateKey===dateKey):null;
@@ -4170,6 +4232,7 @@ function openAnalysisDayDetail(dateKey){
   '<div class="analysis-factor-stat"><span>乗車回数</span><strong>'+trips.length+'回</strong></div>'+
   '<div class="analysis-factor-stat"><span>平均単価</span><strong>'+yen(avg)+'</strong></div>'+
   '<div class="analysis-factor-stat"><span>最高 / 最低</span><strong>'+yen(high)+' / '+yen(low)+'</strong></div>';
+ renderAnalysisDayPickupPie(dateKey);
  const rows=[['出庫〜帰庫',start+' 〜 '+end],['予約',reserv],['県外',outside],['天候',weather],['JR',jr],['イベント',event],['メモ',note]];
  const list=document.getElementById('analysisFactorList');
  if(list)list.innerHTML=rows.map(x=>'<div class="analysis-factor-row"><div class="analysis-factor-key">'+escapeHtml(x[0])+'</div><div class="analysis-factor-value">'+escapeHtml(x[1])+'</div></div>').join('');
