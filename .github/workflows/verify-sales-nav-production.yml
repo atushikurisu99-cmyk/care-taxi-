@@ -152,13 +152,13 @@ jobs:
             if(!pageBox||!svgBox||svgBox.width<500||svgBox.height<700){
               throw new Error('Sogo front template is not visibly laid out: '+JSON.stringify({pageBox,svgBox}));
             }
-            if(frontTemplate.mode!=='inline-trace'||frontTemplate.h!==38||frontTemplate.v!==22){
+            if(frontTemplate.mode!=='inline-trace'||frontTemplate.h!==29||frontTemplate.v!==22){
               throw new Error('Sogo inline traced rules missing: '+JSON.stringify(frontTemplate));
             }
             if(new Set(frontTemplate.ids).size!==frontTemplate.ids.length){
               throw new Error('Sogo front line IDs are duplicated');
             }
-            for(const requiredId of ['H01','H38','V01','V22']){
+            for(const requiredId of ['H01','H29','V01','V22']){
               if(!frontTemplate.ids.includes(requiredId)) throw new Error('Sogo front traced line missing '+requiredId);
             }
             if(backLedger.h<10||backLedger.v<9){
