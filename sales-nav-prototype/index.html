@@ -1664,6 +1664,8 @@ html,body{
    <div id="homeEventValue" class="value">取得待ち</div>
    <div id="homeEventSub" class="sub">ライブ・スポーツを確認中</div>
   </div>
+
+  <button class="force-refresh-btn" type="button" onclick="forceAppRefresh()">↻ 強制更新</button>
  </div>
  <div class="action home-actions">
   <button id="dutyMainButton" class="primary" onclick="handleDutyMain()">乗務開始</button>
@@ -1868,6 +1870,7 @@ html,body{
 
 <section id="today" class="screen">
  <div class="content today-content">
+  <button id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
   <div class="info-grid">
    <div id="jrInfoCard" class="info-card">
     <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
