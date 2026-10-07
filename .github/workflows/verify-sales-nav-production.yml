@@ -149,8 +149,8 @@ jobs:
               ids:[...el.querySelectorAll('line[data-line-id]')].map(x=>x.getAttribute('data-line-id'))
             }));
             const visibleDemoValues=await firstPage.innerText();
-            if(!pageBox||!svgBox||svgBox.width<500||svgBox.height<700){
-              throw new Error('Sogo front template is not visibly laid out: '+JSON.stringify({pageBox,svgBox}));
+            if(!pageBox||!svgBox||svgBox.width<340||svgBox.height<500||pageBox.x<0||pageBox.x+pageBox.width>393.5){
+              throw new Error('Sogo front template is not visibly laid out or fit to iPhone width: '+JSON.stringify({pageBox,svgBox}));
             }
             if(frontTemplate.mode!=='inline-trace'||frontTemplate.h!==29||frontTemplate.v!==22){
               throw new Error('Sogo inline traced rules missing: '+JSON.stringify(frontTemplate));
