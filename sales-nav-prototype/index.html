@@ -3069,32 +3069,26 @@ function sogoSvgText(x,y,v,cls='cell',anchor='middle',extra=''){
 }
 function sogoFrontSvg(r){
  const W=1000,H=1414;
- const x=[50,100.6,168.7,301.8,429.8,475.2,525.8,649.7,773.5,950];
- const lines=[]; let hNo=1,vNo=1;
- const Hline=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('H'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
- const V=(xx,y1,y2,kind='normal')=>lines.push(sogoSvgLine('V'+String(vNo++).padStart(2,'0'),xx,y1,xx,y2,kind));
-
- // 上段：日付／出庫／入庫。罫線は段ごとに独立させ、下段へ誤って伸ばさない。
- Hline(130,50,950,'major'); Hline(170); Hline(210);
- V(50,130,210,'major'); V(950,130,210,'major');
- [480,550,600,640,700,770,820,860,910].forEach(xx=>V(xx,130,170));
- [135,510,650].forEach(xx=>V(xx,170,210,'major'));
-
- // 明細見出し。降車時刻だけ二段。
- // 実物写真を台形補正し、縦罫線10本の実測比率を固定。
- Hline(235,x[4],x[6]);
- Hline(260);
- x.forEach((xx,i)=>{
-  const fromY=(i===5)?235:210;
-  V(xx,fromY,1060,(i===0||i===x.length-1)?'major':'normal');
- });
-
- // 20行。横罫線は全幅、40単位で固定。
- for(let i=1;i<=20;i++) Hline(260+i*40,50,950,(i%5===0)?'major':'normal');
-
- // 下部集計。明細表の縦線をここまで延長せず、別系統として作る。
- Hline(1105); Hline(1150); Hline(1195);
- [50,90,160,400,500,650,740,950].forEach((xx,i)=>V(xx,1060,1195,(i===0||i===7)?'major':'normal'));
+ const sourceW=1447,sourceH=2048,sx=W/sourceW,sy=H/sourceH;
+ const X=v=>v*sx,Y=v=>v*sy;
+ const lines=[];
+ const tracedH=[
+  [206,493,946],[230,36,1405],[287,36,1405],[342,36,1405],[398,36,1405],
+  [463,36,1405],[529,36,1405],[594,36,1405],[660,36,1405],[725,36,1405],
+  [791,36,1405],[856,36,1405],[921,36,1405],[987,36,1405],[1053,36,1405],
+  [1118,36,1405],[1184,36,1405],[1249,36,1405],[1314,36,1405],[1380,36,1405],
+  [1445,36,1405],[1511,36,1405],[1576,36,1405],[1642,36,1405],[1707,36,1405],
+  [1775,140,1405],[1842,140,1405],[1910,36,1405],[2011,36,1405]
+ ];
+ const tracedV=[
+  [37,230,2011],[1403,230,2011],
+  [595,230,287],[724,230,287],[997,230,287],[1122,230,287],
+  [165,287,342],[666,287,342],[848,287,342],
+  [105,342,1707],[205,342,1707],[399,342,1707],[595,342,1707],[752,342,1707],[940,342,1707],[1128,342,1707],
+  [141,1707,1910],[270,1707,1910],[556,1707,1910],[704,1707,1910],[991,1707,1910],[1114,1707,1910]
+ ];
+ tracedH.forEach((a,i)=>lines.push(sogoSvgLine('H'+String(i+1).padStart(2,'0'),X(a[1]),Y(a[0]),X(a[2]),Y(a[0]),'traced')));
+ tracedV.forEach((a,i)=>lines.push(sogoSvgLine('V'+String(i+1).padStart(2,'0'),X(a[0]),Y(a[1]),X(a[0]),Y(a[2]),'traced')));
 
  const d=r?.dateKey?new Date(r.dateKey+'T12:00:00'):null;
  const yy=d?d.getFullYear():'',mm=d?d.getMonth()+1:'',dd=d?d.getDate():'';
@@ -3106,50 +3100,52 @@ function sogoFrontSvg(r){
  const trips=reportTripsForTemplate(r);
 
  let text='';
- text+=sogoSvgText(500,102,'運 転 日 報','title');
- text+=sogoSvgText(940,62,'相互個人タクシー協同組合','org','end');
- text+=sogoSvgText(940,84,'事務所代表　253-2505','org small','end');
- text+=sogoSvgText(940,104,'253-2500','org small','end');
+ text+=sogoSvgText(X(720),Y(182),'運 転 日 報','title');
+ text+=sogoSvgText(X(1392),Y(150),'相互個人タクシー協同組合','org','end');
+ text+=sogoSvgText(X(1392),Y(172),'事務所代表　253-2505','org small','end');
+ text+=sogoSvgText(X(1392),Y(192),'253-2500','org small','end');
 
- text+=sogoSvgText(65,156,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start');
- text+=sogoSvgText(515,156,'出庫','top');
- text+=sogoSvgText(575,156,start[0]||'','top');
- text+=sogoSvgText(620,156,'時','top');
- text+=sogoSvgText(670,156,start[1]||'','top');
- text+=sogoSvgText(735,156,'入庫','top');
- text+=sogoSvgText(795,156,end[0]||'','top');
- text+=sogoSvgText(840,156,'時','top');
- text+=sogoSvgText(885,156,end[1]||'','top');
- text+=sogoSvgText(930,156,'分','top');
+ const yDate=Y((230+287)/2),yReg=Y((287+342)/2),yHead=Y((342+398)/2);
+ text+=sogoSvgText(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start');
+ text+=sogoSvgText(X((595+724)/2),yDate,'出庫','top');
+ text+=sogoSvgText(X(770),yDate,start[0]||'','top');
+ text+=sogoSvgText(X(835),yDate,'時','top');
+ text+=sogoSvgText(X(915),yDate,start[1]||'','top');
+ text+=sogoSvgText(X((997+1122)/2),yDate,'入庫','top');
+ text+=sogoSvgText(X(1180),yDate,end[0]||'','top');
+ text+=sogoSvgText(X(1245),yDate,'時','top');
+ text+=sogoSvgText(X(1325),yDate,end[1]||'','top');
+ text+=sogoSvgText(X(1380),yDate,'分','top');
 
- text+=sogoSvgText(92,196,'登録番号','top label');
- text+=sogoSvgText(150,196,reg,'top left','start');
- text+=sogoSvgText(580,196,'氏名又は名称','top label');
- text+=sogoSvgText(670,196,name,'top left','start');
+ text+=sogoSvgText(X((37+165)/2),yReg,'登録番号','top label');
+ text+=sogoSvgText(X(185),yReg,reg,'top left','start');
+ text+=sogoSvgText(X((666+848)/2),yReg,'氏名又は名称','top label');
+ text+=sogoSvgText(X(870),yReg,name,'top left','start');
 
- const headers=[
-  [(x[0]+x[1])/2,239,'回数'],[(x[1]+x[2])/2,239,'人員'],[(x[2]+x[3])/2,239,'乗車地'],[(x[3]+x[4])/2,239,'降車地'],
-  [(x[4]+x[6])/2,226,'降車時刻'],[(x[6]+x[7])/2,239,'現収'],[(x[7]+x[8])/2,239,'未収'],[(x[8]+x[9])/2,239,'備考']
- ];
- headers.forEach(a=>text+=sogoSvgText(a[0],a[1],a[2],'head'));
- text+=sogoSvgText((x[4]+x[5])/2,253,'時','head small');
- text+=sogoSvgText((x[5]+x[6])/2,253,'分','head small');
+ const cols=[37,105,205,399,595,752,940,1128,1403];
+ const centers=cols.slice(0,-1).map((v,i)=>(v+cols[i+1])/2);
+ ['回数','人員','乗車地','降車地','降車時刻','現収','未収','備考'].forEach((v,i)=>{
+  text+=sogoSvgText(X(centers[i]),yHead,v,'head');
+ });
+ text+=sogoSvgText(X(650),Y(386),'時','head small');
+ text+=sogoSvgText(X(705),Y(386),'分','head small');
 
+ const rowBounds=[398,463,529,594,660,725,791,856,921,987,1053,1118,1184,1249,1314,1380,1445,1511,1576,1642,1707];
  for(let i=0;i<20;i++){
-  const n=i+1,trip=trips[i]||null,cy=286+i*40;
+  const n=i+1,trip=trips[i]||null,cy=Y((rowBounds[i]+rowBounds[i+1])/2);
   const hm=trip?reportTemplateHm(trip.dropoffTs):'',parts=hm?hm.split(':'):['',''];
   const money=sogoCashColumns(trip);
   const people=trip?(trip.passengers??(trip.demoData?1:'')):'';
   const remarks=trip?(trip.remarks||trip.paymentMethod||''):'';
-  text+=sogoSvgText((x[0]+x[1])/2,cy,n,'body');
-  text+=sogoSvgText((x[1]+x[2])/2,cy,people,'body');
-  text+=sogoSvgText(x[2]+10,cy,trip?reportTemplatePlace(trip.pickup):'','body left','start');
-  text+=sogoSvgText(x[3]+10,cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
-  text+=sogoSvgText((x[4]+x[5])/2,cy,parts[0],'body');
-  text+=sogoSvgText((x[5]+x[6])/2,cy,parts[1],'body');
-  text+=sogoSvgText((x[6]+x[7])/2,cy,money.cash,'body');
-  text+=sogoSvgText((x[7]+x[8])/2,cy,money.receivable,'body');
-  text+=sogoSvgText(x[8]+10,cy,remarks,'body left','start');
+  text+=sogoSvgText(X(centers[0]),cy,n,'body');
+  text+=sogoSvgText(X(centers[1]),cy,people,'body');
+  text+=sogoSvgText(X(220),cy,trip?reportTemplatePlace(trip.pickup):'','body left','start');
+  text+=sogoSvgText(X(415),cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
+  text+=sogoSvgText(X(650),cy,parts[0],'body');
+  text+=sogoSvgText(X(705),cy,parts[1],'body');
+  text+=sogoSvgText(X(centers[5]),cy,money.cash,'body');
+  text+=sogoSvgText(X(centers[6]),cy,money.receivable,'body');
+  text+=sogoSvgText(X(1145),cy,remarks,'body left','start');
  }
 
  const km=reportTravelKm(r);
@@ -3157,43 +3153,21 @@ function sogoFrontSvg(r){
  const cash=trips.filter(z=>String(z?.paymentMethod||'')==='現金').reduce((s,z)=>s+Math.max(0,Number(z?.fare)||0),0);
  const receivable=Math.max(0,sales-cash);
  const people=trips.reduce((s,z)=>s+(Number(z?.passengers)||1),0);
+ const sumY=[Y((1707+1775)/2),Y((1775+1842)/2),Y((1842+1910)/2)];
 
- // 元PNGを実測して抽出した罫線をSVGへ直接描画する。外部画像読込に依存しない。
- const sourceW=1447,sourceH=2048,sx=W/sourceW,sy=H/sourceH;
- const tracedH=[
-  [241,488,940],[269,48,1393],[321,48,1393],[373,48,1393],[401,595,754],
-  [425,48,1393],[472,48,1393],[519,48,1393],[566,48,1393],[613,48,1393],
-  [660,48,1393],[707,48,1393],[754,48,1393],[801,48,1393],[847,48,1393],
-  [895,48,1393],[941,48,1393],[988,48,1393],[1035,48,1393],[1082,48,1393],
-  [1129,48,1393],[1176,48,1393],[1223,48,1393],[1269,48,1393],[1317,48,1393],
-  [1363,48,1393],[1411,48,1393],[1457,48,1393],[1504,48,1393],[1551,48,1393],
-  [1598,48,1393],[1645,48,1393],[1692,48,1393],[1739,48,1393],[1805,48,1393],
-  [1870,48,1393],[1936,48,1393],[2002,48,1393]
- ];
- const tracedV=[
-  [49,267,2004],[116,372,1741],[162,1738,1938],[174,320,375],[213,372,1741],
-  [293,1738,1938],[405,372,1741],[566,1738,1938],[594,268,323],[594,372,1741],
-  [665,320,375],[691,1738,1938],[720,268,323],[752,372,1741],[845,320,375],
-  [937,372,1741],[963,1738,1938],[992,268,323],[1095,1738,1938],[1116,268,323],
-  [1125,372,1741],[1391,267,2004]
- ];
- lines.length=0;
- tracedH.forEach((a,i)=>lines.push(sogoSvgLine('H'+String(i+1).padStart(2,'0'),a[1]*sx,a[0]*sy,a[2]*sx,a[0]*sy,'traced')));
- tracedV.forEach((a,i)=>lines.push(sogoSvgLine('V'+String(i+1).padStart(2,'0'),a[0]*sx,a[1]*sy,a[0]*sx,a[2]*sy,'traced')));
-
- text+=sogoSvgText(70,1130,'走行粁','summary v','middle','transform="rotate(-90 70 1130)"');
- ['入庫','出庫','差引'].forEach((v,i)=>text+=sogoSvgText(125,1090+i*45,v,'summary'));
- text+=sogoSvgText(390,1090,(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end');
- text+=sogoSvgText(390,1135,(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end');
- text+=sogoSvgText(390,1180,(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end');
- ['乗車粁','運送回数','輸送人員'].forEach((v,i)=>text+=sogoSvgText(450,1090+i*45,v,'summary'));
- text+=sogoSvgText(640,1090,(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end');
- text+=sogoSvgText(640,1135,(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end');
- text+=sogoSvgText(640,1180,(people||'')+(people?' 人':''),'summary value','end');
- ['現収','未収','合計'].forEach((v,i)=>text+=sogoSvgText(695,1090+i*45,v,'summary'));
- text+=sogoSvgText(940,1090,(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end');
- text+=sogoSvgText(940,1135,(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end');
- text+=sogoSvgText(940,1180,(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end');
+ text+=sogoSvgText(X(82),Y((1707+1910)/2),'走行粁','summary v','middle','transform="rotate(-90 '+X(82)+' '+Y((1707+1910)/2)+')"');
+ ['入庫','出庫','差引'].forEach((v,i)=>text+=sogoSvgText(X((141+270)/2),sumY[i],v,'summary'));
+ text+=sogoSvgText(X(545),sumY[0],(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end');
+ text+=sogoSvgText(X(545),sumY[1],(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end');
+ text+=sogoSvgText(X(545),sumY[2],(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end');
+ ['乗車粁','運送回数','輸送人員'].forEach((v,i)=>text+=sogoSvgText(X((556+704)/2),sumY[i],v,'summary'));
+ text+=sogoSvgText(X(980),sumY[0],(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end');
+ text+=sogoSvgText(X(980),sumY[1],(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end');
+ text+=sogoSvgText(X(980),sumY[2],(people||'')+(people?' 人':''),'summary value','end');
+ ['現収','未収','合計'].forEach((v,i)=>text+=sogoSvgText(X((991+1114)/2),sumY[i],v,'summary'));
+ text+=sogoSvgText(X(1390),sumY[0],(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end');
+ text+=sogoSvgText(X(1390),sumY[1],(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end');
+ text+=sogoSvgText(X(1390),sumY[2],(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end');
 
  return '<svg class="sogo-svg sogo-front-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="相互個人タクシー協同組合 運転日報 表面" data-template-mode="inline-trace" data-horizontal-lines="'+tracedH.length+'" data-vertical-lines="'+tracedV.length+'">'+
   '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
