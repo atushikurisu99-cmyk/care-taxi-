@@ -34,22 +34,29 @@ jobs:
               userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'
             });
             const page=await context.newPage();
-            await page.goto(target+'?sogo_verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
-            await page.waitForTimeout(2500);
-            await page.evaluate(()=>{
-              document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
-              const m=document.getElementById('monthlyReport'); if(m)m.classList.add('active');
-              if(typeof renderMonthlyReportCenter==='function') renderMonthlyReportCenter();
-              if(typeof seedDemoOperationData==='function') seedDemoOperationData();
-              if(typeof renderMonthlyReportPreview==='function') renderMonthlyReportPreview(true);
-            });
-            await page.waitForTimeout(300);
+            let ready=false;
+            for(let attempt=1;attempt<=8;attempt++){
+              await page.goto(target+'?sogo_verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
+              await page.waitForTimeout(2000);
+              await page.evaluate(()=>{
+                document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+                const m=document.getElementById('monthlyReport'); if(m)m.classList.add('active');
+                if(typeof renderMonthlyReportCenter==='function') renderMonthlyReportCenter();
+                if(typeof seedDemoOperationData==='function') seedDemoOperationData();
+                if(typeof renderMonthlyReportPreview==='function') renderMonthlyReportPreview(true);
+              });
+              await page.waitForTimeout(250);
+              ready=(await page.locator('#monthlyReportPreview .sogo-front-svg').count())===1 &&
+                    (await page.locator('#monthlyReportPreview .sogo-back-trip-svg').count())===1;
+              if(ready) break;
+              await page.waitForTimeout(8000);
+            }
 
             const preview=page.locator('#monthlyReportPreview');
             if(await preview.count()!==1) throw new Error('monthly preview missing');
             const front=page.locator('#monthlyReportPreview .sogo-front-svg');
             const back=page.locator('#monthlyReportPreview .sogo-back-trip-svg');
-            if(await front.count()!==1||await back.count()!==1) throw new Error('traced SVG pages missing');
+            if(!ready) throw new Error('traced SVG pages missing after production deploy wait');
 
             const ledger=await front.evaluate(el=>({
               h:Number(el.getAttribute('data-horizontal-lines')||0),
