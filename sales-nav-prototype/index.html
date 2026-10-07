@@ -2339,6 +2339,7 @@ html,body{
    <div class="menuitem" onclick="show('monthlyReport')"><span class="menu-icon monthly" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span>月報・帳票出力</span></div>
    <div class="menuitem" onclick="show('settings')"><span class="menu-icon settings" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.4 2.7a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.4 2.7h4.4l.4-2.7a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg></span><span>設定</span></div>
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></span><span>乗務終了</span></div>
+   <div id="menuForceDutyEnd" class="menuitem danger" onclick="forceEndDutyTemporary()" style="display:none"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/><path d="M8 8l8 8M16 8l-8 8" stroke="#071019" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>強制終了（一時）</span></div>
   </div>
  </div>
  <div class="action"><button class="primary secondary">ログアウト</button></div>
@@ -5935,6 +5936,7 @@ function renderDutyUI(){
  const mb=document.getElementById('dutyMainButton');
  const vs=document.getElementById('vacantShiftTime');
  const me=document.getElementById('menuDutyEnd');
+ const mfe=document.getElementById('menuForceDutyEnd');
  const dutyMeta=document.getElementById('headerDutyMeta');
  if(dutyMeta){
   dutyMeta.textContent=d.active
@@ -5944,6 +5946,7 @@ function renderDutyUI(){
  if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
  if(vs) vs.textContent=d.active?formatDuration(Date.now()-d.start):'未乗務';
  if(me) me.style.display=d.active?'block':'none';
+ if(mfe) mfe.style.display=d.active?'flex':'none';
  const active=document.querySelector('.screen.active');
  const badge=document.getElementById('badge');
  if(active&&badge&&active.id==='home'){
@@ -5968,6 +5971,18 @@ function endDuty(){
  const d=getDutyState();
  if(!d.active){show('home');return}
  openDailyReportForDutyEnd();
+}
+// TEMP 2026-10-08: broken duty-state escape hatch. Remove before release.
+function forceEndDutyTemporary(){
+ const d=getDutyState();
+ if(!d.active){show('home');renderDutyUI();return}
+ if(!window.confirm('今回の壊れた乗務状態を強制終了しますか？\n売上・乗車履歴は消さず、現在の乗務状態だけ解除します。')) return;
+ currentRideStart=null;
+ saveDutyState(false);
+ try{localStorage.removeItem('taxi_current_ride')}catch(e){}
+ show('home');
+ renderDutyUI();
+ toast('乗務状態を強制終了しました');
 }
 function backFromInfo(){
  const d=getDutyState();
