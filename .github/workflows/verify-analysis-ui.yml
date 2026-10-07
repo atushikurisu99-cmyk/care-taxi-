@@ -68,7 +68,10 @@ jobs:
             if(info.title!=='分析') throw new Error('analysis title wrong');
             if(info.analysisHeaderVisible==='none') throw new Error('analysis header period control hidden');
             if(info.calendarHeaderVisible!=='none') throw new Error('calendar control visible on analysis');
-            if(!['1日','1週間','10日間','1か月'].includes(info.period)) throw new Error('period label missing');
+            if(!['1週間','10日間','1か月'].includes(info.period)) throw new Error('period label missing');
+            const modes=await page.evaluate(()=>ANALYSIS_PERIOD_MODES.map(x=>x.label));
+            console.log('PERIOD_MODES',JSON.stringify(modes));
+            if(modes.includes('1日')) throw new Error('1-day top period mode must be removed');
             for(const x of ['10日合計','平均売上','平均単価','乗車回数']) if(!info.summary.includes(x)) throw new Error('summary missing '+x);
             if(!String(info.yAxis||'').includes('5万')||!String(info.yAxis||'').includes('0')) throw new Error('50k y-axis missing');
             if(info.legacyBarSales!==0) throw new Error('per-day sales labels still visible');
@@ -91,12 +94,22 @@ jobs:
             await clickable.nth(1).click();
             await page.waitForTimeout(100);
             if(!await page.locator('#analysisFactorCard').evaluate(el=>el.classList.contains('show'))) throw new Error('day factor detail did not open');
+            const detailHeaderDisplay=await page.locator('#analysisHeaderNav').evaluate(el=>getComputedStyle(el).display);
+            if(detailHeaderDisplay!=='none') throw new Error('top period switch must hide during day detail');
+            const dayPieBox=await page.locator('#analysisDayPickupPie').boundingBox();
+            const dayLegend=await page.locator('#analysisDayPickupLegend').innerText();
+            console.log('DAY_DETAIL_PIE',JSON.stringify({dayPieBox,dayLegend}));
+            if(!dayPieBox||dayPieBox.width<100||!dayLegend.includes('%')) throw new Error('daily pickup pie missing in detail');
             const firstTitle=await page.locator('#analysisFactorTitle').innerText();
             await page.locator('#analysisNextDay').click();
             await page.waitForTimeout(100);
             const nextTitle=await page.locator('#analysisFactorTitle').innerText();
             console.log('DAY_NAV',JSON.stringify({firstTitle,nextTitle}));
             if(firstTitle===nextTitle) throw new Error('next-day detail navigation did not change date');
+            await page.locator('.analysis-factor-close').click();
+            await page.waitForTimeout(100);
+            const headerAfterClose=await page.locator('#analysisHeaderNav').evaluate(el=>getComputedStyle(el).display);
+            if(headerAfterClose==='none') throw new Error('top period switch did not return after closing day detail');
 
             await page.screenshot({path:'/tmp/analysis-ui.png',fullPage:false});
             console.log('ANALYSIS_UI_OK');
