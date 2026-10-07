@@ -3067,7 +3067,7 @@ function sogoSvgText(x,y,v,cls='cell',anchor='middle',extra=''){
 }
 function sogoFrontSvg(r){
  const W=1000,H=1414;
- const x=[50,104,171,301,432,491,537,655,788,950];
+ const x=[50,100.6,168.7,301.8,429.8,475.2,525.8,649.7,773.5,950];
  const lines=[]; let hNo=1,vNo=1;
  const Hline=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('H'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
  const V=(xx,y1,y2,kind='normal')=>lines.push(sogoSvgLine('V'+String(vNo++).padStart(2,'0'),xx,y1,xx,y2,kind));
@@ -3079,6 +3079,7 @@ function sogoFrontSvg(r){
  [135,510,650].forEach(xx=>V(xx,170,210,'major'));
 
  // 明細見出し。降車時刻だけ二段。
+ // 実物写真を台形補正し、縦罫線10本の実測比率を固定。
  Hline(235,x[4],x[6]);
  Hline(260);
  x.forEach((xx,i)=>{
@@ -3172,7 +3173,7 @@ function sogoFrontSvg(r){
   '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
 }
 function sogoBackTripSvg(r){
- const W=1000,H=520,x=[50,85.5,175.7,302.4,430.1,480.7,535.5,654.1,776.7,950];
+ const W=1000,H=520,x=[50,100.6,168.7,301.8,429.8,475.2,525.8,649.7,773.5,950];
  const lines=[]; let hNo=1,vNo=1;
  const Hline=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('BH'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
  const Vline=(xx,y1,y2,kind='normal')=>lines.push(sogoSvgLine('BV'+String(vNo++).padStart(2,'0'),xx,y1,xx,y2,kind));
