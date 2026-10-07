@@ -118,10 +118,10 @@ jobs:
             const backSvg=page.locator('#monthlyReportPreview .sogo-back-trip-svg');
             const pageBox=await firstPage.boundingBox();
             const svgBox=await frontSvg.boundingBox();
-            const ledger=await frontSvg.evaluate(el=>({
-              h:Number(el.getAttribute('data-horizontal-lines')||0),
-              v:Number(el.getAttribute('data-vertical-lines')||0),
-              ids:[...el.querySelectorAll('line[data-line-id]')].map(x=>x.getAttribute('data-line-id')),
+            const frontTemplate=await frontSvg.evaluate(el=>({
+              mode:el.getAttribute('data-template-mode')||'',
+              imageCount:el.querySelectorAll('image.sogo-front-template-image').length,
+              href:el.querySelector('image.sogo-front-template-image')?.getAttribute('href')||'',
               title:[...el.querySelectorAll('text')].find(x=>x.textContent.includes('運 転 日 報'))?.getBoundingClientRect().toJSON?.()||null
             }));
             const backLedger=await backSvg.evaluate(el=>({
@@ -131,31 +131,24 @@ jobs:
             }));
             const visibleDemoValues=await firstPage.innerText();
             if(!pageBox||!svgBox||svgBox.width<500||svgBox.height<700){
-              throw new Error('Sogo traced SVG is not visibly laid out: '+JSON.stringify({pageBox,svgBox}));
+              throw new Error('Sogo front template is not visibly laid out: '+JSON.stringify({pageBox,svgBox}));
             }
-            if(ledger.h<25||ledger.v<20||backLedger.h<10||backLedger.v<9){
-              throw new Error('Sogo line ledger count too small: '+JSON.stringify({ledger,backLedger}));
+            if(frontTemplate.mode!=='fixed-image'||frontTemplate.imageCount!==1||!frontTemplate.href.includes('sogo-front-lines.png')){
+              throw new Error('Sogo fixed image template missing: '+JSON.stringify(frontTemplate));
             }
-            if(new Set(ledger.ids).size!==ledger.ids.length||new Set(backLedger.ids).size!==backLedger.ids.length){
-              throw new Error('Sogo line ledger contains duplicate IDs');
+            if(backLedger.h<10||backLedger.v<9){
+              throw new Error('Sogo back line ledger count too small: '+JSON.stringify(backLedger));
             }
-            for(const requiredId of ['H01','H02','H03','V01','V02','V03','BH01','BV01']){
-              const all=ledger.ids.concat(backLedger.ids);
-              if(!all.includes(requiredId)) throw new Error('Sogo line ledger missing '+requiredId);
+            if(new Set(backLedger.ids).size!==backLedger.ids.length){
+              throw new Error('Sogo back line ledger contains duplicate IDs');
+            }
+            for(const requiredId of ['BH01','BV01']){
+              if(!backLedger.ids.includes(requiredId)) throw new Error('Sogo back line ledger missing '+requiredId);
             }
             for(const value of ['52340','52462','広島駅 新幹線口','八丁堀','1,780']){
               if(!visibleDemoValues.includes(value)) throw new Error('Sogo visible demo value missing: '+value);
             }
-            const badTopCarry=await frontSvg.evaluate(el=>{
-              const lines=[...el.querySelectorAll('line')];
-              return lines.some(l=>{
-                const x1=Number(l.getAttribute('x1')),x2=Number(l.getAttribute('x2')),
-                      y1=Number(l.getAttribute('y1')),y2=Number(l.getAttribute('y2'));
-                return x1===x2 && [135,510,650].includes(x1) && y1<210 && y2>210;
-              });
-            });
-            if(badTopCarry) throw new Error('Sogo stepped header vertical line leaks into detail grid');
-            console.log('SOGO_LINE_LEDGER_OK',JSON.stringify({ledger:{h:ledger.h,v:ledger.v},backLedger:{h:backLedger.h,v:backLedger.v},pageBox,svgBox}));
+            console.log('SOGO_FIXED_IMAGE_OK',JSON.stringify({frontTemplate,backLedger:{h:backLedger.h,v:backLedger.v},pageBox,svgBox}));
             await page.screenshot({path:'/tmp/monthly-preview-template-v3.png',fullPage:false});
             await page.locator('#monthlyReportPreview .monthly-preview-close').click();
             if(await preview.isVisible()) throw new Error('monthly preview did not close');
