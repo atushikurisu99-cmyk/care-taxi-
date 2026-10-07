@@ -199,7 +199,24 @@ main{position:relative;min-height:0;overflow:hidden}
 .fare-estimate-note{font-size:11px;color:var(--muted);margin-top:7px;text-align:center}
 .vehicle-fare-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px 12px;margin-top:10px}
 .vehicle-fare-grid label{display:grid;grid-template-rows:32px 52px;gap:5px;min-width:0;font-size:12px;color:var(--muted);font-weight:800;align-items:end}
-.vehicle-fare-grid input,.vehicle-fare-grid select{width:100%;min-width:0;height:52px;box-sizing:border-box;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 9px;font-size:16px}
+.vehicle-fare-grid input,.vehicle-fare-grid select{width:100%;min-width:0;height:54px;min-height:54px;max-height:54px;box-sizing:border-box;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.2}
+#settingsVehicle .vehicle-fare-grid input,
+#settingsVehicle .vehicle-fare-grid select{
+ display:block;
+ width:100%;
+ min-width:0;
+ height:54px;
+ min-height:54px;
+ max-height:54px;
+ box-sizing:border-box;
+ -webkit-appearance:none;
+ appearance:none;
+}
+#settingsVehicle .vehicle-fare-grid label{
+ grid-template-rows:32px 54px;
+ align-items:end;
+ min-width:0;
+}
 .vehicle-fare-advanced{display:none;margin-top:10px}
 .vehicle-fare-advanced.show{display:grid}
 .fare-advanced-toggle{width:100%;min-height:44px;margin-top:10px;border:1px solid #304252;background:#101c26;color:#c8d4dc;border-radius:11px;font-weight:850;font-size:14px}
@@ -2282,13 +2299,13 @@ html,body{
     <div class="vehicle-fare-grid">
      <label>登録番号<input id="vehicleRegistrationNumber" type="text" inputmode="text" placeholder="広島 300 あ 12-34"></label>
      <label>車種<input id="vehicleTypeName" type="text" inputmode="text" placeholder="クラウン"></label>
-     <label>締め日<select id="vehicleClosingDay"><option value="month-end">末日</option></select></label>
-     <label>車検満了日<input id="vehicleInspectionExpiry" type="date"></label>
-     <label style="grid-column:1/-1">営業区域
-      <select id="vehicleSalesArea" style="width:100%;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 9px;font-size:16px"></select>
-     </label>
      <label style="grid-column:1/-1">現在のオドメーター
       <input id="vehicleCurrentOdometer" type="number" min="0" step="1" inputmode="numeric" placeholder="例 52340">
+     </label>
+     <label>車検満了日<input id="vehicleInspectionExpiry" type="date"></label>
+     <label>締め日<select id="vehicleClosingDay"><option value="month-end">末日</option></select></label>
+     <label style="grid-column:1/-1">営業区域
+      <select id="vehicleSalesArea"></select>
      </label>
     </div>
     <button class="smallbtn" type="button" style="width:100%;margin-top:10px" onclick="suggestSalesAreaFromLocation()">現在地から営業区域候補を出す</button>
