@@ -1664,8 +1664,6 @@ html,body{
    <div id="homeEventValue" class="value">取得待ち</div>
    <div id="homeEventSub" class="sub">ライブ・スポーツを確認中</div>
   </div>
-
-  <button class="force-refresh-btn" type="button" onclick="forceAppRefresh()">↻ 強制更新</button>
  </div>
  <div class="action home-actions">
   <button id="dutyMainButton" class="primary" onclick="handleDutyMain()">乗務開始</button>
@@ -1757,7 +1755,10 @@ html,body{
   </div>
   <div id="reservationList" class="reservation-list"></div>
  </div>
- <div class="action"><button class="primary" onclick="openReservationEditor()">＋ 予約を追加</button></div>
+ <div class="action form-actions">
+  <button class="primary secondary" onclick="backFromReservations()">戻る</button>
+  <button class="primary" onclick="openReservationEditor()">＋ 予約を追加</button>
+ </div>
 </section>
 
 <section id="reservationEdit" class="screen">
@@ -1802,7 +1803,7 @@ html,body{
   </div>
  </div>
  <div class="action form-actions">
-  <button class="primary secondary" onclick="show('schedule')">戻る</button>
+  <button class="primary secondary" onclick="backFromReservationEdit()">戻る</button>
   <button class="primary" onclick="saveReservation()">保存</button>
  </div>
 </section>
@@ -1867,7 +1868,6 @@ html,body{
 
 <section id="today" class="screen">
  <div class="content today-content">
-  <button id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
   <div class="info-grid">
    <div id="jrInfoCard" class="info-card">
     <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
@@ -2101,7 +2101,7 @@ html,body{
    <div class="sub" style="margin-top:7px">この端末に保存した金額だけで表示</div>
   </div>
  </div>
- <div class="action"><button class="primary secondary" onclick="show('settings')">売上・目標を設定</button></div>
+ <div class="action"><button class="primary secondary" onclick="show('settings');openSettingsSection('personal')">売上・目標を設定</button></div>
 </section>
 
 <section id="verify" class="screen">
@@ -2320,7 +2320,6 @@ html,body{
  <div class="content">
   <div class="card menu-card-compact">
    <div class="menuitem" onclick="show('home')"><span class="menu-icon home" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M3 10.6 12 3l9 7.6v9.1A1.3 1.3 0 0 1 19.7 21h-5.1v-6.2H9.4V21H4.3A1.3 1.3 0 0 1 3 19.7z"/></svg></span><span>ホーム</span></div>
-   <div class="menuitem" onclick="show('today')"><span class="menu-icon info" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></span><span>本日の営業情報</span></div>
    <div class="menuitem" onclick="show('sales')"><span class="menu-icon sales" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 18h16M6 15l4-4 3 2 5-6"/><path d="M15 7h3v3"/></svg></span><span>売上・実績</span></div>
    <div class="menuitem" onclick="show('analysis')"><span class="menu-icon analysis" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="3" y="12" width="4" height="9" rx="1.2"/><rect x="10" y="7" width="4" height="14" rx="1.2"/><rect x="17" y="3" width="4" height="18" rx="1.2"/></svg></span><span>営業分析</span></div>
    <div class="menuitem" onclick="show('verify')"><span class="menu-icon gps" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><span>位置・警告検証</span></div>
@@ -4053,7 +4052,11 @@ function localDateValue(d=new Date()){
 function setReservationTimed(v){
  reservationTimed=!!v;
 }
+let reservationReturnScreen='home';
+let reservationEditReturnScreen='schedule';
 function openReservationEditor(){
+ const from=currentScreenId();
+ if(from&&from!=='reservationEdit') reservationEditReturnScreen=from;
  const ids=['resPickup','resDestination','resName','resPhone','resMemo','resTime'];
  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
  const date=document.getElementById('resDate');if(date)date.value=localDateValue();
@@ -4090,8 +4093,17 @@ function compactMonthDay(v,slash=false){
 }
 let reservationListMode='all';
 function openAllReservations(){
+ const from=currentScreenId();
+ if(from&&from!=='schedule'&&from!=='reservationEdit'&&from!=='reservationShare') reservationReturnScreen=from;
  reservationListMode='all';
  show('schedule');
+}
+function backFromReservations(){
+ show(reservationReturnScreen||'home');
+}
+function backFromReservationEdit(){
+ const dest=(reservationEditReturnScreen&&reservationEditReturnScreen!=='reservationEdit')?reservationEditReturnScreen:'schedule';
+ show(dest);
 }
 function renderReservations(){
  const base=getReservations().sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
@@ -4171,7 +4183,7 @@ function saveReservation(){
  };
  const all=getReservations();all.push(r);saveReservations(all);
  renderReservations();
- show('schedule');
+ show(reservationEditReturnScreen==='calendar'?'calendar':'schedule');
 }
 let currentReservationJobId=null;
 let reservationJobTouchStartY=0;
