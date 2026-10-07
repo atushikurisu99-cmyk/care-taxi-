@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-VEHICLE-PROFILE-V1 -->
+<!-- BUILD:2026-10-08-VEHICLE-AREA-FARE-V2 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -220,6 +220,18 @@ main{position:relative;min-height:0;overflow:hidden}
 .vehicle-fare-advanced{display:none;margin-top:10px}
 .vehicle-fare-advanced.show{display:grid}
 .fare-advanced-toggle{width:100%;min-height:44px;margin-top:10px;border:1px solid #304252;background:#101c26;color:#c8d4dc;border-radius:11px;font-weight:850;font-size:14px}
+.vehicle-area-grid{display:grid;grid-template-columns:minmax(0,1.35fr) minmax(0,.85fr);gap:12px;margin-top:10px}
+.vehicle-area-field{display:grid;grid-template-rows:32px 54px;gap:5px;min-width:0;font-size:12px;color:var(--muted);font-weight:800;align-items:end}
+.vehicle-area-field select,.vehicle-area-value{width:100%;min-width:0;height:54px;box-sizing:border-box;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 12px;font-size:16px;line-height:1.2;display:flex;align-items:center;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.vehicle-area-field select{-webkit-appearance:none;appearance:none}
+.vehicle-location-btn{width:100%;min-height:58px;margin-top:12px;border:1px solid #2f86ff;background:#174a76;color:#fff;border-radius:14px;padding:12px 14px;font-size:16px;font-weight:950;letter-spacing:.1px}
+.vehicle-location-btn:active{transform:translateY(1px)}
+.vehicle-fare-pattern-wrap{margin-top:10px}
+.vehicle-fare-pattern-wrap label{display:grid;grid-template-rows:28px 54px;gap:5px;font-size:12px;color:var(--muted);font-weight:800}
+.vehicle-fare-pattern-wrap select{width:100%;height:54px;border:1px solid #3b5770;background:#0a141d;color:#fff;border-radius:10px;padding:10px 12px;font-size:16px;font-weight:850}
+.vehicle-fare-pattern-note{font-size:12px;color:#8fa5b4;line-height:1.45;margin-top:7px}
+.vehicle-save-all{width:100%;min-height:62px;margin:14px 0 4px;border:0;border-radius:16px;background:var(--blue);color:#fff;font-size:19px;font-weight:950}
+
 .report-trip-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .report-trip-card{border:1px solid #263743;border-radius:13px;background:#0b1720;padding:11px 12px}
 .report-trip-top{display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:8px}
@@ -2293,35 +2305,50 @@ html,body{
 
   <div id="settingsVehicle" class="hidden">
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
+
    <div class="settings-card">
     <div class="settings-title">車両設定</div>
-    <div class="settings-note">車両情報と営業区域を保存します。営業区域は現在地から候補を出し、確認して保存できます。</div>
+    <div class="settings-note">車両情報と営業区域を設定します。営業区域は現在地から候補を出し、確認後に保存します。</div>
     <div class="vehicle-fare-grid">
      <label>登録番号<input id="vehicleRegistrationNumber" type="text" inputmode="text" placeholder="広島 300 あ 12-34"></label>
      <label>車種<input id="vehicleTypeName" type="text" inputmode="text" placeholder="クラウン"></label>
-     <label style="grid-column:1/-1">現在のオドメーター
-      <input id="vehicleCurrentOdometer" type="number" min="0" step="1" inputmode="numeric" placeholder="例 52340">
-     </label>
+     <label>現在のオドメーター<input id="vehicleCurrentOdometer" type="number" min="0" step="1" inputmode="numeric" placeholder="例 52340"></label>
      <label>車検満了日<input id="vehicleInspectionExpiry" type="date"></label>
-     <label>締め日<select id="vehicleClosingDay"><option value="month-end">末日</option></select></label>
-     <label style="grid-column:1/-1">営業区域
-      <select id="vehicleSalesArea"></select>
-     </label>
+     <label>締め日<input id="vehicleClosingDay" type="text" inputmode="numeric" value="末日" placeholder="末日 または 1〜31"></label>
     </div>
-    <button class="smallbtn" type="button" style="width:100%;margin-top:10px" onclick="suggestSalesAreaFromLocation()">現在地から営業区域候補を出す</button>
-    <button class="smallbtn" type="button" style="width:100%;margin-top:8px" onclick="saveVehicleProfile()">車両設定を保存</button>
+
+    <div class="vehicle-area-grid">
+     <label class="vehicle-area-field">営業区域
+      <select id="vehicleSalesArea" onchange="handleVehicleSalesAreaChange()"></select>
+     </label>
+     <div class="vehicle-area-field">
+      <span>現在地エリア</span>
+      <div id="vehicleLocalArea" class="vehicle-area-value">未取得</div>
+     </div>
+    </div>
+    <button class="vehicle-location-btn" type="button" onclick="suggestSalesAreaFromLocation()">現在地から営業区域候補を出す</button>
    </div>
+
    <div class="settings-card">
     <div class="settings-title">料金設定</div>
-    <div class="settings-note">支払い画面の自動計算と▲▼の1メーター調整に使います。</div>
+    <div class="settings-note">営業区域に対応する料金パターンを選ぶと、初乗り・加算・時間距離・深夜割増を自動入力します。</div>
+
+    <div class="vehicle-fare-pattern-wrap">
+     <label>初乗り運賃（料金パターン）
+      <select id="vehicleFarePattern" onchange="applySelectedFarePattern()"></select>
+     </label>
+     <div id="vehicleFarePatternNote" class="vehicle-fare-pattern-note">営業区域を選ぶと候補を表示します。自動入力後も下の数値は手修正できます。</div>
+    </div>
+
     <div class="vehicle-fare-grid">
      <label>初乗り運賃<input id="fareBaseYen" type="number" min="0" step="10" inputmode="numeric"></label>
-     <label>初乗り距離(m)<input id="fareBaseMeters" type="number" min="0" step="10" inputmode="numeric"></label>
+     <label>初乗り距離(m)<input id="fareBaseMeters" type="number" min="0" step="1" inputmode="numeric"></label>
      <label>加算運賃<input id="fareStepYen" type="number" min="0" step="10" inputmode="numeric"></label>
      <label>加算距離(m)<input id="fareStepMeters" type="number" min="1" step="1" inputmode="numeric"></label>
      <label>迎車料金<input id="farePickupYen" type="number" min="0" step="10" inputmode="numeric"></label>
      <label>深夜割増(%)<input id="fareLateNightPct" type="number" min="0" step="1" inputmode="numeric"></label>
     </div>
+
     <button class="fare-advanced-toggle" type="button" onclick="toggleFareAdvanced()">詳細設定を表示</button>
     <div id="vehicleFareAdvanced" class="vehicle-fare-grid vehicle-fare-advanced">
      <label>低速判定(km/h以下)<input id="fareLowSpeedKmh" type="number" min="0" step="1" inputmode="numeric"></label>
@@ -2329,8 +2356,9 @@ html,body{
      <label>深夜開始<input id="fareLateNightStart" type="time"></label>
      <label>深夜終了<input id="fareLateNightEnd" type="time"></label>
     </div>
-    <button class="smallbtn" type="button" style="width:100%;margin-top:12px" onclick="saveVehicleFareSettings()">料金設定を保存</button>
    </div>
+
+   <button class="vehicle-save-all" type="button" onclick="saveVehicleAndFareSettings()">車両設定を保存</button>
   </div>
 
   <div id="settingsNotifications" class="hidden">
@@ -7294,6 +7322,20 @@ const HIROSHIMA_SALES_AREAS=[
  '広島交通圏','呉市A','呉市B','竹原市','東広島市','三原市','尾道市','福山交通圏','府中市','三次市','庄原市',
  '大竹市','江田島市','安芸高田市','山県郡','世羅郡','神石郡','豊田郡','佐伯交通圏','宮島'
 ];
+
+// 中国運輸局の公定幅運賃（令和8年3月11日適用）。
+// 現段階では広島交通圏・普通車の6パターンを自動入力対象とし、その他の区域は手入力を維持する。
+const VEHICLE_FARE_PATTERNS={
+ '広島交通圏':[
+  {id:'hiroshima_regular_upper',name:'800円（上限）',baseYen:800,baseMeters:1450,stepYen:100,stepMeters:300,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_regular_b',name:'790円（B）',baseYen:790,baseMeters:1450,stepYen:100,stepMeters:304,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_regular_c',name:'780円（C）',baseYen:780,baseMeters:1450,stepYen:100,stepMeters:308,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_regular_d',name:'770円（D）',baseYen:770,baseMeters:1450,stepYen:100,stepMeters:312,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_regular_e',name:'760円（E）',baseYen:760,baseMeters:1450,stepYen:100,stepMeters:316,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_regular_lower',name:'750円（下限）',baseYen:750,baseMeters:1450,stepYen:100,stepMeters:320,timeStepSec:120,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'}
+ ]
+};
+
 function getVehicleProfile(){
  try{return JSON.parse(localStorage.getItem(VEHICLE_PROFILE_KEY)||'{}')||{}}catch(e){return{}}
 }
@@ -7302,6 +7344,30 @@ function renderSalesAreaOptions(selected=''){
  const opts=['<option value="">選択してください</option>'].concat(HIROSHIMA_SALES_AREAS.map(v=>'<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>'));
  el.innerHTML=opts.join('');
  el.value=HIROSHIMA_SALES_AREAS.includes(selected)?selected:'';
+}
+function renderVehicleLocalArea(label=''){
+ const el=document.getElementById('vehicleLocalArea');
+ if(el) el.textContent=String(label||'未取得');
+}
+function renderVehicleFarePatternOptions(area,selected=''){
+ const el=document.getElementById('vehicleFarePattern');
+ const note=document.getElementById('vehicleFarePatternNote');
+ if(!el)return;
+ const patterns=VEHICLE_FARE_PATTERNS[area]||[];
+ if(!patterns.length){
+  el.innerHTML='<option value="">手入力</option>';
+  el.value='';
+  if(note) note.textContent=area?'この営業区域は現在、料金パターン自動入力の対象外です。下の数値を手入力できます。':'営業区域を選ぶと候補を表示します。自動入力後も下の数値は手修正できます。';
+  return;
+ }
+ el.innerHTML='<option value="">選択してください</option>'+patterns.map(p=>'<option value="'+escapeHtml(p.id)+'">'+escapeHtml(p.name)+'</option>').join('');
+ el.value=patterns.some(p=>p.id===selected)?selected:'';
+ if(note) note.textContent='初乗り運賃を選ぶと、対応する距離・加算・時間距離・深夜割増を一括入力します。入力後の数値は手修正できます。';
+}
+function handleVehicleSalesAreaChange(){
+ const area=String(document.getElementById('vehicleSalesArea')?.value||'');
+ const fare=getVehicleFareSettings();
+ renderVehicleFarePatternOptions(area,fare.area===area?fare.patternId:'');
 }
 function renderVehicleProfile(){
  const p=getVehicleProfile();
@@ -7313,8 +7379,11 @@ function renderVehicleProfile(){
  const odo=latestKnownOdometer();
  set('vehicleCurrentOdometer',odo??'');
  renderSalesAreaOptions(p.salesArea||'');
+ renderVehicleLocalArea(p.localAreaLabel||'');
+ const fare=getVehicleFareSettings();
+ renderVehicleFarePatternOptions(p.salesArea||'',fare.area===p.salesArea?fare.patternId:'');
 }
-function saveVehicleProfile(){
+function saveVehicleProfile(silent=false){
  const registrationNumber=String(document.getElementById('vehicleRegistrationNumber')?.value||'').trim();
  const vehicleType=String(document.getElementById('vehicleTypeName')?.value||'').trim();
  const closingDayRaw=String(document.getElementById('vehicleClosingDay')?.value||'末日').trim();
@@ -7324,77 +7393,128 @@ function saveVehicleProfile(){
   if(!Number.isInteger(n)||n<1||n>31){
    toast('締め日は「末日」または1〜31で入力してください');
    document.getElementById('vehicleClosingDay')?.focus();
-   return;
+   return false;
   }
   closingDay=n;
  }
  const inspectionExpiry=String(document.getElementById('vehicleInspectionExpiry')?.value||'');
  const salesArea=String(document.getElementById('vehicleSalesArea')?.value||'');
+ const localAreaLabel=String(document.getElementById('vehicleLocalArea')?.textContent||'').trim();
  const odometerRaw=String(document.getElementById('vehicleCurrentOdometer')?.value||'').trim();
  const currentOdometer=odometerRaw===''?null:Number(odometerRaw);
- const p={registrationNumber,vehicleType,closingDay,inspectionExpiry,salesArea,updatedAt:Date.now()};
+ const p={registrationNumber,vehicleType,closingDay,inspectionExpiry,salesArea,localAreaLabel:localAreaLabel==='未取得'?'':localAreaLabel,updatedAt:Date.now()};
  try{localStorage.setItem(VEHICLE_PROFILE_KEY,JSON.stringify(p))}catch(e){}
  if(Number.isFinite(currentOdometer)&&currentOdometer>=0){
   try{localStorage.setItem(LAST_ODOMETER_KEY,String(currentOdometer))}catch(e){}
  }
- toast('車両設定を保存しました');
+ if(!silent) toast('車両設定を保存しました');
+ return true;
 }
 function salesAreaCandidatesFromAddress(a={}){
  const city=String(a.city||a.town||a.village||a.municipality||a.county||'');
  const suburb=String(a.suburb||a.city_district||'');
- const text=city+' '+suburb;
- if(/広島市/.test(text)) return ['広島交通圏'];
- if(/東広島市/.test(text)) return ['東広島市'];
- if(/呉市/.test(text)) return ['呉市A','呉市B'];
- if(/竹原市/.test(text)) return ['竹原市'];
- if(/三原市/.test(text)) return ['三原市'];
- if(/尾道市/.test(text)) return ['尾道市'];
- if(/福山市/.test(text)) return ['福山交通圏'];
- if(/府中市/.test(text)) return ['府中市'];
- if(/三次市/.test(text)) return ['三次市'];
- if(/庄原市/.test(text)) return ['庄原市'];
- if(/大竹市/.test(text)) return ['大竹市'];
- if(/江田島市/.test(text)) return ['江田島市'];
- if(/安芸高田市/.test(text)) return ['安芸高田市'];
- if(/山県郡|安芸太田町|北広島町/.test(text)) return ['山県郡'];
- if(/世羅町/.test(text)) return ['世羅郡'];
- if(/神石高原町/.test(text)) return ['神石郡'];
- if(/大崎上島町/.test(text)) return ['豊田郡'];
- if(/廿日市市/.test(text)) return ['広島交通圏','佐伯交通圏','宮島'];
+ const quarter=String(a.quarter||a.neighbourhood||a.hamlet||a.locality||'');
+ const full=[city,suburb,quarter,String(a.road||''),String(a.island||'')].join(' ');
+ if(/広島市/.test(full)){
+  if(/湯来/.test(full)) return ['佐伯交通圏'];
+  return ['広島交通圏'];
+ }
+ if(/廿日市市/.test(full)){
+  if(/宮島/.test(full)) return ['宮島'];
+  if(/佐伯|吉和|大野/.test(full)) return ['佐伯交通圏'];
+  return ['広島交通圏'];
+ }
+ if(/府中町|海田町|熊野町|坂町/.test(full)) return ['広島交通圏'];
+ if(/呉市/.test(full)){
+  if(/豊浜町|豊町/.test(full)) return ['呉市B'];
+  return ['呉市A'];
+ }
+ if(/東広島市/.test(full)) return ['東広島市'];
+ if(/竹原市/.test(full)) return ['竹原市'];
+ if(/三原市/.test(full)){
+  if(/広島空港|本郷町善入寺/.test(full)) return ['竹原市','東広島市'];
+  return ['三原市'];
+ }
+ if(/尾道市/.test(full)){
+  if(/浦崎/.test(full)) return ['福山交通圏'];
+  return ['尾道市'];
+ }
+ if(/福山市/.test(full)) return ['福山交通圏'];
+ if(/府中市/.test(full)) return ['府中市'];
+ if(/三次市/.test(full)) return ['三次市'];
+ if(/庄原市/.test(full)) return ['庄原市'];
+ if(/大竹市/.test(full)) return ['大竹市'];
+ if(/江田島市/.test(full)) return ['江田島市'];
+ if(/安芸高田市/.test(full)) return ['安芸高田市'];
+ if(/安芸太田町|北広島町|山県郡/.test(full)) return ['山県郡'];
+ if(/世羅町/.test(full)) return ['世羅郡'];
+ if(/神石高原町/.test(full)) return ['神石郡'];
+ if(/大崎上島町/.test(full)) return ['豊田郡'];
  return [];
+}
+function localAreaLabelFromAddress(a={}){
+ const parts=[
+  a.city||a.town||a.village||a.municipality||'',
+  a.city_district||a.suburb||'',
+  a.quarter||a.neighbourhood||a.hamlet||''
+ ].map(v=>String(v||'').trim()).filter(Boolean);
+ return [...new Set(parts)].join(' ');
 }
 async function suggestSalesAreaFromLocation(){
  if(!latestPosition?.coords){toast('位置情報を取得してからお試しください');startLocation();return}
  const lat=latestPosition.coords.latitude,lon=latestPosition.coords.longitude;
  try{
-  const url=APP_LINKS.reverseNominatim+'?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=12&addressdetails=1&accept-language=ja';
+  const url=APP_LINKS.reverseNominatim+'?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=14&addressdetails=1&accept-language=ja';
   const d=await fetchJsonWithTimeout(url,4500);
-  const candidates=salesAreaCandidatesFromAddress(d.address||{});
-  if(!candidates.length){toast('営業区域候補を自動判定できませんでした');return}
+  const address=d.address||{};
+  const candidates=salesAreaCandidatesFromAddress(address);
+  renderVehicleLocalArea(localAreaLabelFromAddress(address)||'現在地取得済み');
+  if(!candidates.length){
+   renderVehicleFarePatternOptions('', '');
+   toast('営業区域候補を自動判定できませんでした');
+   return;
+  }
   const el=document.getElementById('vehicleSalesArea');
   if(candidates.length===1){
-   if(el) el.value=candidates[0];
+   if(el)el.value=candidates[0];
+   renderVehicleFarePatternOptions(candidates[0],'');
    toast(candidates[0]+' を候補にしました');
    return;
   }
-  if(el) el.value=candidates[0];
+  if(el)el.value=candidates[0];
+  renderVehicleFarePatternOptions(candidates[0],'');
   toast('候補が複数あります。営業区域を確認してください');
  }catch(e){toast('営業区域候補を取得できませんでした')}
 }
 
 const VEHICLE_FARE_SETTINGS_KEY='taxi_vehicle_fare_settings_v1';
 const DEFAULT_VEHICLE_FARE_SETTINGS={
- baseYen:0,baseMeters:0,stepYen:0,stepMeters:0,lowSpeedKmh:10,timeStepSec:0,
- lateNightPct:0,lateNightStart:'22:00',lateNightEnd:'05:00',pickupYen:0
+ area:'',patternId:'',baseYen:0,baseMeters:0,stepYen:0,stepMeters:0,lowSpeedKmh:10,timeStepSec:0,
+ lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00',pickupYen:0
 };
 let rideFareTracking={lastTs:0,lowSpeedSeconds:0};
 function getVehicleFareSettings(){
  try{return {...DEFAULT_VEHICLE_FARE_SETTINGS,...JSON.parse(localStorage.getItem(VEHICLE_FARE_SETTINGS_KEY)||'{}')}}catch(e){return {...DEFAULT_VEHICLE_FARE_SETTINGS}}
 }
 function renderVehicleFareSettings(){
- const s=getVehicleFareSettings();
- const map={fareBaseYen:s.baseYen,fareBaseMeters:s.baseMeters,fareStepYen:s.stepYen,fareStepMeters:s.stepMeters,fareLowSpeedKmh:s.lowSpeedKmh,fareTimeStepSec:s.timeStepSec,fareLateNightPct:s.lateNightPct,farePickupYen:s.pickupYen,fareLateNightStart:s.lateNightStart,fareLateNightEnd:s.lateNightEnd};
+ const fs=getVehicleFareSettings();
+ const map={fareBaseYen:fs.baseYen,fareBaseMeters:fs.baseMeters,fareStepYen:fs.stepYen,fareStepMeters:fs.stepMeters,fareLowSpeedKmh:fs.lowSpeedKmh,fareTimeStepSec:fs.timeStepSec,fareLateNightPct:fs.lateNightPct,farePickupYen:fs.pickupYen,fareLateNightStart:fs.lateNightStart,fareLateNightEnd:fs.lateNightEnd};
  Object.entries(map).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v??''});
+ const area=String(document.getElementById('vehicleSalesArea')?.value||getVehicleProfile().salesArea||'');
+ renderVehicleFarePatternOptions(area,fs.area===area?fs.patternId:'');
+}
+function applySelectedFarePattern(){
+ const area=String(document.getElementById('vehicleSalesArea')?.value||'');
+ const id=String(document.getElementById('vehicleFarePattern')?.value||'');
+ const p=(VEHICLE_FARE_PATTERNS[area]||[]).find(x=>x.id===id);
+ if(!p)return;
+ const values={
+  fareBaseYen:p.baseYen,fareBaseMeters:p.baseMeters,fareStepYen:p.stepYen,fareStepMeters:p.stepMeters,
+  fareLowSpeedKmh:p.lowSpeedKmh,fareTimeStepSec:p.timeStepSec,fareLateNightPct:p.lateNightPct,
+  fareLateNightStart:p.lateNightStart,fareLateNightEnd:p.lateNightEnd
+ };
+ Object.entries(values).forEach(([field,v])=>{const el=document.getElementById(field);if(el)el.value=v});
+ toast('料金パターンを反映しました');
 }
 function toggleFareAdvanced(){
  const el=document.getElementById('vehicleFareAdvanced');
@@ -7404,16 +7524,26 @@ function toggleFareAdvanced(){
  el.classList.toggle('show',show);
  if(btn)btn.textContent=show?'詳細設定を隠す':'詳細設定を表示';
 }
-function saveVehicleFareSettings(){
+function saveVehicleFareSettings(silent=false){
  const n=id=>Math.max(0,Number(document.getElementById(id)?.value||0));
- const s={
+ const area=String(document.getElementById('vehicleSalesArea')?.value||'');
+ const patternId=String(document.getElementById('vehicleFarePattern')?.value||'');
+ const fs={
+  area,patternId,
   baseYen:n('fareBaseYen'),baseMeters:n('fareBaseMeters'),stepYen:n('fareStepYen'),stepMeters:n('fareStepMeters'),
   lowSpeedKmh:n('fareLowSpeedKmh'),timeStepSec:n('fareTimeStepSec'),lateNightPct:n('fareLateNightPct'),pickupYen:n('farePickupYen'),
   lateNightStart:document.getElementById('fareLateNightStart')?.value||'22:00',
-  lateNightEnd:document.getElementById('fareLateNightEnd')?.value||'05:00'
+  lateNightEnd:document.getElementById('fareLateNightEnd')?.value||'05:00',
+  updatedAt:Date.now()
  };
- localStorage.setItem(VEHICLE_FARE_SETTINGS_KEY,JSON.stringify(s));
- toast('料金設定を保存しました');
+ try{localStorage.setItem(VEHICLE_FARE_SETTINGS_KEY,JSON.stringify(fs))}catch(e){return false}
+ if(!silent) toast('料金設定を保存しました');
+ return true;
+}
+function saveVehicleAndFareSettings(){
+ if(!saveVehicleProfile(true))return;
+ if(!saveVehicleFareSettings(true)){toast('料金設定を保存できませんでした');return}
+ toast('車両・料金設定を保存しました');
 }
 function isLateNightFareTime(d=new Date()){
  const s=getVehicleFareSettings();
