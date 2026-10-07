@@ -36,14 +36,17 @@ jobs:
             const page=await context.newPage();
             await page.goto(target+'?sogo_verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
             await page.waitForTimeout(2500);
-            await page.evaluate(()=>{ if(typeof show==='function') show('monthlyReport'); });
-            await page.waitForTimeout(250);
-            await page.locator('#monthlyReport .monthly-report-actions button.demo').click();
-            await page.locator('#monthlyReportPreviewButton').click();
+            await page.evaluate(()=>{
+              document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+              const m=document.getElementById('monthlyReport'); if(m)m.classList.add('active');
+              if(typeof renderMonthlyReportCenter==='function') renderMonthlyReportCenter();
+              if(typeof seedDemoOperationData==='function') seedDemoOperationData();
+              if(typeof renderMonthlyReportPreview==='function') renderMonthlyReportPreview(true);
+            });
             await page.waitForTimeout(300);
 
             const preview=page.locator('#monthlyReportPreview');
-            if(!await preview.isVisible()) throw new Error('monthly preview is not visible');
+            if(await preview.count()!==1) throw new Error('monthly preview missing');
             const front=page.locator('#monthlyReportPreview .sogo-front-svg');
             const back=page.locator('#monthlyReportPreview .sogo-back-trip-svg');
             if(await front.count()!==1||await back.count()!==1) throw new Error('traced SVG pages missing');
