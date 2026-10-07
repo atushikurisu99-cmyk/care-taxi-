@@ -1473,7 +1473,7 @@ html,body{
 .sogo-page-back{padding-top:16px}
 .sogo-inspection-title{
  display:grid;
- grid-template-columns:minmax(0,1fr) 190px;
+ grid-template-columns:minmax(0,1fr) 82px 150px;
  min-height:38px;
  border:1px solid #222;
  border-bottom:0;
@@ -1497,6 +1497,11 @@ html,body{
  font-size:9px;
  white-space:nowrap;
 }
+.sogo-inspection-title .sogo-inspector-name{
+ justify-content:flex-start;
+ padding-left:8px;
+ font-size:10px;
+}
 .sogo-inspection th{
  height:20px;
  padding:2px!important;
@@ -1517,8 +1522,8 @@ html,body{
  font-size:7px!important;
  letter-spacing:.05em;
 }
-.sogo-inspection .point{text-align:center!important}
-.sogo-inspection .detail{text-align:left!important;padding-left:3px!important}
+.sogo-inspection .point{text-align:center!important;font-size:6.8px!important;line-height:1.02!important}
+.sogo-inspection .detail{text-align:left!important;padding-left:3px!important;font-size:7px!important;line-height:1.04!important}
 .sogo-inspection .result{font-size:10px!important;font-family:sans-serif}
 .sogo-inspection .note-cell{
  font-size:6.8px!important;
@@ -3041,7 +3046,7 @@ function sogoInspectionHtml(r){
  };
  const n=15; let rows='';
  for(let i=0;i<n;i++) rows+='<tr>'+cells(L,i)+cells(M,i)+cells(R,i)+'</tr>';
- return '<div class="sogo-inspection-title"><strong>日 常 点 検</strong><span>点検者　'+escapeHtml(r?.inspectorName||'')+'</span></div>'+
+ return '<div class="sogo-inspection-title"><strong>日 常 点 検</strong><span class="sogo-inspector-label">点検者</span><span class="sogo-inspector-name">'+escapeHtml(r?.inspectorName||'')+'</span></div>'+
  '<table class="sogo-inspection"><colgroup>'+
   '<col style="width:4%"><col style="width:11%"><col style="width:12%"><col style="width:4%">'+
   '<col style="width:4%"><col style="width:12%"><col style="width:16%"><col style="width:4%">'+
@@ -3082,11 +3087,11 @@ function sogoFrontSvg(r){
   [1775,140,1405],[1842,140,1405],[1910,36,1405],[2011,36,1405]
  ];
  const tracedV=[
-  [37,229,2013],[1403,229,2013],
-  [595,229,289],[724,229,289],[997,229,289],[1122,229,289],
-  [165,286,344],[666,286,344],[848,286,344],
-  [105,341,1709],[205,341,1709],[399,341,1709],[595,341,1709],[752,341,1709],[940,341,1709],[1128,341,1709],
-  [141,1706,1912],[270,1706,1912],[556,1706,1912],[704,1706,1912],[991,1706,1912],[1114,1706,1912]
+  [38,230,2011],[1404,230,2011],
+  [596,230,287],[724,230,287],[998,230,287],[1122,230,287],
+  [166,287,342],[666,287,342],[848,287,342],
+  [106,342,1707],[205,342,1707],[400,342,1707],[596,342,1707],[752,342,1707],[940,342,1707],[1128,342,1707],
+  [142,1707,1910],[270,1707,1910],[556,1707,1910],[704,1707,1910],[992,1707,1910],[1114,1707,1910]
  ];
  tracedH.forEach((a,i)=>lines.push(sogoSvgLine('H'+String(i+1).padStart(2,'0'),X(a[1]),Y(a[0]),X(a[2]),Y(a[0]),'traced')));
  tracedV.forEach((a,i)=>lines.push(sogoSvgLine('V'+String(i+1).padStart(2,'0'),X(a[0]),Y(a[1]),X(a[0]),Y(a[2]),'traced')));
@@ -3121,12 +3126,12 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1325),yDate,end[1]||'','top');
  text+=sogoSvgText(X(1380),yDate,'分','top');
 
- text+=sogoSvgText(X((37+165)/2),yReg,'登録番号','top label');
- text+=sogoSvgText(X(185),yReg,reg,'top left','start');
+ text+=sogoSvgText(X((38+166)/2),yReg,'登録番号','top label');
+ text+=sogoSvgText(X(184),yReg,reg,'top left','start');
  text+=sogoSvgText(X((666+848)/2),yReg,'氏名又は名称','top label');
- text+=sogoSvgText(X(870),yReg,name,'top left','start');
+ text+=sogoSvgText(X(866),yReg,name,'top left','start');
 
- const cols=[37,105,205,399,595,752,940,1128,1403];
+ const cols=[38,106,205,400,596,752,940,1128,1404];
  const centers=cols.slice(0,-1).map((v,i)=>(v+cols[i+1])/2);
  ['回数','人員','乗車地','降車地','降車時刻','現収','未収','備考'].forEach((v,i)=>{
   text+=sogoSvgText(X(centers[i]),yHead,v,'head');
@@ -3144,12 +3149,12 @@ function sogoFrontSvg(r){
   text+=sogoSvgText(X(centers[0]),cy,n,'body');
   text+=sogoSvgText(X(centers[1]),cy,people,'body');
   text+=sogoSvgText(X(220),cy,trip?reportTemplatePlace(trip.pickup):'','body left','start');
-  text+=sogoSvgText(X(415),cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
+  text+=sogoSvgText(X(414),cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
   text+=sogoSvgText(X(635),cy,parts[0],'body');
   text+=sogoSvgText(X(713),cy,parts[1],'body');
   text+=sogoSvgText(X(centers[5]),cy,money.cash,'body');
   text+=sogoSvgText(X(centers[6]),cy,money.receivable,'body');
-  text+=sogoSvgText(X(1145),cy,remarks,'body left','start');
+  text+=sogoSvgText(X(1142),cy,remarks,'body left','start');
  }
 
  const km=reportTravelKm(r);
