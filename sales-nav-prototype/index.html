@@ -3106,26 +3106,42 @@ function sogoFrontSvg(r){
   const maxWidth=Math.max(1,box.x2-box.x1);
   if(units>0&&units*fontSize>maxWidth) actual=Math.max(minFontSize,fontSize*(maxWidth/(units*fontSize)));
   const x=anchor==='start'?box.x1:(anchor==='end'?box.x2:(box.x1+box.x2)/2);
-  const y=(box.y1+box.y2)/2;
+  const y=(box.y1+box.y2)/2-0.8;
   return sogoSvgText(x,y,raw,cls,anchor,'style="font-size:'+actual.toFixed(2)+'px"');
  };
- const verticalColumns=(box,leftText,rightText,cls='summary',fontSize=9)=>{
+ const mixedRight=(box,main,unit,mainSize=10.6,unitSize=8.6,gap=4)=>{
+  const m=main==null?'':String(main),u=unit==null?'':String(unit);
+  const ux=box.x2,uy=(box.y1+box.y2)/2;
+  let html='';
+  if(u) html+=sogoSvgText(ux,uy,u,'summary value','end','style="font-size:'+unitSize+'px"');
+  const approxUnit=(u.length||0)*unitSize*.62;
+  const mx=ux-approxUnit-(u?gap:0);
+  if(m) html+=sogoSvgText(mx,uy,m,'summary value','end','style="font-size:'+mainSize+'px"');
+  return html;
+ };
+ const verticalColumns=(box,leftText,rightText,cls='summary')=>{
   const render=(value,x,withParens=false)=>{
    const chars=[...String(value||'')];
    if(!chars.length)return '';
    const seq=withParens?['(',...chars,')']:chars;
-   const top=box.y1+(withParens?3:12),bottom=box.y2-(withParens?3:12);
+   const top=box.y1+(withParens?1:16),bottom=box.y2-(withParens?1:16);
    const step=(bottom-top)/(seq.length+1);
    return seq.map((ch,i)=>{
     const y=top+step*(i+1);
     const isParen=(ch==='('||ch===')');
-    const rotate=isParen?' transform="rotate(90 '+x+' '+y+')"':'';
-    const fs=isParen?fontSize*.92:fontSize;
+    const isDash=(ch==='ー');
+    const rotate=(isParen||isDash)?' transform="rotate(90 '+x+' '+y+')"':'';
+    let fs=10.4;
+    if(withParens){
+      fs=9.1;
+      if(isParen) fs=8.2;
+      if(isDash) fs=8.7;
+    }
     return sogoSvgText(x,y,ch,cls,'middle','style="font-size:'+fs.toFixed(2)+'px"'+rotate);
    }).join('');
   };
   const w=box.x2-box.x1;
-  return render(leftText,box.x1+w*.30,false)+render(rightText,box.x1+w*.69,true);
+  return render(leftText,box.x1+w*.28,false)+render(rightText,box.x1+w*.70,true);
  };
  const lines=[];
  const tracedH=[
@@ -3218,25 +3234,25 @@ function sogoFrontSvg(r){
  const sumY=[Y((1707+1775)/2),Y((1775+1842)/2),Y((1842+1910)/2)];
 
  const runBox=cellBox(38,1707,142,1910,0,0);
- text+=verticalColumns(runBox,'走行粁','走行メーター粁数','summary',8.8);
+ text+=verticalColumns(runBox,'走行粁','走行メーター粁数','summary');
  text+=cellText(cellBox(142,1707,270,1775,4,2),'入庫','summary','middle',10.5,9.5);
  text+=cellText(cellBox(142,1775,270,1842,4,2),'出庫','summary','middle',10.5,9.5);
  text+=cellText(cellBox(142,1842,270,1910,4,2),'差引','summary','middle',10.5,9.5);
- text+=cellText(cellBox(270,1707,556,1775,8,2),(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end',10,9);
- text+=cellText(cellBox(270,1775,556,1842,8,2),(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end',10,9);
- text+=cellText(cellBox(270,1842,556,1910,8,2),(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end',10,9);
+ text+=mixedRight(cellBox(270,1707,556,1775,8,2),(r?.odometerEnd??''),(r?.odometerEnd!==''?'キロ':''),10.8,8.5,5);
+ text+=mixedRight(cellBox(270,1775,556,1842,8,2),(r?.odometerStart??''),(r?.odometerStart!==''?'キロ':''),10.8,8.5,5);
+ text+=mixedRight(cellBox(270,1842,556,1910,8,2),(km??''),(km!==null&&km!==''?'キロ':''),10.8,8.5,5);
  text+=cellText(cellBox(556,1707,704,1775,4,2),'乗車粁','summary','middle',10.5,9);
  text+=cellText(cellBox(556,1775,704,1842,4,2),'運送回数','summary','middle',10.5,9);
  text+=cellText(cellBox(556,1842,704,1910,4,2),'輸送人員','summary','middle',10.5,9);
- text+=cellText(cellBox(704,1707,992,1775,8,2),(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end',10,9);
- text+=cellText(cellBox(704,1775,992,1842,8,2),(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end',10,9);
- text+=cellText(cellBox(704,1842,992,1910,8,2),(people||'')+(people?' 人':''),'summary value','end',10,9);
+ text+=mixedRight(cellBox(704,1707,992,1775,8,2),(r?.occupiedKm??''),(r?.occupiedKm!==''?'キロ':''),10.8,8.5,5);
+ text+=mixedRight(cellBox(704,1775,992,1842,8,2),(r?.trips||trips.length||''),((r?.trips||trips.length)?'回':''),10.8,8.5,5);
+ text+=mixedRight(cellBox(704,1842,992,1910,8,2),(people||''),(people?'人':''),10.8,8.5,5);
  text+=cellText(cellBox(992,1707,1114,1775,4,2),'現収','summary','middle',10.5,9.5);
  text+=cellText(cellBox(992,1775,1114,1842,4,2),'未収','summary','middle',10.5,9.5);
  text+=cellText(cellBox(992,1842,1114,1910,4,2),'合計','summary','middle',10.5,9.5);
- text+=cellText(cellBox(1114,1707,1404,1775,8,2),(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end',10,9);
- text+=cellText(cellBox(1114,1775,1404,1842,8,2),(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end',10,9);
- text+=cellText(cellBox(1114,1842,1404,1910,8,2),(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end',10,9);
+ text+=mixedRight(cellBox(1114,1707,1404,1775,8,2),(cash?cash.toLocaleString('ja-JP'):''),(cash?'円':''),10.8,8.5,5);
+ text+=mixedRight(cellBox(1114,1775,1404,1842,8,2),(receivable?receivable.toLocaleString('ja-JP'):''),(receivable?'円':''),10.8,8.5,5);
+ text+=mixedRight(cellBox(1114,1842,1404,1910,8,2),(sales?sales.toLocaleString('ja-JP'):''),(sales?'円':''),10.8,8.5,5);
  const restBox=cellBox(38,1910,1404,2011,0,0);
  const restY=(restBox.y1+restBox.y2)/2;
  text+=sogoSvgText(X(70),restY,'休憩','summary','start');
