@@ -174,6 +174,8 @@ jobs:
               if(!visibleDemoValues.includes(value)) throw new Error('Sogo visible demo value missing: '+value);
             }
             console.log('SOGO_INLINE_TRACE_OK',JSON.stringify({frontTemplate:{mode:frontTemplate.mode,h:frontTemplate.h,v:frontTemplate.v},backLedger:{h:backLedger.h,v:backLedger.v},pageBox,svgBox}));
+            await firstPage.screenshot({path:'/tmp/sogo-front-page.png'});
+            await page.locator('#monthlyReportPreview .sogo-page').nth(1).screenshot({path:'/tmp/sogo-back-page.png'});
             await page.screenshot({path:'/tmp/monthly-preview-template-v3.png',fullPage:false});
             await page.locator('#monthlyReportPreview .monthly-preview-close').click();
             if(await preview.isVisible()) throw new Error('monthly preview did not close');
@@ -239,6 +241,8 @@ jobs:
             /tmp/menu-production.png
             /tmp/monthly-preview-production.png
             /tmp/monthly-preview-template-v3.png
+            /tmp/sogo-front-page.png
+            /tmp/sogo-back-page.png
           if-no-files-found: ignore
           retention-days: 1
 
