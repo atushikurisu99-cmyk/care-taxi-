@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-VEHICLE-AREA-FARE-V2 -->
+<!-- BUILD:2026-10-08-HIROSHIMA-FARE-12PATTERNS-V3 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -7323,18 +7323,25 @@ const HIROSHIMA_SALES_AREAS=[
  '大竹市','江田島市','安芸高田市','山県郡','世羅郡','神石郡','豊田郡','佐伯交通圏','宮島'
 ];
 
-// 中国運輸局の公定幅運賃（令和8年3月11日適用）。
-// 現段階では広島交通圏・普通車の6パターンを自動入力対象とし、その他の区域は手入力を維持する。
+// 中国運輸局の公定幅運賃（広島交通圏・普通車）。
+// 通常6パターン＋初乗距離短縮6パターンの計12パターンを自動入力対象とし、その他の区域は手入力を維持する。
 const VEHICLE_FARE_PATTERNS={
  '広島交通圏':[
-  {id:'hiroshima_regular_upper',name:'800円（上限）',baseYen:800,baseMeters:1450,stepYen:100,stepMeters:300,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
-  {id:'hiroshima_regular_b',name:'790円（B）',baseYen:790,baseMeters:1450,stepYen:100,stepMeters:304,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
-  {id:'hiroshima_regular_c',name:'780円（C）',baseYen:780,baseMeters:1450,stepYen:100,stepMeters:308,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
-  {id:'hiroshima_regular_d',name:'770円（D）',baseYen:770,baseMeters:1450,stepYen:100,stepMeters:312,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
-  {id:'hiroshima_regular_e',name:'760円（E）',baseYen:760,baseMeters:1450,stepYen:100,stepMeters:316,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
-  {id:'hiroshima_regular_lower',name:'750円（下限）',baseYen:750,baseMeters:1450,stepYen:100,stepMeters:320,timeStepSec:120,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'}
+  {id:'hiroshima_standard_upper',name:'800円・1.42km（通常 上限）',baseYen:800,baseMeters:1420,stepYen:100,stepMeters:288,timeStepSec:105,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_standard_b',name:'790円・1.42km（通常 B）',baseYen:790,baseMeters:1420,stepYen:100,stepMeters:292,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_standard_c',name:'780円・1.42km（通常 C）',baseYen:780,baseMeters:1420,stepYen:100,stepMeters:295,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_standard_d',name:'770円・1.42km（通常 D）',baseYen:770,baseMeters:1420,stepYen:100,stepMeters:299,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_standard_e',name:'760円・1.42km（通常 E）',baseYen:760,baseMeters:1420,stepYen:100,stepMeters:303,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_standard_lower',name:'750円・1.42km（通常 下限）',baseYen:750,baseMeters:1420,stepYen:100,stepMeters:307,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+
+  {id:'hiroshima_short_upper',name:'700円・1.15km（短縮 上限）',baseYen:700,baseMeters:1150,stepYen:100,stepMeters:300,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_short_b',name:'690円・1.146km（短縮 B）',baseYen:690,baseMeters:1146,stepYen:100,stepMeters:304,timeStepSec:110,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_short_c',name:'680円・1.142km（短縮 C）',baseYen:680,baseMeters:1142,stepYen:100,stepMeters:308,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_short_d',name:'670円・1.138km（短縮 D）',baseYen:670,baseMeters:1138,stepYen:100,stepMeters:312,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_short_e',name:'660円・1.134km（短縮 E）',baseYen:660,baseMeters:1134,stepYen:100,stepMeters:316,timeStepSec:115,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'},
+  {id:'hiroshima_short_lower',name:'650円・1.13km（短縮 下限）',baseYen:650,baseMeters:1130,stepYen:100,stepMeters:320,timeStepSec:120,lowSpeedKmh:10,lateNightPct:20,lateNightStart:'22:00',lateNightEnd:'05:00'}
  ]
-};
+}
 
 function getVehicleProfile(){
  try{return JSON.parse(localStorage.getItem(VEHICLE_PROFILE_KEY)||'{}')||{}}catch(e){return{}}
