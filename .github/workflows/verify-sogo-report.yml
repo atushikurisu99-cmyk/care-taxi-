@@ -99,10 +99,11 @@ jobs:
             }
 
             const box=await front.boundingBox();
-            if(!box||box.width<500||box.height<700) throw new Error('front SVG geometry too small '+JSON.stringify(box));
             await page.locator('#monthlyReportPreview .sogo-page-front').screenshot({path:'/tmp/sogo-front-full.png'});
             await page.locator('#monthlyReportPreview .sogo-page-back').screenshot({path:'/tmp/sogo-back-full.png'});
             await page.screenshot({path:'/tmp/sogo-report-production.png',fullPage:false});
+            if(!box||box.width<340||box.height<500||box.x<0||box.x+box.width>393.5) throw new Error('front SVG not fitted to iPhone width '+JSON.stringify(box));
+
             console.log('SOGO_REPORT_OK',JSON.stringify({front:{h:ledger.h,v:ledger.v},back:{h:backLedger.h,v:backLedger.v},box}));
             await browser.close();
           })().catch(e=>{console.error(e);process.exit(1)});
