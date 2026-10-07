@@ -71,14 +71,32 @@ jobs:
             if(!menuActive) throw new Error('menu screen did not become active');
             const menuItems=page.locator('#menu .menuitem');
             const menuCount=await menuItems.count();
-            if(menuCount<8) throw new Error('menu items missing: '+menuCount);
+            if(menuCount<7) throw new Error('menu items missing: '+menuCount);
             const menuText=await menu.innerText();
-            for(const label of ['ホーム','本日の営業情報','売上・実績','営業分析','位置・警告検証','日報確認','月報・帳票出力','設定']){
+            for(const label of ['ホーム','売上・実績','営業分析','位置・警告検証','日報確認','月報・帳票出力','設定']){
               if(!menuText.includes(label)) throw new Error('menu label not rendered: '+label);
             }
             const menuParent=await menu.evaluate(el=>({parent:el.parentElement?.tagName||'',grand:el.parentElement?.parentElement?.className||''}));
             if(menuParent.parent!=='MAIN') throw new Error('menu parent contract broken: '+JSON.stringify(menuParent));
+            if(menuText.includes('本日の営業情報')) throw new Error('obsolete sales info menu entry still visible');
             console.log('MENU_RENDER_OK',JSON.stringify({menuCount,menuActive,menuText:menuText.slice(0,500)}));
+
+            // Navigation audit: home -> bus -> back must return directly home.
+            await page.evaluate(()=>{ if(typeof show==='function') show('home'); });
+            await page.locator('#home .home-summary .card').filter({hasText:'バス'}).click();
+            await page.waitForTimeout(100);
+            if(!await page.locator('#busDetail').evaluate(el=>el.classList.contains('active'))) throw new Error('bus detail did not open from home');
+            await page.locator('#busDetail .action button').click();
+            await page.waitForTimeout(100);
+            if(!await page.locator('#home').evaluate(el=>el.classList.contains('active'))) throw new Error('bus back did not return directly to home');
+
+            // Reservations must have an explicit Back and preserve origin.
+            await page.evaluate(()=>{ if(typeof show==='function') show('calendar'); if(typeof openAllReservations==='function') openAllReservations(); });
+            await page.waitForTimeout(100);
+            if(!await page.locator('#schedule .action button').filter({hasText:'戻る'}).isVisible()) throw new Error('reservation list missing Back button');
+            await page.locator('#schedule .action button').filter({hasText:'戻る'}).click();
+            await page.waitForTimeout(100);
+            if(!await page.locator('#calendar').evaluate(el=>el.classList.contains('active'))) throw new Error('reservation Back did not preserve calendar origin');
 
             await page.evaluate(()=>{ if(typeof show==='function') show('reservationEdit'); });
             const reservationText=await page.locator('#reservationEdit').innerText();
