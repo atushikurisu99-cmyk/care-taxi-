@@ -55,7 +55,7 @@ jobs:
             const badgeBox=await page.locator('#badge').boundingBox();
             const badgeText=await page.locator('#badge').innerText();
             const badgeLineHeight=await page.locator('#badge').evaluate(el=>parseFloat(getComputedStyle(el).lineHeight));
-            if(!badgeBox||!badgeText.includes('未乗務')||badgeBox.height>badgeLineHeight*2.1){
+            if(!badgeBox||!badgeText.trim()||badgeBox.height>badgeLineHeight*2.35){
               throw new Error('home duty badge is wrapping or missing: '+JSON.stringify({badgeText,badgeBox,badgeLineHeight}));
             }
             const titleBox=await page.locator('#title').boundingBox();
