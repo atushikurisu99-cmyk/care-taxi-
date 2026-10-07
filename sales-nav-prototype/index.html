@@ -5592,7 +5592,7 @@ function ensureDailyReportForDuty(startTs){
   vehicleNumber:getVehicleProfile().registrationNumber||'',
   vehicleType:getVehicleProfile().vehicleType||'',
   salesArea:getVehicleProfile().salesArea||'',
-  closingDay:getVehicleProfile().closingDay||31,
+  closingDay:getVehicleProfile().closingDay||'month-end',
   inspectionExpiry:getVehicleProfile().inspectionExpiry||'',
   odometerStart:latestKnownOdometer(),
   odometerEnd:null,
@@ -7308,7 +7308,7 @@ function renderVehicleProfile(){
  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??''};
  set('vehicleRegistrationNumber',p.registrationNumber||'');
  set('vehicleTypeName',p.vehicleType||'');
- set('vehicleClosingDay',p.closingDay||31);
+ set('vehicleClosingDay',p.closingDay==='month-end'||!p.closingDay?'末日':p.closingDay);
  set('vehicleInspectionExpiry',p.inspectionExpiry||'');
  const odo=latestKnownOdometer();
  set('vehicleCurrentOdometer',odo??'');
@@ -7317,7 +7317,17 @@ function renderVehicleProfile(){
 function saveVehicleProfile(){
  const registrationNumber=String(document.getElementById('vehicleRegistrationNumber')?.value||'').trim();
  const vehicleType=String(document.getElementById('vehicleTypeName')?.value||'').trim();
- const closingDay=Math.min(31,Math.max(1,Number(document.getElementById('vehicleClosingDay')?.value||31)));
+ const closingDayRaw=String(document.getElementById('vehicleClosingDay')?.value||'末日').trim();
+ let closingDay='month-end';
+ if(closingDayRaw!=='末日'&&closingDayRaw!=='月末'){
+  const n=Number(closingDayRaw);
+  if(!Number.isInteger(n)||n<1||n>31){
+   toast('締め日は「末日」または1〜31で入力してください');
+   document.getElementById('vehicleClosingDay')?.focus();
+   return;
+  }
+  closingDay=n;
+ }
  const inspectionExpiry=String(document.getElementById('vehicleInspectionExpiry')?.value||'');
  const salesArea=String(document.getElementById('vehicleSalesArea')?.value||'');
  const odometerRaw=String(document.getElementById('vehicleCurrentOdometer')?.value||'').trim();
