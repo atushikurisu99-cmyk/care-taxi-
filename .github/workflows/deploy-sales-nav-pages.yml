@@ -37,6 +37,18 @@ jobs:
           CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_API_TOKEN }}
           CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
 
+      - name: Ensure production branch is main
+        run: |
+          curl --fail-with-body --silent --show-error \
+            -X PATCH "https://api.cloudflare.com/client/v4/accounts/$CLOUDFLARE_ACCOUNT_ID/pages/projects/taxi-sales-nav" \
+            -H "Authorization: Bearer $CLOUDFLARE_API_TOKEN" \
+            -H "Content-Type: application/json" \
+            --data '{"production_branch":"main"}' >/tmp/pages-project-update.json
+          node -e "const d=require('/tmp/pages-project-update.json'); if(!d.success) process.exit(1); console.log('production_branch='+d.result.production_branch)"
+        env:
+          CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_PAGES_API_TOKEN }}
+          CLOUDFLARE_ACCOUNT_ID: ${{ secrets.CLOUDFLARE_ACCOUNT_ID }}
+
       - name: Deploy
         run: |
           npx --yes wrangler@latest pages deploy sales-nav-prototype --project-name=taxi-sales-nav --branch=main
