@@ -1333,13 +1333,16 @@ html,body{
 .sogo-svg-line.major{stroke-width:2.5}
 .sogo-svg-line.time-divider{stroke-width:1.4;stroke-dasharray:3 3}
 .sogo-svg-text{fill:#111;dominant-baseline:middle;font-weight:400}
-.sogo-svg-text.title{font-size:38px;font-weight:700;letter-spacing:9px}
-.sogo-svg-text.org{font-size:16px;font-weight:700}
+.sogo-svg-text.title{font-size:36px;font-weight:700;letter-spacing:8px}
+.sogo-svg-text.org{font-size:17px;font-weight:700}
 .sogo-svg-text.org.small{font-size:13px;font-weight:400}
-.sogo-svg-text.top{font-size:16px}.sogo-svg-text.top.label{font-size:15px;font-weight:700}
-.sogo-svg-text.head{font-size:15px;font-weight:700}.sogo-svg-text.head.small{font-size:13px}
-.sogo-svg-text.body{font-size:15px}.sogo-svg-text.body.left{font-size:14px}
-.sogo-svg-text.summary{font-size:15px;font-weight:700}.sogo-svg-text.summary.value{font-size:14px;font-weight:400}
+.sogo-svg-text.top{font-size:15px}.sogo-svg-text.top.label{font-size:14px;font-weight:700}
+.sogo-svg-text.head{font-size:14px;font-weight:700}.sogo-svg-text.head.small{font-size:12px}
+.sogo-svg-text.body{font-size:16px}.sogo-svg-text.body.left{font-size:14px}
+.sogo-svg-text.body.money{font-size:15px;font-variant-numeric:tabular-nums}
+.sogo-svg-text.body.place{font-size:14px}
+.sogo-svg-text.body.remarks{font-size:13px}
+.sogo-svg-text.summary{font-size:14px;font-weight:700}.sogo-svg-text.summary.value{font-size:13px;font-weight:400;font-variant-numeric:tabular-nums}
 .sogo-page-front{padding:0!important}
 .sogo-page-back{padding:0!important}
 .sogo-page-back .sogo-inspection-title,
@@ -3073,6 +3076,20 @@ function sogoSvgLine(id,x1,y1,x2,y2,kind='normal'){
 function sogoSvgText(x,y,v,cls='cell',anchor='middle',extra=''){
  return '<text class="sogo-svg-text '+cls+'" x="'+x+'" y="'+y+'" text-anchor="'+anchor+'" '+extra+'>'+sogoSvgEsc(v)+'</text>';
 }
+function sogoSvgTextFit(x,y,v,cls='cell',anchor='middle',maxWidth=0,fontSize=14,extra=''){
+ const raw=v==null?'':String(v);
+ let units=0;
+ for(const ch of raw){
+  units+=(/[\x00-\x7F]/.test(ch)?0.58:1);
+ }
+ const attrs=[];
+ if(maxWidth>0&&units*fontSize>maxWidth){
+  attrs.push('textLength="'+Math.max(1,maxWidth).toFixed(1)+'"');
+  attrs.push('lengthAdjust="spacingAndGlyphs"');
+ }
+ if(extra) attrs.push(extra);
+ return sogoSvgText(x,y,raw,cls,anchor,attrs.join(' '));
+}
 function sogoFrontSvg(r){
  const W=1000,H=1414;
  const sourceW=1447,sourceH=2048,sx=W/sourceW,sy=H/sourceH;
@@ -3130,9 +3147,9 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1380),yDate,'分','top');
 
  text+=sogoSvgText(X((38+166)/2),yReg,'登録番号','top label');
- text+=sogoSvgText(X(184),yReg,reg,'top left','start');
+ text+=sogoSvgTextFit(X(184),yReg,reg,'top left','start',X(650-184),15);
  text+=sogoSvgText(X((666+848)/2),yReg,'氏名又は名称','top label');
- text+=sogoSvgText(X(866),yReg,name,'top left','start');
+ text+=sogoSvgTextFit(X(866),yReg,name,'top left','start',X(1390-866),15);
 
  const cols=[38,106,205,400,596,752,940,1128,1404];
  const centers=cols.slice(0,-1).map((v,i)=>(v+cols[i+1])/2);
@@ -3151,13 +3168,13 @@ function sogoFrontSvg(r){
   const remarks=trip?(trip.remarks||trip.paymentMethod||''):'';
   text+=sogoSvgText(X(centers[0]),cy,n,'body');
   text+=sogoSvgText(X(centers[1]),cy,people,'body');
-  text+=sogoSvgText(X(220),cy,trip?reportTemplatePlace(trip.pickup):'','body left','start');
-  text+=sogoSvgText(X(414),cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
+  text+=sogoSvgTextFit(X(218),cy,trip?reportTemplatePlace(trip.pickup):'','body place','start',X(392-218),14);
+  text+=sogoSvgTextFit(X(413),cy,trip?reportTemplatePlace(trip.dropoff):'','body place','start',X(588-413),14);
   text+=sogoSvgText(X(635),cy,parts[0],'body');
   text+=sogoSvgText(X(713),cy,parts[1],'body');
-  text+=sogoSvgText(X(centers[5]),cy,money.cash,'body');
-  text+=sogoSvgText(X(centers[6]),cy,money.receivable,'body');
-  text+=sogoSvgText(X(1142),cy,remarks,'body left','start');
+  text+=sogoSvgTextFit(X(centers[5]),cy,money.cash,'body money','middle',X(940-752)-10,15);
+  text+=sogoSvgTextFit(X(centers[6]),cy,money.receivable,'body money','middle',X(1128-940)-10,15);
+  text+=sogoSvgTextFit(X(1142),cy,remarks,'body remarks','start',X(1394-1142),13);
  }
 
  const km=reportTravelKm(r);
