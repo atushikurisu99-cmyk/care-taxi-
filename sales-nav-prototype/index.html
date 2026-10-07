@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-07-SOGO-LINE-LEDGER-V3 -->
+<!-- BUILD:2026-10-08-RIDE-RESERVATION-FARE-V1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -193,6 +193,13 @@ main{position:relative;min-height:0;overflow:hidden}
 .discount-toggle.selected{background:#4a3512;border-color:#b6842d;color:#ffe4a1}
 .payment-note{font-size:11px;color:var(--muted);margin-top:8px;line-height:1.4}
 .fare{font-size:44px;font-weight:1000}
+.fare-editor{display:grid;grid-template-columns:54px minmax(0,1fr) 54px;gap:8px;align-items:center;margin-top:8px}
+.fare-step{height:54px;border:1px solid #334754;border-radius:13px;background:#13212d;color:#fff;font-size:27px;font-weight:950}
+.fare-input{min-width:0;width:100%;height:58px;border:1px solid #334754;border-radius:13px;background:#09141d;color:#fff;text-align:center;font-size:34px;font-weight:1000;padding:0 8px}
+.fare-estimate-note{font-size:11px;color:var(--muted);margin-top:7px;text-align:center}
+.vehicle-fare-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px}
+.vehicle-fare-grid label{display:flex;flex-direction:column;gap:5px;font-size:12px;color:var(--muted);font-weight:800}
+.vehicle-fare-grid input{width:100%;min-width:0;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 9px;font-size:16px}
 .report-trip-list{display:flex;flex-direction:column;gap:8px;margin-top:8px}
 .report-trip-card{border:1px solid #263743;border-radius:13px;background:#0b1720;padding:11px 12px}
 .report-trip-top{display:grid;grid-template-columns:58px 1fr auto;align-items:center;gap:8px}
@@ -393,7 +400,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .shift-card{display:flex;align-items:center;justify-content:space-between;gap:10px}
 .shift-time{font-size:22px;font-weight:900}
 .ride-state-main{display:flex;align-items:center;justify-content:space-between;gap:12px}
-.ride-state-main .ride-from{font-size:20px;font-weight:900;line-height:1.2;text-align:right;max-width:62%;white-space:nowrap;writing-mode:horizontal-tb;word-break:keep-all}
+.ride-state-main .ride-from{font-size:20px;font-weight:900;line-height:1.2;text-align:right;max-width:62%;white-space:normal;writing-mode:horizontal-tb;word-break:keep-all;overflow:visible;text-overflow:clip}
 
 /* 営業情報画面 */
 .today-content{gap:12px}
@@ -1601,7 +1608,7 @@ html,body{
 </head>
 <body>
 <div class="app">
-<header><div class="header-title-row"><h1 id="title">タクシー営業ナビ</h1><div id="calendarHeaderNav" class="calendar-header-nav" aria-hidden="true"><button class="calendar-header-move" type="button" onclick="moveCalendarMonth(-1)" aria-label="前の月">‹</button><span id="calendarTitle" class="calendar-header-title">----</span><button class="calendar-header-move" type="button" onclick="moveCalendarMonth(1)" aria-label="次の月">›</button></div></div><div id="homeHeaderState" class="header-state"><span class="badge" id="badge">空車</span><span id="headerDutyMeta" class="header-duty-meta">乗務開始前</span></div></header>
+<header><div class="header-title-row"><h1 id="title">タクシー営業ナビ</h1><div id="calendarHeaderNav" class="calendar-header-nav" aria-hidden="true"><button class="calendar-header-move" type="button" onclick="moveCalendarMonth(-1)" aria-label="前の月">‹</button><span id="calendarTitle" class="calendar-header-title">----</span><button class="calendar-header-move" type="button" onclick="moveCalendarMonth(1)" aria-label="次の月">›</button></div></div><div id="homeHeaderState" class="header-state"><span class="badge" id="badge">空車</span><span id="headerDutyMeta" class="header-duty-meta"></span></div></header>
 <main>
 <div id="notice" class="notice normal"><div class="icon" id="nicon">i</div><div><strong id="ntitle">通知</strong><span id="nbody">お知らせ</span></div></div>
 <div id="safety" class="safety">
@@ -1729,16 +1736,24 @@ html,body{
    </div>
   </div>
 
-  <div id="rideReservationCard" class="reservation hidden" onclick="show('schedule')"><div><div class="label">予約</div><strong>予約あり</strong><div id="rideReservationSub" class="sub"></div></div><span class="chev">›</span></div>
+  <div id="rideReservationCard" class="reservation hidden" onclick="show('schedule')"><div><div class="label">予約</div><strong id="rideReservationTitle">予約あり</strong><div id="rideReservationSub" class="sub"></div></div><span class="chev">›</span></div>
 
   <div class="drive-note">通知は必要な時だけ重ねて表示</div>
  </div>
- <div class="action"><button class="primary pay" onclick="resetPaymentChoices();show('payment')">支払</button></div>
+ <div class="action"><button class="primary pay" onclick="preparePaymentFare();show('payment')">支払</button></div>
 </section>
 
 <section id="payment" class="screen">
  <div class="content">
-  <div class="card"><div class="label">運賃</div><div class="fare">3,680円</div></div>
+  <div class="card">
+   <div class="label">運賃</div>
+   <div class="fare-editor">
+    <button class="fare-step" type="button" onclick="adjustPaymentFare(-1)" aria-label="1メーター下げる">▼</button>
+    <input id="paymentFareInput" class="fare-input" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="運賃">
+    <button class="fare-step" type="button" onclick="adjustPaymentFare(1)" aria-label="1メーター上げる">▲</button>
+   </div>
+   <div id="paymentFareEstimateNote" class="fare-estimate-note">GPS・低速時間から自動計算</div>
+  </div>
   <div class="card">
    <h2>支払方法</h2>
    <div class="payopts">
@@ -2202,6 +2217,9 @@ html,body{
    <button class="settings-category" type="button" onclick="openSettingsSection('personal')">
     <div class="card-label"><span class="card-label-icon settings" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="8" r="3"/><path d="M6 20c.7-4 3-6 6-6s5.3 2 6 6"/></svg></span><span><strong>個人設定</strong><small>売上・目標など</small></span></div><span>›</span>
    </button>
+   <button class="settings-category" type="button" onclick="openSettingsSection('vehicle')">
+    <div class="card-label"><span class="card-label-icon settings" aria-hidden="true">車</span><span><strong>車両・料金設定</strong><small>運賃計算に使う車両設定</small></span></div><span>›</span>
+   </button>
    <button class="settings-category" type="button" onclick="openSettingsSection('notifications')">
     <div class="card-label"><span class="card-label-icon event" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 8a6 6 0 1 0-12 0c0 7-3 7-3 9h18c0-2-3-2-3-9"/><path d="M10 21h4"/></svg></span><span><strong>通知設定</strong><small>バス・ライブ通知など</small></span></div><span>›</span>
    </button>
@@ -2251,6 +2269,27 @@ html,body{
    </div>
    <div class="settings-autosave-note">自動保存</div>
   </div>
+  </div>
+
+  <div id="settingsVehicle" class="hidden">
+   <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
+   <div class="settings-card">
+    <div class="settings-title">車両・料金設定</div>
+    <div class="settings-note">この車両の料金体系を設定します。支払い画面の自動計算と▲▼の1メーター調整に使います。</div>
+    <div class="vehicle-fare-grid">
+     <label>初乗り運賃<input id="fareBaseYen" type="number" min="0" step="10" inputmode="numeric"></label>
+     <label>初乗り距離(m)<input id="fareBaseMeters" type="number" min="0" step="10" inputmode="numeric"></label>
+     <label>加算運賃<input id="fareStepYen" type="number" min="0" step="10" inputmode="numeric"></label>
+     <label>加算距離(m)<input id="fareStepMeters" type="number" min="1" step="1" inputmode="numeric"></label>
+     <label>時間加算の低速(km/h以下)<input id="fareLowSpeedKmh" type="number" min="0" step="1" inputmode="numeric"></label>
+     <label>時間加算間隔(秒)<input id="fareTimeStepSec" type="number" min="1" step="1" inputmode="numeric"></label>
+     <label>深夜割増(%)<input id="fareLateNightPct" type="number" min="0" step="1" inputmode="numeric"></label>
+     <label>迎車料金<input id="farePickupYen" type="number" min="0" step="10" inputmode="numeric"></label>
+     <label>深夜開始<input id="fareLateNightStart" type="time"></label>
+     <label>深夜終了<input id="fareLateNightEnd" type="time"></label>
+    </div>
+    <button class="smallbtn" type="button" style="width:100%;margin-top:12px" onclick="saveVehicleFareSettings()">料金設定を保存</button>
+   </div>
   </div>
 
   <div id="settingsNotifications" class="hidden">
@@ -2479,12 +2518,15 @@ function show(id){
 function openSettingsSection(section){
  const root=document.getElementById('settingsRoot');
  const personal=document.getElementById('settingsPersonal');
+ const vehicle=document.getElementById('settingsVehicle');
  const notifications=document.getElementById('settingsNotifications');
- if(!root||!personal||!notifications) return;
+ if(!root||!personal||!vehicle||!notifications) return;
  root.classList.toggle('hidden',section!=='root');
  personal.classList.toggle('hidden',section!=='personal');
+ vehicle.classList.toggle('hidden',section!=='vehicle');
  notifications.classList.toggle('hidden',section!=='notifications');
  if(section==='personal'){ renderSalesGoalSettings(); refreshGoogleAuthStatus(); }
+ if(section==='vehicle'){ renderVehicleFareSettings(); }
  if(section==='notifications'){ openNotificationSection('root'); renderNotificationSettings(); }
 }
 function openNotificationSection(section='root'){
@@ -4262,9 +4304,29 @@ function renderReservations(){
  if(vv) vv.textContent=n?([compactMonthDay(n.date,true),n.timed&&n.time?n.time:'',n.pickup].filter(Boolean).join(' ')):'---';
 
  const ride=document.getElementById('rideReservationCard');
+ const rideTitle=document.getElementById('rideReservationTitle');
  const rideSub=document.getElementById('rideReservationSub');
- if(ride) ride.classList.toggle('hidden',!n);
- if(rideSub) rideSub.textContent=n?(n.timed&&n.time?n.time+' / '+n.pickup:n.pickup):'';
+ const now=new Date();
+ const todayKey=localDateValue(now);
+ const tomorrowDate=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
+ const tomorrowKey=localDateValue(tomorrowDate);
+ const activeRows=base.filter(r=>r.shareStatus!=='cancelled'&&r.shareStatus!=='completed');
+ const todayRows=activeRows.filter(r=>r.date===todayKey).sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+ const tomorrowRows=activeRows.filter(r=>r.date===tomorrowKey).sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+ const primary=todayRows[0]||tomorrowRows[0]||null;
+ if(ride) ride.classList.toggle('hidden',!primary);
+ if(primary&&rideTitle){
+  rideTitle.textContent=todayRows.length?'予約あり':'明日乗務・予約あり';
+ }
+ if(rideSub){
+  if(!primary) rideSub.textContent='';
+  else if(todayRows.length){
+   const main=[primary.timed&&primary.time?primary.time:'時間なし',primary.pickup].filter(Boolean).join(' / ');
+   rideSub.textContent=main+(tomorrowRows.length?'　明日乗務も'+tomorrowRows.length+'件':'');
+  }else{
+   rideSub.textContent=[primary.timed&&primary.time?primary.time:'時間なし',primary.pickup].filter(Boolean).join(' / ');
+  }
+ }
 }
 function saveReservation(){
  const date=document.getElementById('resDate')?.value||'';
@@ -6025,7 +6087,7 @@ function backFromInfo(){
  else if(d.active) show('vacant');
  else show('home');
 }
-setInterval(renderDutyUI,30000);
+setInterval(()=>{renderDutyUI();if(currentRideStart)updateRideStartUI(currentRideStart)},30000);
 
 let geoWatchId=null;
 let latestPosition=null;
@@ -7091,6 +7153,7 @@ function handlePosition(pos){
  else setLocationUI('位置情報 低精度','精度 ±'+a+'m・判定保留','warn');
  updateVacantArea(pos);
  updateDutyDistance(pos);
+ updateRideFareTracking(pos);
  const sampleId=recordGpsQuality(pos);
  enqueueGpsAnalysis(pos,sampleId);
  const acquisitionMs=Math.round((performance.now()-cycleStart)*10)/10;
@@ -7161,6 +7224,75 @@ function refreshLocationDependentFeeds(){
  maybeNotifyJrLastTrain();
 }
 
+const VEHICLE_FARE_SETTINGS_KEY='taxi_vehicle_fare_settings_v1';
+const DEFAULT_VEHICLE_FARE_SETTINGS={
+ baseYen:0,baseMeters:0,stepYen:0,stepMeters:0,lowSpeedKmh:10,timeStepSec:0,
+ lateNightPct:0,lateNightStart:'22:00',lateNightEnd:'05:00',pickupYen:0
+};
+let rideFareTracking={lastTs:0,lowSpeedSeconds:0};
+function getVehicleFareSettings(){
+ try{return {...DEFAULT_VEHICLE_FARE_SETTINGS,...JSON.parse(localStorage.getItem(VEHICLE_FARE_SETTINGS_KEY)||'{}')}}catch(e){return {...DEFAULT_VEHICLE_FARE_SETTINGS}}
+}
+function renderVehicleFareSettings(){
+ const s=getVehicleFareSettings();
+ const map={fareBaseYen:s.baseYen,fareBaseMeters:s.baseMeters,fareStepYen:s.stepYen,fareStepMeters:s.stepMeters,fareLowSpeedKmh:s.lowSpeedKmh,fareTimeStepSec:s.timeStepSec,fareLateNightPct:s.lateNightPct,farePickupYen:s.pickupYen,fareLateNightStart:s.lateNightStart,fareLateNightEnd:s.lateNightEnd};
+ Object.entries(map).forEach(([id,v])=>{const el=document.getElementById(id);if(el)el.value=v??''});
+}
+function saveVehicleFareSettings(){
+ const n=id=>Math.max(0,Number(document.getElementById(id)?.value||0));
+ const s={
+  baseYen:n('fareBaseYen'),baseMeters:n('fareBaseMeters'),stepYen:n('fareStepYen'),stepMeters:n('fareStepMeters'),
+  lowSpeedKmh:n('fareLowSpeedKmh'),timeStepSec:n('fareTimeStepSec'),lateNightPct:n('fareLateNightPct'),pickupYen:n('farePickupYen'),
+  lateNightStart:document.getElementById('fareLateNightStart')?.value||'22:00',
+  lateNightEnd:document.getElementById('fareLateNightEnd')?.value||'05:00'
+ };
+ localStorage.setItem(VEHICLE_FARE_SETTINGS_KEY,JSON.stringify(s));
+ toast('料金設定を保存しました');
+}
+function isLateNightFareTime(d=new Date()){
+ const s=getVehicleFareSettings();
+ const toMin=v=>{const m=String(v||'').match(/^(\d{2}):(\d{2})$/);return m?Number(m[1])*60+Number(m[2]):0};
+ const now=d.getHours()*60+d.getMinutes(),start=toMin(s.lateNightStart),end=toMin(s.lateNightEnd);
+ return start>end?(now>=start||now<end):(now>=start&&now<end);
+}
+function updateRideFareTracking(pos){
+ if(!currentRideStart||!pos?.coords) return;
+ const now=Number(pos.timestamp)||Date.now();
+ if(rideFareTracking.lastTs){
+  const dt=Math.max(0,Math.min(20,(now-rideFareTracking.lastTs)/1000));
+  const speedMs=Number(pos.coords.speed);
+  const limit=Math.max(0,Number(getVehicleFareSettings().lowSpeedKmh)||0)/3.6;
+  if(Number.isFinite(speedMs)&&speedMs<=limit) rideFareTracking.lowSpeedSeconds+=dt;
+ }
+ rideFareTracking.lastTs=now;
+ if(currentRideStart?.rideId) upsertTripRecord(currentRideStart.rideId,{lowSpeedSeconds:Math.round(rideFareTracking.lowSpeedSeconds)});
+}
+function estimatedRideFare(){
+ if(!currentRideStart) return 0;
+ const s=getVehicleFareSettings();
+ const meters=Math.max(0,currentDutyMeters()-Number(currentRideStart.pickupDutyMeters||0));
+ let fare=Math.max(0,Number(s.baseYen)||0)+Math.max(0,Number(s.pickupYen)||0);
+ const excess=Math.max(0,meters-Math.max(0,Number(s.baseMeters)||0));
+ if(excess>0&&Number(s.stepMeters)>0&&Number(s.stepYen)>0) fare+=Math.ceil(excess/Number(s.stepMeters))*Number(s.stepYen);
+ if(Number(s.timeStepSec)>0&&Number(s.stepYen)>0) fare+=Math.floor(rideFareTracking.lowSpeedSeconds/Number(s.timeStepSec))*Number(s.stepYen);
+ if(Number(s.lateNightPct)>0&&isLateNightFareTime(new Date(currentRideStart.startedAt||Date.now()))) fare*=1+Number(s.lateNightPct)/100;
+ const step=Math.max(1,Number(s.stepYen)||10);
+ return Math.max(0,Math.round(fare/step)*step);
+}
+function getPaymentFareValue(){return Math.max(0,Number(document.getElementById('paymentFareInput')?.value||0))}
+function preparePaymentFare(){
+ resetPaymentChoices();
+ const v=estimatedRideFare();
+ const input=document.getElementById('paymentFareInput');
+ if(input) input.value=String(v||0);
+ const note=document.getElementById('paymentFareEstimateNote');
+ if(note) note.textContent=(v>0?'自動計算 '+v.toLocaleString('ja-JP')+'円':'料金設定後に自動計算')+' / 実メーターに合わせて▲▼または直接入力';
+}
+function adjustPaymentFare(dir){
+ const input=document.getElementById('paymentFareInput');if(!input)return;
+ const step=Math.max(10,Number(getVehicleFareSettings().stepYen)||10);
+ input.value=String(Math.max(0,Number(input.value||0)+(dir>0?step:-step)));
+}
 function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
 function toggleDisabilityDiscount(){
  const b=document.getElementById('disabilityDiscountButton');if(!b)return;
@@ -7412,14 +7544,17 @@ function hideSafety(){
 function toast(msg='保存しました'){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2300)}
 function shortPlaceLabel(d){
  const a=d.address||{};
- const town=a.neighbourhood||a.quarter||a.suburb||a.city_district||a.village||a.town||a.hamlet||'';
- if(town) return town;
+ const candidates=[a.neighbourhood,a.quarter,a.suburb,a.city_district,a.village,a.town,a.hamlet].filter(Boolean).map(String);
+ const chome=candidates.find(v=>/丁目/.test(v));
+ if(chome) return chome.replace(/…|\.\.\.$/g,'')+'付近';
+ const town=candidates[0]||'';
+ if(town) return town.replace(/…|\.\.\.$/g,'')+'付近';
 
  const cityPart=a.borough||a.municipality||'';
- if(cityPart) return cityPart;
+ if(cityPart) return String(cityPart).replace(/…|\.\.\.$/g,'')+'付近';
 
  const first=(d.display_name||'').split(',')[0].trim();
- return first || '場所取得不能';
+ return first ? first.replace(/…|\.\.\.$/g,'')+'付近' : '場所取得不能';
 }
 async function fetchJsonWithTimeout(url,ms=4500){
  const controller=new AbortController();
@@ -7490,10 +7625,18 @@ function visiblePlaceLabel(rec){
  if(isCoordFallbackLabel(rec.address)) return '住所を確認中…';
  return rec.address||'場所を確認中…';
 }
+function formatRideElapsed(ms){
+ const sec=Math.max(0,Math.floor(Number(ms||0)/1000));
+ const min=Math.floor(sec/60);
+ const h=Math.floor(min/60),m=min%60;
+ return h>0?h+'時間'+String(m).padStart(2,'0')+'分':min+'分';
+}
 function updateRideStartUI(rec){
  if(!rec) return;
- const addr=visiblePlaceLabel(rec);
- const meta=(Number.isFinite(rec.accuracy)?'精度 ±'+rec.accuracy+'m':'位置情報を確認中')+' / '+rec.time;
+ const addr=visiblePlaceLabel(rec).replace(/…|\.\.\.$/g,'');
+ const startedAt=Number(rec.startedAt||0);
+ const timeLabel=startedAt?new Date(startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'―';
+ const meta='乗車 '+timeLabel+' / 経過 '+(startedAt?formatRideElapsed(Date.now()-startedAt):'―');
  const a=document.getElementById('rideStartAddress');
  const m=document.getElementById('rideStartMeta');
  const p=document.getElementById('paymentStartAddress');
@@ -7505,13 +7648,14 @@ async function startRideCapture(){
  if(!getDutyState().active){toast('先に乗務開始してください');show('home');return}
 
  const rideStartedAt=Date.now();
- const startedTime=new Date(rideStartedAt).toLocaleString('ja-JP',{hour12:false});
+ const startedTime=new Date(rideStartedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',hour12:false});
  const rideId='ride_'+String(rideStartedAt);
  const lastDropoff=getLastDropoffSnapshot();
  const dutyMetersNow=currentDutyMeters();
  const vacantSeconds=lastDropoff&&lastDropoff.t?Math.max(0,Math.round((rideStartedAt-lastDropoff.t)/1000)):null;
  const vacantMeters=lastDropoff&&Number.isFinite(Number(lastDropoff.dutyMeters))
    ?Math.max(0,Math.round(dutyMetersNow-Number(lastDropoff.dutyMeters))):null;
+ rideFareTracking={lastTs:0,lowSpeedSeconds:0};
  currentRideStart={
    type:'乗車',
    rideId,
@@ -7520,7 +7664,8 @@ async function startRideCapture(){
    lat:null,
    lon:null,
    accuracy:null,
-   address:'位置情報を確認中…'
+   address:'位置情報を確認中…',
+   pickupDutyMeters:currentDutyMeters()
  };
  upsertTripRecord(rideId,{
   dutyId:currentDutyId(),
@@ -7532,6 +7677,8 @@ async function startRideCapture(){
   vacantSeconds,
   vacantMeters,
   fare:null,
+  pickupDutyMeters:currentRideStart.pickupDutyMeters,
+  lowSpeedSeconds:0,
   paymentMethod:null
  });
  logAnalyticsEvent('ride_start',{rideId,vacantSeconds,vacantMeters});
@@ -7625,6 +7772,7 @@ async function finishRide(){
    dropoffTs:dropoffAt,
    dropoffIso:new Date(dropoffAt).toISOString(),
    dropoff:{lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy,address:rec.address},
+   fare:getPaymentFareValue(),
    paymentMethod,
    disabilityDiscount
   });
