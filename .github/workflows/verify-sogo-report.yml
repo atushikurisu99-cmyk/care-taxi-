@@ -1,0 +1,96 @@
+name: Verify Sogo report template
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - "sales-nav-prototype/**"
+      - ".github/workflows/verify-sogo-report.yml"
+  workflow_dispatch:
+
+jobs:
+  verify-sogo:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install browser verifier
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright
+          npx playwright install --with-deps webkit
+      - name: Verify Sogo report ledger on production
+        run: |
+          node - <<'NODE'
+          (async()=>{
+            const { webkit } = require('playwright');
+            const target='https://taxi-sales-nav.pages.dev/';
+            const browser=await webkit.launch({headless:true});
+            const context=await browser.newContext({
+              viewport:{width:393,height:852},isMobile:true,hasTouch:true,deviceScaleFactor:3,
+              userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'
+            });
+            const page=await context.newPage();
+            await page.goto(target+'?sogo_verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
+            await page.waitForTimeout(2500);
+            await page.evaluate(()=>{ if(typeof show==='function') show('monthlyReport'); });
+            await page.waitForTimeout(250);
+            await page.locator('#monthlyReport .monthly-report-actions button.demo').click();
+            await page.locator('#monthlyReportPreviewButton').click();
+            await page.waitForTimeout(300);
+
+            const preview=page.locator('#monthlyReportPreview');
+            if(!await preview.isVisible()) throw new Error('monthly preview is not visible');
+            const front=page.locator('#monthlyReportPreview .sogo-front-svg');
+            const back=page.locator('#monthlyReportPreview .sogo-back-trip-svg');
+            if(await front.count()!==1||await back.count()!==1) throw new Error('traced SVG pages missing');
+
+            const ledger=await front.evaluate(el=>({
+              h:Number(el.getAttribute('data-horizontal-lines')||0),
+              v:Number(el.getAttribute('data-vertical-lines')||0),
+              ids:[...el.querySelectorAll('line[data-line-id]')].map(x=>x.getAttribute('data-line-id')),
+              text:el.textContent||''
+            }));
+            const backLedger=await back.evaluate(el=>({
+              h:Number(el.getAttribute('data-horizontal-lines')||0),
+              v:Number(el.getAttribute('data-vertical-lines')||0),
+              ids:[...el.querySelectorAll('line[data-line-id]')].map(x=>x.getAttribute('data-line-id')),
+              text:el.textContent||''
+            }));
+
+            if(ledger.h<25||ledger.v<20) throw new Error('front ledger count too small '+JSON.stringify({h:ledger.h,v:ledger.v}));
+            if(backLedger.h<10||backLedger.v<9) throw new Error('back ledger count too small '+JSON.stringify({h:backLedger.h,v:backLedger.v}));
+            if(new Set(ledger.ids).size!==ledger.ids.length) throw new Error('front duplicate line IDs');
+            if(new Set(backLedger.ids).size!==backLedger.ids.length) throw new Error('back duplicate line IDs');
+
+            for(const id of ['H01','H02','H03','V01','V02','V03']) if(!ledger.ids.includes(id)) throw new Error('front missing '+id);
+            for(const id of ['BH01','BV01']) if(!backLedger.ids.includes(id)) throw new Error('back missing '+id);
+
+            const badCarry=await front.evaluate(el=>[...el.querySelectorAll('line')].some(l=>{
+              const x1=Number(l.getAttribute('x1')),x2=Number(l.getAttribute('x2')),
+                    y1=Number(l.getAttribute('y1')),y2=Number(l.getAttribute('y2'));
+              return x1===x2 && [135,510,650].includes(x1) && y1<210 && y2>210;
+            }));
+            if(badCarry) throw new Error('stepped top vertical line leaks into detail grid');
+
+            for(const value of ['相互個人タクシー協同組合','運 転 日 報','登録番号','氏名又は名称','52340','52462','広島駅 新幹線口','八丁堀','1,780']){
+              if(!ledger.text.includes(value)) throw new Error('front visible value missing '+value);
+            }
+
+            const box=await front.boundingBox();
+            if(!box||box.width<500||box.height<700) throw new Error('front SVG geometry too small '+JSON.stringify(box));
+            await page.screenshot({path:'/tmp/sogo-report-production.png',fullPage:false});
+            console.log('SOGO_REPORT_OK',JSON.stringify({front:{h:ledger.h,v:ledger.v},back:{h:backLedger.h,v:backLedger.v},box}));
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: sogo-report-snapshot
+          path: /tmp/sogo-report-production.png
+          if-no-files-found: ignore
+          retention-days: 1
