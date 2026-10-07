@@ -1,0 +1,113 @@
+name: Verify analysis UI
+
+on:
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - "sales-nav-prototype/**"
+      - ".github/workflows/verify-analysis-ui.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - name: Install Playwright
+        run: |
+          npm init -y >/dev/null 2>&1
+          npm install --silent playwright
+          npx playwright install --with-deps webkit
+      - name: Verify analysis on production
+        run: |
+          node - <<'NODE'
+          (async()=>{
+            const {webkit}=require('playwright');
+            const browser=await webkit.launch({headless:true});
+            const context=await browser.newContext({
+              viewport:{width:393,height:852},
+              isMobile:true,hasTouch:true,deviceScaleFactor:3,
+              userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'
+            });
+            const page=await context.newPage();
+            await page.goto('https://taxi-sales-nav.pages.dev/?analysisVerify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
+            await page.waitForTimeout(2500);
+            await page.evaluate(()=>show('analysis'));
+            await page.waitForTimeout(300);
+
+            const info=await page.evaluate(()=>{
+              const q=s=>document.querySelector(s);
+              const rect=s=>{const r=q(s)?.getBoundingClientRect();return r?{x:r.x,y:r.y,width:r.width,height:r.height,bottom:r.bottom,right:r.right}:null};
+              const content=q('#analysis .content');
+              const nav=q('nav');
+              return {
+                title:q('#title')?.textContent,
+                period:q('#analysisPeriodLabel')?.textContent,
+                analysisHeaderVisible:getComputedStyle(q('#analysisHeaderNav')).display,
+                calendarHeaderVisible:getComputedStyle(q('#calendarHeaderNav')).display,
+                content:{clientHeight:content?.clientHeight,scrollHeight:content?.scrollHeight,overflowY:getComputedStyle(content).overflowY},
+                analysisRect:rect('#analysis'),
+                contentRect:rect('#analysis .content'),
+                navRect:rect('nav'),
+                summary:[...document.querySelectorAll('.analysis-summary-label')].map(x=>x.textContent.trim()),
+                summaryValues:[...document.querySelectorAll('.analysis-summary-value')].map(x=>x.textContent.trim()),
+                yAxis:q('.analysis-y-axis')?.innerText,
+                barCount:document.querySelectorAll('.analysis-day-col').length,
+                pieRect:rect('#analysisPickupPie'),
+                legend:q('#analysisPickupLegend')?.innerText,
+                legacyBarSales:document.querySelectorAll('.analysis-day-sales').length
+              };
+            });
+            console.log('ANALYSIS_UI',JSON.stringify(info));
+            if(info.title!=='分析') throw new Error('analysis title wrong');
+            if(info.analysisHeaderVisible==='none') throw new Error('analysis header period control hidden');
+            if(info.calendarHeaderVisible!=='none') throw new Error('calendar control visible on analysis');
+            if(!['1日','1週間','10日間','1か月'].includes(info.period)) throw new Error('period label missing');
+            for(const x of ['10日合計','平均売上','平均単価','乗車回数']) if(!info.summary.includes(x)) throw new Error('summary missing '+x);
+            if(!String(info.yAxis||'').includes('5万')||!String(info.yAxis||'').includes('0')) throw new Error('50k y-axis missing');
+            if(info.legacyBarSales!==0) throw new Error('per-day sales labels still visible');
+            if(info.barCount<1) throw new Error('daily bars missing');
+            if(!info.pieRect||info.pieRect.width<100||!String(info.legend||'').includes('%')) throw new Error('pickup pie/percent legend missing');
+            if(info.content?.overflowY!=='auto') throw new Error('analysis content is not adaptive-scroll');
+            if(info.contentRect&&info.navRect&&Math.abs(info.contentRect.bottom-info.navRect.y)>24) throw new Error('large blank gap remains above bottom tabs');
+
+            // Period switch behaves like the calendar header control.
+            await page.locator('#analysisHeaderNav .analysis-header-move').nth(1).click();
+            await page.waitForTimeout(100);
+            const period2=await page.locator('#analysisPeriodLabel').innerText();
+            console.log('PERIOD_AFTER_NEXT',period2);
+            if(period2===info.period) throw new Error('period switch did not change');
+
+            // Return to 10 days and verify daily drilldown previous/next navigation.
+            await page.evaluate(()=>{analysisPeriodMode='10d';renderSimpleSalesAnalysis();});
+            const clickable=page.locator('#analysisDailyBars .analysis-day-col:not([disabled])');
+            if(await clickable.count()<2) throw new Error('not enough demo days for drilldown nav');
+            await clickable.nth(1).click();
+            await page.waitForTimeout(100);
+            if(!await page.locator('#analysisFactorCard').evaluate(el=>el.classList.contains('show'))) throw new Error('day factor detail did not open');
+            const firstTitle=await page.locator('#analysisFactorTitle').innerText();
+            await page.locator('#analysisNextDay').click();
+            await page.waitForTimeout(100);
+            const nextTitle=await page.locator('#analysisFactorTitle').innerText();
+            console.log('DAY_NAV',JSON.stringify({firstTitle,nextTitle}));
+            if(firstTitle===nextTitle) throw new Error('next-day detail navigation did not change date');
+
+            await page.screenshot({path:'/tmp/analysis-ui.png',fullPage:false});
+            console.log('ANALYSIS_UI_OK');
+            await browser.close();
+          })().catch(e=>{console.error(e);process.exit(1)});
+          NODE
+      - name: Upload screenshot
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: analysis-ui-screenshot
+          path: /tmp/analysis-ui.png
+          if-no-files-found: ignore
+          retention-days: 1
