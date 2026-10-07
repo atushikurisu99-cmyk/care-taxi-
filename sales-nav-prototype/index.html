@@ -3069,25 +3069,25 @@ function sogoFrontSvg(r){
  const W=1000,H=1414;
  const x=[50,85.5,175.7,302.4,430.1,480.7,535.5,654.1,776.7,950];
  const lines=[]; let hNo=1,vNo=1;
- const H=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('H'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
+ const Hline=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('H'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
  const V=(xx,y1,y2,kind='normal')=>lines.push(sogoSvgLine('V'+String(vNo++).padStart(2,'0'),xx,y1,xx,y2,kind));
 
  // 上段：日付／出庫／入庫。罫線は段ごとに独立させ、下段へ誤って伸ばさない。
- H(130,50,950,'major'); H(170); H(210);
+ Hline(130,50,950,'major'); Hline(170); Hline(210);
  V(50,130,210,'major'); V(950,130,210,'major');
  [480,550,600,640,700,770,820,860,910].forEach(xx=>V(xx,130,170));
  [135,510,650].forEach(xx=>V(xx,170,210,'major'));
 
  // 明細見出し。降車時刻だけ二段。
- H(235,510,600);
- H(260);
+ Hline(235,510,600);
+ Hline(260);
  x.forEach((xx,i)=>V(xx,210,1060,(i===0||i===x.length-1)?'major':'normal'));
 
  // 20行。横罫線は全幅、40単位で固定。
- for(let i=1;i<=20;i++) H(260+i*40,50,950,(i%5===0)?'major':'normal');
+ for(let i=1;i<=20;i++) Hline(260+i*40,50,950,(i%5===0)?'major':'normal');
 
  // 下部集計。明細表の縦線をここまで延長せず、別系統として作る。
- H(1105); H(1150); H(1195);
+ Hline(1105); Hline(1150); Hline(1195);
  [50,90,160,400,500,650,740,950].forEach((xx,i)=>V(xx,1060,1195,(i===0||i===7)?'major':'normal'));
 
  const d=r?.dateKey?new Date(r.dateKey+'T12:00:00'):null;
