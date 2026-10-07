@@ -5952,8 +5952,21 @@ function formatDuration(ms){
  const h=Math.floor(m/60),mm=m%60;
  return h+'時間'+String(mm).padStart(2,'0')+'分';
 }
+function validDutyStartMs(start){
+ const n=Number(start);
+ const now=Date.now();
+ return Number.isFinite(n)&&n>=Date.UTC(2020,0,1)&&n<=now+5*60*1000?n:0;
+}
 function renderDutyUI(){
- const d=getDutyState();
+ let d=getDutyState();
+ let start=d.active?validDutyStartMs(d.start):0;
+
+ // 画面側でも二重防御。開始時刻が壊れていたら1970年基準の巨大時間を絶対に表示しない。
+ if(d.active&&!start){
+  saveDutyState(false);
+  d={active:false,start:0};
+ }
+ const elapsed=d.active?formatDuration(Math.max(0,Date.now()-start)):'';
  const mb=document.getElementById('dutyMainButton');
  const vs=document.getElementById('vacantShiftTime');
  const me=document.getElementById('menuDutyEnd');
@@ -5961,11 +5974,11 @@ function renderDutyUI(){
  const dutyMeta=document.getElementById('headerDutyMeta');
  if(dutyMeta){
   dutyMeta.textContent=d.active
-   ? new Date(d.start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'開始 · '+formatDuration(Date.now()-d.start)
+   ? new Date(start).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'})+'開始 · '+elapsed
    : '';
  }
  if(mb) mb.textContent=d.active?'乗務へ戻る':'乗務開始';
- if(vs) vs.textContent=d.active?formatDuration(Date.now()-d.start):'未乗務';
+ if(vs) vs.textContent=d.active?elapsed:'未乗務';
  if(me) me.style.display=d.active?'block':'none';
  if(mfe) mfe.style.display=d.active?'flex':'none';
  const active=document.querySelector('.screen.active');
