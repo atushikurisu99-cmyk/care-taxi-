@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-FIT-FIX-V5 -->
+<!-- BUILD:2026-10-08-ANALYSIS-DAY-NAV-V6 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -286,6 +286,10 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-row-value{text-align:right;font-size:10px;color:#d9e2e8;font-weight:900;white-space:nowrap}
 .analysis-factor-card{display:none;position:fixed;z-index:140;left:50%;transform:translateX(-50%);top:calc(var(--header) + 8px);bottom:calc(var(--nav) + 8px);width:min(402px,calc(100% - 22px));padding:14px;border-color:#31526d;overflow:hidden;box-shadow:0 18px 50px rgba(0,0,0,.45)}
 .analysis-factor-card.show{display:block}
+.analysis-factor-head{display:grid;grid-template-columns:40px minmax(0,1fr) 40px 34px;gap:6px;align-items:center;margin-bottom:8px}
+.analysis-factor-head strong{font-size:18px;line-height:1.1;text-align:center}
+.analysis-day-nav{height:38px;border:1px solid #304454;background:#10202c;color:#dce7ee;border-radius:10px;font-size:28px;font-weight:900;line-height:1;padding:0}
+.analysis-day-nav:disabled{opacity:.28}
 .analysis-factor-close{border:0;background:transparent;color:#9fb1bd;font-size:24px;font-weight:900;line-height:1;padding:0 2px}
 .analysis-factor-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:7px;margin:8px 0 9px}
 .analysis-factor-stat{background:#0a141d;border:1px solid #21313d;border-radius:10px;padding:8px 7px;text-align:left;min-width:0}
@@ -2233,8 +2237,10 @@ html,body{
   </div>
 
   <div id="analysisFactorCard" class="card analysis-factor-card">
-   <div class="analysis-section-head">
+   <div class="analysis-factor-head">
+    <button id="analysisPrevDay" type="button" class="analysis-day-nav" onclick="shiftAnalysisDay(-1)" aria-label="前の日">‹</button>
     <strong id="analysisFactorTitle">実績の要因</strong>
+    <button id="analysisNextDay" type="button" class="analysis-day-nav" onclick="shiftAnalysisDay(1)" aria-label="次の日">›</button>
     <button type="button" class="analysis-factor-close" onclick="closeAnalysisDayDetail()" aria-label="閉じる">×</button>
    </div>
    <div id="analysisFactorSummary" class="analysis-factor-summary"></div>
@@ -3999,6 +4005,27 @@ function closeAnalysisDayDetail(){
  if(card)card.classList.remove('show');
  renderAnalysisDaily();
 }
+function analysisDetailDateKeys(){
+ const rows=analysisUseDemo()?ANALYSIS_DEMO_ROWS:analysisReports().slice(-10);
+ return rows.map(x=>x.dateKey).filter(Boolean);
+}
+function shiftAnalysisDay(delta){
+ const keys=analysisDetailDateKeys();
+ if(!keys.length)return;
+ let i=keys.indexOf(analysisSelectedDateKey);
+ if(i<0)i=0;
+ const next=Math.max(0,Math.min(keys.length-1,i+Number(delta||0)));
+ if(next===i)return;
+ openAnalysisDayDetail(keys[next]);
+}
+function renderAnalysisDayNav(){
+ const keys=analysisDetailDateKeys();
+ const i=keys.indexOf(analysisSelectedDateKey);
+ const prev=document.getElementById('analysisPrevDay');
+ const next=document.getElementById('analysisNextDay');
+ if(prev) prev.disabled=i<=0;
+ if(next) next.disabled=i<0||i>=keys.length-1;
+}
 function openAnalysisDayDetail(dateKey){
  analysisSelectedDateKey=dateKey;
  renderAnalysisDaily();
@@ -4027,6 +4054,7 @@ function openAnalysisDayDetail(dateKey){
   note=String(r.note||'').trim()||'なし';
  }
  const wd=['日','月','火','水','木','金','土'][new Date(dateKey+'T12:00:00').getDay()];
+ renderAnalysisDayNav();
  const title=document.getElementById('analysisFactorTitle');
  if(title)title.textContent=analysisDateLabel(dateKey)+'（'+wd+'） 実績の要因';
  const summary=document.getElementById('analysisFactorSummary');
