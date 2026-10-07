@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-DEMO-LARGE-V2 -->
+<!-- BUILD:2026-10-08-ANALYSIS-ILLUSTRATION-MATCH-V3 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -258,26 +258,33 @@ main{position:relative;min-height:0;overflow:hidden}
  radial-gradient(circle at 49% 55%,rgba(255,196,0,.75),transparent 12%),
  radial-gradient(circle at 30% 62%,rgba(40,160,255,.7),transparent 15%),
  linear-gradient(135deg,#163044,#101b24)}
-#analysis .content{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:10px;gap:12px}
-.analysis-compact-card,.analysis-trend-card{padding:15px 15px}
+#analysis .content{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:12px;gap:12px}
+.analysis-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.analysis-summary-card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:15px;padding:13px 14px;min-height:92px}
+.analysis-summary-label{font-size:13px;color:var(--muted);font-weight:850}
+.analysis-summary-value{font-size:26px;color:#fff;font-weight:1000;line-height:1.05;margin-top:7px}
+.analysis-summary-sub{font-size:11px;color:#8396a4;margin-top:5px}
+.analysis-compact-card,.analysis-trend-card{padding:15px}
 .analysis-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
 .analysis-section-head strong{font-size:20px;line-height:1.1}
 .analysis-section-head span{font-size:12px;color:var(--muted);font-weight:800}
-.analysis-daily-bars{height:220px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;align-items:end;padding:8px 2px 0}
-.analysis-day-col{height:100%;border:0;background:transparent;color:#aebdca;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-width:0}
-.analysis-day-bar-wrap{height:156px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:9px;background:#0a141d;border:1px solid #1d2b36;padding:3px}
+.analysis-range-pill{border:1px solid #2e4251;background:#0d1923;color:#dbe5ec;border-radius:999px;padding:6px 10px;font-size:12px;font-weight:900}
+.analysis-daily-bars{height:230px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;align-items:end;padding:8px 2px 0}
+.analysis-day-col{height:100%;border:0;background:transparent;color:#aebdca;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:5px;min-width:0}
+.analysis-day-bar-wrap{height:150px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:8px;background:#0a141d;border:1px solid #1d2b36;padding:3px}
 .analysis-day-bar{width:76%;min-height:5px;border-radius:6px 6px 3px 3px;background:#2f86ff}
 .analysis-day-col.selected .analysis-day-bar-wrap{border-color:#66a8ff;box-shadow:0 0 0 1px rgba(102,168,255,.2)}
 .analysis-day-col.selected .analysis-day-bar{background:#66a8ff}
-.analysis-day-label{font-size:12px;font-weight:900;line-height:1;white-space:nowrap}
-.analysis-day-sales{font-size:11px;color:#8fa0ad;line-height:1;font-weight:850;white-space:nowrap}
-.analysis-row-chart{display:flex;flex-direction:column;gap:12px}
-.analysis-row-item{display:grid;grid-template-columns:66px minmax(0,1fr) 90px;gap:10px;align-items:center;min-height:38px}
-.analysis-row-label{font-size:16px;color:#c2ced7;font-weight:900}
+.analysis-day-label{font-size:11px;font-weight:900;line-height:1.05;white-space:nowrap}
+.analysis-day-sales{font-size:10px;color:#91a2ae;line-height:1;font-weight:850;white-space:nowrap}
+.analysis-trend-card{padding-bottom:14px}
+.analysis-row-chart{display:flex;flex-direction:column;gap:11px}
+.analysis-row-item{display:grid;grid-template-columns:64px minmax(0,1fr) 90px;gap:10px;align-items:center;min-height:36px}
+.analysis-row-label{font-size:15px;color:#c7d2da;font-weight:900}
 .analysis-row-track{height:15px;border-radius:999px;background:#09131c;border:1px solid #243541;overflow:hidden}
 .analysis-row-fill{height:100%;min-width:3px;border-radius:999px;background:#49a775}
-.analysis-row-value{text-align:right;font-size:14px;color:#d5dfe6;font-weight:900;white-space:nowrap}
-.analysis-factor-card{display:none;padding:15px 15px;border-color:#31526d}
+.analysis-row-value{text-align:right;font-size:13px;color:#d9e2e8;font-weight:900;white-space:nowrap}
+.analysis-factor-card{display:none;padding:15px;border-color:#31526d}
 .analysis-factor-card.show{display:block}
 .analysis-factor-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 12px}
 .analysis-factor-stat{background:#0a141d;border:1px solid #21313d;border-radius:12px;padding:10px 8px;text-align:left;min-width:0}
@@ -2168,6 +2175,33 @@ html,body{
 
 <section id="analysis" class="screen">
  <div class="content">
+  <div class="analysis-section-head" style="margin:0 2px 0">
+   <div>
+    <strong style="font-size:22px">営業分析</strong>
+    <div class="sub" style="margin-top:4px">自分の営業スタイルを振り返る</div>
+   </div>
+   <span class="analysis-range-pill">直近10日間</span>
+  </div>
+
+  <div class="analysis-summary-grid">
+   <div class="analysis-summary-card">
+    <div class="analysis-summary-label">10日合計</div>
+    <div id="analysisTenDayTotal" class="analysis-summary-value">0円</div>
+   </div>
+   <div class="analysis-summary-card">
+    <div class="analysis-summary-label">平均売上</div>
+    <div id="analysisAvgSales" class="analysis-summary-value">0円</div>
+   </div>
+   <div class="analysis-summary-card">
+    <div class="analysis-summary-label">平均単価</div>
+    <div id="analysisAvgFare" class="analysis-summary-value">0円</div>
+   </div>
+   <div class="analysis-summary-card">
+    <div class="analysis-summary-label">乗車回数</div>
+    <div id="analysisTripCount" class="analysis-summary-value">0回</div>
+   </div>
+  </div>
+
   <div class="card analysis-compact-card">
    <div class="analysis-section-head">
     <strong>日別売上</strong>
@@ -3839,6 +3873,36 @@ function analysisHourInBand(hour,band){
  if(band.end<=24) return hour>=band.start&&hour<band.end;
  return hour>=band.start||hour<(band.end-24);
 }
+function renderAnalysisSummary(){
+ const demo=analysisUseDemo();
+ const rows=demo?ANALYSIS_DEMO_ROWS:analysisReports().slice(-10);
+ let total=0,count=0,fareSum=0,fareCount=0;
+ for(const r of rows){
+  const sales=demo?Number(r.sales||0):analysisReportSales(r);
+  total+=sales;
+  if(demo){
+   count+=Number(r.trips||0);
+   fareSum+=Number(r.avg||0)*Number(r.trips||0);
+   fareCount+=Number(r.trips||0);
+  }else{
+   const trips=analysisTripsForReport(r);
+   count+=trips.length;
+   for(const x of trips){
+    const fare=Math.max(0,Number(x.fare)||0);
+    if(fare>0){fareSum+=fare;fareCount++}
+   }
+  }
+ }
+ const dutyCount=rows.length||0;
+ const avgSales=dutyCount?Math.round(total/dutyCount):0;
+ const avgFare=fareCount?Math.round(fareSum/fareCount):0;
+ const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
+ set('analysisTenDayTotal',yen(total));
+ set('analysisAvgSales',yen(avgSales));
+ set('analysisAvgFare',yen(avgFare));
+ set('analysisTripCount',count+'回');
+}
+
 function renderAnalysisDaily(){
  const el=document.getElementById('analysisDailyBars');if(!el)return;
  const demo=analysisUseDemo();
@@ -3968,6 +4032,7 @@ function openAnalysisDayDetail(dateKey){
  setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'nearest'}),20);
 }
 function renderSimpleSalesAnalysis(){
+ renderAnalysisSummary();
  renderAnalysisDaily();
  renderAnalysisHourly();
  renderAnalysisWeekday();
