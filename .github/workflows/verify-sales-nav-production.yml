@@ -119,33 +119,49 @@ jobs:
             if(!await preview.isVisible()) throw new Error('monthly preview did not become visible after demo');
             const sheet=page.locator('#monthlyReportPreview .sogo-sheet');
             const firstPage=page.locator('#monthlyReportPreview .sogo-page').first();
-            const title=page.locator('#monthlyReportPreview .sogo-title').first();
-            const topTable=page.locator('#monthlyReportPreview .sogo-top').first();
-            const tripTable=page.locator('#monthlyReportPreview .sogo-trip').first();
-            const reportTitleBox=await title.boundingBox();
+            const frontSvg=page.locator('#monthlyReportPreview .sogo-front-svg');
+            const backSvg=page.locator('#monthlyReportPreview .sogo-back-trip-svg');
             const pageBox=await firstPage.boundingBox();
-            const topBox=await topTable.boundingBox();
-            const titleStyle=await title.evaluate(el=>({fontSize:parseFloat(getComputedStyle(el).fontSize),color:getComputedStyle(el).color,display:getComputedStyle(el).display}));
-            const tripRows=await tripTable.locator('tbody tr').count();
-            const firstTripCells=await tripTable.locator('tbody tr').first().locator('td').count();
-            const topFirstRowCells=await topTable.locator('tbody tr').first().locator('td').count();
+            const svgBox=await frontSvg.boundingBox();
+            const ledger=await frontSvg.evaluate(el=>({
+              h:Number(el.getAttribute('data-horizontal-lines')||0),
+              v:Number(el.getAttribute('data-vertical-lines')||0),
+              ids:[...el.querySelectorAll('line[data-line-id]')].map(x=>x.getAttribute('data-line-id')),
+              title:[...el.querySelectorAll('text')].find(x=>x.textContent.includes('運 転 日 報'))?.getBoundingClientRect().toJSON?.()||null
+            }));
+            const backLedger=await backSvg.evaluate(el=>({
+              h:Number(el.getAttribute('data-horizontal-lines')||0),
+              v:Number(el.getAttribute('data-vertical-lines')||0),
+              ids:[...el.querySelectorAll('line[data-line-id]')].map(x=>x.getAttribute('data-line-id'))
+            }));
             const visibleDemoValues=await firstPage.innerText();
-            if(!reportTitleBox||!pageBox||!topBox||reportTitleBox.width<120||reportTitleBox.height<20||titleStyle.fontSize<24){
-              throw new Error('Sogo title is not visibly laid out: '+JSON.stringify({reportTitleBox,pageBox,topBox,titleStyle}));
+            if(!pageBox||!svgBox||svgBox.width<500||svgBox.height<700){
+              throw new Error('Sogo traced SVG is not visibly laid out: '+JSON.stringify({pageBox,svgBox}));
             }
-            if(reportTitleBox.y<pageBox.y||reportTitleBox.y+reportTitleBox.height>topBox.y){
-              throw new Error('Sogo title overlaps or escapes header area: '+JSON.stringify({reportTitleBox,pageBox,topBox}));
+            if(ledger.h<25||ledger.v<20||backLedger.h<10||backLedger.v<9){
+              throw new Error('Sogo line ledger count too small: '+JSON.stringify({ledger,backLedger}));
             }
-            if(tripRows!==20||firstTripCells!==9||topFirstRowCells<7){
-              throw new Error('Sogo grid structure broken: '+JSON.stringify({tripRows,firstTripCells,topFirstRowCells}));
+            if(new Set(ledger.ids).size!==ledger.ids.length||new Set(backLedger.ids).size!==backLedger.ids.length){
+              throw new Error('Sogo line ledger contains duplicate IDs');
+            }
+            for(const requiredId of ['H01','H02','H03','V01','V02','V03','BH01','BV01']){
+              const all=ledger.ids.concat(backLedger.ids);
+              if(!all.includes(requiredId)) throw new Error('Sogo line ledger missing '+requiredId);
             }
             for(const value of ['52340','52462','広島駅 新幹線口','八丁堀','1,780']){
               if(!visibleDemoValues.includes(value)) throw new Error('Sogo visible demo value missing: '+value);
             }
-            const tripFont=await tripTable.locator('tbody td').first().evaluate(el=>parseFloat(getComputedStyle(el).fontSize));
-            if(tripFont<9) throw new Error('Sogo trip text too small: '+tripFont);
-            console.log('SOGO_VISUAL_STRUCTURE_OK',JSON.stringify({reportTitleBox,pageBox,topBox,titleStyle,tripRows,firstTripCells,topFirstRowCells,tripFont}));
-            await page.screenshot({path:'/tmp/monthly-preview-template-v2.png',fullPage:false});
+            const badTopCarry=await frontSvg.evaluate(el=>{
+              const lines=[...el.querySelectorAll('line')];
+              return lines.some(l=>{
+                const x1=Number(l.getAttribute('x1')),x2=Number(l.getAttribute('x2')),
+                      y1=Number(l.getAttribute('y1')),y2=Number(l.getAttribute('y2'));
+                return x1===x2 && [135,510,650].includes(x1) && y1<210 && y2>210;
+              });
+            });
+            if(badTopCarry) throw new Error('Sogo stepped header vertical line leaks into detail grid');
+            console.log('SOGO_LINE_LEDGER_OK',JSON.stringify({ledger:{h:ledger.h,v:ledger.v},backLedger:{h:backLedger.h,v:backLedger.v},pageBox,svgBox}));
+            await page.screenshot({path:'/tmp/monthly-preview-template-v3.png',fullPage:false});
             await page.locator('#monthlyReportPreview .monthly-preview-close').click();
             if(await preview.isVisible()) throw new Error('monthly preview did not close');
             await page.locator('#monthlyReportPreviewButton').click();
@@ -209,7 +225,7 @@ jobs:
             /tmp/prod-verify.json
             /tmp/menu-production.png
             /tmp/monthly-preview-production.png
-            /tmp/monthly-preview-template-v2.png
+            /tmp/monthly-preview-template-v3.png
           if-no-files-found: ignore
           retention-days: 1
 
