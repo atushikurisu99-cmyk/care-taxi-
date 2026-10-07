@@ -1331,6 +1331,7 @@ html,body{
 .sogo-svg{display:block;width:100%;height:auto;background:#fff;color:#111;font-family:"Yu Mincho","Hiragino Mincho ProN","Yu Gothic",serif}
 .sogo-svg-line{stroke:#222;stroke-width:2;shape-rendering:crispEdges;vector-effect:non-scaling-stroke}
 .sogo-svg-line.major{stroke-width:2.5}
+.sogo-svg-line.time-divider{stroke-width:1.4;stroke-dasharray:3 3}
 .sogo-svg-text{fill:#111;dominant-baseline:middle;font-weight:400}
 .sogo-svg-text.title{font-size:38px;font-weight:700;letter-spacing:9px}
 .sogo-svg-text.org{font-size:16px;font-weight:700}
@@ -3081,14 +3082,16 @@ function sogoFrontSvg(r){
   [1775,140,1405],[1842,140,1405],[1910,36,1405],[2011,36,1405]
  ];
  const tracedV=[
-  [37,230,2011],[1403,230,2011],
-  [595,230,287],[724,230,287],[997,230,287],[1122,230,287],
-  [165,287,342],[666,287,342],[848,287,342],
-  [105,342,1707],[205,342,1707],[399,342,1707],[595,342,1707],[752,342,1707],[940,342,1707],[1128,342,1707],
-  [141,1707,1910],[270,1707,1910],[556,1707,1910],[704,1707,1910],[991,1707,1910],[1114,1707,1910]
+  [37,229,2013],[1403,229,2013],
+  [595,229,289],[724,229,289],[997,229,289],[1122,229,289],
+  [165,286,344],[666,286,344],[848,286,344],
+  [105,341,1709],[205,341,1709],[399,341,1709],[595,341,1709],[752,341,1709],[940,341,1709],[1128,341,1709],
+  [141,1706,1912],[270,1706,1912],[556,1706,1912],[704,1706,1912],[991,1706,1912],[1114,1706,1912]
  ];
  tracedH.forEach((a,i)=>lines.push(sogoSvgLine('H'+String(i+1).padStart(2,'0'),X(a[1]),Y(a[0]),X(a[2]),Y(a[0]),'traced')));
  tracedV.forEach((a,i)=>lines.push(sogoSvgLine('V'+String(i+1).padStart(2,'0'),X(a[0]),Y(a[1]),X(a[0]),Y(a[2]),'traced')));
+ lines.push(sogoSvgLine('HTIME',X(595),Y(370),X(752),Y(370),'traced'));
+ lines.push('<line class="sogo-svg-line time-divider" data-line-id="VTIME" x1="'+X(674)+'" y1="'+Y(370)+'" x2="'+X(674)+'" y2="'+Y(1709)+'"/>');
 
  const d=r?.dateKey?new Date(r.dateKey+'T12:00:00'):null;
  const yy=d?d.getFullYear():'',mm=d?d.getMonth()+1:'',dd=d?d.getDate():'';
@@ -3105,7 +3108,7 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1392),Y(172),'事務所代表　253-2505','org small','end');
  text+=sogoSvgText(X(1392),Y(192),'253-2500','org small','end');
 
- const yDate=Y((230+287)/2),yReg=Y((287+342)/2),yHead=Y((342+398)/2);
+ const yDate=Y((230+287)/2),yReg=Y((287+342)/2),yHead=Y(356);
  text+=sogoSvgText(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start');
  text+=sogoSvgText(X((595+724)/2),yDate,'出庫','top');
  text+=sogoSvgText(X(770),yDate,start[0]||'','top');
@@ -3127,8 +3130,8 @@ function sogoFrontSvg(r){
  ['回数','人員','乗車地','降車地','降車時刻','現収','未収','備考'].forEach((v,i)=>{
   text+=sogoSvgText(X(centers[i]),yHead,v,'head');
  });
- text+=sogoSvgText(X(650),Y(386),'時','head small');
- text+=sogoSvgText(X(705),Y(386),'分','head small');
+ text+=sogoSvgText(X(635),Y(384),'時','head small');
+ text+=sogoSvgText(X(713),Y(384),'分','head small');
 
  const rowBounds=[398,463,529,594,660,725,791,856,921,987,1053,1118,1184,1249,1314,1380,1445,1511,1576,1642,1707];
  for(let i=0;i<20;i++){
@@ -3141,8 +3144,8 @@ function sogoFrontSvg(r){
   text+=sogoSvgText(X(centers[1]),cy,people,'body');
   text+=sogoSvgText(X(220),cy,trip?reportTemplatePlace(trip.pickup):'','body left','start');
   text+=sogoSvgText(X(415),cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
-  text+=sogoSvgText(X(650),cy,parts[0],'body');
-  text+=sogoSvgText(X(705),cy,parts[1],'body');
+  text+=sogoSvgText(X(635),cy,parts[0],'body');
+  text+=sogoSvgText(X(713),cy,parts[1],'body');
   text+=sogoSvgText(X(centers[5]),cy,money.cash,'body');
   text+=sogoSvgText(X(centers[6]),cy,money.receivable,'body');
   text+=sogoSvgText(X(1145),cy,remarks,'body left','start');
@@ -3310,7 +3313,7 @@ function renderMonthlyReportPreview(forceShow=true){
  if(forceShow){
   p.classList.add('show');
   p.scrollTop=0;p.scrollLeft=0;
-  const fit=Math.max(.72,Math.min(1,(p.clientWidth-20)/760));
+  const fit=Math.max(.42,Math.min(1,(p.clientWidth-20)/760));
   monthlyPreviewZoom=fit;
   setMonthlyPreviewZoom(fit);
   initMonthlyPreviewPinch();
