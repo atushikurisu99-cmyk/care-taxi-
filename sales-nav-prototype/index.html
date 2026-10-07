@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-RIDE-RESERVATION-FARE-V1 -->
+<!-- BUILD:2026-10-08-VEHICLE-PROFILE-V1 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2274,8 +2274,26 @@ html,body{
   <div id="settingsVehicle" class="hidden">
    <button class="settings-backlink" type="button" onclick="openSettingsSection('root')">‹ 設定</button>
    <div class="settings-card">
-    <div class="settings-title">車両・料金設定</div>
-    <div class="settings-note">この車両の料金体系を設定します。支払い画面の自動計算と▲▼の1メーター調整に使います。</div>
+    <div class="settings-title">車両設定</div>
+    <div class="settings-note">車両情報と営業区域を保存します。営業区域は現在地から候補を出し、確認して保存できます。</div>
+    <div class="vehicle-fare-grid">
+     <label>登録番号<input id="vehicleRegistrationNumber" type="text" inputmode="text" placeholder="広島 300 あ 12-34"></label>
+     <label>車種<input id="vehicleTypeName" type="text" inputmode="text" placeholder="クラウン"></label>
+     <label>締め日<input id="vehicleClosingDay" type="number" min="1" max="31" step="1" inputmode="numeric" placeholder="31"></label>
+     <label>車検満了日<input id="vehicleInspectionExpiry" type="date"></label>
+     <label style="grid-column:1/-1">営業区域
+      <select id="vehicleSalesArea" style="width:100%;border:1px solid #30404d;background:#0a141d;color:#fff;border-radius:10px;padding:10px 9px;font-size:16px"></select>
+     </label>
+     <label style="grid-column:1/-1">現在のオドメーター
+      <input id="vehicleCurrentOdometer" type="number" min="0" step="1" inputmode="numeric" placeholder="例 52340">
+     </label>
+    </div>
+    <button class="smallbtn" type="button" style="width:100%;margin-top:10px" onclick="suggestSalesAreaFromLocation()">現在地から営業区域候補を出す</button>
+    <button class="smallbtn" type="button" style="width:100%;margin-top:8px" onclick="saveVehicleProfile()">車両設定を保存</button>
+   </div>
+   <div class="settings-card">
+    <div class="settings-title">料金設定</div>
+    <div class="settings-note">支払い画面の自動計算と▲▼の1メーター調整に使います。</div>
     <div class="vehicle-fare-grid">
      <label>初乗り運賃<input id="fareBaseYen" type="number" min="0" step="10" inputmode="numeric"></label>
      <label>初乗り距離(m)<input id="fareBaseMeters" type="number" min="0" step="10" inputmode="numeric"></label>
@@ -2526,7 +2544,7 @@ function openSettingsSection(section){
  vehicle.classList.toggle('hidden',section!=='vehicle');
  notifications.classList.toggle('hidden',section!=='notifications');
  if(section==='personal'){ renderSalesGoalSettings(); refreshGoogleAuthStatus(); }
- if(section==='vehicle'){ renderVehicleFareSettings(); }
+ if(section==='vehicle'){ renderVehicleProfile(); renderVehicleFareSettings(); }
  if(section==='notifications'){ openNotificationSection('root'); renderNotificationSettings(); }
 }
 function openNotificationSection(section='root'){
@@ -5547,6 +5565,12 @@ function ensureDailyReportForDuty(startTs){
   endTs:null,
   startTime:hmFromTs(startTs),
   endTime:'',
+  registrationNumber:getVehicleProfile().registrationNumber||'',
+  vehicleNumber:getVehicleProfile().registrationNumber||'',
+  vehicleType:getVehicleProfile().vehicleType||'',
+  salesArea:getVehicleProfile().salesArea||'',
+  closingDay:getVehicleProfile().closingDay||31,
+  inspectionExpiry:getVehicleProfile().inspectionExpiry||'',
   odometerStart:latestKnownOdometer(),
   odometerEnd:null,
   sales:Number(sales)||0,
@@ -6053,6 +6077,13 @@ function renderDutyUI(){
 function handleDutyMain(){
  const d=getDutyState();
  if(d.active){show('vacant');return}
+ if(latestKnownOdometer()===null){
+  const raw=window.prompt('初回の出庫オドメーターを入力してください');
+  if(raw===null) return;
+  const n=Number(String(raw).replace(/,/g,'').trim());
+  if(!Number.isFinite(n)||n<0){toast('オドメーターを正しく入力してください');return}
+  try{localStorage.setItem(LAST_ODOMETER_KEY,String(n))}catch(e){}
+ }
  const startedAt=Date.now();
  saveDutyState(true,startedAt);
  ensureDailyReportForDuty(startedAt);
@@ -7222,6 +7253,89 @@ function refreshLocationDependentFeeds(){
  }
  loadJrLastTrains(false);
  maybeNotifyJrLastTrain();
+}
+
+const VEHICLE_PROFILE_KEY='taxi_vehicle_profile_v1';
+const HIROSHIMA_SALES_AREAS=[
+ '広島交通圏','呉市A','呉市B','竹原市','東広島市','三原市','尾道市','福山交通圏','府中市','三次市','庄原市',
+ '大竹市','江田島市','安芸高田市','山県郡','世羅郡','神石郡','豊田郡','佐伯交通圏','宮島'
+];
+function getVehicleProfile(){
+ try{return JSON.parse(localStorage.getItem(VEHICLE_PROFILE_KEY)||'{}')||{}}catch(e){return{}}
+}
+function renderSalesAreaOptions(selected=''){
+ const el=document.getElementById('vehicleSalesArea');if(!el)return;
+ const opts=['<option value="">選択してください</option>'].concat(HIROSHIMA_SALES_AREAS.map(v=>'<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>'));
+ el.innerHTML=opts.join('');
+ el.value=HIROSHIMA_SALES_AREAS.includes(selected)?selected:'';
+}
+function renderVehicleProfile(){
+ const p=getVehicleProfile();
+ const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??''};
+ set('vehicleRegistrationNumber',p.registrationNumber||'');
+ set('vehicleTypeName',p.vehicleType||'');
+ set('vehicleClosingDay',p.closingDay||'');
+ set('vehicleInspectionExpiry',p.inspectionExpiry||'');
+ const odo=latestKnownOdometer();
+ set('vehicleCurrentOdometer',odo??'');
+ renderSalesAreaOptions(p.salesArea||'');
+}
+function saveVehicleProfile(){
+ const registrationNumber=String(document.getElementById('vehicleRegistrationNumber')?.value||'').trim();
+ const vehicleType=String(document.getElementById('vehicleTypeName')?.value||'').trim();
+ const closingDay=Math.min(31,Math.max(1,Number(document.getElementById('vehicleClosingDay')?.value||31)));
+ const inspectionExpiry=String(document.getElementById('vehicleInspectionExpiry')?.value||'');
+ const salesArea=String(document.getElementById('vehicleSalesArea')?.value||'');
+ const odometerRaw=String(document.getElementById('vehicleCurrentOdometer')?.value||'').trim();
+ const currentOdometer=odometerRaw===''?null:Number(odometerRaw);
+ const p={registrationNumber,vehicleType,closingDay,inspectionExpiry,salesArea,updatedAt:Date.now()};
+ try{localStorage.setItem(VEHICLE_PROFILE_KEY,JSON.stringify(p))}catch(e){}
+ if(Number.isFinite(currentOdometer)&&currentOdometer>=0){
+  try{localStorage.setItem(LAST_ODOMETER_KEY,String(currentOdometer))}catch(e){}
+ }
+ toast('車両設定を保存しました');
+}
+function salesAreaCandidatesFromAddress(a={}){
+ const city=String(a.city||a.town||a.village||a.municipality||a.county||'');
+ const suburb=String(a.suburb||a.city_district||'');
+ const text=city+' '+suburb;
+ if(/広島市/.test(text)) return ['広島交通圏'];
+ if(/東広島市/.test(text)) return ['東広島市'];
+ if(/呉市/.test(text)) return ['呉市A','呉市B'];
+ if(/竹原市/.test(text)) return ['竹原市'];
+ if(/三原市/.test(text)) return ['三原市'];
+ if(/尾道市/.test(text)) return ['尾道市'];
+ if(/福山市/.test(text)) return ['福山交通圏'];
+ if(/府中市/.test(text)) return ['府中市'];
+ if(/三次市/.test(text)) return ['三次市'];
+ if(/庄原市/.test(text)) return ['庄原市'];
+ if(/大竹市/.test(text)) return ['大竹市'];
+ if(/江田島市/.test(text)) return ['江田島市'];
+ if(/安芸高田市/.test(text)) return ['安芸高田市'];
+ if(/山県郡|安芸太田町|北広島町/.test(text)) return ['山県郡'];
+ if(/世羅町/.test(text)) return ['世羅郡'];
+ if(/神石高原町/.test(text)) return ['神石郡'];
+ if(/大崎上島町/.test(text)) return ['豊田郡'];
+ if(/廿日市市/.test(text)) return ['広島交通圏','佐伯交通圏','宮島'];
+ return [];
+}
+async function suggestSalesAreaFromLocation(){
+ if(!latestPosition?.coords){toast('位置情報を取得してからお試しください');startLocation();return}
+ const lat=latestPosition.coords.latitude,lon=latestPosition.coords.longitude;
+ try{
+  const url=APP_LINKS.reverseNominatim+'?format=jsonv2&lat='+encodeURIComponent(lat)+'&lon='+encodeURIComponent(lon)+'&zoom=12&addressdetails=1&accept-language=ja';
+  const d=await fetchJsonWithTimeout(url,4500);
+  const candidates=salesAreaCandidatesFromAddress(d.address||{});
+  if(!candidates.length){toast('営業区域候補を自動判定できませんでした');return}
+  const el=document.getElementById('vehicleSalesArea');
+  if(candidates.length===1){
+   if(el) el.value=candidates[0];
+   toast(candidates[0]+' を候補にしました');
+   return;
+  }
+  if(el) el.value=candidates[0];
+  toast('候補が複数あります。営業区域を確認してください');
+ }catch(e){toast('営業区域候補を取得できませんでした')}
 }
 
 const VEHICLE_FARE_SETTINGS_KEY='taxi_vehicle_fare_settings_v1';
