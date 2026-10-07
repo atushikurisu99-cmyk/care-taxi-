@@ -3093,10 +3093,14 @@ function sogoFrontSvg(r){
   [106,342,1707],[205,342,1707],[400,342,1707],[596,342,1707],[752,342,1707],[940,342,1707],[1128,342,1707],
   [142,1707,1910],[270,1707,1910],[556,1707,1910],[704,1707,1910],[992,1707,1910],[1114,1707,1910]
  ];
- tracedH.forEach((a,i)=>lines.push(sogoSvgLine('H'+String(i+1).padStart(2,'0'),X(a[1]),Y(a[0]),X(a[2]),Y(a[0]),'traced')));
- tracedV.forEach((a,i)=>lines.push(sogoSvgLine('V'+String(i+1).padStart(2,'0'),X(a[0]),Y(a[1]),X(a[0]),Y(a[2]),'traced')));
- lines.push(sogoSvgLine('HTIME',X(595),Y(370),X(752),Y(370),'traced'));
- lines.push('<line class="sogo-svg-line time-divider" data-line-id="VTIME" x1="'+X(674)+'" y1="'+Y(370)+'" x2="'+X(674)+'" y2="'+Y(1709)+'"/>');
+ const TRACE_LINE_LIMIT=1;
+ const traceSegments=[
+  ...tracedH.map((a,i)=>({id:'H'+String(i+1).padStart(2,'0'),x1:X(a[1]),y1:Y(a[0]),x2:X(a[2]),y2:Y(a[0])})),
+  ...tracedV.map((a,i)=>({id:'V'+String(i+1).padStart(2,'0'),x1:X(a[0]),y1:Y(a[1]),x2:X(a[0]),y2:Y(a[2])})),
+  {id:'HTIME',x1:X(595),y1:Y(370),x2:X(752),y2:Y(370)},
+  {id:'VTIME',x1:X(674),y1:Y(370),x2:X(674),y2:Y(1709)}
+ ];
+ traceSegments.slice(0,TRACE_LINE_LIMIT).forEach(s=>lines.push(sogoSvgLine(s.id,s.x1,s.y1,s.x2,s.y2,'traced')));
 
  const d=r?.dateKey?new Date(r.dateKey+'T12:00:00'):null;
  const yy=d?d.getFullYear():'',mm=d?d.getMonth()+1:'',dd=d?d.getDate():'';
@@ -3182,7 +3186,7 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(245),Y((1910+2011)/2),'～','summary');
  text+=sogoSvgText(X(340),Y((1910+2011)/2),'：','summary');
 
- return '<svg class="sogo-svg sogo-front-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="相互個人タクシー協同組合 運転日報 表面" data-template-mode="inline-trace" data-horizontal-lines="'+tracedH.length+'" data-vertical-lines="'+tracedV.length+'">'+
+ return '<svg class="sogo-svg sogo-front-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="相互個人タクシー協同組合 運転日報 表面" data-template-mode="inline-trace-step" data-trace-line-limit="'+TRACE_LINE_LIMIT+'" data-horizontal-lines="'+tracedH.length+'" data-vertical-lines="'+tracedV.length+'">'+
   '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
 }
 function sogoBackTripSvg(r){
