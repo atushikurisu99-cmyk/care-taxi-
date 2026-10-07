@@ -3110,14 +3110,19 @@ function sogoFrontSvg(r){
   return sogoSvgText(x,y,raw,cls,anchor,'style="font-size:'+actual.toFixed(2)+'px"');
  };
  const verticalColumns=(box,leftText,rightText,cls='summary',fontSize=12)=>{
-  const render=(value,x)=>{
+  const render=(value,x,withParens=false)=>{
    const chars=[...String(value||'')];
    if(!chars.length)return '';
-   const step=(box.y2-box.y1)/(chars.length+1);
-   return chars.map((ch,i)=>sogoSvgText(x,box.y1+step*(i+1),ch,cls,'middle','style="font-size:'+fontSize+'px"')).join('');
+   const seq=withParens?['（',...chars,'）']:chars;
+   const step=(box.y2-box.y1)/(seq.length+1);
+   return seq.map((ch,i)=>{
+    const y=box.y1+step*(i+1);
+    const rotate=(ch==='（'||ch==='）')?' transform="rotate(90 '+x+' '+y+')"':'';
+    return sogoSvgText(x,y,ch,cls,'middle','style="font-size:'+fontSize+'px"'+rotate);
+   }).join('');
   };
   const w=box.x2-box.x1;
-  return render(leftText,box.x1+w*.32)+render(rightText,box.x1+w*.70);
+  return render(leftText,box.x1+w*.32,false)+render(rightText,box.x1+w*.70,true);
  };
  const lines=[];
  const tracedH=[
@@ -3210,7 +3215,7 @@ function sogoFrontSvg(r){
  const sumY=[Y((1707+1775)/2),Y((1775+1842)/2),Y((1842+1910)/2)];
 
  const runBox=cellBox(38,1707,142,1910,0,0);
- text+=verticalColumns(runBox,'走行粁','実車キロ数','summary',11.5);
+ text+=verticalColumns(runBox,'走行粁','走行メーター粁数','summary',11.5);
  text+=cellText(cellBox(142,1707,270,1775,4,2),'入庫','summary','middle',13,11);
  text+=cellText(cellBox(142,1775,270,1842,4,2),'出庫','summary','middle',13,11);
  text+=cellText(cellBox(142,1842,270,1910,4,2),'差引','summary','middle',13,11);
