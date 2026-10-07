@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-07-SOGO-TEMPLATE-V2 -->
+<!-- BUILD:2026-10-07-SOGO-LINE-LEDGER-V3 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1328,6 +1328,24 @@ html,body{
 
 .report-template-fixed{width:100%;min-height:46px;display:flex;align-items:center;background:#0b1620;border:1px solid #2a3a47;border-radius:11px;color:#fff;padding:10px 11px;font-size:15px;font-weight:900}
 .monthly-report-actions button.demo{background:#513f13;border-color:#b69229;color:#fff}
+.sogo-svg{display:block;width:100%;height:auto;background:#fff;color:#111;font-family:"Yu Mincho","Hiragino Mincho ProN","Yu Gothic",serif}
+.sogo-svg-line{stroke:#222;stroke-width:2;shape-rendering:crispEdges;vector-effect:non-scaling-stroke}
+.sogo-svg-line.major{stroke-width:2.5}
+.sogo-svg-text{fill:#111;dominant-baseline:middle;font-weight:400}
+.sogo-svg-text.title{font-size:38px;font-weight:700;letter-spacing:9px}
+.sogo-svg-text.org{font-size:16px;font-weight:700}
+.sogo-svg-text.org.small{font-size:13px;font-weight:400}
+.sogo-svg-text.top{font-size:16px}.sogo-svg-text.top.label{font-size:15px;font-weight:700}
+.sogo-svg-text.head{font-size:15px;font-weight:700}.sogo-svg-text.head.small{font-size:13px}
+.sogo-svg-text.body{font-size:15px}.sogo-svg-text.body.left{font-size:14px}
+.sogo-svg-text.summary{font-size:15px;font-weight:700}.sogo-svg-text.summary.value{font-size:14px;font-weight:400}
+.sogo-page-front{padding:0!important}
+.sogo-page-back{padding:0!important}
+.sogo-page-back .sogo-inspection-title,
+.sogo-page-back .sogo-inspection,
+.sogo-page-back .sogo-alcohol,
+.sogo-page-back .sogo-remarks{width:90%;margin-left:5%;margin-right:5%}
+.sogo-page-back .sogo-inspection-title{box-sizing:border-box}
 .sogo-sheet{
  background:#fff;
  color:#111;
@@ -3039,18 +3057,148 @@ function sogoInspectionHtml(r){
  '<tr><td>帰庫時</td><td>有　'+(demo?'○':'')+'　無</td><td>帰庫時</td><td>有　無 '+(demo?'○':'')+'</td></tr></tbody></table>'+
  '<div class="sogo-remarks"><strong>備考欄</strong><div style="margin-top:6px">'+escapeHtml(r?.inspectionNote||'')+'</div></div>';
 }
+
+function sogoSvgEsc(v){ return escapeHtml(v==null?'':String(v)); }
+function sogoSvgLine(id,x1,y1,x2,y2,kind='normal'){
+ return '<line class="sogo-svg-line '+kind+'" data-line-id="'+id+'" x1="'+x1+'" y1="'+y1+'" x2="'+x2+'" y2="'+y2+'"/>';
+}
+function sogoSvgText(x,y,v,cls='cell',anchor='middle',extra=''){
+ return '<text class="sogo-svg-text '+cls+'" x="'+x+'" y="'+y+'" text-anchor="'+anchor+'" '+extra+'>'+sogoSvgEsc(v)+'</text>';
+}
+function sogoFrontSvg(r){
+ const W=1000,H=1414;
+ const x=[50,95,160,335,510,555,600,715,830,950];
+ const lines=[]; let hNo=1,vNo=1;
+ const H=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('H'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
+ const V=(xx,y1,y2,kind='normal')=>lines.push(sogoSvgLine('V'+String(vNo++).padStart(2,'0'),xx,y1,xx,y2,kind));
+
+ // 上段：日付／出庫／入庫。罫線は段ごとに独立させ、下段へ誤って伸ばさない。
+ H(130,50,950,'major'); H(170); H(210);
+ V(50,130,210,'major'); V(950,130,210,'major');
+ [480,550,600,640,700,770,820,860,910].forEach(xx=>V(xx,130,170));
+ [135,510,650].forEach(xx=>V(xx,170,210,'major'));
+
+ // 明細見出し。降車時刻だけ二段。
+ H(235,510,600);
+ H(260);
+ x.forEach((xx,i)=>V(xx,210,1060,(i===0||i===x.length-1)?'major':'normal'));
+
+ // 20行。横罫線は全幅、40単位で固定。
+ for(let i=1;i<=20;i++) H(260+i*40,50,950,(i%5===0)?'major':'normal');
+
+ // 下部集計。明細表の縦線をここまで延長せず、別系統として作る。
+ H(1105); H(1150); H(1195);
+ [50,90,160,400,500,650,740,950].forEach((xx,i)=>V(xx,1060,1195,(i===0||i===7)?'major':'normal'));
+
+ const d=r?.dateKey?new Date(r.dateKey+'T12:00:00'):null;
+ const yy=d?d.getFullYear():'',mm=d?d.getMonth()+1:'',dd=d?d.getDate():'';
+ const wd=d?['日','月','火','水','木','金','土'][d.getDay()]:'';
+ const start=String(r?.startTime||'').split(':');
+ const end=String(r?.endTime||'').split(':');
+ const reg=r?.registrationNumber||r?.vehicleNumber||'';
+ const name=r?.businessName||r?.driverName||'';
+ const trips=reportTripsForTemplate(r);
+
+ let text='';
+ text+=sogoSvgText(500,102,'運 転 日 報','title');
+ text+=sogoSvgText(940,62,'相互個人タクシー協同組合','org','end');
+ text+=sogoSvgText(940,84,'事務所代表　253-2505','org small','end');
+ text+=sogoSvgText(940,104,'253-2500','org small','end');
+
+ text+=sogoSvgText(65,156,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start');
+ text+=sogoSvgText(515,156,'出庫','top');
+ text+=sogoSvgText(575,156,start[0]||'','top');
+ text+=sogoSvgText(620,156,'時','top');
+ text+=sogoSvgText(670,156,start[1]||'','top');
+ text+=sogoSvgText(735,156,'入庫','top');
+ text+=sogoSvgText(795,156,end[0]||'','top');
+ text+=sogoSvgText(840,156,'時','top');
+ text+=sogoSvgText(885,156,end[1]||'','top');
+ text+=sogoSvgText(930,156,'分','top');
+
+ text+=sogoSvgText(92,196,'登録番号','top label');
+ text+=sogoSvgText(150,196,reg,'top left','start');
+ text+=sogoSvgText(580,196,'氏名又は名称','top label');
+ text+=sogoSvgText(670,196,name,'top left','start');
+
+ const headers=[
+  [72.5,239,'回数'],[127.5,239,'人員'],[247.5,239,'乗車地'],[422.5,239,'降車地'],
+  [555,226,'降車時刻'],[657.5,239,'現収'],[772.5,239,'未収'],[890,239,'備考']
+ ];
+ headers.forEach(a=>text+=sogoSvgText(a[0],a[1],a[2],'head'));
+ text+=sogoSvgText(532.5,253,'時','head small');
+ text+=sogoSvgText(577.5,253,'分','head small');
+
+ for(let i=0;i<20;i++){
+  const n=i+1,trip=trips[i]||null,cy=286+i*40;
+  const hm=trip?reportTemplateHm(trip.dropoffTs):'',parts=hm?hm.split(':'):['',''];
+  const money=sogoCashColumns(trip);
+  const people=trip?(trip.passengers??(trip.demoData?1:'')):'';
+  const remarks=trip?(trip.remarks||trip.paymentMethod||''):'';
+  text+=sogoSvgText(72.5,cy,n,'body');
+  text+=sogoSvgText(127.5,cy,people,'body');
+  text+=sogoSvgText(170,cy,trip?reportTemplatePlace(trip.pickup):'','body left','start');
+  text+=sogoSvgText(345,cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
+  text+=sogoSvgText(532.5,cy,parts[0],'body');
+  text+=sogoSvgText(577.5,cy,parts[1],'body');
+  text+=sogoSvgText(657.5,cy,money.cash,'body');
+  text+=sogoSvgText(772.5,cy,money.receivable,'body');
+  text+=sogoSvgText(840,cy,remarks,'body left','start');
+ }
+
+ const km=reportTravelKm(r);
+ const sales=trips.reduce((sum,z)=>sum+Math.max(0,Number(z?.fare)||0),0)||Math.max(0,Number(r?.sales)||0);
+ const cash=trips.filter(z=>String(z?.paymentMethod||'')==='現金').reduce((s,z)=>s+Math.max(0,Number(z?.fare)||0),0);
+ const receivable=Math.max(0,sales-cash);
+ const people=trips.reduce((s,z)=>s+(Number(z?.passengers)||1),0);
+ text+=sogoSvgText(70,1130,'走行粁','summary v','middle','transform="rotate(-90 70 1130)"');
+ ['入庫','出庫','差引'].forEach((v,i)=>text+=sogoSvgText(125,1090+i*45,v,'summary'));
+ text+=sogoSvgText(390,1090,(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end');
+ text+=sogoSvgText(390,1135,(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end');
+ text+=sogoSvgText(390,1180,(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end');
+ ['乗車粁','運送回数','輸送人員'].forEach((v,i)=>text+=sogoSvgText(450,1090+i*45,v,'summary'));
+ text+=sogoSvgText(640,1090,(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end');
+ text+=sogoSvgText(640,1135,(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end');
+ text+=sogoSvgText(640,1180,(people||'')+(people?' 人':''),'summary value','end');
+ ['現収','未収','合計'].forEach((v,i)=>text+=sogoSvgText(695,1090+i*45,v,'summary'));
+ text+=sogoSvgText(940,1090,(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end');
+ text+=sogoSvgText(940,1135,(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end');
+ text+=sogoSvgText(940,1180,(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end');
+
+ return '<svg class="sogo-svg sogo-front-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="相互個人タクシー協同組合 運転日報 表面" data-horizontal-lines="'+(hNo-1)+'" data-vertical-lines="'+(vNo-1)+'">'+
+  '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
+}
+function sogoBackTripSvg(r){
+ const W=1000,H=520,x=[50,95,160,335,510,555,600,715,830,950];
+ const lines=[]; let hNo=1,vNo=1;
+ const Hline=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('BH'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
+ const Vline=(xx,y1,y2,kind='normal')=>lines.push(sogoSvgLine('BV'+String(vNo++).padStart(2,'0'),xx,y1,xx,y2,kind));
+ Hline(30,50,950,'major'); Hline(55,510,600); Hline(80);
+ x.forEach((xx,i)=>Vline(xx,30,480,(i===0||i===x.length-1)?'major':'normal'));
+ for(let i=1;i<=10;i++) Hline(80+i*40,50,950,(i===5||i===10)?'major':'normal');
+ const trips=reportTripsForTemplate(r); let text='';
+ const heads=[[72.5,61,'回数'],[127.5,61,'人員'],[247.5,61,'乗車地'],[422.5,61,'降車地'],[555,48,'降車時刻'],[657.5,61,'現収'],[772.5,61,'未収'],[890,61,'備考']];
+ heads.forEach(a=>text+=sogoSvgText(a[0],a[1],a[2],'head'));
+ text+=sogoSvgText(532.5,74,'時','head small')+sogoSvgText(577.5,74,'分','head small');
+ for(let i=0;i<10;i++){
+  const n=21+i,trip=trips[n-1]||null,cy=106+i*40;
+  const hm=trip?reportTemplateHm(trip.dropoffTs):'',parts=hm?hm.split(':'):['',''];
+  const money=sogoCashColumns(trip),people=trip?(trip.passengers??(trip.demoData?1:'')):'';
+  const remarks=trip?(trip.remarks||trip.paymentMethod||''):'';
+  text+=sogoSvgText(72.5,cy,n,'body')+sogoSvgText(127.5,cy,people,'body');
+  text+=sogoSvgText(170,cy,trip?reportTemplatePlace(trip.pickup):'','body left','start');
+  text+=sogoSvgText(345,cy,trip?reportTemplatePlace(trip.dropoff):'','body left','start');
+  text+=sogoSvgText(532.5,cy,parts[0],'body')+sogoSvgText(577.5,cy,parts[1],'body');
+  text+=sogoSvgText(657.5,cy,money.cash,'body')+sogoSvgText(772.5,cy,money.receivable,'body');
+  text+=sogoSvgText(840,cy,remarks,'body left','start');
+ }
+ return '<svg class="sogo-svg sogo-back-trip-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="運転日報 裏面 21回から30回" data-horizontal-lines="'+(hNo-1)+'" data-vertical-lines="'+(vNo-1)+'"><rect width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
+}
 function sogoDailyReportHtml(r){
  if(!r) return '<div class="calendar-detail-empty">日報データがありません</div>';
  return '<div class="sogo-sheet">'+
-  '<div class="sogo-page">'+
-    sogoFrontHeader(r)+
-    '<table class="sogo-trip">'+sogoTripHeader()+'<tbody>'+sogoTripRows(r,1,20)+'</tbody></table>'+
-    sogoSummaryHtml(r)+
-  '</div>'+
-  '<div class="sogo-page sogo-page-back">'+
-    '<table class="sogo-trip">'+sogoTripHeader()+'<tbody>'+sogoTripRows(r,21,30)+'</tbody></table>'+
-    sogoInspectionHtml(r)+
-  '</div>'+
+  '<div class="sogo-page sogo-page-front">'+sogoFrontSvg(r)+'</div>'+
+  '<div class="sogo-page sogo-page-back">'+sogoBackTripSvg(r)+sogoInspectionHtml(r)+'</div>'+
  '</div>';
 }
 let monthlyReportDemoState=null;
