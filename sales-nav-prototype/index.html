@@ -1333,16 +1333,16 @@ html,body{
 .sogo-svg-line.major{stroke-width:2.5}
 .sogo-svg-line.time-divider{stroke-width:1.4;stroke-dasharray:3 3}
 .sogo-svg-text{fill:#111;dominant-baseline:middle;font-weight:400}
-.sogo-svg-text.title{font-size:34px;font-weight:700;letter-spacing:7px}
-.sogo-svg-text.org{font-size:16px;font-weight:700}
-.sogo-svg-text.org.small{font-size:12px;font-weight:400}
-.sogo-svg-text.top{font-size:14px}.sogo-svg-text.top.label{font-size:13px;font-weight:700}
-.sogo-svg-text.head{font-size:13px;font-weight:700}.sogo-svg-text.head.small{font-size:11px}
-.sogo-svg-text.body{font-size:15px}.sogo-svg-text.body.left{font-size:13px}
-.sogo-svg-text.body.money{font-size:14px;font-variant-numeric:tabular-nums}
-.sogo-svg-text.body.place{font-size:13px}
-.sogo-svg-text.body.remarks{font-size:12px}
-.sogo-svg-text.summary{font-size:13px;font-weight:700}.sogo-svg-text.summary.value{font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
+.sogo-svg-text.title{font-size:29px;font-weight:700;letter-spacing:6px}
+.sogo-svg-text.org{font-size:13px;font-weight:700}
+.sogo-svg-text.org.small{font-size:10px;font-weight:400}
+.sogo-svg-text.top{font-size:11.5px}.sogo-svg-text.top.label{font-size:10.5px;font-weight:700}
+.sogo-svg-text.head{font-size:10.5px;font-weight:700}.sogo-svg-text.head.small{font-size:9px}
+.sogo-svg-text.body{font-size:11.5px}.sogo-svg-text.body.left{font-size:10.5px}
+.sogo-svg-text.body.money{font-size:11px;font-variant-numeric:tabular-nums}
+.sogo-svg-text.body.place{font-size:10.5px}
+.sogo-svg-text.body.remarks{font-size:9.5px}
+.sogo-svg-text.summary{font-size:10.5px;font-weight:700}.sogo-svg-text.summary.value{font-size:10px;font-weight:400;font-variant-numeric:tabular-nums}
 .sogo-page-front{padding:0!important}
 .sogo-page-back{padding:0!important}
 .sogo-page-back .sogo-inspection-title,
@@ -1485,8 +1485,8 @@ html,body{
  color:#111;
 }
 .sogo-inspection-title strong{
- font-size:17px;
- letter-spacing:.26em;
+ font-size:15px;
+ letter-spacing:.24em;
  display:flex;
  align-items:center;
  justify-content:center;
@@ -1497,37 +1497,37 @@ html,body{
  display:flex;
  align-items:center;
  justify-content:center;
- font-size:8.5px;
+ font-size:7.6px;
  white-space:nowrap;
 }
 .sogo-inspection-title .sogo-inspector-name{
  justify-content:flex-start;
  padding-left:8px;
- font-size:9.5px;
+ font-size:8.4px;
 }
 .sogo-inspection th{
  height:20px;
  padding:2px!important;
- font-size:7px!important;
+ font-size:6.4px!important;
  line-height:1.05;
  text-align:center!important;
 }
 .sogo-inspection td{
  height:20px;
  padding:2px!important;
- font-size:7px!important;
+ font-size:6.4px!important;
  line-height:1.08;
  text-align:center!important;
 }
 .sogo-inspection .cat{
  writing-mode:vertical-rl;
  text-orientation:upright;
- font-size:6.8px!important;
+ font-size:6.2px!important;
  letter-spacing:.04em;
 }
-.sogo-inspection .point{text-align:center!important;font-size:6.6px!important;line-height:1.02!important}
-.sogo-inspection .detail{text-align:left!important;padding-left:3px!important;font-size:6.8px!important;line-height:1.04!important}
-.sogo-inspection .result{font-size:9px!important;font-family:sans-serif}
+.sogo-inspection .point{text-align:center!important;font-size:6.0px!important;line-height:1.02!important}
+.sogo-inspection .detail{text-align:left!important;padding-left:3px!important;font-size:6.2px!important;line-height:1.04!important}
+.sogo-inspection .result{font-size:8px!important;font-family:sans-serif}
 .sogo-inspection .note-cell{
  font-size:6.8px!important;
  line-height:1.3;
@@ -3109,20 +3109,23 @@ function sogoFrontSvg(r){
   const y=(box.y1+box.y2)/2;
   return sogoSvgText(x,y,raw,cls,anchor,'style="font-size:'+actual.toFixed(2)+'px"');
  };
- const verticalColumns=(box,leftText,rightText,cls='summary',fontSize=12)=>{
+ const verticalColumns=(box,leftText,rightText,cls='summary',fontSize=9)=>{
   const render=(value,x,withParens=false)=>{
    const chars=[...String(value||'')];
    if(!chars.length)return '';
-   const seq=withParens?['（',...chars,'）']:chars;
-   const step=(box.y2-box.y1)/(seq.length+1);
+   const seq=withParens?['(',...chars,')']:chars;
+   const top=box.y1+(withParens?3:12),bottom=box.y2-(withParens?3:12);
+   const step=(bottom-top)/(seq.length+1);
    return seq.map((ch,i)=>{
-    const y=box.y1+step*(i+1);
-    const rotate=(ch==='（'||ch==='）')?' transform="rotate(90 '+x+' '+y+')"':'';
-    return sogoSvgText(x,y,ch,cls,'middle','style="font-size:'+fontSize+'px"'+rotate);
+    const y=top+step*(i+1);
+    const isParen=(ch==='('||ch===')');
+    const rotate=isParen?' transform="rotate(90 '+x+' '+y+')"':'';
+    const fs=isParen?fontSize*.92:fontSize;
+    return sogoSvgText(x,y,ch,cls,'middle','style="font-size:'+fs.toFixed(2)+'px"'+rotate);
    }).join('');
   };
   const w=box.x2-box.x1;
-  return render(leftText,box.x1+w*.32,false)+render(rightText,box.x1+w*.70,true);
+  return render(leftText,box.x1+w*.30,false)+render(rightText,box.x1+w*.69,true);
  };
  const lines=[];
  const tracedH=[
@@ -3158,13 +3161,13 @@ function sogoFrontSvg(r){
  const trips=reportTripsForTemplate(r);
 
  let text='';
- text+=sogoSvgText(X(720),Y(182),'運 転 日 報','title');
- text+=sogoSvgText(X(1392),Y(150),'相互個人タクシー協同組合','org','end');
+ text+=sogoSvgText(X(720),Y(184),'運 転 日 報','title');
+ text+=sogoSvgText(X(1392),Y(151),'相互個人タクシー協同組合','org','end');
  text+=sogoSvgText(X(1392),Y(172),'事務所代表　253-2505','org small','end');
  text+=sogoSvgText(X(1392),Y(192),'253-2500','org small','end');
 
  const yDate=Y((230+287)/2),yReg=Y((287+342)/2),yHead=Y(356);
- text+=sogoSvgTextFit(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start',X(580-55),14,'',12);
+ text+=sogoSvgTextFit(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start',X(580-55),11.5,'',10);
  text+=sogoSvgText(X((595+724)/2),yDate,'出庫','top');
  text+=sogoSvgText(X(770),yDate,start[0]||'','top');
  text+=sogoSvgText(X(835),yDate,'時','top');
@@ -3177,9 +3180,9 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1380),yDate,'分','top');
 
  text+=sogoSvgText(X((38+166)/2),yReg,'登録番号','top label');
- text+=sogoSvgTextFit(X(184),yReg,reg,'top left','start',X(650-184),14);
+ text+=sogoSvgTextFit(X(184),yReg,reg,'top left','start',X(650-184),11.5,'',10);
  text+=sogoSvgText(X((666+848)/2),yReg,'氏名又は名称','top label');
- text+=sogoSvgTextFit(X(866),yReg,name,'top left','start',X(1390-866),14);
+ text+=sogoSvgTextFit(X(866),yReg,name,'top left','start',X(1390-866),11.5,'',10);
 
  const cols=[38,106,205,400,596,752,940,1128,1404];
  const centers=cols.slice(0,-1).map((v,i)=>(v+cols[i+1])/2);
@@ -3196,15 +3199,15 @@ function sogoFrontSvg(r){
   const money=sogoCashColumns(trip);
   const people=trip?(trip.passengers??(trip.demoData?1:'')):'';
   const remarks=trip?(trip.remarks||trip.paymentMethod||''):'';
-  text+=cellText(cellBox(38,rowBounds[i],106,rowBounds[i+1],3,2),n,'body','middle',15,12);
-  text+=cellText(cellBox(106,rowBounds[i],205,rowBounds[i+1],3,2),people,'body','middle',15,12);
-  text+=cellText(cellBox(205,rowBounds[i],400,rowBounds[i+1],8,2),trip?reportTemplatePlace(trip.pickup):'','body place','start',13,10.5);
-  text+=cellText(cellBox(400,rowBounds[i],596,rowBounds[i+1],8,2),trip?reportTemplatePlace(trip.dropoff):'','body place','start',13,10.5);
-  text+=cellText(cellBox(596,rowBounds[i],674,rowBounds[i+1],2,2),parts[0],'body','middle',15,12);
-  text+=cellText(cellBox(674,rowBounds[i],752,rowBounds[i+1],2,2),parts[1],'body','middle',15,12);
-  text+=cellText(cellBox(752,rowBounds[i],940,rowBounds[i+1],5,2),money.cash,'body money','middle',14,10.5);
-  text+=cellText(cellBox(940,rowBounds[i],1128,rowBounds[i+1],5,2),money.receivable,'body money','middle',14,10.5);
-  text+=cellText(cellBox(1128,rowBounds[i],1404,rowBounds[i+1],8,2),remarks,'body remarks','start',12,9.5);
+  text+=cellText(cellBox(38,rowBounds[i],106,rowBounds[i+1],3,2),n,'body','middle',11.5,10);
+  text+=cellText(cellBox(106,rowBounds[i],205,rowBounds[i+1],3,2),people,'body','middle',11.5,10);
+  text+=cellText(cellBox(205,rowBounds[i],400,rowBounds[i+1],7,2),trip?reportTemplatePlace(trip.pickup):'','body place','start',10.5,9);
+  text+=cellText(cellBox(400,rowBounds[i],596,rowBounds[i+1],7,2),trip?reportTemplatePlace(trip.dropoff):'','body place','start',10.5,9);
+  text+=cellText(cellBox(596,rowBounds[i],674,rowBounds[i+1],2,2),parts[0],'body','middle',11.5,10);
+  text+=cellText(cellBox(674,rowBounds[i],752,rowBounds[i+1],2,2),parts[1],'body','middle',11.5,10);
+  text+=cellText(cellBox(752,rowBounds[i],940,rowBounds[i+1],5,2),money.cash,'body money','middle',11,9.5);
+  text+=cellText(cellBox(940,rowBounds[i],1128,rowBounds[i+1],5,2),money.receivable,'body money','middle',11,9.5);
+  text+=cellText(cellBox(1128,rowBounds[i],1404,rowBounds[i+1],7,2),remarks,'body remarks','start',9.5,8.5);
  }
 
  const km=reportTravelKm(r);
@@ -3215,25 +3218,25 @@ function sogoFrontSvg(r){
  const sumY=[Y((1707+1775)/2),Y((1775+1842)/2),Y((1842+1910)/2)];
 
  const runBox=cellBox(38,1707,142,1910,0,0);
- text+=verticalColumns(runBox,'走行粁','走行メーター粁数','summary',11.5);
- text+=cellText(cellBox(142,1707,270,1775,4,2),'入庫','summary','middle',13,11);
- text+=cellText(cellBox(142,1775,270,1842,4,2),'出庫','summary','middle',13,11);
- text+=cellText(cellBox(142,1842,270,1910,4,2),'差引','summary','middle',13,11);
- text+=cellText(cellBox(270,1707,556,1775,8,2),(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end',12,10);
- text+=cellText(cellBox(270,1775,556,1842,8,2),(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end',12,10);
- text+=cellText(cellBox(270,1842,556,1910,8,2),(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end',12,10);
- text+=cellText(cellBox(556,1707,704,1775,4,2),'乗車粁','summary','middle',13,10.5);
- text+=cellText(cellBox(556,1775,704,1842,4,2),'運送回数','summary','middle',13,10.5);
- text+=cellText(cellBox(556,1842,704,1910,4,2),'輸送人員','summary','middle',13,10.5);
- text+=cellText(cellBox(704,1707,992,1775,8,2),(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end',12,10);
- text+=cellText(cellBox(704,1775,992,1842,8,2),(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end',12,10);
- text+=cellText(cellBox(704,1842,992,1910,8,2),(people||'')+(people?' 人':''),'summary value','end',12,10);
- text+=cellText(cellBox(992,1707,1114,1775,4,2),'現収','summary','middle',13,11);
- text+=cellText(cellBox(992,1775,1114,1842,4,2),'未収','summary','middle',13,11);
- text+=cellText(cellBox(992,1842,1114,1910,4,2),'合計','summary','middle',13,11);
- text+=cellText(cellBox(1114,1707,1404,1775,8,2),(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end',12,10);
- text+=cellText(cellBox(1114,1775,1404,1842,8,2),(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end',12,10);
- text+=cellText(cellBox(1114,1842,1404,1910,8,2),(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end',12,10);
+ text+=verticalColumns(runBox,'走行粁','走行メーター粁数','summary',8.8);
+ text+=cellText(cellBox(142,1707,270,1775,4,2),'入庫','summary','middle',10.5,9.5);
+ text+=cellText(cellBox(142,1775,270,1842,4,2),'出庫','summary','middle',10.5,9.5);
+ text+=cellText(cellBox(142,1842,270,1910,4,2),'差引','summary','middle',10.5,9.5);
+ text+=cellText(cellBox(270,1707,556,1775,8,2),(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end',10,9);
+ text+=cellText(cellBox(270,1775,556,1842,8,2),(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end',10,9);
+ text+=cellText(cellBox(270,1842,556,1910,8,2),(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end',10,9);
+ text+=cellText(cellBox(556,1707,704,1775,4,2),'乗車粁','summary','middle',10.5,9);
+ text+=cellText(cellBox(556,1775,704,1842,4,2),'運送回数','summary','middle',10.5,9);
+ text+=cellText(cellBox(556,1842,704,1910,4,2),'輸送人員','summary','middle',10.5,9);
+ text+=cellText(cellBox(704,1707,992,1775,8,2),(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end',10,9);
+ text+=cellText(cellBox(704,1775,992,1842,8,2),(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end',10,9);
+ text+=cellText(cellBox(704,1842,992,1910,8,2),(people||'')+(people?' 人':''),'summary value','end',10,9);
+ text+=cellText(cellBox(992,1707,1114,1775,4,2),'現収','summary','middle',10.5,9.5);
+ text+=cellText(cellBox(992,1775,1114,1842,4,2),'未収','summary','middle',10.5,9.5);
+ text+=cellText(cellBox(992,1842,1114,1910,4,2),'合計','summary','middle',10.5,9.5);
+ text+=cellText(cellBox(1114,1707,1404,1775,8,2),(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end',10,9);
+ text+=cellText(cellBox(1114,1775,1404,1842,8,2),(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end',10,9);
+ text+=cellText(cellBox(1114,1842,1404,1910,8,2),(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end',10,9);
  const restBox=cellBox(38,1910,1404,2011,0,0);
  const restY=(restBox.y1+restBox.y2)/2;
  text+=sogoSvgText(X(70),restY,'休憩','summary','start');
