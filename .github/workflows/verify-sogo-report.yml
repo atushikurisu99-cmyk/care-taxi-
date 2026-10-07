@@ -14,6 +14,7 @@ on:
 jobs:
   verify-sogo:
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -24,41 +25,46 @@ jobs:
           npm init -y >/dev/null 2>&1
           npm install --silent playwright
           npx playwright install --with-deps webkit
-      - name: Verify Sogo report ledger on production
+      - name: Start local sales-nav
+        run: |
+          python3 -m http.server 4173 --directory sales-nav-prototype >/tmp/sogo-http.log 2>&1 &
+          echo $! >/tmp/sogo-http.pid
+          for i in 1 2 3 4 5; do
+            curl -fsS http://127.0.0.1:4173/ >/dev/null && exit 0
+            sleep 1
+          done
+          cat /tmp/sogo-http.log
+          exit 1
+      - name: Verify Sogo report ledger locally
         run: |
           node - <<'NODE'
           (async()=>{
             const { webkit } = require('playwright');
-            const target='https://b872e3c9.taxi-sales-nav.pages.dev/';
+            const target='http://127.0.0.1:4173/';
             const browser=await webkit.launch({headless:true});
             const context=await browser.newContext({
               viewport:{width:393,height:852},isMobile:true,hasTouch:true,deviceScaleFactor:3,
               userAgent:'Mozilla/5.0 (iPhone; CPU iPhone OS 18_0 like Mac OS X) AppleWebKit/605.1.15 Version/18.0 Mobile/15E148 Safari/604.1'
             });
             const page=await context.newPage();
-            let ready=false;
-            for(let attempt=1;attempt<=8;attempt++){
-              await page.goto(target+'?sogo_verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:30000});
-              await page.waitForTimeout(2000);
-              await page.evaluate(()=>{
-                document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
-                const m=document.getElementById('monthlyReport'); if(m)m.classList.add('active');
-                if(typeof renderMonthlyReportCenter==='function') renderMonthlyReportCenter();
-                if(typeof seedDemoOperationData==='function') seedDemoOperationData();
-                if(typeof renderMonthlyReportPreview==='function') renderMonthlyReportPreview(true);
-              });
-              await page.waitForTimeout(250);
-              ready=(await page.locator('#monthlyReportPreview .sogo-front-svg').count())===1 &&
-                    (await page.locator('#monthlyReportPreview .sogo-back-trip-svg').count())===1;
-              if(ready) break;
-              await page.waitForTimeout(8000);
-            }
+            await page.goto(target+'?sogo_verify='+Date.now(),{waitUntil:'domcontentloaded',timeout:15000});
+            await page.waitForTimeout(350);
+            await page.evaluate(()=>{
+              document.querySelectorAll('.screen').forEach(x=>x.classList.remove('active'));
+              const m=document.getElementById('monthlyReport'); if(m)m.classList.add('active');
+              if(typeof renderMonthlyReportCenter==='function') renderMonthlyReportCenter();
+              if(typeof seedDemoOperationData==='function') seedDemoOperationData();
+              if(typeof renderMonthlyReportPreview==='function') renderMonthlyReportPreview(true);
+            });
+            await page.waitForTimeout(120);
+            const ready=(await page.locator('#monthlyReportPreview .sogo-front-svg').count())===1 &&
+                        (await page.locator('#monthlyReportPreview .sogo-back-trip-svg').count())===1;
 
             const preview=page.locator('#monthlyReportPreview');
             if(await preview.count()!==1) throw new Error('monthly preview missing');
             const front=page.locator('#monthlyReportPreview .sogo-front-svg');
             const back=page.locator('#monthlyReportPreview .sogo-back-trip-svg');
-            if(!ready) throw new Error('traced SVG pages missing after production deploy wait');
+            if(!ready) throw new Error('traced SVG pages missing in local render');
 
             const ledger=await front.evaluate(el=>({
               h:Number(el.getAttribute('data-horizontal-lines')||0),
@@ -94,6 +100,8 @@ jobs:
 
             const box=await front.boundingBox();
             if(!box||box.width<500||box.height<700) throw new Error('front SVG geometry too small '+JSON.stringify(box));
+            await page.locator('#monthlyReportPreview .sogo-page-front').screenshot({path:'/tmp/sogo-front-full.png'});
+            await page.locator('#monthlyReportPreview .sogo-page-back').screenshot({path:'/tmp/sogo-back-full.png'});
             await page.screenshot({path:'/tmp/sogo-report-production.png',fullPage:false});
             console.log('SOGO_REPORT_OK',JSON.stringify({front:{h:ledger.h,v:ledger.v},back:{h:backLedger.h,v:backLedger.v},box}));
             await browser.close();
@@ -103,6 +111,9 @@ jobs:
         if: always()
         with:
           name: sogo-report-snapshot
-          path: /tmp/sogo-report-production.png
+          path: |
+            /tmp/sogo-report-production.png
+            /tmp/sogo-front-full.png
+            /tmp/sogo-back-full.png
           if-no-files-found: ignore
           retention-days: 1
