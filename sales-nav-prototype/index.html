@@ -3158,8 +3158,29 @@ function sogoFrontSvg(r){
  const receivable=Math.max(0,sales-cash);
  const people=trips.reduce((s,z)=>s+(Number(z?.passengers)||1),0);
 
- // 罫線はPNGトレースを固定背景として使用する。モバイルでもセル幅解釈に依存しない。
- const frontTemplateImage='./assets/sogo-front-lines.png';
+ // 元PNGを実測して抽出した罫線をSVGへ直接描画する。外部画像読込に依存しない。
+ const sourceW=1447,sourceH=2048,sx=W/sourceW,sy=H/sourceH;
+ const tracedH=[
+  [241,488,940],[269,48,1393],[321,48,1393],[373,48,1393],[401,595,754],
+  [425,48,1393],[472,48,1393],[519,48,1393],[566,48,1393],[613,48,1393],
+  [660,48,1393],[707,48,1393],[754,48,1393],[801,48,1393],[847,48,1393],
+  [895,48,1393],[941,48,1393],[988,48,1393],[1035,48,1393],[1082,48,1393],
+  [1129,48,1393],[1176,48,1393],[1223,48,1393],[1269,48,1393],[1317,48,1393],
+  [1363,48,1393],[1411,48,1393],[1457,48,1393],[1504,48,1393],[1551,48,1393],
+  [1598,48,1393],[1645,48,1393],[1692,48,1393],[1739,48,1393],[1805,48,1393],
+  [1870,48,1393],[1936,48,1393],[2002,48,1393]
+ ];
+ const tracedV=[
+  [49,267,2004],[116,372,1741],[162,1738,1938],[174,320,375],[213,372,1741],
+  [293,1738,1938],[405,372,1741],[566,1738,1938],[594,268,323],[594,372,1741],
+  [665,320,375],[691,1738,1938],[720,268,323],[752,372,1741],[845,320,375],
+  [937,372,1741],[963,1738,1938],[992,268,323],[1095,1738,1938],[1116,268,323],
+  [1125,372,1741],[1391,267,2004]
+ ];
+ lines.length=0;
+ tracedH.forEach((a,i)=>lines.push(sogoSvgLine('H'+String(i+1).padStart(2,'0'),a[1]*sx,a[0]*sy,a[2]*sx,a[0]*sy,'traced')));
+ tracedV.forEach((a,i)=>lines.push(sogoSvgLine('V'+String(i+1).padStart(2,'0'),a[0]*sx,a[1]*sy,a[0]*sx,a[2]*sy,'traced')));
+
  text+=sogoSvgText(70,1130,'走行粁','summary v','middle','transform="rotate(-90 70 1130)"');
  ['入庫','出庫','差引'].forEach((v,i)=>text+=sogoSvgText(125,1090+i*45,v,'summary'));
  text+=sogoSvgText(390,1090,(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end');
@@ -3174,9 +3195,8 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(940,1135,(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end');
  text+=sogoSvgText(940,1180,(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end');
 
- return '<svg class="sogo-svg sogo-front-svg sogo-front-image-template" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="相互個人タクシー協同組合 運転日報 表面" data-template-mode="fixed-image">'+
-  '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+
-  '<image class="sogo-front-template-image" href="'+frontTemplateImage+'" x="0" y="0" width="'+W+'" height="'+H+'" preserveAspectRatio="none"/>'+text+'</svg>';
+ return '<svg class="sogo-svg sogo-front-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="相互個人タクシー協同組合 運転日報 表面" data-template-mode="inline-trace" data-horizontal-lines="'+tracedH.length+'" data-vertical-lines="'+tracedV.length+'">'+
+  '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
 }
 function sogoBackTripSvg(r){
  const W=1000,H=520,x=[50,100.6,168.7,301.8,429.8,475.2,525.8,649.7,773.5,950];
