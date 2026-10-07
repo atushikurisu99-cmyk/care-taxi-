@@ -1333,16 +1333,16 @@ html,body{
 .sogo-svg-line.major{stroke-width:2.5}
 .sogo-svg-line.time-divider{stroke-width:1.4;stroke-dasharray:3 3}
 .sogo-svg-text{fill:#111;dominant-baseline:middle;font-weight:400}
-.sogo-svg-text.title{font-size:36px;font-weight:700;letter-spacing:8px}
-.sogo-svg-text.org{font-size:17px;font-weight:700}
-.sogo-svg-text.org.small{font-size:13px;font-weight:400}
-.sogo-svg-text.top{font-size:15px}.sogo-svg-text.top.label{font-size:14px;font-weight:700}
-.sogo-svg-text.head{font-size:14px;font-weight:700}.sogo-svg-text.head.small{font-size:12px}
-.sogo-svg-text.body{font-size:16px}.sogo-svg-text.body.left{font-size:14px}
-.sogo-svg-text.body.money{font-size:15px;font-variant-numeric:tabular-nums}
-.sogo-svg-text.body.place{font-size:14px}
-.sogo-svg-text.body.remarks{font-size:13px}
-.sogo-svg-text.summary{font-size:14px;font-weight:700}.sogo-svg-text.summary.value{font-size:13px;font-weight:400;font-variant-numeric:tabular-nums}
+.sogo-svg-text.title{font-size:34px;font-weight:700;letter-spacing:7px}
+.sogo-svg-text.org{font-size:16px;font-weight:700}
+.sogo-svg-text.org.small{font-size:12px;font-weight:400}
+.sogo-svg-text.top{font-size:14px}.sogo-svg-text.top.label{font-size:13px;font-weight:700}
+.sogo-svg-text.head{font-size:13px;font-weight:700}.sogo-svg-text.head.small{font-size:11px}
+.sogo-svg-text.body{font-size:15px}.sogo-svg-text.body.left{font-size:13px}
+.sogo-svg-text.body.money{font-size:14px;font-variant-numeric:tabular-nums}
+.sogo-svg-text.body.place{font-size:13px}
+.sogo-svg-text.body.remarks{font-size:12px}
+.sogo-svg-text.summary{font-size:13px;font-weight:700}.sogo-svg-text.summary.value{font-size:12px;font-weight:400;font-variant-numeric:tabular-nums}
 .sogo-page-front{padding:0!important}
 .sogo-page-back{padding:0!important}
 .sogo-page-back .sogo-inspection-title,
@@ -1485,8 +1485,8 @@ html,body{
  color:#111;
 }
 .sogo-inspection-title strong{
- font-size:19px;
- letter-spacing:.34em;
+ font-size:17px;
+ letter-spacing:.26em;
  display:flex;
  align-items:center;
  justify-content:center;
@@ -1497,37 +1497,37 @@ html,body{
  display:flex;
  align-items:center;
  justify-content:center;
- font-size:9px;
+ font-size:8.5px;
  white-space:nowrap;
 }
 .sogo-inspection-title .sogo-inspector-name{
  justify-content:flex-start;
  padding-left:8px;
- font-size:10px;
+ font-size:9.5px;
 }
 .sogo-inspection th{
  height:20px;
  padding:2px!important;
- font-size:7.2px!important;
+ font-size:7px!important;
  line-height:1.05;
  text-align:center!important;
 }
 .sogo-inspection td{
  height:20px;
  padding:2px!important;
- font-size:7.3px!important;
+ font-size:7px!important;
  line-height:1.08;
  text-align:center!important;
 }
 .sogo-inspection .cat{
  writing-mode:vertical-rl;
  text-orientation:upright;
- font-size:7px!important;
- letter-spacing:.05em;
+ font-size:6.8px!important;
+ letter-spacing:.04em;
 }
-.sogo-inspection .point{text-align:center!important;font-size:6.8px!important;line-height:1.02!important}
-.sogo-inspection .detail{text-align:left!important;padding-left:3px!important;font-size:7px!important;line-height:1.04!important}
-.sogo-inspection .result{font-size:10px!important;font-family:sans-serif}
+.sogo-inspection .point{text-align:center!important;font-size:6.6px!important;line-height:1.02!important}
+.sogo-inspection .detail{text-align:left!important;padding-left:3px!important;font-size:6.8px!important;line-height:1.04!important}
+.sogo-inspection .result{font-size:9px!important;font-family:sans-serif}
 .sogo-inspection .note-cell{
  font-size:6.8px!important;
  line-height:1.3;
@@ -3135,7 +3135,7 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1392),Y(192),'253-2500','org small','end');
 
  const yDate=Y((230+287)/2),yReg=Y((287+342)/2),yHead=Y(356);
- text+=sogoSvgTextFit(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start',X(580-55),15,'',12);
+ text+=sogoSvgTextFit(X(55),yDate,(yy?yy+' 年 '+mm+' 月 '+dd+' 日 '+wd+' 曜日':''),'top left','start',X(580-55),14,'',12);
  text+=sogoSvgText(X((595+724)/2),yDate,'出庫','top');
  text+=sogoSvgText(X(770),yDate,start[0]||'','top');
  text+=sogoSvgText(X(835),yDate,'時','top');
@@ -3148,9 +3148,9 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1380),yDate,'分','top');
 
  text+=sogoSvgText(X((38+166)/2),yReg,'登録番号','top label');
- text+=sogoSvgTextFit(X(184),yReg,reg,'top left','start',X(650-184),15);
+ text+=sogoSvgTextFit(X(184),yReg,reg,'top left','start',X(650-184),14);
  text+=sogoSvgText(X((666+848)/2),yReg,'氏名又は名称','top label');
- text+=sogoSvgTextFit(X(866),yReg,name,'top left','start',X(1390-866),15);
+ text+=sogoSvgTextFit(X(866),yReg,name,'top left','start',X(1390-866),14);
 
  const cols=[38,106,205,400,596,752,940,1128,1404];
  const centers=cols.slice(0,-1).map((v,i)=>(v+cols[i+1])/2);
@@ -3169,13 +3169,13 @@ function sogoFrontSvg(r){
   const remarks=trip?(trip.remarks||trip.paymentMethod||''):'';
   text+=sogoSvgText(X(centers[0]),cy,n,'body');
   text+=sogoSvgText(X(centers[1]),cy,people,'body');
-  text+=sogoSvgTextFit(X(218),cy,trip?reportTemplatePlace(trip.pickup):'','body place','start',X(392-218),14);
-  text+=sogoSvgTextFit(X(413),cy,trip?reportTemplatePlace(trip.dropoff):'','body place','start',X(588-413),14);
+  text+=sogoSvgTextFit(X(218),cy,trip?reportTemplatePlace(trip.pickup):'','body place','start',X(392-218),13);
+  text+=sogoSvgTextFit(X(413),cy,trip?reportTemplatePlace(trip.dropoff):'','body place','start',X(588-413),13);
   text+=sogoSvgText(X(635),cy,parts[0],'body');
   text+=sogoSvgText(X(713),cy,parts[1],'body');
-  text+=sogoSvgTextFit(X(centers[5]),cy,money.cash,'body money','middle',X(940-752)-10,15);
-  text+=sogoSvgTextFit(X(centers[6]),cy,money.receivable,'body money','middle',X(1128-940)-10,15);
-  text+=sogoSvgTextFit(X(1142),cy,remarks,'body remarks','start',X(1394-1142),13);
+  text+=sogoSvgTextFit(X(centers[5]),cy,money.cash,'body money','middle',X(940-752)-10,14);
+  text+=sogoSvgTextFit(X(centers[6]),cy,money.receivable,'body money','middle',X(1128-940)-10,14);
+  text+=sogoSvgTextFit(X(1142),cy,remarks,'body remarks','start',X(1394-1142),12);
  }
 
  const km=reportTravelKm(r);
@@ -3187,17 +3187,17 @@ function sogoFrontSvg(r){
 
  text+=sogoSvgText(X(82),Y((1707+1910)/2),'走行粁','summary v','middle','transform="rotate(-90 '+X(82)+' '+Y((1707+1910)/2)+')"');
  ['入庫','出庫','差引'].forEach((v,i)=>text+=sogoSvgText(X((141+270)/2),sumY[i],v,'summary'));
- text+=sogoSvgTextFit(X(545),sumY[0],(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end',X(545-280),13,'',11);
- text+=sogoSvgTextFit(X(545),sumY[1],(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end',X(545-280),13,'',11);
- text+=sogoSvgTextFit(X(545),sumY[2],(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end',X(545-280),13,'',11);
+ text+=sogoSvgTextFit(X(545),sumY[0],(r?.odometerEnd??'')+(r?.odometerEnd!==''?' キロ':''),'summary value','end',X(545-280),12,'',10.5);
+ text+=sogoSvgTextFit(X(545),sumY[1],(r?.odometerStart??'')+(r?.odometerStart!==''?' キロ':''),'summary value','end',X(545-280),12,'',10.5);
+ text+=sogoSvgTextFit(X(545),sumY[2],(km??'')+(km!==null&&km!==''?' キロ':''),'summary value','end',X(545-280),12,'',10.5);
  ['乗車粁','運送回数','輸送人員'].forEach((v,i)=>text+=sogoSvgText(X((556+704)/2),sumY[i],v,'summary'));
- text+=sogoSvgTextFit(X(980),sumY[0],(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end',X(980-715),13,'',11);
- text+=sogoSvgTextFit(X(980),sumY[1],(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end',X(980-715),13,'',11);
- text+=sogoSvgTextFit(X(980),sumY[2],(people||'')+(people?' 人':''),'summary value','end',X(980-715),13,'',11);
+ text+=sogoSvgTextFit(X(980),sumY[0],(r?.occupiedKm??'')+(r?.occupiedKm!==''?' キロ':''),'summary value','end',X(980-715),12,'',10.5);
+ text+=sogoSvgTextFit(X(980),sumY[1],(r?.trips||trips.length||'')+((r?.trips||trips.length)?' 回':''),'summary value','end',X(980-715),12,'',10.5);
+ text+=sogoSvgTextFit(X(980),sumY[2],(people||'')+(people?' 人':''),'summary value','end',X(980-715),12,'',10.5);
  ['現収','未収','合計'].forEach((v,i)=>text+=sogoSvgText(X((991+1114)/2),sumY[i],v,'summary'));
- text+=sogoSvgTextFit(X(1390),sumY[0],(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end',X(1390-1125),13,'',11);
- text+=sogoSvgTextFit(X(1390),sumY[1],(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end',X(1390-1125),13,'',11);
- text+=sogoSvgTextFit(X(1390),sumY[2],(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end',X(1390-1125),13,'',11);
+ text+=sogoSvgTextFit(X(1390),sumY[0],(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end',X(1390-1125),12,'',10.5);
+ text+=sogoSvgTextFit(X(1390),sumY[1],(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end',X(1390-1125),12,'',10.5);
+ text+=sogoSvgTextFit(X(1390),sumY[2],(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end',X(1390-1125),12,'',10.5);
  text+=sogoSvgText(X(70),Y((1910+2011)/2),'休憩','summary','start');
  text+=sogoSvgText(X(150),Y((1910+2011)/2),'：','summary');
  text+=sogoSvgText(X(245),Y((1910+2011)/2),'～','summary');
