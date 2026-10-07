@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-DAILY-DRILLDOWN-V1 -->
+<!-- BUILD:2026-10-08-ANALYSIS-DEMO-LARGE-V2 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -258,38 +258,38 @@ main{position:relative;min-height:0;overflow:hidden}
  radial-gradient(circle at 49% 55%,rgba(255,196,0,.75),transparent 12%),
  radial-gradient(circle at 30% 62%,rgba(40,160,255,.7),transparent 15%),
  linear-gradient(135deg,#163044,#101b24)}
-#analysis .content{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:8px}
-.analysis-compact-card{padding:11px 12px}
-.analysis-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:8px}
-.analysis-section-head strong{font-size:16px}
-.analysis-section-head span{font-size:11px;color:var(--muted)}
-.analysis-daily-bars{height:126px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:5px;align-items:end;padding:4px 1px 0}
-.analysis-day-col{height:100%;border:0;background:transparent;color:#aebdca;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px;min-width:0}
-.analysis-day-bar-wrap{height:90px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:8px;background:#0a141d;border:1px solid #1d2b36;padding:2px}
-.analysis-day-bar{width:72%;min-height:3px;border-radius:5px 5px 3px 3px;background:#2f86ff}
+#analysis .content{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-bottom:10px;gap:12px}
+.analysis-compact-card,.analysis-trend-card{padding:15px 15px}
+.analysis-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:12px}
+.analysis-section-head strong{font-size:20px;line-height:1.1}
+.analysis-section-head span{font-size:12px;color:var(--muted);font-weight:800}
+.analysis-daily-bars{height:220px;display:grid;grid-template-columns:repeat(10,minmax(0,1fr));gap:6px;align-items:end;padding:8px 2px 0}
+.analysis-day-col{height:100%;border:0;background:transparent;color:#aebdca;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:6px;min-width:0}
+.analysis-day-bar-wrap{height:156px;width:100%;display:flex;align-items:flex-end;justify-content:center;border-radius:9px;background:#0a141d;border:1px solid #1d2b36;padding:3px}
+.analysis-day-bar{width:76%;min-height:5px;border-radius:6px 6px 3px 3px;background:#2f86ff}
 .analysis-day-col.selected .analysis-day-bar-wrap{border-color:#66a8ff;box-shadow:0 0 0 1px rgba(102,168,255,.2)}
 .analysis-day-col.selected .analysis-day-bar{background:#66a8ff}
-.analysis-day-label{font-size:10px;font-weight:850;line-height:1;white-space:nowrap}
-.analysis-day-sales{font-size:9px;color:#7f92a0;line-height:1;white-space:nowrap}
-.analysis-trend-card{padding:11px 12px}
-.analysis-row-chart{display:flex;flex-direction:column;gap:7px}
-.analysis-row-item{display:grid;grid-template-columns:56px minmax(0,1fr) 74px;gap:8px;align-items:center;min-height:27px}
-.analysis-row-label{font-size:12px;color:#b7c4cd;font-weight:850}
-.analysis-row-track{height:10px;border-radius:999px;background:#09131c;border:1px solid #1d2a34;overflow:hidden}
-.analysis-row-fill{height:100%;min-width:2px;border-radius:999px;background:#49a775}
-.analysis-row-value{text-align:right;font-size:11px;color:#cbd6de;font-weight:800;white-space:nowrap}
-.analysis-factor-card{display:none;padding:11px 12px;border-color:#31526d}
+.analysis-day-label{font-size:12px;font-weight:900;line-height:1;white-space:nowrap}
+.analysis-day-sales{font-size:11px;color:#8fa0ad;line-height:1;font-weight:850;white-space:nowrap}
+.analysis-row-chart{display:flex;flex-direction:column;gap:12px}
+.analysis-row-item{display:grid;grid-template-columns:66px minmax(0,1fr) 90px;gap:10px;align-items:center;min-height:38px}
+.analysis-row-label{font-size:16px;color:#c2ced7;font-weight:900}
+.analysis-row-track{height:15px;border-radius:999px;background:#09131c;border:1px solid #243541;overflow:hidden}
+.analysis-row-fill{height:100%;min-width:3px;border-radius:999px;background:#49a775}
+.analysis-row-value{text-align:right;font-size:14px;color:#d5dfe6;font-weight:900;white-space:nowrap}
+.analysis-factor-card{display:none;padding:15px 15px;border-color:#31526d}
 .analysis-factor-card.show{display:block}
-.analysis-factor-summary{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin:8px 0 10px}
-.analysis-factor-stat{background:#0a141d;border:1px solid #21313d;border-radius:10px;padding:8px 5px;text-align:center;min-width:0}
-.analysis-factor-stat span{display:block;font-size:9px;color:#8294a1;white-space:nowrap}
-.analysis-factor-stat strong{display:block;font-size:13px;color:#fff;margin-top:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.analysis-factor-list{display:flex;flex-direction:column;gap:6px}
-.analysis-factor-row{display:grid;grid-template-columns:68px minmax(0,1fr);gap:8px;padding:7px 0;border-top:1px solid #1e2d38}
+.analysis-factor-summary{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0 12px}
+.analysis-factor-stat{background:#0a141d;border:1px solid #21313d;border-radius:12px;padding:10px 8px;text-align:left;min-width:0}
+.analysis-factor-stat span{display:block;font-size:11px;color:#8294a1;white-space:nowrap}
+.analysis-factor-stat strong{display:block;font-size:18px;color:#fff;margin-top:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.analysis-factor-list{display:flex;flex-direction:column;gap:0}
+.analysis-factor-row{display:grid;grid-template-columns:76px minmax(0,1fr);gap:10px;padding:10px 0;border-top:1px solid #1e2d38}
 .analysis-factor-row:first-child{border-top:0}
-.analysis-factor-key{font-size:11px;color:#88a0b0;font-weight:850}
-.analysis-factor-value{font-size:12px;color:#e1e8ed;font-weight:750;line-height:1.4}
-.analysis-empty{padding:18px 6px;text-align:center;color:var(--muted);font-size:12px}
+.analysis-factor-key{font-size:13px;color:#8da3b3;font-weight:900}
+.analysis-factor-value{font-size:14px;color:#e5ebef;font-weight:800;line-height:1.45}
+.analysis-empty{padding:24px 6px;text-align:center;color:var(--muted);font-size:14px}
+.analysis-demo-note{display:inline-flex;align-items:center;border:1px solid #3b5366;border-radius:999px;padding:3px 8px;font-size:10px!important;color:#a9bdcb!important;background:#101c26}
 
 .menuitem{padding:14px 0;border-bottom:1px solid #22313d;font-size:16px;font-weight:700;display:flex;align-items:center;gap:12px}
 .menu-icon{width:26px;height:26px;display:inline-flex;align-items:center;justify-content:center;flex:0 0 26px;color:#a8b7c2}
@@ -2171,7 +2171,7 @@ html,body{
   <div class="card analysis-compact-card">
    <div class="analysis-section-head">
     <strong>日別売上</strong>
-    <span>直近10乗務・タップで詳細</span>
+    <span id="analysisDemoBadge" class="analysis-demo-note" style="display:none">デモ表示</span>
    </div>
    <div id="analysisDailyBars" class="analysis-daily-bars"></div>
   </div>
@@ -3769,6 +3769,30 @@ function completedDutyDaysThisMonth(){
 }
 let analysisSelectedDateKey='';
 
+const ANALYSIS_DEMO_ROWS=[
+ {dateKey:'2026-09-29',sales:16180,trips:10,startTime:'17:50',endTime:'01:40',avg:1618,high:4620,low:700,weather:'晴れ',jr:'なし',event:'なし',reservation:'なし',out:'なし',note:'夕方から安定'},
+ {dateKey:'2026-09-30',sales:21910,trips:14,startTime:'18:05',endTime:'02:10',avg:1565,high:5480,low:700,weather:'曇り',jr:'5分遅れ',event:'なし',reservation:'1件',out:'なし',note:'駅周辺が強かった'},
+ {dateKey:'2026-10-01',sales:28730,trips:16,startTime:'17:40',endTime:'02:35',avg:1796,high:8420,low:670,weather:'小雨',jr:'山陽本線 遅延あり',event:'ライブ終演あり',reservation:'1件',out:'岩国方面 1件',note:'終電後の動きが強かった'},
+ {dateKey:'2026-10-02',sales:20270,trips:13,startTime:'18:10',endTime:'01:55',avg:1559,high:5310,low:700,weather:'晴れ',jr:'なし',event:'なし',reservation:'なし',out:'なし',note:'通常営業'},
+ {dateKey:'2026-10-03',sales:19450,trips:12,startTime:'18:00',endTime:'01:30',avg:1621,high:4760,low:690,weather:'曇り',jr:'なし',event:'スポーツあり',reservation:'なし',out:'なし',note:'試合後に短距離が増えた'},
+ {dateKey:'2026-10-04',sales:24360,trips:15,startTime:'17:35',endTime:'02:20',avg:1624,high:6230,low:700,weather:'雨',jr:'10分遅れ',event:'ライブあり',reservation:'2件',out:'なし',note:'雨と予約で伸びた'},
+ {dateKey:'2026-10-05',sales:22840,trips:14,startTime:'18:15',endTime:'02:05',avg:1631,high:5980,low:680,weather:'晴れ',jr:'なし',event:'なし',reservation:'なし',out:'なし',note:'20〜24時が強かった'},
+ {dateKey:'2026-10-06',sales:18620,trips:11,startTime:'18:25',endTime:'01:15',avg:1693,high:5120,low:700,weather:'晴れ',jr:'なし',event:'なし',reservation:'なし',out:'なし',note:'早めに帰庫'},
+ {dateKey:'2026-10-07',sales:20780,trips:13,startTime:'17:55',endTime:'01:50',avg:1598,high:4890,low:670,weather:'曇り',jr:'5分遅れ',event:'なし',reservation:'なし',out:'なし',note:'駅前中心'},
+ {dateKey:'2026-10-08',sales:25490,trips:15,startTime:'17:45',endTime:'02:25',avg:1699,high:7120,low:700,weather:'小雨',jr:'なし',event:'ライブあり',reservation:'1件',out:'岩国方面 1件',note:'終演後と県外が効いた'}
+];
+const ANALYSIS_DEMO_HOURLY=[
+ {label:'16–19',sales:31200,trips:18},
+ {label:'19–22',sales:48600,trips:31},
+ {label:'22–01',sales:68200,trips:42},
+ {label:'01–04',sales:44100,trips:25},
+ {label:'04–07',sales:15300,trips:8}
+];
+const ANALYSIS_DEMO_WEEKDAY=[
+ {label:'日曜日',value:18800},{label:'月曜日',value:20100},{label:'火曜日',value:22400},
+ {label:'水曜日',value:21700},{label:'木曜日',value:23600},{label:'金曜日',value:27100},{label:'土曜日',value:28900}
+];
+
 function analysisReports(){
  return getDailyReports()
   .filter(r=>r&&r.dateKey&&r.status!=='draft')
@@ -3785,6 +3809,12 @@ function analysisReportSales(r){
  const trips=analysisTripsForReport(r);
  const tripSales=trips.reduce((sum,x)=>sum+Math.max(0,Number(x.fare)||0),0);
  return tripSales||Math.max(0,Number(r?.sales)||0);
+}
+function analysisUseDemo(){
+ const rows=analysisReports();
+ const realSales=rows.reduce((sum,r)=>sum+analysisReportSales(r),0);
+ const fareSales=getTripRecords().reduce((sum,x)=>sum+Math.max(0,Number(x?.fare)||0),0);
+ return realSales<=0&&fareSales<=0;
 }
 function analysisShortYen(v){
  const n=Math.max(0,Number(v)||0);
@@ -3811,15 +3841,18 @@ function analysisHourInBand(hour,band){
 }
 function renderAnalysisDaily(){
  const el=document.getElementById('analysisDailyBars');if(!el)return;
- const rows=analysisReports().slice(-10);
+ const demo=analysisUseDemo();
+ const badge=document.getElementById('analysisDemoBadge');if(badge)badge.style.display=demo?'inline-flex':'none';
+ const rows=demo?ANALYSIS_DEMO_ROWS:analysisReports().slice(-10);
  if(!rows.length){
   el.innerHTML='<div class="analysis-empty" style="grid-column:1/-1">乗務データがまだありません</div>';
   return;
  }
- const max=Math.max(1,...rows.map(analysisReportSales));
+ const valueOf=r=>demo?r.sales:analysisReportSales(r);
+ const max=Math.max(1,...rows.map(valueOf));
  el.innerHTML=rows.map(r=>{
-  const sales=analysisReportSales(r);
-  const h=Math.max(4,Math.round(sales/max*84));
+  const sales=valueOf(r);
+  const h=Math.max(6,Math.round(sales/max*150));
   const sel=r.dateKey===analysisSelectedDateKey?' selected':'';
   return '<button type="button" class="analysis-day-col'+sel+'" onclick="openAnalysisDayDetail(\''+escapeHtml(r.dateKey)+'\')">'+
    '<div class="analysis-day-sales">'+escapeHtml(analysisShortYen(sales))+'</div>'+
@@ -3830,38 +3863,46 @@ function renderAnalysisDaily(){
 }
 function renderAnalysisHourly(){
  const el=document.getElementById('analysisHourlyBars');if(!el)return;
- const trips=getTripRecords().filter(x=>x&&x.dropoffTs&&Number(x.fare)>=0);
- const bands=analysisTimeBands().map(b=>({...b,sales:0,trips:0}));
- for(const x of trips){
-  const h=new Date(Number(x.dropoffTs)).getHours();
-  const b=bands.find(v=>analysisHourInBand(h,v));
-  if(!b)continue;
-  b.sales+=Math.max(0,Number(x.fare)||0);b.trips++;
+ let bands;
+ if(analysisUseDemo()) bands=ANALYSIS_DEMO_HOURLY.map(x=>({...x}));
+ else{
+  const trips=getTripRecords().filter(x=>x&&x.dropoffTs&&Number(x.fare)>=0);
+  bands=analysisTimeBands().map(b=>({...b,sales:0,trips:0}));
+  for(const x of trips){
+   const h=new Date(Number(x.dropoffTs)).getHours();
+   const b=bands.find(v=>analysisHourInBand(h,v));
+   if(!b)continue;
+   b.sales+=Math.max(0,Number(x.fare)||0);b.trips++;
+  }
  }
  const max=Math.max(1,...bands.map(x=>x.sales));
  el.innerHTML=bands.map(x=>
   '<div class="analysis-row-item">'+
    '<div class="analysis-row-label">'+x.label+'</div>'+
-   '<div class="analysis-row-track"><div class="analysis-row-fill" style="width:'+Math.max(2,Math.round(x.sales/max*100))+'%"></div></div>'+
+   '<div class="analysis-row-track"><div class="analysis-row-fill" style="width:'+Math.max(3,Math.round(x.sales/max*100))+'%"></div></div>'+
    '<div class="analysis-row-value">'+escapeHtml(analysisShortYen(x.sales))+' / '+x.trips+'回</div>'+
   '</div>'
  ).join('');
 }
 function renderAnalysisWeekday(){
  const el=document.getElementById('analysisWeekdayBars');if(!el)return;
- const days=['日','月','火','水','木','金','土'];
- const sums=days.map(()=>({sales:0,count:0}));
- for(const r of analysisReports()){
-  const d=new Date(r.dateKey+'T12:00:00');if(Number.isNaN(d.getTime()))continue;
-  const x=sums[d.getDay()];x.sales+=analysisReportSales(r);x.count++;
+ let rows;
+ if(analysisUseDemo()) rows=ANALYSIS_DEMO_WEEKDAY.map(x=>({...x}));
+ else{
+  const days=['日','月','火','水','木','金','土'];
+  const sums=days.map(()=>({sales:0,count:0}));
+  for(const r of analysisReports()){
+   const d=new Date(r.dateKey+'T12:00:00');if(Number.isNaN(d.getTime()))continue;
+   const x=sums[d.getDay()];x.sales+=analysisReportSales(r);x.count++;
+  }
+  rows=days.map((d,i)=>({label:d+'曜日',value:sums[i].count?Math.round(sums[i].sales/sums[i].count):0,empty:!sums[i].count}));
  }
- const vals=sums.map(x=>x.count?Math.round(x.sales/x.count):0);
- const max=Math.max(1,...vals);
- el.innerHTML=days.map((d,i)=>
+ const max=Math.max(1,...rows.map(x=>x.value||0));
+ el.innerHTML=rows.map(x=>
   '<div class="analysis-row-item">'+
-   '<div class="analysis-row-label">'+d+'曜日</div>'+
-   '<div class="analysis-row-track"><div class="analysis-row-fill" style="width:'+Math.max(2,Math.round(vals[i]/max*100))+'%"></div></div>'+
-   '<div class="analysis-row-value">'+(sums[i].count?yen(vals[i]):'—')+'</div>'+
+   '<div class="analysis-row-label">'+x.label+'</div>'+
+   '<div class="analysis-row-track"><div class="analysis-row-fill" style="width:'+Math.max(3,Math.round((x.value||0)/max*100))+'%"></div></div>'+
+   '<div class="analysis-row-value">'+(x.empty?'—':yen(x.value))+'</div>'+
   '</div>'
  ).join('');
 }
@@ -3885,37 +3926,41 @@ function analysisOutOfPrefectureTrips(trips){
 function openAnalysisDayDetail(dateKey){
  analysisSelectedDateKey=dateKey;
  renderAnalysisDaily();
- const r=analysisReports().find(x=>x.dateKey===dateKey);
- const card=document.getElementById('analysisFactorCard');
- if(!r||!card)return;
- const trips=analysisTripsForReport(r);
- const fares=trips.map(x=>Math.max(0,Number(x.fare)||0)).filter(x=>x>0);
- const sales=analysisReportSales(r);
- const avg=fares.length?Math.round(fares.reduce((a,b)=>a+b,0)/fares.length):0;
- const high=fares.length?Math.max(...fares):0;
- const low=fares.length?Math.min(...fares):0;
- const reservations=getReservations().filter(x=>x&&x.date===dateKey);
- const factors=analysisNoticeFactors(dateKey);
- const outTrips=analysisOutOfPrefectureTrips(trips);
+ const card=document.getElementById('analysisFactorCard');if(!card)return;
+ const demo=analysisUseDemo();
+ const demoRow=demo?ANALYSIS_DEMO_ROWS.find(x=>x.dateKey===dateKey):null;
+ let sales=0,trips=[],avg=0,high=0,low=0,start='—',end='—',reserv='なし',outside='なし',weather='記録なし',jr='記録なし',event='記録なし',note='なし';
+ if(demoRow){
+  sales=demoRow.sales;avg=demoRow.avg;high=demoRow.high;low=demoRow.low;start=demoRow.startTime;end=demoRow.endTime;
+  reserv=demoRow.reservation;outside=demoRow.out;weather=demoRow.weather;jr=demoRow.jr;event=demoRow.event;note=demoRow.note;
+  trips=Array.from({length:demoRow.trips},()=>({}));
+ }else{
+  const r=analysisReports().find(x=>x.dateKey===dateKey);if(!r)return;
+  trips=analysisTripsForReport(r);
+  const fares=trips.map(x=>Math.max(0,Number(x.fare)||0)).filter(x=>x>0);
+  sales=analysisReportSales(r);avg=fares.length?Math.round(fares.reduce((a,b)=>a+b,0)/fares.length):0;
+  high=fares.length?Math.max(...fares):0;low=fares.length?Math.min(...fares):0;start=r.startTime||'—';end=r.endTime||'—';
+  const reservations=getReservations().filter(x=>x&&x.date===dateKey);
+  const factors=analysisNoticeFactors(dateKey);
+  const outTrips=analysisOutOfPrefectureTrips(trips);
+  reserv=reservations.length?reservations.length+'件'+(reservations[0]?.name?'・'+reservations[0].name:''):'なし';
+  outside=outTrips.length?outTrips.length+'件・'+String(outTrips[0].dropoff?.address||'').replace(/\s+/g,' ').slice(0,32):'なし';
+  weather=factors.weather.length?factors.weather.join(' / '):'記録なし';
+  jr=factors.jr.length?factors.jr.join(' / '):'記録なし';
+  event=factors.event.length?factors.event.join(' / '):'記録なし';
+  note=String(r.note||'').trim()||'なし';
+ }
  const wd=['日','月','火','水','木','金','土'][new Date(dateKey+'T12:00:00').getDay()];
  const title=document.getElementById('analysisFactorTitle');
  if(title)title.textContent=analysisDateLabel(dateKey)+'（'+wd+'） 実績の要因';
-
  const summary=document.getElementById('analysisFactorSummary');
  if(summary) summary.innerHTML=
   '<div class="analysis-factor-stat"><span>売上</span><strong>'+yen(sales)+'</strong></div>'+
-  '<div class="analysis-factor-stat"><span>乗車</span><strong>'+trips.length+'回</strong></div>'+
-  '<div class="analysis-factor-stat"><span>平均</span><strong>'+yen(avg)+'</strong></div>'+
+  '<div class="analysis-factor-stat"><span>乗車回数</span><strong>'+trips.length+'回</strong></div>'+
+  '<div class="analysis-factor-stat"><span>平均単価</span><strong>'+yen(avg)+'</strong></div>'+
   '<div class="analysis-factor-stat"><span>最高 / 最低</span><strong>'+yen(high)+' / '+yen(low)+'</strong></div>';
-
  const rows=[
-  ['乗務時間',(r.startTime||'—')+' 〜 '+(r.endTime||'—')],
-  ['予約',reservations.length?reservations.length+'件'+(reservations[0]?.name?'・'+reservations[0].name:''):'なし'],
-  ['県外',outTrips.length?outTrips.length+'件・'+String(outTrips[0].dropoff?.address||'').replace(/\s+/g,' ').slice(0,32):'なし'],
-  ['天候',factors.weather.length?factors.weather.join(' / '):'記録なし'],
-  ['JR',factors.jr.length?factors.jr.join(' / '):'記録なし'],
-  ['イベント',factors.event.length?factors.event.join(' / '):'記録なし'],
-  ['備考',String(r.note||'').trim()||'なし']
+  ['出庫〜帰庫',start+' 〜 '+end],['予約',reserv],['県外',outside],['天候',weather],['JR',jr],['イベント',event],['メモ',note]
  ];
  const list=document.getElementById('analysisFactorList');
  if(list)list.innerHTML=rows.map(x=>'<div class="analysis-factor-row"><div class="analysis-factor-key">'+escapeHtml(x[0])+'</div><div class="analysis-factor-value">'+escapeHtml(x[1])+'</div></div>').join('');
@@ -3927,11 +3972,8 @@ function renderSimpleSalesAnalysis(){
  renderAnalysisHourly();
  renderAnalysisWeekday();
  const card=document.getElementById('analysisFactorCard');
- if(analysisSelectedDateKey){
-  const exists=analysisReports().some(x=>x.dateKey===analysisSelectedDateKey);
-  if(exists) openAnalysisDayDetail(analysisSelectedDateKey);
-  else {analysisSelectedDateKey='';if(card)card.classList.remove('show')}
- }else if(card) card.classList.remove('show');
+ if(analysisSelectedDateKey) openAnalysisDayDetail(analysisSelectedDateKey);
+ else if(card) card.classList.remove('show');
 }
 
 const BUS_NOTIFY_SETTINGS_KEY='taxi_bus_notify_settings_v1';
