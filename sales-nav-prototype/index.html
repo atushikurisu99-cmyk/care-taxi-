@@ -3278,7 +3278,7 @@ function setMonthlyPreviewZoom(scale){
  const p=document.getElementById('monthlyReportPreview');
  const canvas=p?.querySelector('.monthly-preview-canvas');
  if(!p||!canvas)return;
- monthlyPreviewZoom=Math.max(.7,Math.min(3.2,Number(scale)||1));
+ monthlyPreviewZoom=Math.max(.42,Math.min(3.2,Number(scale)||1));
  canvas.style.transform='scale('+monthlyPreviewZoom+')';
  canvas.style.marginRight=((monthlyPreviewZoom-1)*canvas.scrollWidth)+'px';
  canvas.style.marginBottom=((monthlyPreviewZoom-1)*canvas.scrollHeight)+'px';
