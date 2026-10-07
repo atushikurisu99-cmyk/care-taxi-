@@ -3114,6 +3114,7 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(770),yDate,start[0]||'','top');
  text+=sogoSvgText(X(835),yDate,'時','top');
  text+=sogoSvgText(X(915),yDate,start[1]||'','top');
+ text+=sogoSvgText(X(970),yDate,'分','top');
  text+=sogoSvgText(X((997+1122)/2),yDate,'入庫','top');
  text+=sogoSvgText(X(1180),yDate,end[0]||'','top');
  text+=sogoSvgText(X(1245),yDate,'時','top');
@@ -3171,6 +3172,10 @@ function sogoFrontSvg(r){
  text+=sogoSvgText(X(1390),sumY[0],(cash?cash.toLocaleString('ja-JP'):'')+(cash?' 円':''),'summary value','end');
  text+=sogoSvgText(X(1390),sumY[1],(receivable?receivable.toLocaleString('ja-JP'):'')+(receivable?' 円':''),'summary value','end');
  text+=sogoSvgText(X(1390),sumY[2],(sales?sales.toLocaleString('ja-JP'):'')+(sales?' 円':''),'summary value','end');
+ text+=sogoSvgText(X(70),Y((1910+2011)/2),'休憩','summary','start');
+ text+=sogoSvgText(X(150),Y((1910+2011)/2),'：','summary');
+ text+=sogoSvgText(X(245),Y((1910+2011)/2),'～','summary');
+ text+=sogoSvgText(X(340),Y((1910+2011)/2),'：','summary');
 
  return '<svg class="sogo-svg sogo-front-svg" viewBox="0 0 '+W+' '+H+'" role="img" aria-label="相互個人タクシー協同組合 運転日報 表面" data-template-mode="inline-trace" data-horizontal-lines="'+tracedH.length+'" data-vertical-lines="'+tracedV.length+'">'+
   '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
