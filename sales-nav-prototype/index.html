@@ -3022,7 +3022,7 @@ function sogoInspectionHtml(r){
   {point:'反射器及び自動車登録番号標',detail:'汚れ、損傷'}
  ];
  const R=[
-  {point:'非常信号用具',detail:'電池灯'},
+  {cat:'',catRows:15,point:'非常信号用具',detail:'電池灯'},
   {point:'ドアー矢印',detail:'有・無'},
   {point:'運転免許証',detail:'〃'},
   {point:'自動車検査証',detail:'〃'},
@@ -3181,7 +3181,7 @@ function sogoFrontSvg(r){
   '<rect x="0" y="0" width="'+W+'" height="'+H+'" fill="#fff"/>'+lines.join('')+text+'</svg>';
 }
 function sogoBackTripSvg(r){
- const W=1000,H=520,x=[50,100.6,168.7,301.8,429.8,475.2,525.8,649.7,773.5,950];
+ const W=1000,H=480,x=[50,100.6,168.7,301.8,429.8,475.2,525.8,649.7,773.5,950];
  const lines=[]; let hNo=1,vNo=1;
  const Hline=(y,x1=50,x2=950,kind='normal')=>lines.push(sogoSvgLine('BH'+String(hNo++).padStart(2,'0'),x1,y,x2,y,kind));
  const Vline=(xx,y1,y2,kind='normal')=>lines.push(sogoSvgLine('BV'+String(vNo++).padStart(2,'0'),xx,y1,xx,y2,kind));
