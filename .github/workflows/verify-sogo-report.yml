@@ -79,12 +79,12 @@ jobs:
               text:el.textContent||''
             }));
 
-            if(ledger.h<25||ledger.v<20) throw new Error('front ledger count too small '+JSON.stringify({h:ledger.h,v:ledger.v}));
-            if(backLedger.h<10||backLedger.v<9) throw new Error('back ledger count too small '+JSON.stringify({h:backLedger.h,v:backLedger.v}));
+            if(ledger.h!==29||ledger.v!==22) throw new Error('front ledger count mismatch '+JSON.stringify({h:ledger.h,v:ledger.v}));
+            if(backLedger.h!==13||backLedger.v!==10) throw new Error('back ledger count mismatch '+JSON.stringify({h:backLedger.h,v:backLedger.v}));
             if(new Set(ledger.ids).size!==ledger.ids.length) throw new Error('front duplicate line IDs');
             if(new Set(backLedger.ids).size!==backLedger.ids.length) throw new Error('back duplicate line IDs');
 
-            for(const id of ['H01','H02','H03','V01','V02','V03']) if(!ledger.ids.includes(id)) throw new Error('front missing '+id);
+            for(const id of ['H01','H29','V01','V22','HTIME','VTIME']) if(!ledger.ids.includes(id)) throw new Error('front missing '+id);
             for(const id of ['BH01','BV01']) if(!backLedger.ids.includes(id)) throw new Error('back missing '+id);
 
             const badCarry=await front.evaluate(el=>[...el.querySelectorAll('line')].some(l=>{
@@ -94,7 +94,7 @@ jobs:
             }));
             if(badCarry) throw new Error('stepped top vertical line leaks into detail grid');
 
-            for(const value of ['相互個人タクシー協同組合','運 転 日 報','登録番号','氏名又は名称','52340','52462','広島駅 新幹線口','八丁堀','1,780']){
+            for(const value of ['相互個人タクシー協同組合','運 転 日 報','登録番号','氏名又は名称','休憩','52340','52462','広島駅 新幹線口','八丁堀','1,780']){
               if(!ledger.text.includes(value)) throw new Error('front visible value missing '+value);
             }
 
