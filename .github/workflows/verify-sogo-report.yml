@@ -29,7 +29,7 @@ jobs:
           node - <<'NODE'
           (async()=>{
             const { webkit } = require('playwright');
-            const target='https://taxi-sales-nav.pages.dev/';
+            const target='https://b872e3c9.taxi-sales-nav.pages.dev/';
             const browser=await webkit.launch({headless:true});
             const context=await browser.newContext({
               viewport:{width:393,height:852},isMobile:true,hasTouch:true,deviceScaleFactor:3,
