@@ -68,17 +68,36 @@ jobs:
             if(info.title!=='分析') throw new Error('analysis title wrong');
             if(info.analysisHeaderVisible==='none') throw new Error('analysis header period control hidden');
             if(info.calendarHeaderVisible!=='none') throw new Error('calendar control visible on analysis');
-            if(!['1週間','10日間','1か月'].includes(info.period)) throw new Error('period label missing');
+            if(!['3日','10日間','1か月'].includes(info.period)) throw new Error('period label missing');
             const modes=await page.evaluate(()=>ANALYSIS_PERIOD_MODES.map(x=>x.label));
             console.log('PERIOD_MODES',JSON.stringify(modes));
-            if(modes.includes('1日')) throw new Error('1-day top period mode must be removed');
+            if(JSON.stringify(modes)!==JSON.stringify(['3日','10日間','1か月'])) throw new Error('period modes must be exactly 3d/10d/month');
             for(const x of ['10日合計','平均売上','平均単価','乗車回数']) if(!info.summary.includes(x)) throw new Error('summary missing '+x);
             if(!String(info.yAxis||'').includes('5万')||!String(info.yAxis||'').includes('0')) throw new Error('50k y-axis missing');
             if(info.legacyBarSales!==0) throw new Error('per-day sales labels still visible');
             if(info.barCount<1) throw new Error('daily bars missing');
             if(!info.pieRect||info.pieRect.width<100||!String(info.legend||'').includes('%')) throw new Error('pickup pie/percent legend missing');
-            if(info.content?.overflowY!=='auto') throw new Error('analysis content is not adaptive-scroll');
+            if(info.content?.overflowY!=='hidden') throw new Error('analysis whole screen must not vertically scroll');
             if(info.contentRect&&info.navRect&&Math.abs(info.contentRect.bottom-info.navRect.y)>24) throw new Error('large blank gap remains above bottom tabs');
+            const interaction=await page.evaluate(()=>{
+              const slider=document.querySelector('#analysisInsightSlider');
+              const hour=document.querySelector('.analysis-hour-scroll');
+              return {
+                sliderOverflowX:getComputedStyle(slider).overflowX,
+                sliderWidth:slider.scrollWidth,
+                sliderClient:slider.clientWidth,
+                hourOverflowY:getComputedStyle(hour).overflowY,
+                hourScrollHeight:hour.scrollHeight,
+                hourClientHeight:hour.clientHeight,
+                slideCount:document.querySelectorAll('.analysis-insight-slide').length,
+                hourRows:document.querySelectorAll('#analysisHourlyBars .analysis-row-item').length
+              };
+            });
+            console.log('ANALYSIS_INTERACTION',JSON.stringify(interaction));
+            if(interaction.slideCount!==3) throw new Error('analysis insight slider must have 3 slides');
+            if(interaction.sliderOverflowX!=='auto'||interaction.sliderWidth<=interaction.sliderClient*2.5) throw new Error('horizontal swipe slider not active');
+            if(interaction.hourOverflowY!=='auto') throw new Error('hourly area must have internal vertical scroll');
+            if(interaction.hourRows<1) throw new Error('hourly actual rows missing');
 
             // Period switch behaves like the calendar header control.
             await page.locator('#analysisHeaderNav .analysis-header-move').nth(1).click();
@@ -86,6 +105,18 @@ jobs:
             const period2=await page.locator('#analysisPeriodLabel').innerText();
             console.log('PERIOD_AFTER_NEXT',period2);
             if(period2===info.period) throw new Error('period switch did not change');
+
+            // Horizontal swipe: time -> weekday -> pickup.
+            const slider=page.locator('#analysisInsightSlider');
+            const sw=await slider.evaluate(el=>el.clientWidth);
+            await slider.evaluate((el,w)=>el.scrollTo({left:w,behavior:'instant'}),sw);
+            await page.waitForTimeout(100);
+            const slide1=await slider.evaluate(el=>Math.round(el.scrollLeft/el.clientWidth));
+            await slider.evaluate((el,w)=>el.scrollTo({left:w*2,behavior:'instant'}),sw);
+            await page.waitForTimeout(100);
+            const slide2=await slider.evaluate(el=>Math.round(el.scrollLeft/el.clientWidth));
+            console.log('SWIPE_SLIDES',JSON.stringify({slide1,slide2}));
+            if(slide1!==1||slide2!==2) throw new Error('horizontal insight switching failed');
 
             // Return to 10 days and verify daily drilldown previous/next navigation.
             await page.evaluate(()=>{analysisPeriodMode='10d';renderSimpleSalesAnalysis();});
