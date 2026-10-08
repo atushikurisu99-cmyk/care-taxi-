@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-SWIPE-RESTORE-V16 -->
+<!-- BUILD:2026-10-08-ANALYSIS-MONTH-LINE-V17 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -282,6 +282,12 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-day-bar{width:72%;min-height:2px;border-radius:5px 5px 2px 2px;background:#2f86ff}
 .analysis-day-col.selected .analysis-day-bar{background:#66a8ff;box-shadow:0 0 0 1px rgba(102,168,255,.22)}
 .analysis-day-label{font-size:9px;font-weight:900;line-height:1;white-space:nowrap;height:14px}
+.analysis-daily-bars.analysis-month-line{display:block;min-width:100%!important;padding:0;background:none;position:relative}
+.analysis-month-line svg{display:block;width:100%;height:100%;overflow:visible}
+.analysis-month-line .month-line-path{fill:none;stroke:#2f86ff;stroke-width:2.8;vector-effect:non-scaling-stroke;stroke-linecap:round;stroke-linejoin:round}
+.analysis-month-line .month-line-point{fill:#66a8ff;stroke:#0c1721;stroke-width:1.5;vector-effect:non-scaling-stroke}
+.analysis-month-line .month-line-date{fill:#aebdca;font-size:10px;font-weight:800;text-anchor:middle}
+.analysis-month-line .month-line-guide{stroke:rgba(95,116,130,.2);stroke-width:1;vector-effect:non-scaling-stroke}
 .analysis-insight-shell{min-height:250px;flex:1 1 auto;overflow:hidden;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,var(--panel2),var(--panel))}
  .analysis-insight-slider{height:100%;display:flex;overflow-x:auto;overflow-y:hidden;touch-action:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
 .analysis-insight-slider::-webkit-scrollbar{display:none}
@@ -4034,6 +4040,33 @@ function renderAnalysisDaily(){
  const badge=document.getElementById('analysisDemoBadge');if(badge)badge.style.display=demo?'inline-flex':'none';
  const rowMap=new Map(analysisRowsInPeriod().map(r=>[r.dateKey,r]));
  const keys=analysisPeriodDayKeys();
+ if(analysisPeriodMode==='month'){
+  el.classList.add('analysis-month-line');
+  el.style.minWidth='100%';
+  const values=keys.map(k=>{
+   const r=rowMap.get(k);
+   return r?(demo?Number(r.sales||0):analysisReportSales(r)):0;
+  });
+  const scale=v=>Math.max(0,Math.min(1,v<=20000?(v/20000)*.25:.25+((v-20000)/30000)*.75));
+  const left=14,right=326,top=6,bottom=126;
+  const points=values.map((v,i)=>({
+   x:keys.length===1?(left+right)/2:left+(right-left)*i/(keys.length-1),
+   y:bottom-scale(v)*(bottom-top),
+   value:v,
+   key:keys[i]
+  }));
+  const line=points.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
+  const ticks=[0,1,2,3,4].map(i=>'<line class="month-line-guide" x1="0" y1="'+(top+(bottom-top)*i/4)+'" x2="340" y2="'+(top+(bottom-top)*i/4)+'"/>').join('');
+  const labels=points.map((p,i)=>{
+   const day=Number(p.key.slice(-2));
+   if(i!==0&&i!==keys.length-1&&day%5!==0)return '';
+   return '<text class="month-line-date" x="'+p.x.toFixed(1)+'" y="145">'+day+'日</text>';
+  }).join('');
+  const circles=points.filter(p=>p.value>0).map(p=>'<circle class="month-line-point" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5"><title>'+escapeHtml(analysisDateLabel(p.key))+' '+escapeHtml(yen(p.value))+'</title></circle>').join('');
+  el.innerHTML='<svg viewBox="0 0 340 149" preserveAspectRatio="none" role="img" aria-label="1か月の日別売上折れ線グラフ">'+ticks+'<path class="month-line-path" d="'+line+'"/>'+circles+labels+'</svg>';
+  return;
+ }
+ el.classList.remove('analysis-month-line');
  el.style.minWidth=keys.length>10?(keys.length*34)+'px':'100%';
  el.innerHTML=keys.map(k=>{
   const r=rowMap.get(k);
