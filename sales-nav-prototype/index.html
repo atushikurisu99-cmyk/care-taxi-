@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-MONTH-LINE-V17 -->
+<!-- BUILD:2026-10-08-ANALYSIS-THREE-MONTH-AUTOSCALE-V18 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -288,6 +288,12 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-month-line .month-line-point{fill:#66a8ff;stroke:#0c1721;stroke-width:1.5;vector-effect:non-scaling-stroke}
 .analysis-month-line .month-line-date{fill:#aebdca;font-size:10px;font-weight:800;text-anchor:middle}
 .analysis-month-line .month-line-guide{stroke:rgba(95,116,130,.2);stroke-width:1;vector-effect:non-scaling-stroke}
+.analysis-month-line .month-line-path{stroke-width:2.2}
+.analysis-month-line .month-line-current{stroke:#66a8ff;stroke-width:3.2}
+.analysis-month-line .month-line-prev{stroke:#42c9a0}
+.analysis-month-line .month-line-older{stroke:#d7ad63}
+.analysis-month-line .month-line-legend{font-size:10px;font-weight:850;display:flex;justify-content:center;gap:12px;color:#aebdca;margin-top:2px}
+.analysis-month-line .month-line-legend b{display:inline-block;width:12px;height:3px;vertical-align:middle;margin-right:3px}
 .analysis-insight-shell{min-height:250px;flex:1 1 auto;overflow:hidden;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,var(--panel2),var(--panel))}
  .analysis-insight-slider{height:100%;display:flex;overflow-x:auto;overflow-y:hidden;touch-action:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
 .analysis-insight-slider::-webkit-scrollbar{display:none}
@@ -2252,7 +2258,7 @@ html,body{
     <strong>日別売上</strong>
     <span id="analysisDemoBadge" class="analysis-demo-note" style="display:none">デモ表示</span>
    </div>
-   <div class="analysis-daily-chart">
+   <div id="analysisDailyChart" class="analysis-daily-chart">
     <div class="analysis-y-axis"><span>5万</span><span>4万</span><span>3万</span><span>2万</span><span>0</span></div>
     <div class="analysis-daily-scroll"><div id="analysisDailyBars" class="analysis-daily-bars"></div></div>
    </div>
@@ -3886,7 +3892,7 @@ let analysisPeriodMode='10d';
 const ANALYSIS_PERIOD_MODES=[
  {id:'3d',label:'3日',summary:'3日合計'},
  {id:'10d',label:'10日間',summary:'10日合計'},
- {id:'month',label:'1か月',summary:'月合計'}
+ {id:'month',label:'3か月',summary:'今月合計'}
 ];
 
 const ANALYSIS_DEMO_ROWS=[
@@ -4043,29 +4049,54 @@ function renderAnalysisDaily(){
  if(analysisPeriodMode==='month'){
   el.classList.add('analysis-month-line');
   el.style.minWidth='100%';
-  const values=keys.map(k=>{
-   const r=rowMap.get(k);
-   return r?(demo?Number(r.sales||0):analysisReportSales(r)):0;
+  const anchor=analysisDateObj(analysisPeriodRange().to);
+  const data=analysisBaseRows();
+  const today=analysisDateObj(localDateValue());
+  const periods=[0,1,2].map(offset=>{
+   const first=new Date(anchor.getFullYear(),anchor.getMonth()-offset,1,12);
+   const endDay=new Date(first.getFullYear(),first.getMonth()+1,0,12).getDate();
+   const currentLimit=offset===0?Math.min(endDay,anchor.getDate(),today.getFullYear()===first.getFullYear()&&today.getMonth()===first.getMonth()?today.getDate():endDay):endDay;
+   const entries=new Map(data.filter(r=>r.dateKey.slice(0,7)===analysisDayKey(first).slice(0,7)).map(r=>[r.dateKey,r]));
+   let cumulative=0;
+   const points=[];
+   for(let day=1;day<=currentLimit;day++){
+    const date=analysisDayKey(new Date(first.getFullYear(),first.getMonth(),day,12));
+    const record=entries.get(date);
+    cumulative+=record?(demo?Number(record.sales||0):analysisReportSales(record)):0;
+    points.push({day,value:cumulative});
+   }
+   return {month:first.getMonth()+1,points,total:cumulative};
   });
-  const scale=v=>Math.max(0,Math.min(1,v<=20000?(v/20000)*.25:.25+((v-20000)/30000)*.75));
-  const left=14,right=326,top=6,bottom=126;
-  const points=values.map((v,i)=>({
-   x:keys.length===1?(left+right)/2:left+(right-left)*i/(keys.length-1),
-   y:bottom-scale(v)*(bottom-top),
-   value:v,
-   key:keys[i]
-  }));
-  const line=points.map((p,i)=>(i?'L':'M')+p.x.toFixed(1)+' '+p.y.toFixed(1)).join(' ');
-  const ticks=[0,1,2,3,4].map(i=>'<line class="month-line-guide" x1="0" y1="'+(top+(bottom-top)*i/4)+'" x2="340" y2="'+(top+(bottom-top)*i/4)+'"/>').join('');
-  const labels=points.map((p,i)=>{
-   const day=Number(p.key.slice(-2));
-   if(i!==0&&i!==keys.length-1&&day%5!==0)return '';
-   return '<text class="month-line-date" x="'+p.x.toFixed(1)+'" y="145">'+day+'日</text>';
+  const peak=Math.max(1,...periods.map(p=>p.total));
+  const increments=[10000,20000,25000,50000,100000,200000,250000,500000,1000000,2000000];
+  const options=increments.map(step=>({step,ceiling:Math.ceil(peak/step)*step,ticks:Math.ceil(peak/step)}));
+  const best=options.filter(o=>o.ticks>=4&&o.ticks<=6).sort((a,b)=>a.ceiling-b.ceiling||a.step-b.step)[0]
+   ||options.filter(o=>o.ticks<=6).sort((a,b)=>a.ceiling-b.ceiling)[0]||options[options.length-1];
+  const ceiling=best.ceiling,step=best.step;
+  const axis=document.querySelector('#analysisDailyChart .analysis-y-axis');
+  if(axis){
+   axis.style.justifyContent='space-between';
+   axis.innerHTML=Array.from({length:Math.round(ceiling/step)+1},(_,i)=>'<span>'+Math.round((ceiling-i*step)/10000)+'万</span>').join('');
+  }
+  const x=day=>9+(day-1)*321/30;
+  const y=value=>126-Math.min(1,value/ceiling)*120;
+  const grid=Array.from({length:Math.round(ceiling/step)+1},(_,i)=>{
+   const yy=y(i*step).toFixed(1);
+   return '<line class="month-line-guide" x1="0" y1="'+yy+'" x2="340" y2="'+yy+'"/>';
   }).join('');
-  const circles=points.filter(p=>p.value>0).map(p=>'<circle class="month-line-point" cx="'+p.x.toFixed(1)+'" cy="'+p.y.toFixed(1)+'" r="3.5"><title>'+escapeHtml(analysisDateLabel(p.key))+' '+escapeHtml(yen(p.value))+'</title></circle>').join('');
-  el.innerHTML='<svg viewBox="0 0 340 149" preserveAspectRatio="none" role="img" aria-label="1か月の日別売上折れ線グラフ">'+ticks+'<path class="month-line-path" d="'+line+'"/>'+circles+labels+'</svg>';
+  const colors=['current','prev','older'];
+  const paths=periods.map((period,i)=>{
+   if(!period.points.length)return '';
+   const d=period.points.map((p,j)=>(j?'L':'M')+x(p.day).toFixed(1)+' '+y(p.value).toFixed(1)).join(' ');
+   return '<path class="month-line-path month-line-'+colors[i]+'" d="'+d+'"/>';
+  }).join('');
+  const labels=[1,5,10,15,20,25,31].map(day=>'<text class="month-line-date" x="'+x(day).toFixed(1)+'" y="145">'+day+'</text>').join('');
+  el.innerHTML='<svg viewBox="0 0 340 149" preserveAspectRatio="none" role="img" aria-label="直近3か月の累計売上比較。目盛り自動調整">'+grid+paths+labels+'</svg>'+
+   '<div class="month-line-legend">'+periods.map((p,i)=>'<span><b style="background:'+['#66a8ff','#42c9a0','#d7ad63'][i]+'"></b>'+p.month+'月</span>').join('')+'</div>';
   return;
  }
+ const axis=document.querySelector('#analysisDailyChart .analysis-y-axis');
+ if(axis){axis.style.justifyContent='space-between';axis.innerHTML='<span>5万</span><span>4万</span><span>3万</span><span>2万</span><span>0</span>'}
  el.classList.remove('analysis-month-line');
  el.style.minWidth=keys.length>10?(keys.length*34)+'px':'100%';
  el.innerHTML=keys.map(k=>{
