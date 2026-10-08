@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-FILL-BOTTOM-V11 -->
+<!-- BUILD:2026-10-08-ANALYSIS-AXIS-HOUR-SCROLL-V12 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -273,7 +273,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-section-head{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:5px}
 .analysis-section-head strong{font-size:16px;line-height:1.05}
 .analysis-section-head span{font-size:10px;color:var(--muted);font-weight:800}
-.analysis-daily-chart{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px;align-items:stretch}
+.analysis-daily-chart{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px;align-items:stretch;margin-top:8px}
 .analysis-y-axis{height:164px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding:0 2px 17px 0;box-sizing:border-box;color:#7f929f;font-size:8px;font-weight:850;line-height:1}
 .analysis-daily-scroll{height:164px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
 .analysis-daily-bars{height:164px;display:flex;align-items:flex-end;gap:4px;min-width:100%;padding:0 1px;box-sizing:border-box;background:repeating-linear-gradient(to bottom,rgba(95,116,130,.14) 0 1px,transparent 1px 20%);border-bottom:1px solid #2b3b47}
@@ -289,7 +289,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-insight-slide .analysis-section-head{margin-bottom:7px}
 .analysis-insight-hint{font-size:9px!important;color:#718794!important}
 .analysis-row-chart{display:flex;flex-direction:column;gap:4px}
-.analysis-hour-scroll{min-height:0;flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:2px}
+.analysis-hour-scroll{height:188px;min-height:188px;max-height:188px;flex:0 0 188px;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior-y:contain;padding-right:4px;touch-action:pan-y}
 .analysis-row-item{display:grid;grid-template-columns:52px minmax(0,1fr) 78px;gap:7px;align-items:center;min-height:24px}
 .analysis-row-label{font-size:12px;color:#c7d2da;font-weight:900}
 .analysis-row-track{height:9px;border-radius:999px;background:#09131c;border:1px solid #243541;overflow:hidden}
@@ -335,6 +335,7 @@ main{position:relative;min-height:0;overflow:hidden}
  .analysis-insight-shell{min-height:232px;flex:1 1 auto}
  .analysis-row-item{min-height:22px}
  .analysis-row-chart{gap:3px}
+ .analysis-hour-scroll{height:172px;min-height:172px;max-height:172px;flex-basis:172px}
  .analysis-pickup-wrap{grid-template-columns:156px minmax(0,1fr);gap:10px}
  .analysis-pie{width:152px;height:152px}
  .analysis-pie:after{inset:37px}
@@ -2243,7 +2244,7 @@ html,body{
     <span id="analysisDemoBadge" class="analysis-demo-note" style="display:none">デモ表示</span>
    </div>
    <div class="analysis-daily-chart">
-    <div class="analysis-y-axis"><span>5万</span><span>4万</span><span>3万</span><span>2万</span><span>1万</span><span>0</span></div>
+    <div class="analysis-y-axis"><span>5万</span><span>4万</span><span>3万</span><span>2万</span><span aria-hidden="true"></span><span>0</span></div>
     <div class="analysis-daily-scroll"><div id="analysisDailyBars" class="analysis-daily-bars"></div></div>
    </div>
   </div>
