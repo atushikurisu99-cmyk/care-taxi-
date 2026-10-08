@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-DAILY-TOP-GAP-V14 -->
+<!-- BUILD:2026-10-08-ANALYSIS-AXIS-REBALANCE-V15 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -273,12 +273,12 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-section-head{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:5px}
 .analysis-section-head strong{font-size:16px;line-height:1.05}
 .analysis-section-head span{font-size:10px;color:var(--muted);font-weight:800}
-.analysis-daily-chart{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px;align-items:stretch;margin-top:11px}
-.analysis-y-axis{height:164px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding:0 2px 17px 0;box-sizing:border-box;color:#7f929f;font-size:8px;font-weight:850;line-height:1}
-.analysis-daily-scroll{height:164px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
-.analysis-daily-bars{height:164px;display:flex;align-items:flex-end;gap:4px;min-width:100%;padding:0 1px;box-sizing:border-box;background:repeating-linear-gradient(to bottom,rgba(95,116,130,.14) 0 1px,transparent 1px 20%);border-bottom:1px solid #2b3b47}
+.analysis-daily-chart{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px;align-items:stretch;margin-top:26px}
+.analysis-y-axis{height:149px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding:0 2px 17px 0;box-sizing:border-box;color:#7f929f;font-size:8px;font-weight:850;line-height:1}
+.analysis-daily-scroll{height:149px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.analysis-daily-bars{height:149px;display:flex;align-items:flex-end;gap:4px;min-width:100%;padding:0 1px;box-sizing:border-box;background:repeating-linear-gradient(to bottom,rgba(95,116,130,.14) 0 1px,transparent 1px 25%);border-bottom:1px solid #2b3b47}
 .analysis-day-col{height:100%;flex:1 0 28px;min-width:28px;border:0;background:transparent;color:#aebdca;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px}
-.analysis-day-bar-wrap{height:143px;width:100%;display:flex;align-items:flex-end;justify-content:center;padding:0 1px;box-sizing:border-box}
+.analysis-day-bar-wrap{height:128px;width:100%;display:flex;align-items:flex-end;justify-content:center;padding:0 1px;box-sizing:border-box}
 .analysis-day-bar{width:72%;min-height:2px;border-radius:5px 5px 2px 2px;background:#2f86ff}
 .analysis-day-col.selected .analysis-day-bar{background:#66a8ff;box-shadow:0 0 0 1px rgba(102,168,255,.22)}
 .analysis-day-label{font-size:9px;font-weight:900;line-height:1;white-space:nowrap;height:14px}
@@ -330,8 +330,8 @@ main{position:relative;min-height:0;overflow:hidden}
 @media(max-height:760px){
  .analysis-summary-card{min-height:44px;padding:5px 9px}
  .analysis-summary-value{font-size:16px}
- .analysis-y-axis,.analysis-daily-scroll,.analysis-daily-bars{height:144px}
- .analysis-day-bar-wrap{height:123px}
+ .analysis-y-axis,.analysis-daily-scroll,.analysis-daily-bars{height:129px}
+ .analysis-day-bar-wrap{height:108px}
  .analysis-insight-shell{min-height:232px;flex:1 1 auto}
  .analysis-row-item{min-height:22px}
  .analysis-row-chart{gap:3px}
@@ -2245,7 +2245,7 @@ html,body{
     <span id="analysisDemoBadge" class="analysis-demo-note" style="display:none">デモ表示</span>
    </div>
    <div class="analysis-daily-chart">
-    <div class="analysis-y-axis"><span>5万</span><span>4万</span><span>3万</span><span>2万</span><span aria-hidden="true"></span><span>0</span></div>
+    <div class="analysis-y-axis"><span>5万</span><span>4万</span><span>3万</span><span>2万</span><span>0</span></div>
     <div class="analysis-daily-scroll"><div id="analysisDailyBars" class="analysis-daily-bars"></div></div>
    </div>
   </div>
@@ -4036,7 +4036,7 @@ function renderAnalysisDaily(){
  el.innerHTML=keys.map(k=>{
   const r=rowMap.get(k);
   const sales=r?(demo?Number(r.sales||0):analysisReportSales(r)):0;
-  const pct=Math.max(0,Math.min(100,sales/50000*100));
+  const pct=Math.max(0,Math.min(100,sales<=20000?sales/20000*25:25+(sales-20000)/30000*75));
   const sel=k===analysisSelectedDateKey?' selected':'';
   const clickable=r&&sales>0;
   return '<button type="button" class="analysis-day-col'+sel+'" '+(clickable?('onclick="openAnalysisDayDetail(\''+escapeHtml(k)+'\')"'):'disabled')+'>'+
