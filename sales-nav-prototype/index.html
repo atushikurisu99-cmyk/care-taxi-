@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-DETAIL-HEADER-PIE-V8 -->
+<!-- BUILD:2026-10-08-ANALYSIS-3D-SWIPE-V9 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -264,37 +264,43 @@ main{position:relative;min-height:0;overflow:hidden}
  radial-gradient(circle at 30% 62%,rgba(40,160,255,.7),transparent 15%),
  linear-gradient(135deg,#163044,#101b24)}
 #analysis{grid-template-rows:minmax(0,1fr);gap:0}
-#analysis .content{overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;overscroll-behavior:contain;gap:10px;padding-bottom:10px}
-.analysis-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:9px}
-.analysis-summary-card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:15px;padding:11px 13px;min-height:72px}
-.analysis-summary-label{font-size:12px;color:var(--muted);font-weight:850}
-.analysis-summary-value{font-size:23px;color:#fff;font-weight:1000;line-height:1.05;margin-top:5px}
-.analysis-compact-card,.analysis-trend-card,.analysis-pickup-card{padding:13px 14px}
-.analysis-section-head{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:9px}
-.analysis-section-head strong{font-size:18px;line-height:1.05}
-.analysis-section-head span{font-size:11px;color:var(--muted);font-weight:800}
-.analysis-daily-chart{display:grid;grid-template-columns:36px minmax(0,1fr);gap:5px;align-items:stretch}
-.analysis-y-axis{height:148px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding:0 2px 20px 0;box-sizing:border-box;color:#7f929f;font-size:9px;font-weight:850;line-height:1}
-.analysis-daily-scroll{height:148px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
-.analysis-daily-bars{height:148px;display:flex;align-items:flex-end;gap:5px;min-width:100%;padding:0 1px;box-sizing:border-box;background:repeating-linear-gradient(to bottom,rgba(95,116,130,.14) 0 1px,transparent 1px 25%);border-bottom:1px solid #2b3b47}
-.analysis-day-col{height:100%;flex:1 0 28px;min-width:28px;border:0;background:transparent;color:#aebdca;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:4px}
-.analysis-day-bar-wrap{height:122px;width:100%;display:flex;align-items:flex-end;justify-content:center;padding:0 1px;box-sizing:border-box}
+#analysis .content{overflow:hidden;gap:7px;padding-bottom:0}
+.analysis-summary-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.analysis-summary-card{background:linear-gradient(180deg,var(--panel2),var(--panel));border:1px solid var(--line);border-radius:13px;padding:7px 10px;min-height:52px}
+.analysis-summary-label{font-size:10px;color:var(--muted);font-weight:850;line-height:1}
+.analysis-summary-value{font-size:18px;color:#fff;font-weight:1000;line-height:1.05;margin-top:4px}
+.analysis-compact-card{padding:9px 10px}
+.analysis-section-head{display:flex;align-items:center;justify-content:space-between;gap:7px;margin-bottom:5px}
+.analysis-section-head strong{font-size:16px;line-height:1.05}
+.analysis-section-head span{font-size:10px;color:var(--muted);font-weight:800}
+.analysis-daily-chart{display:grid;grid-template-columns:34px minmax(0,1fr);gap:4px;align-items:stretch}
+.analysis-y-axis{height:116px;display:flex;flex-direction:column;justify-content:space-between;align-items:flex-end;padding:0 2px 17px 0;box-sizing:border-box;color:#7f929f;font-size:8px;font-weight:850;line-height:1}
+.analysis-daily-scroll{height:116px;overflow-x:auto;overflow-y:hidden;-webkit-overflow-scrolling:touch}
+.analysis-daily-bars{height:116px;display:flex;align-items:flex-end;gap:4px;min-width:100%;padding:0 1px;box-sizing:border-box;background:repeating-linear-gradient(to bottom,rgba(95,116,130,.14) 0 1px,transparent 1px 20%);border-bottom:1px solid #2b3b47}
+.analysis-day-col{height:100%;flex:1 0 28px;min-width:28px;border:0;background:transparent;color:#aebdca;padding:0;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;gap:3px}
+.analysis-day-bar-wrap{height:95px;width:100%;display:flex;align-items:flex-end;justify-content:center;padding:0 1px;box-sizing:border-box}
 .analysis-day-bar{width:72%;min-height:2px;border-radius:5px 5px 2px 2px;background:#2f86ff}
 .analysis-day-col.selected .analysis-day-bar{background:#66a8ff;box-shadow:0 0 0 1px rgba(102,168,255,.22)}
-.analysis-day-label{font-size:10px;font-weight:900;line-height:1;white-space:nowrap;height:16px}
-.analysis-trend-card{padding-bottom:12px}
-.analysis-row-chart{display:flex;flex-direction:column;gap:7px}
-.analysis-row-item{display:grid;grid-template-columns:58px minmax(0,1fr) 84px;gap:8px;align-items:center;min-height:27px}
-.analysis-row-label{font-size:13px;color:#c7d2da;font-weight:900}
-.analysis-row-track{height:11px;border-radius:999px;background:#09131c;border:1px solid #243541;overflow:hidden}
+.analysis-day-label{font-size:9px;font-weight:900;line-height:1;white-space:nowrap;height:14px}
+.analysis-insight-shell{min-height:0;flex:1;overflow:hidden;border:1px solid var(--line);border-radius:15px;background:linear-gradient(180deg,var(--panel2),var(--panel))}
+.analysis-insight-slider{height:100%;display:flex;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;overscroll-behavior-x:contain;scrollbar-width:none}
+.analysis-insight-slider::-webkit-scrollbar{display:none}
+.analysis-insight-slide{height:100%;min-width:100%;scroll-snap-align:start;padding:10px 11px;box-sizing:border-box;display:flex;flex-direction:column;overflow:hidden}
+.analysis-insight-slide .analysis-section-head{margin-bottom:7px}
+.analysis-insight-hint{font-size:9px!important;color:#718794!important}
+.analysis-row-chart{display:flex;flex-direction:column;gap:6px}
+.analysis-hour-scroll{min-height:0;flex:1;overflow-y:auto;overflow-x:hidden;-webkit-overflow-scrolling:touch;padding-right:2px}
+.analysis-row-item{display:grid;grid-template-columns:52px minmax(0,1fr) 78px;gap:7px;align-items:center;min-height:28px}
+.analysis-row-label{font-size:12px;color:#c7d2da;font-weight:900}
+.analysis-row-track{height:10px;border-radius:999px;background:#09131c;border:1px solid #243541;overflow:hidden}
 .analysis-row-fill{height:100%;min-width:2px;border-radius:999px;background:#49a775}
-.analysis-row-value{text-align:right;font-size:12px;color:#d9e2e8;font-weight:900;white-space:nowrap}
-.analysis-pickup-wrap{display:grid;grid-template-columns:142px minmax(0,1fr);gap:14px;align-items:center}
-.analysis-pie{width:140px;height:140px;border-radius:50%;position:relative;border:1px solid #2c3c48;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
-.analysis-pie:after{content:"";position:absolute;inset:34px;border-radius:50%;background:#0c1721;border:1px solid #22313d}
-.analysis-pie-center{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;text-align:center;font-size:12px;font-weight:900;line-height:1.25;color:#e6edf2}
+.analysis-row-value{text-align:right;font-size:11px;color:#d9e2e8;font-weight:900;white-space:nowrap}
+.analysis-pickup-wrap{display:grid;grid-template-columns:128px minmax(0,1fr);gap:12px;align-items:center;margin:auto 0}
+.analysis-pie{width:126px;height:126px;border-radius:50%;position:relative;border:1px solid #2c3c48;box-shadow:inset 0 0 0 1px rgba(255,255,255,.03)}
+.analysis-pie:after{content:"";position:absolute;inset:31px;border-radius:50%;background:#0c1721;border:1px solid #22313d}
+.analysis-pie-center{position:absolute;inset:0;z-index:2;display:flex;align-items:center;justify-content:center;text-align:center;font-size:11px;font-weight:900;line-height:1.25;color:#e6edf2}
 .analysis-pickup-legend{display:flex;flex-direction:column;gap:7px;min-width:0}
-.analysis-pickup-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:7px;align-items:center;font-size:12px}
+.analysis-pickup-row{display:grid;grid-template-columns:10px minmax(0,1fr) auto;gap:7px;align-items:center;font-size:11px}
 .analysis-pickup-dot{width:10px;height:10px;border-radius:50%}
 .analysis-pickup-name{color:#d7e1e8;font-weight:850;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
 .analysis-pickup-pct{color:#fff;font-weight:950;white-space:nowrap}
@@ -321,11 +327,12 @@ main{position:relative;min-height:0;overflow:hidden}
 .analysis-factor-value{font-size:13px;color:#e5ebef;font-weight:800;line-height:1.35}
 .analysis-empty{padding:18px 6px;text-align:center;color:var(--muted);font-size:13px}
 .analysis-demo-note{display:inline-flex;align-items:center;border:1px solid #3b5366;border-radius:999px;padding:2px 7px;font-size:9px!important;color:#a9bdcb!important;background:#101c26}
-@media(max-width:370px){
- .analysis-pickup-wrap{grid-template-columns:122px minmax(0,1fr);gap:10px}
- .analysis-pie{width:120px;height:120px}
- .analysis-pie:after{inset:29px}
- .analysis-summary-value{font-size:21px}
+@media(max-height:760px){
+ .analysis-summary-card{min-height:46px;padding:6px 9px}
+ .analysis-summary-value{font-size:16px}
+ .analysis-daily-chart,.analysis-y-axis,.analysis-daily-scroll,.analysis-daily-bars{height:104px}
+ .analysis-day-bar-wrap{height:84px}
+ #analysis .content{gap:5px}
 }
 
 .menuitem{padding:14px 0;border-bottom:1px solid #22313d;font-size:16px;font-weight:700;display:flex;align-items:center;gap:12px}
@@ -2235,30 +2242,32 @@ html,body{
    </div>
   </div>
 
-  <div class="card analysis-trend-card">
-   <div class="analysis-section-head">
-    <strong>時間帯別</strong>
-    <span>売上 / 乗車回数</span>
-   </div>
-   <div id="analysisHourlyBars" class="analysis-row-chart"></div>
-  </div>
-
-  <div class="card analysis-trend-card">
-   <div class="analysis-section-head">
-    <strong>曜日別</strong>
-    <span>1乗務あたり平均売上</span>
-   </div>
-   <div id="analysisWeekdayBars" class="analysis-row-chart"></div>
-  </div>
-
-  <div class="card analysis-pickup-card">
-   <div class="analysis-section-head">
-    <strong>乗車場所の割合</strong>
-    <span>乗車地ベース</span>
-   </div>
-   <div class="analysis-pickup-wrap">
-    <div id="analysisPickupPie" class="analysis-pie"><div class="analysis-pie-center">乗車場所<br>割合</div></div>
-    <div id="analysisPickupLegend" class="analysis-pickup-legend"></div>
+  <div class="analysis-insight-shell">
+   <div id="analysisInsightSlider" class="analysis-insight-slider">
+    <div class="analysis-insight-slide">
+     <div class="analysis-section-head">
+      <strong>時間帯別</strong>
+      <span class="analysis-insight-hint">横にスライド ›</span>
+     </div>
+     <div class="analysis-hour-scroll"><div id="analysisHourlyBars" class="analysis-row-chart"></div></div>
+    </div>
+    <div class="analysis-insight-slide">
+     <div class="analysis-section-head">
+      <strong>曜日別</strong>
+      <span class="analysis-insight-hint">‹ 横にスライド ›</span>
+     </div>
+     <div id="analysisWeekdayBars" class="analysis-row-chart"></div>
+    </div>
+    <div class="analysis-insight-slide">
+     <div class="analysis-section-head">
+      <strong>乗車場所の割合</strong>
+      <span class="analysis-insight-hint">‹ 横にスライド</span>
+     </div>
+     <div class="analysis-pickup-wrap">
+      <div id="analysisPickupPie" class="analysis-pie"><div class="analysis-pie-center">乗車場所<br>割合</div></div>
+      <div id="analysisPickupLegend" class="analysis-pickup-legend"></div>
+     </div>
+    </div>
    </div>
   </div>
 
@@ -2695,7 +2704,11 @@ function show(id){
  if(id==='jrDetail') setTimeout(renderJrDetail,0);
  if(id==='eventDetail') setTimeout(renderEventDetail,0);
  if(id==='calendar') renderCalendar();
- if(id==='analysis') renderSimpleSalesAnalysis(); else closeAnalysisDayDetail();
+ if(id==='analysis'){
+  renderSimpleSalesAnalysis();
+  const insight=document.getElementById('analysisInsightSlider');
+  if(insight)insight.scrollLeft=0;
+ } else closeAnalysisDayDetail();
  if(id==='dailyReport') renderDailyReport();
  if(id==='reportEdit') renderReportEdit();
  if(id==='monthlyReport') renderMonthlyReportCenter();
@@ -3855,7 +3868,7 @@ function completedDutyDaysThisMonth(){
 let analysisSelectedDateKey='';
 let analysisPeriodMode='10d';
 const ANALYSIS_PERIOD_MODES=[
- {id:'week',label:'1週間',summary:'週合計'},
+ {id:'3d',label:'3日',summary:'3日合計'},
  {id:'10d',label:'10日間',summary:'10日合計'},
  {id:'month',label:'1か月',summary:'月合計'}
 ];
@@ -3873,11 +3886,11 @@ const ANALYSIS_DEMO_ROWS=[
  {dateKey:'2026-10-08',sales:25490,trips:15,startTime:'17:45',endTime:'02:25',avg:1699,high:7120,low:700,weather:'小雨',jr:'なし',event:'ライブあり',reservation:'1件',out:'岩国方面 1件',note:'終演後と県外が効いた'}
 ];
 const ANALYSIS_DEMO_HOURLY=[
- {label:'16–19',share:.15,tripsShare:.15},
- {label:'19–22',share:.22,tripsShare:.25},
- {label:'22–01',share:.31,tripsShare:.34},
- {label:'01–04',share:.24,tripsShare:.20},
- {label:'04–07',share:.08,tripsShare:.06}
+ {hour:17,share:.06,tripsShare:.06},{hour:18,share:.08,tripsShare:.08},
+ {hour:19,share:.09,tripsShare:.10},{hour:20,share:.10,tripsShare:.11},
+ {hour:21,share:.11,tripsShare:.11},{hour:22,share:.13,tripsShare:.13},
+ {hour:23,share:.14,tripsShare:.14},{hour:0,share:.12,tripsShare:.12},
+ {hour:1,share:.09,tripsShare:.08},{hour:2,share:.08,tripsShare:.07}
 ];
 const ANALYSIS_DEMO_PICKUPS=[
  {name:'広島駅',pct:31},{name:'八丁堀',pct:24},{name:'流川周辺',pct:18},{name:'紙屋町・本通',pct:15},{name:'その他',pct:12}
@@ -3932,7 +3945,7 @@ function analysisPeriodRange(){
  const lastKey=rows.length?rows[rows.length-1].dateKey:localDateValue();
  const end=analysisDateObj(lastKey);
  let start=new Date(end);
- if(analysisPeriodMode==='week') start.setDate(start.getDate()-6);
+ if(analysisPeriodMode==='3d') start.setDate(start.getDate()-2);
  else if(analysisPeriodMode==='10d') start.setDate(start.getDate()-9);
  else if(analysisPeriodMode==='month') start=new Date(end.getFullYear(),end.getMonth(),1,12,0,0);
  return {from:analysisDayKey(start),to:analysisDayKey(end)};
@@ -4026,28 +4039,43 @@ function renderAnalysisDaily(){
 }
 function renderAnalysisHourly(){
  const el=document.getElementById('analysisHourlyBars');if(!el)return;
- let bands;
+ let rows=[];
  if(analysisUseDemo()){
-  const rows=analysisRowsInPeriod();
-  const total=rows.reduce((s,r)=>s+Number(r.sales||0),0);
-  const trips=rows.reduce((s,r)=>s+Number(r.trips||0),0);
-  bands=ANALYSIS_DEMO_HOURLY.map(x=>({label:x.label,sales:Math.round(total*x.share),trips:Math.round(trips*x.tripsShare)}));
+  const periodRows=analysisRowsInPeriod();
+  const total=periodRows.reduce((sum,r)=>sum+Number(r.sales||0),0);
+  const tripCount=periodRows.reduce((sum,r)=>sum+Number(r.trips||0),0);
+  rows=ANALYSIS_DEMO_HOURLY.map(x=>({
+   hour:x.hour,
+   sales:Math.max(0,Math.round(total*x.share)),
+   trips:Math.max(1,Math.round(tripCount*x.tripsShare))
+  })).filter(x=>x.sales>0&&x.trips>0);
  }else{
-  const trips=analysisTripsInPeriod();
-  bands=analysisTimeBands().map(b=>({...b,sales:0,trips:0}));
-  for(const x of trips){
-   const h=new Date(Number(x.dropoffTs)).getHours();
-   const b=bands.find(v=>analysisHourInBand(h,v));if(!b)continue;
-   b.sales+=Math.max(0,Number(x.fare)||0);b.trips++;
+  const map=new Map();
+  for(const x of analysisTripsInPeriod()){
+   const fare=Math.max(0,Number(x.fare)||0);
+   if(fare<=0)continue;
+   const hour=new Date(Number(x.dropoffTs)).getHours();
+   const row=map.get(hour)||{hour,sales:0,trips:0};
+   row.sales+=fare;row.trips++;map.set(hour,row);
   }
+  rows=[...map.values()].sort((a,b)=>{
+   const aa=a.hour<12?a.hour+24:a.hour,bb=b.hour<12?b.hour+24:b.hour;
+   return aa-bb;
+  });
  }
- const max=Math.max(1,...bands.map(x=>x.sales));
- el.innerHTML=bands.map(x=>
-  '<div class="analysis-row-item"><div class="analysis-row-label">'+x.label+'</div>'+
-  '<div class="analysis-row-track"><div class="analysis-row-fill" style="width:'+Math.max(2,Math.round(x.sales/max*100))+'%"></div></div>'+
-  '<div class="analysis-row-value">'+escapeHtml(analysisShortYen(x.sales))+' / '+x.trips+'回</div></div>'
- ).join('');
+ if(!rows.length){
+  el.innerHTML='<div class="analysis-empty">実績のある時間帯がまだありません</div>';
+  return;
+ }
+ const max=Math.max(1,...rows.map(x=>x.sales));
+ el.innerHTML=rows.map(x=>{
+  const label=String(x.hour).padStart(2,'0')+'時';
+  return '<div class="analysis-row-item"><div class="analysis-row-label">'+label+'</div>'+
+   '<div class="analysis-row-track"><div class="analysis-row-fill" style="width:'+Math.max(2,Math.round(x.sales/max*100))+'%"></div></div>'+
+   '<div class="analysis-row-value">'+escapeHtml(analysisShortYen(x.sales))+' / '+x.trips+'回</div></div>';
+ }).join('');
 }
+
 function renderAnalysisWeekday(){
  const el=document.getElementById('analysisWeekdayBars');if(!el)return;
  const days=['日','月','火','水','木','金','土'];
