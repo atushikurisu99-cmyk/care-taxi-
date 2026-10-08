@@ -94,6 +94,21 @@ jobs:
               };
             });
             console.log('ANALYSIS_INTERACTION',JSON.stringify(interaction));
+            const layout=await page.evaluate(()=>{
+              const rect=s=>document.querySelector(s)?.getBoundingClientRect()?.toJSON?.()||null;
+              return {
+                daily:rect('.analysis-daily-chart'),
+                insight:rect('.analysis-insight-shell'),
+                pie:rect('#analysisPickupPie'),
+                weekdayLast:document.querySelector('#analysisWeekdayBars .analysis-row-item:last-child')?.getBoundingClientRect()?.toJSON?.()||null,
+                weekdaySlide:document.querySelector('#analysisWeekdayBars')?.closest('.analysis-insight-slide')?.getBoundingClientRect()?.toJSON?.()||null
+              };
+            });
+            console.log('LAYOUT_REBALANCE',JSON.stringify(layout));
+            if(!layout.daily||layout.daily.height<145) throw new Error('daily chart is not tall enough');
+            if(!layout.insight||layout.insight.height>260) throw new Error('insight card is still too tall');
+            if(!layout.pie||layout.pie.width<150) throw new Error('pickup pie is not enlarged');
+            if(layout.weekdayLast&&layout.weekdaySlide&&layout.weekdayLast.bottom>layout.weekdaySlide.bottom+1) throw new Error('weekday baseline no longer fits insight card');
             if(interaction.slideCount!==3) throw new Error('analysis insight slider must have 3 slides');
             if(interaction.sliderOverflowX!=='auto'||interaction.sliderWidth<=interaction.sliderClient*2.5) throw new Error('horizontal swipe slider not active');
             if(interaction.hourOverflowY!=='auto') throw new Error('hourly area must have internal vertical scroll');
