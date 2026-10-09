@@ -2589,6 +2589,25 @@ html,body{
  <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
 </section>
 
+<section id="lpgStand" class="screen">
+ <div class="content" style="overflow-y:auto;padding-bottom:20px">
+  <div class="card" style="display:flex;flex-direction:column;gap:12px">
+   <div style="font-size:18px;font-weight:800">LPガス充填所を探す</div>
+   <div style="font-size:13px;color:var(--muted);line-height:1.5">タクシー用オートガス充填所をGoogleマップの候補一覧から探せます。</div>
+   <button type="button" class="primary" onclick="openNearbyLpgStands()" style="min-height:58px">現在地の周辺を探す</button>
+   <label for="lpgAreaKeyword" style="font-weight:700;font-size:14px">地名から探す（県外でも可）</label>
+   <input id="lpgAreaKeyword" type="search" placeholder="例：福山、大阪、岡山" autocomplete="off" style="width:100%;min-height:50px;border-radius:10px;background:#13212d;color:#fff;border:1px solid #304252;padding:0 12px">
+   <button type="button" class="smallbtn" onclick="openAreaLpgStands()" style="min-height:48px;font-size:15px">この地域の充填所を探す</button>
+   <div style="font-size:12px;color:var(--muted);line-height:1.6">候補をタップすると、Googleマップで場所・電話番号・経路を確認できます。LPG車への充填可否・営業状況・現金対応は、出発前に施設へ確認してください。</div>
+  </div>
+  <div class="card" style="margin-top:12px">
+   <div style="font-size:14px;font-weight:800;margin-bottom:9px">公式の全国一覧でも確認</div>
+   <button type="button" class="smallbtn" onclick="window.open('https://www.japanlpg.or.jp/lgv/map/index.php','_blank','noopener,noreferrer')" style="font-size:14px;min-height:46px;width:100%">全国LPガス協会のスタンドマップを開く ↗</button>
+  </div>
+ </div>
+ <div class="action"><button class="primary secondary" onclick="show('menu')">戻る</button></div>
+</section>
+
 <section id="menu" class="screen">
  <div class="content">
   <div class="card menu-card-compact">
@@ -2598,6 +2617,7 @@ html,body{
    <div class="menuitem" onclick="show('verify')"><span class="menu-icon gps" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><circle cx="12" cy="12" r="8"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></span><span>位置・警告検証</span></div>
    <div class="menuitem" onclick="openLatestReport()"><span class="menu-icon daily" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 3h9l3 3v15H6z"/><path d="M15 3v4h4M9 11h6M9 15h6"/></svg></span><span>日報確認</span></div>
    <div class="menuitem" onclick="show('monthlyReport')"><span class="menu-icon monthly" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="4" y="4" width="16" height="16" rx="2"/><path d="M8 8h8M8 12h8M8 16h5"/></svg></span><span>月報・帳票出力</span></div>
+   <div class="menuitem" onclick="show('lpgStand')"><span class="menu-icon info" aria-hidden="true">⛽</span><span>LPガス充填所</span></div>
    <div class="menuitem" onclick="show('settings')"><span class="menu-icon settings" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="3"/><path d="M19 12a7 7 0 0 0-.1-1.2l2-1.5-2-3.4-2.4 1a7 7 0 0 0-2-1.2L14.2 3h-4.4l-.4 2.7a7 7 0 0 0-2 1.2l-2.4-1-2 3.4 2 1.5A7 7 0 0 0 5 12c0 .4 0 .8.1 1.2l-2 1.5 2 3.4 2.4-1a7 7 0 0 0 2 1.2l.4 2.7h4.4l.4-2.7a7 7 0 0 0 2-1.2l2.4 1 2-3.4-2-1.5c.1-.4.1-.8.1-1.2z"/></svg></span><span>設定</span></div>
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></span><span>乗務終了</span></div>
    <div id="menuForceDutyEnd" class="menuitem danger" onclick="forceEndDutyTemporary()" style="display:none"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/><path d="M8 8l8 8M16 8l-8 8" stroke="#071019" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>強制終了（一時）</span></div>
@@ -2649,7 +2669,7 @@ preventIosPinchZoom();
  document.addEventListener('dblclick',e=>e.preventDefault(),{passive:false});
 })();
 
-const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',dailyReport:'日報入力',reportEdit:'日報編集',monthlyReport:'月報・帳票出力',menu:'メニュー'};
+const titles={home:'タクシー営業ナビ',vacant:'空車中',ride:'実車中',payment:'支払',schedule:'予約一覧',reservationEdit:'予約を追加',reservationShare:'予約共有',weatherDetail:'天気',jrDetail:'JR運行状況',eventDetail:'各種イベント',today:'営業情報',busDetail:'バス終バス情報',calendar:'カレンダー',sales:'売上・実績',analysis:'分析',verify:'位置精度検証',settings:'設定',dailyReport:'日報入力',reportEdit:'日報編集',monthlyReport:'月報・帳票出力',lpgStand:'LPガス充填所',menu:'メニュー'};
 const APP_LINKS=Object.freeze({
  googleAuthBase:'https://taxi-google-auth.atushi-works.workers.dev',
  jrApiBase:'https://taxi-jr-higashima-proxy.atushi-works.workers.dev/api',
@@ -2673,6 +2693,28 @@ function ensureCalendarHeaderNav(){
  const legacy=document.querySelector('#calendar .calendar-head');
  if(headerTitleRow&&nav&&nav.parentElement!==headerTitleRow) headerTitleRow.appendChild(nav);
  if(legacy) legacy.style.display='none';
+}
+function lpgMapsSearch(query){
+ const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
+ window.open(url,'_blank','noopener,noreferrer');
+}
+function openNearbyLpgStands(){
+ const launch=pos=>{
+  const lat=Number(pos.coords.latitude),lon=Number(pos.coords.longitude);
+  if(!Number.isFinite(lat)||!Number.isFinite(lon)){toast('現在地を取得できません');return;}
+  lpgMapsSearch('オートガススタンド LPガス '+lat.toFixed(5)+','+lon.toFixed(5));
+ };
+ if(navigator.geolocation){
+  navigator.geolocation.getCurrentPosition(launch,()=>{
+   if(latestPosition&&latestPosition.coords) launch(latestPosition);
+   else toast('位置情報を取得できません。地名検索をご利用ください');
+  },{enableHighAccuracy:true,timeout:8000,maximumAge:120000});
+ }else toast('位置情報が使えません。地名検索をご利用ください');
+}
+function openAreaLpgStands(){
+ const area=(document.getElementById('lpgAreaKeyword')?.value||'').trim();
+ if(!area){toast('地名を入力してください');return;}
+ lpgMapsSearch(area+' オートガススタンド LPガス');
 }
 function show(id){
  hideNotice();hideSafety();
