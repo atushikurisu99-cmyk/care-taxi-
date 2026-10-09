@@ -6799,7 +6799,7 @@ const GPS_STATE_EVENT_KEY='taxi_gps_state_event_log_v2';
 const GPS_ROAD_EVENT_KEY='taxi_gps_road_event_log_v1';
 const GPS_PERF_EVENT_KEY='taxi_gps_perf_event_log_v1';
 const GPS_DB_NAME='taxi-sales-nav-gps-v1';
-const GPS_DB_VERSION=1;
+const GPS_DB_VERSION=2;
 const GPS_TILE_CACHE_MAX=36;
 let lastLocationErrorState=null;
 let recentMotionPoints=[];
@@ -6933,6 +6933,7 @@ function openGpsDb(){
     const db=req.result;
     if(!db.objectStoreNames.contains('raw')) db.createObjectStore('raw',{keyPath:'id'});
     if(!db.objectStoreNames.contains('analysis')) db.createObjectStore('analysis',{keyPath:'id'});
+     if(!db.objectStoreNames.contains('fare')) db.createObjectStore('fare',{keyPath:'id'});
    };
    req.onsuccess=()=>resolve(req.result);
    req.onerror=()=>resolve(null);
@@ -7286,6 +7287,9 @@ function recordGpsQuality(pos){
  const id='gps_'+now+'_'+Math.random().toString(36).slice(2,8);
  const rec={
   id,
+  rideId:currentRideStart?.rideId||null,
+  dutyId:currentDutyId(),
+  visibility:document.visibilityState,
   t:now,
   measuredAt,
   measuredIso:new Date(measuredAt).toISOString(),
@@ -7319,6 +7323,7 @@ function recordGpsQuality(pos){
  log.push(rec);
  saveGpsQualityLog(log);
  queueGpsDbWrite('raw',{...rec,roadSnap:undefined,speedEvidence:undefined,roadDecision:undefined,diagnostics:undefined,processing:undefined});
+ trackFareRaw(rec);
 
  if(prev&&gap>=GPS_GAP_EVENT_THRESHOLD_SEC){
   const interruptions=getGpsInterruptionLog();
@@ -7347,7 +7352,8 @@ function updateGpsSample(id,patch){
  if(idx<0) return;
  log[idx]={...log[idx],...patch};
  saveGpsQualityLog(log);
- queueGpsDbWrite('analysis',{id,t:log[idx].t,measuredAt:log[idx].measuredAt,...patch});
+ queueGpsDbWrite('analysis',{id,rideId:log[idx].rideId,dutyId:log[idx].dutyId,t:log[idx].t,measuredAt:log[idx].measuredAt,...patch});
+ if(patch.roadSnap)trackFareSnap(log[idx]);
 }
 function nearestPointOnGsiRoadFeature(f,lon,lat){
  return closestPointOnLineSet(roadFeatureLines(f),lon,lat);
@@ -7589,7 +7595,7 @@ function resetGpsQualityLog(){
  matchedRoadState={key:null,match:null,confidence:'none',pendingKey:null,pendingCount:0,lastSwitchAt:0};
  matchedRoadHistory=[];
  safetyMatchState={key:null,pendingOn:0,pendingOff:0,active:false};
- clearGpsDb();
+ // IndexedDB raw/analysis/fare records persist across duty starts.
 }
 function gpsQualitySummary(){
  const log=getGpsQualityLog();
@@ -8160,6 +8166,66 @@ function isLateNightFareTime(d=new Date()){
  const now=d.getHours()*60+d.getMinutes(),start=toMin(s.lateNightStart),end=toMin(s.lateNightEnd);
  return start>end?(now>=start||now<end):(now>=start&&now<end);
 }
+// Shadow fare research: collected amount and calculated amounts stay separate.
+const FARE_SHADOW_SCHEMA='taxi-fare-shadow-v1';
+let fareTrack=null;
+function beginFareTrack(rideId){fareTrack={rideId,rawMeters:0,snapMeters:0,lastRaw:null,lastSnap:null,rawGood:0,rawBad:0,snapGood:0,snapBad:0,gapSeconds:0,samples:0,accuracyTotal:0,hiddenSamples:0}}
+function trackFareRaw(r){
+ const f=fareTrack;if(!f||r.rideId!==f.rideId)return;
+ f.samples++;f.accuracyTotal+=r.accuracy||0;if(r.visibility==='hidden')f.hiddenSamples++;
+ const p={t:r.measuredAt,lat:r.lat,lon:r.lon,accuracy:r.accuracy};
+ if(f.lastRaw){
+  const dt=(p.t-f.lastRaw.t)/1000,d=metersBetween(p.lat,p.lon,f.lastRaw.lat,f.lastRaw.lon);
+  if(dt>0&&dt<=30&&p.accuracy<=35&&f.lastRaw.accuracy<=35&&d<=Math.max(180,dt*55)){f.rawMeters+=d;f.rawGood++}
+  else{f.rawBad++;if(dt>30)f.gapSeconds+=dt}
+ }
+ f.lastRaw=p;
+}
+function trackFareSnap(r){
+ const f=fareTrack,s=r.roadSnap;if(!f||r.rideId!==f.rideId||!s)return;
+ if(!s.accepted||!s.snapped){f.snapBad++;f.lastSnap=null;return}
+ const p={t:r.measuredAt,lat:s.snapped.lat,lon:s.snapped.lon};
+ if(f.lastSnap){
+  const dt=(p.t-f.lastSnap.t)/1000,d=metersBetween(p.lat,p.lon,f.lastSnap.lat,f.lastSnap.lon);
+  if(dt>0&&dt<=30&&d<=Math.max(180,dt*55)){f.snapMeters+=d;f.snapGood++}else f.snapBad++;
+ }
+ f.lastSnap=p;
+}
+function shadowFareFor(meters,seconds,settings,startedAt){
+ const s=settings;if(!s||!(s.baseYen>0&&s.baseMeters>0&&s.stepYen>0&&s.stepMeters>0))return null;
+ let yen=Number(s.baseYen)+Math.max(0,Number(s.pickupYen)||0);
+ yen+=Math.ceil(Math.max(0,meters-Number(s.baseMeters))/Number(s.stepMeters))*Number(s.stepYen);
+ if(Number(s.timeStepSec)>0)yen+=Math.floor(seconds/Number(s.timeStepSec))*Number(s.stepYen);
+ const d=new Date(startedAt),min=d.getHours()*60+d.getMinutes();
+ const parse=v=>{const m=String(v||'').match(/^(\\d{2}):(\\d{2})$/);return m?Number(m[1])*60+Number(m[2]):0};
+ const a=parse(s.lateNightStart),b=parse(s.lateNightEnd);
+ if(s.lateNightPct>0&&(a>b?(min>=a||min<b):(min>=a&&min<b)))yen*=1+Number(s.lateNightPct)/100;
+ const step=Math.max(1,Number(s.stepYen));return Math.round(yen/step)*step;
+}
+function finishFareShadow(ride,actualYen,paymentMethod,discount){
+ if(!ride?.rideId)return;
+ const f=fareTrack?.rideId===ride.rideId?fareTrack:null,settings=ride.fareSettingsAtPickup||getVehicleFareSettings();
+ const dutyMeters=Math.max(0,currentDutyMeters()-Number(ride.pickupDutyMeters||0));
+ const slowSeconds=Math.round(rideFareTracking.lowSpeedSeconds||0);
+ const estimate=shadowFareFor(dutyMeters,slowSeconds,settings,ride.startedAt);
+ const row={id:ride.rideId,schema:FARE_SHADOW_SCHEMA,algorithm:'gps-distance-shadow-v1',
+  rideId:ride.rideId,dutyId:currentDutyId(),pickupTs:ride.startedAt,dropoffTs:Date.now(),
+  displayEnabled:false,settings,lowSpeedSeconds:slowSeconds,
+  distance:{dutyMeters,rawMeters:f?f.rawMeters:null,snappedStraightMeters:f?f.snapMeters:null},
+  quality:{samples:f?.samples||0,avgAccuracyM:f?.samples?f.accuracyTotal/f.samples:null,hiddenSamples:f?.hiddenSamples||0,
+   rawAccepted:f?.rawGood||0,rawRejected:f?.rawBad||0,snapAccepted:f?.snapGood||0,snapRejected:f?.snapBad||0,gapSeconds:f?.gapSeconds||0},
+  estimates:{currentYen:estimate,rawYen:f?shadowFareFor(f.rawMeters,slowSeconds,settings,ride.startedAt):null,
+   snapYen:f?shadowFareFor(f.snapMeters,slowSeconds,settings,ride.startedAt):null},
+  collectedYen:actualYen,paymentMethod,disabilityDiscount:discount,
+  compareEligible:actualYen>0&&!discount,
+  differenceVsCollectedYen:actualYen>0&&!discount&&estimate!=null?estimate-actualYen:null,
+  actualMeterYenVerified:false,
+  warning:'Collected yen may include adjustments or exclude discounts; do not treat as verified taximeter amount.'};
+ queueGpsDbWrite('fare',row);
+ upsertTripRecord(ride.rideId,{fareShadow:{schema:row.schema,algorithm:row.algorithm,estimates:row.estimates,
+   differenceVsCollectedYen:row.differenceVsCollectedYen,quality:row.quality}});
+ fareTrack=null;
+}
 function updateRideFareTracking(pos){
  if(!currentRideStart||!pos?.coords) return;
  const now=Number(pos.timestamp)||Date.now();
@@ -8187,11 +8253,10 @@ function estimatedRideFare(){
 function getPaymentFareValue(){return Math.max(0,Number(document.getElementById('paymentFareInput')?.value||0))}
 function preparePaymentFare(){
  resetPaymentChoices();
- const v=estimatedRideFare();
  const input=document.getElementById('paymentFareInput');
- if(input) input.value=String(v||0);
+ if(input) input.value='0';
  const note=document.getElementById('paymentFareEstimateNote');
- if(note) note.textContent=(v>0?'自動計算 '+v.toLocaleString('ja-JP')+'円':'料金設定後に自動計算')+' / 実メーターに合わせて▲▼または直接入力';
+ if(note) note.textContent='実メーター料金を入力';
 }
 function adjustPaymentFare(dir){
  const input=document.getElementById('paymentFareInput');if(!input)return;
@@ -8561,6 +8626,7 @@ async function startRideCapture(){
  const vacantMeters=lastDropoff&&Number.isFinite(Number(lastDropoff.dutyMeters))
    ?Math.max(0,Math.round(dutyMetersNow-Number(lastDropoff.dutyMeters))):null;
  rideFareTracking={lastTs:0,lowSpeedSeconds:0};
+ beginFareTrack(rideId);
  currentRideStart={
    type:'乗車',
    rideId,
@@ -8570,7 +8636,8 @@ async function startRideCapture(){
    lon:null,
    accuracy:null,
    address:'位置情報を確認中…',
-   pickupDutyMeters:currentDutyMeters()
+   pickupDutyMeters:currentDutyMeters(),
+  fareSettingsAtPickup:{...getVehicleFareSettings()}
  };
  upsertTripRecord(rideId,{
   dutyId:currentDutyId(),
@@ -8654,6 +8721,11 @@ async function startRideCapture(){
 }
 async function finishRide(){
  const rideBeforeFinish=currentRideStart;
+ const confirmedFare=getPaymentFareValue();
+ const selectedPayment=document.querySelector('.payopt.selected');
+ const confirmedMethod=selectedPayment?(selectedPayment.dataset.pay||selectedPayment.textContent.trim()):null;
+ const confirmedDiscount=!!document.getElementById('disabilityDiscountButton')?.classList.contains('selected');
+ finishFareShadow(rideBeforeFinish,confirmedFare,confirmedMethod,confirmedDiscount);
  currentRideStart=null;
 
  // 降車操作は位置取得・住所変換を待たず即時反映。
@@ -8671,13 +8743,13 @@ async function finishRide(){
   };
   const rideId=rideBeforeFinish&&rideBeforeFinish.rideId?rideBeforeFinish.rideId:null;
   const payEl=document.querySelector('.payopt.selected');
-  const paymentMethod=payEl?(payEl.dataset.pay||payEl.textContent.trim()):null;
-  const disabilityDiscount=!!document.getElementById('disabilityDiscountButton')?.classList.contains('selected');
+  const paymentMethod=confirmedMethod;
+  const disabilityDiscount=confirmedDiscount;
   upsertTripRecord(rideId,{
    dropoffTs:dropoffAt,
    dropoffIso:new Date(dropoffAt).toISOString(),
    dropoff:{lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy,address:rec.address},
-   fare:getPaymentFareValue(),
+   fare:confirmedFare,
    paymentMethod,
    disabilityDiscount
   });
@@ -8785,6 +8857,7 @@ async function shareValidationData(){
  const analysisFull=await readGpsDbStore('analysis');
  data.gpsRawFull=rawFull;
  data.gpsAnalysisFull=analysisFull;
+ data.fareShadowFull=await readGpsDbStore('fare');
  data.storage={engine:'IndexedDB+memory-ring',rawCount:rawFull.length,analysisCount:analysisFull.length};
  const d=new Date();
  const pad=n=>String(n).padStart(2,'0');
