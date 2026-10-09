@@ -8197,7 +8197,7 @@ function shadowFareFor(meters,seconds,settings,startedAt){
  yen+=Math.ceil(Math.max(0,meters-Number(s.baseMeters))/Number(s.stepMeters))*Number(s.stepYen);
  if(Number(s.timeStepSec)>0)yen+=Math.floor(seconds/Number(s.timeStepSec))*Number(s.stepYen);
  const d=new Date(startedAt),min=d.getHours()*60+d.getMinutes();
- const parse=v=>{const m=String(v||'').match(/^(\\d{2}):(\\d{2})$/);return m?Number(m[1])*60+Number(m[2]):0};
+ const parse=v=>{const m=String(v||'').match(/^(\d{2}):(\d{2})$/);return m?Number(m[1])*60+Number(m[2]):0};
  const a=parse(s.lateNightStart),b=parse(s.lateNightEnd);
  if(s.lateNightPct>0&&(a>b?(min>=a||min<b):(min>=a&&min<b)))yen*=1+Number(s.lateNightPct)/100;
  const step=Math.max(1,Number(s.stepYen));return Math.round(yen/step)*step;
