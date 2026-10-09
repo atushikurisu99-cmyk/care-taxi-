@@ -2702,8 +2702,11 @@ function openNearbyLpgStands(){
  const launch=pos=>{
   const lat=Number(pos.coords.latitude),lon=Number(pos.coords.longitude);
   if(!Number.isFinite(lat)||!Number.isFinite(lon)){toast('現在地を取得できません');return;}
-  const query='オートガススタンド LPガス '+lat.toFixed(5)+','+lon.toFixed(5);
-  window.location.assign('https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query));
+  // Keep the GPS coordinates as the map viewport, NOT inside the search keyword.
+  // Text-searching raw coordinates led Google Maps to unrelated cities.
+  const query=encodeURIComponent('オートガススタンド');
+  const centeredMap='https://www.google.com/maps/search/'+query+'/@'+lat.toFixed(6)+','+lon.toFixed(6)+',12z?hl=ja';
+  window.location.assign(centeredMap);
  };
  if(navigator.geolocation){
   navigator.geolocation.getCurrentPosition(launch,()=>{
