@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-09-LIVE-NOTICE-DEDUPE-SOUND-V19 -->
+<!-- BUILD:2026-10-09-LIVE-CARD-NOTICE-SOUND-V20 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -579,6 +579,8 @@ main{position:relative;min-height:0;overflow:hidden}
  font-size:15px;font-weight:700;line-height:1.2;color:#dce5eb;
  min-width:0;white-space:nowrap;overflow:hidden;text-overflow:clip
 }
+/* ライブの時刻と会場を2行に分けて表示 */
+#liveInfoBottom{white-space:pre-line;overflow:hidden;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical}
 .info-card.state-warn{
  border-color:#7b641e;background:linear-gradient(180deg,#261f10,#171710)
 }
@@ -5699,7 +5701,7 @@ function renderLiveEvents(){
   if(e){
    const t=e.start_time?e.start_time+'〜':'時刻確認中';
    const guide=liveEndGuide(e);
-   bot.textContent=t+(guide.time?(' / '+guide.label+' '+guide.time+'頃'):'')+(e.venue?' / '+e.venue:'');
+   bot.textContent=t+(guide.time?(' / '+guide.label+' '+guide.time+'頃'):'')+(e.venue?'\n'+e.venue:'');
   }else{
    bot.textContent=selectedLiveVenues().length?'選択した会場だけ表示':'設定で会場を選択';
   }
