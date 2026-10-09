@@ -5966,7 +5966,7 @@ function renderBusRealtime(){
  const d=busRealtimeData;
  const generated=d?.generated_at||0;
  const facts=pairs.map(p=>({...p,fact:busLastBusFact(p.stop,p.destination)}));
- maybeNotifySelectedLastBuses(facts);
+ // 終バスは利用者が必要時に確認する情報とし、自動通知しない。
  const urgent=facts.find(x=>{
   if(!x.fact) return false;
   if(x.fact.realtime&&x.fact.passed===true) return true;
@@ -5980,19 +5980,19 @@ function renderBusRealtime(){
  if(hs){
   if(!count) hs.textContent=hasStops?'選んだバス停の方面を設定':'設定からバス停・方面を選択';
   else if(urgent) hs.textContent=busLastBusStatusText(urgent.fact)+' / '+urgent.stop;
-  else hs.textContent='終バス15分前・通過を通知';
+  else hs.textContent='タップして終バスを確認';
  }
 
  if(st) st.textContent=count?'終バス':(hasStops?'方面未設定':'未設定');
  if(mid){
   if(!count) mid.textContent=hasStops?'選んだバス停の方面を設定':'バス停・方面を選択';
   else if(urgent) mid.textContent=urgent.stop+' / '+urgent.destination;
-  else mid.textContent=count+'件を通知対象に設定';
+  else mid.textContent=count+'件の終バスを確認';
  }
  if(bot){
   if(!count) bot.textContent=hasStops?'方面を選択してください':'設定画面から選択';
   else if(urgent) bot.textContent=busLastBusStatusText(urgent.fact);
-  else bot.textContent='15分前・通過時のみ通知';
+  else bot.textContent='通知なし・タップで詳細';
  }
  if(upd) upd.textContent=generated?formatAgo(generated):'設定済み';
 
@@ -6002,10 +6002,10 @@ function renderBusRealtime(){
    list.innerHTML='<div class="verify-empty" onclick="show(\'settings\')" style="cursor:pointer">設定画面で<br><strong style="color:#fff">'+msg+'</strong><br><span style="display:inline-block;margin-top:8px;color:#8ec0ff">設定を開く ›</span></div>';
   }else{
    const grouped={};
-   for(const row of facts){
+   for(const row of facts.filter(x=>x.fact&&Number(x.fact.minutes_to_departure)>0).sort((a,b)=>Number(a.fact.minutes_to_departure)-Number(b.fact.minutes_to_departure))){
     (grouped[row.stop]||(grouped[row.stop]=[])).push(row);
    }
-   list.innerHTML=Object.entries(grouped).map(([stop,rows])=>
+   list.innerHTML=(Object.keys(grouped).length?Object.entries(grouped).map(([stop,rows])=>
     '<div class="verify-card">'+
      '<div class="verify-head"><strong>'+escapeHtml(stop)+'</strong><span class="badge">'+rows.length+'件</span></div>'+
      rows.map(row=>{
@@ -6013,7 +6013,7 @@ function renderBusRealtime(){
       return '<div class="verify-row"><span>'+escapeHtml(row.destination)+'</span><strong>'+escapeHtml(status)+'</strong></div>';
      }).join('')+
     '</div>'
-   ).join('');
+   ).join(''):'<div class="verify-empty">本日の終バスは終了、または時刻データがありません。</div>');
   }
  }
 }
