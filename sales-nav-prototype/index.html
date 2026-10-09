@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-08-ANALYSIS-THREE-MONTH-AUTOSCALE-V18 -->
+<!-- BUILD:2026-10-09-LIVE-NOTICE-DEDUPE-SOUND-V19 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -2576,7 +2576,7 @@ html,body{
     <div class="settings-card">
      <div class="settings-title">通知音</div>
      <div class="settings-demo-grid" style="margin-top:8px">
-      <button type="button" class="smallbtn" onclick="demoNoticeSound()">ポン♪</button>
+      <button type="button" class="smallbtn" onclick="demoNoticeSound()">プルルン♪</button>
       <button type="button" class="smallbtn" onclick="demoSafetySound()">ピロリン♪</button>
      </div>
      <div class="settings-note" style="margin-top:8px">iPhoneは最初のタップで音声を有効化します。</div>
@@ -4564,40 +4564,31 @@ function selectedLiveEventsForDate(key,source=eventRealtimeData){
  return selectedLiveEvents(source).filter(e=>liveEventDate(e)===key);
 }
 function liveEventKey(e){
- return [localDateValue(new Date()),e?.venue||'',e?.name||'',e?.start_time||''].join('|');
+ return [liveEventDate(e),e?.venue||'',e?.name||'',e?.start_time||''].join('|');
 }
 function maybeNotifySelectedLiveEvents(d){
  if(!d||!canUseFreshSource(d.generated_at,900)) return;
  const selected=new Set(selectedLiveVenues());
  if(!selected.size) return;
- const events=Array.isArray(d.events)?d.events:[];
- for(const e of events){
-  if(!e||!selected.has(e.venue)) continue;
-  // 開演前通知は営業判断への寄与が弱いため出さない。
-  // 推定根拠が揃ったものは「終演目安」、一般参考幅だけなら「終演参考」と明確に分ける。
+ const today=localDateValue(new Date());
+ for(const e of (Array.isArray(d.events)?d.events:[])){
+  if(!e||!selected.has(e.venue)||liveEventDate(e)!==today) continue;
   const guide=liveEndGuide(e);
-  const endGuide=guide.time;
-  const endLabel=guide.label;
-  if(!endGuide) continue;
-  const p=String(endGuide).split(':').map(Number);
-  if(p.length<2||p.some(x=>!Number.isFinite(x))) continue;
+  if(!guide.time) continue;
+  const p=String(guide.time).split(':').map(Number);
+  if(p.length!==2||p.some(x=>!Number.isInteger(x))||p[0]>23||p[1]>59) continue;
   const end=new Date();
   end.setHours(p[0],p[1],0,0);
+  const opening=String(e.start_time||'').match(/^(\d{1,2}):(\d{2})/);
+  if(opening&&(Number(opening[1])*60+Number(opening[2])>p[0]*60+p[1])) end.setDate(end.getDate()+1);
   const diff=Math.round((end.getTime()-Date.now())/60000);
-  const key=liveEventKey(e);
-  if(diff>0&&diff<=30){
-   notifyFact('live-end-guide',{
-    level:'warn',icon:'!',title:'ライブ '+endLabel+' '+String(endGuide).slice(0,5)+'頃',
-    body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は前後する場合あり',
-    key:key+'|guide',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
-   });
-  }else if(diff<=0&&diff>=-10){
-   notifyFact('live-end-guide-time',{
-    level:'info',icon:'!',title:'ライブ '+endLabel+' '+String(endGuide).slice(0,5)+'頃',
-    body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は未確認',
-    key:key+'|guide-time',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:12*60*60*1000
-   });
-  }
+  // 同じ公演は終演見込み30分前の1回のみ。予定時刻後に再通知しない。
+  if(diff<=0||diff>30) continue;
+  notifyFact('live-end-guide',{
+   level:'warn',icon:'!',title:'ライブ '+guide.label+' '+guide.time+'頃',
+   body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は未確認',
+   key:liveEventKey(e)+'|end-guide',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:48*60*60*1000
+  });
  }
 }
 function renderLiveVenueSettings(){
@@ -8405,19 +8396,20 @@ function playNoticePon(){
   const ctx=noticeAudioCtx;
   if(ctx.state==='suspended') ctx.resume();
   const now=ctx.currentTime;
-  const gain=ctx.createGain();
-  gain.gain.setValueAtTime(0.0001,now);
-  gain.gain.exponentialRampToValueAtTime(0.09,now+0.008);
-  gain.gain.exponentialRampToValueAtTime(0.0001,now+0.22);
-  gain.connect(ctx.destination);
-
-  const osc=ctx.createOscillator();
-  osc.type='sine';
-  osc.frequency.setValueAtTime(760,now);
-  osc.frequency.exponentialRampToValueAtTime(980,now+0.09);
-  osc.connect(gain);
-  osc.start(now);
-  osc.stop(now+0.23);
+  [0,0.115,0.23].forEach((offset,i)=>{
+   const t=now+offset;
+   const gain=ctx.createGain();
+   gain.gain.setValueAtTime(0.0001,t);
+   gain.gain.exponentialRampToValueAtTime(0.24,t+0.015);
+   gain.gain.exponentialRampToValueAtTime(0.0001,t+0.18);
+   gain.connect(ctx.destination);
+   const osc=ctx.createOscillator();
+   osc.type='sine';
+   osc.frequency.setValueAtTime([740,920,820][i],t);
+   osc.frequency.exponentialRampToValueAtTime([860,1050,690][i],t+0.14);
+   osc.connect(gain);
+   osc.start(t);osc.stop(t+0.185);
+  });
  }catch(e){}
 }
 
