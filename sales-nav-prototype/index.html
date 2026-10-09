@@ -2593,7 +2593,7 @@ html,body{
  <div class="content" style="overflow-y:auto;padding-bottom:20px">
   <div class="card" style="display:flex;flex-direction:column;gap:12px">
    <div style="font-size:18px;font-weight:800">LPガス充填所を探す</div>
-   <div style="font-size:13px;color:var(--muted);line-height:1.5">タクシー用オートガス充填所をGoogleマップの候補一覧から探せます。</div>
+   <div style="font-size:13px;color:var(--muted);line-height:1.5">公式情報で充填対応を確認できた施設を下に掲載しています。未照合のGoogleマップ候補は確認済み施設とは区別してください。</div><div id="lpgVerifiedStations" style="display:flex;flex-direction:column;gap:9px" aria-live="polite"></div><div style="font-size:12px;color:var(--muted);line-height:1.55">掲載時点で公式情報を確認していますが、その後の営業状況・利用条件の継続確認は保証できません。必ず出発前に最新情報をご確認ください。</div>
    <button type="button" class="primary" onclick="openNearbyLpgStands()" style="min-height:58px">現在地の周辺を探す</button>
    <label for="lpgAreaKeyword" style="font-weight:700;font-size:14px">地名から探す（県外でも可）</label>
    <input id="lpgAreaKeyword" type="search" placeholder="例：福山、大阪、岡山" autocomplete="off" style="width:100%;min-height:50px;border-radius:10px;background:#13212d;color:#fff;border:1px solid #304252;padding:0 12px">
@@ -2694,6 +2694,33 @@ function ensureCalendarHeaderNav(){
  if(headerTitleRow&&nav&&nav.parentElement!==headerTitleRow) headerTitleRow.appendChild(nav);
  if(legacy) legacy.style.display='none';
 }
+// Verified against operator / taxi-industry pages on 2026-10-10.
+// These records are not live operating-status confirmations; no unverified listings are shown here.
+// Coordinates intentionally omitted until independently confirmed, to avoid false nearest-distance rankings.
+const LPG_VERIFIED_STATIONS=[
+ {name:'ガスセンター広島（出島）',address:'広島県広島市南区出島2-21-8',phone:'082-250-1533',hours:'24時間365日',source:'https://www.taxicenter.net/information',note:'LPG車・一般利用可／現金対応',lat:null,lon:null},
+ {name:'日の丸産業 オートガススタンド',address:'広島県広島市南区上東雲町17-7',phone:'082-281-4291',hours:'月～土 6:30～22:00／日・祝 7:00～18:00',source:'https://hinomaru-sangyo.com/fuel/',note:'タクシー等のLPG車向け。特別期間は営業時間変更あり',lat:null,lon:null}
+];
+function lpgEscape(s){return String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));}
+function renderLpgVerified(){
+ const el=document.getElementById('lpgVerifiedStations');
+ if(!el)return;
+ const list=LPG_VERIFIED_STATIONS.slice();
+ // When independently checked precise coordinates become available, distance sorting activates.
+ if(latestPosition?.coords && list.every(x=>Number.isFinite(x.lat)&&Number.isFinite(x.lon))){
+  const p=latestPosition.coords,rad=Math.PI/180;
+  const km=x=>{const a=Math.sin((x.lat-p.latitude)*rad/2)**2+Math.cos(p.latitude*rad)*Math.cos(x.lat*rad)*Math.sin((x.lon-p.longitude)*rad/2)**2;return 12742*Math.asin(Math.min(1,Math.sqrt(a)));};
+  list.sort((a,b)=>km(a)-km(b));
+ }
+ el.innerHTML='<div style="font-size:14px;font-weight:800">公式確認済み（'+list.length+'件・全国照合は継続中）</div>'+list.map(x=>{
+  const map='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(x.address+' '+x.name);
+  return '<div style="padding:12px;border:1px solid #304252;border-radius:12px;background:#101e2a;line-height:1.55">'+
+   '<strong style="font-size:15px">'+lpgEscape(x.name)+'</strong><div style="font-size:12px">'+lpgEscape(x.address)+'</div>'+
+   '<div style="font-size:12px">営業時間（掲載情報）：'+lpgEscape(x.hours)+'</div>'+
+   '<div style="font-size:12px;color:var(--muted)">'+lpgEscape(x.note)+'</div>'+
+   '<div style="font-size:12px;display:flex;gap:15px;margin-top:8px"><a href="'+map+'" target="_blank" rel="noopener noreferrer" style="color:#7db9ff">地図・経路 ↗</a><a href="tel:'+lpgEscape(x.phone)+'" style="color:#7db9ff">電話</a><a href="'+lpgEscape(x.source)+'" target="_blank" rel="noopener noreferrer" style="color:#7db9ff">公式根拠 ↗</a></div></div>';
+ }).join('');
+}
 function lpgMapsSearch(query){
  const url='https://www.google.com/maps/search/?api=1&query='+encodeURIComponent(query);
  window.open(url,'_blank','noopener,noreferrer');
@@ -2721,6 +2748,7 @@ function openAreaLpgStands(){
  lpgMapsSearch(area+' オートガススタンド LPガス');
 }
 function show(id){
+ if(id==='lpgStand')renderLpgVerified();
  hideNotice();hideSafety();
  const monthlyPreview=document.getElementById('monthlyReportPreview');
  const monthlyPreviewBtn=document.getElementById('monthlyReportPreviewButton');
