@@ -4923,21 +4923,50 @@ function renderCalendar(){
 
 let reservationTimed=true;
 let selectedReservationShareId=null;
-function getReservations(){
- try{
-  const v=JSON.parse(localStorage.getItem('taxi_reservations')||'[]');
-  return Array.isArray(v)?v:[];
- }catch(e){return[]}
+// IndexedDB is the primary reservation store; localStorage remains a legacy import only.
+let reservationCache=[];
+let reservationDb=null;
+let reservationReady=false;
+const reservationDbReady=new Promise(resolve=>{
+ if(!('indexedDB' in window)){reservationReady=true;resolve(false);return}
+ let req;
+ try{req=indexedDB.open('taxi_sales_reservations',1)}
+ catch(e){console.error('予約DB起動失敗',e);reservationReady=true;resolve(false);return}
+ req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains('records'))db.createObjectStore('records')};
+ req.onsuccess=()=>{
+  reservationDb=req.result;
+  const tx=reservationDb.transaction('records','readonly');
+  const get=tx.objectStore('records').get('all');
+  get.onsuccess=()=>{
+   const saved=Array.isArray(get.result)?get.result:null;
+   if(saved){reservationCache=saved;reservationReady=true;resolve(true);refreshReservationViews();return}
+   let legacy=[];
+   try{const v=JSON.parse(localStorage.getItem('taxi_reservations')||'[]');if(Array.isArray(v))legacy=v}catch(e){}
+   reservationCache=legacy;reservationReady=true;
+   if(legacy.length)saveReservations(legacy).then(()=>resolve(true));else resolve(true);
+   refreshReservationViews();
+  };
+  get.onerror=()=>{reservationReady=true;resolve(false)};
+ };
+ req.onerror=()=>{console.error('予約DB利用不可',req.error);reservationReady=true;resolve(false)};
+});
+function refreshReservationViews(){
+ try{if(typeof renderReservations==='function')renderReservations()}catch(e){console.error('予約画面更新失敗',e)}
 }
+function getReservations(){return reservationCache.slice()}
 function saveReservations(v){
- try{
-  localStorage.setItem('taxi_reservations',JSON.stringify(v));
-  return true;
- }catch(e){
-  console.error('予約保存エラー',e);
-  toast('予約を保存できません。端末の保存容量・プライベートブラウズ設定をご確認ください');
-  return false;
- }
+ if(!Array.isArray(v))return Promise.resolve(false);
+ if(!reservationReady)return reservationDbReady.then(()=>saveReservations(v));
+ if(!reservationDb){toast('予約データの保存領域を利用できません');return Promise.resolve(false)}
+ return new Promise(resolve=>{
+  try{
+   const tx=reservationDb.transaction('records','readwrite');
+   tx.objectStore('records').put(v,'all');
+   tx.oncomplete=()=>{reservationCache=v.slice();resolve(true)};
+   tx.onerror=()=>{console.error('予約保存失敗',tx.error);toast('予約を保存できませんでした');resolve(false)};
+   tx.onabort=()=>{console.error('予約保存中断',tx.error);toast('予約を保存できませんでした');resolve(false)};
+  }catch(e){console.error('予約保存例外',e);toast('予約を保存できませんでした');resolve(false)}
+ });
 }
 function localDateValue(d=new Date()){
  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
@@ -5073,7 +5102,7 @@ function renderReservations(){
   }
  }
 }
-function saveReservation(){
+async function saveReservation(){
  const date=document.getElementById('resDate')?.value||'';
  const time=document.getElementById('resTime')?.value||'';
  const pickup=(document.getElementById('resPickup')?.value||'').trim();
@@ -5096,8 +5125,9 @@ function saveReservation(){
   shareEvents:[],
   createdAt:Date.now()
  };
+ await reservationDbReady;
  const all=getReservations();all.push(r);
- if(!saveReservations(all))return;
+ if(!await saveReservations(all))return;
  if(!getReservations().some(item=>item.id===r.id)){
   toast('保存を確認できませんでした。もう一度お試しください');
   return;
