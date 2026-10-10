@@ -5031,7 +5031,7 @@ function backFromReservationEdit(){
 function renderReservations(){
  const base=getReservations().sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
  const today=localDateValue();
- const all=reservationListMode==='today'?base.filter(r=>r.date===today):base;
+ const all=base.filter(r=>r.date && (reservationListMode==='today'?r.date===today:r.date>=today) && r.shareStatus!=='completed' && r.shareStatus!=='cancelled').concat(base.filter(r=>!r.date && r.shareStatus!=='completed' && r.shareStatus!=='cancelled'));
  const title=document.getElementById('title');
  if(document.getElementById('schedule')?.classList.contains('active') && title){
   title.textContent=reservationListMode==='today'?'今日の乗務予約':'予約一覧';
