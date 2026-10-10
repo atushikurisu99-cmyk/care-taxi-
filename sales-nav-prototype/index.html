@@ -4930,7 +4930,14 @@ function getReservations(){
  }catch(e){return[]}
 }
 function saveReservations(v){
- localStorage.setItem('taxi_reservations',JSON.stringify(v));
+ try{
+  localStorage.setItem('taxi_reservations',JSON.stringify(v));
+  return true;
+ }catch(e){
+  console.error('予約保存エラー',e);
+  toast('予約を保存できません。端末の保存容量・プライベートブラウズ設定をご確認ください');
+  return false;
+ }
 }
 function localDateValue(d=new Date()){
  const y=d.getFullYear(),m=String(d.getMonth()+1).padStart(2,'0'),day=String(d.getDate()).padStart(2,'0');
@@ -5088,9 +5095,20 @@ function saveReservation(){
   shareEvents:[],
   createdAt:Date.now()
  };
- const all=getReservations();all.push(r);saveReservations(all);
- renderReservations();
- show(reservationEditReturnScreen==='calendar'?'calendar':'schedule');
+ const all=getReservations();all.push(r);
+ if(!saveReservations(all))return;
+ if(!getReservations().some(item=>item.id===r.id)){
+  toast('保存を確認できませんでした。もう一度お試しください');
+  return;
+ }
+ try{
+  renderReservations();
+  show(reservationEditReturnScreen==='calendar'?'calendar':'schedule');
+  toast('予約を保存しました');
+ }catch(e){
+  console.error('予約保存後の表示エラー',e);
+  toast('予約は保存されました。予約一覧を開き直してください');
+ }
 }
 let currentReservationJobId=null;
 let reservationJobTouchStartY=0;
