@@ -1,6 +1,6 @@
 {
   "ok": true,
-  "generated_at": "2026-10-10T12:33:12.443Z",
+  "generated_at": "2026-10-10T21:47:53.205Z",
   "area": "広島市",
   "source_health": {
     "icch": {
@@ -9,54 +9,53 @@
       "count": 30,
       "previous_count": 30,
       "reference_count": 30,
-      "ms": 768,
-      "last_success_at": "2026-10-10T12:28:46.120Z"
+      "ms": 857,
+      "last_success_at": "2026-10-10T21:45:04.386Z"
     },
     "candy": {
       "ok": true,
       "state": "ok",
       "count": 36,
-      "previous_count": 38,
+      "previous_count": 36,
       "reference_count": 38,
-      "ms": 774,
-      "last_success_at": "2026-10-10T12:28:46.894Z"
+      "ms": 777,
+      "last_success_at": "2026-10-10T21:45:05.164Z"
     },
     "worker_events": {
       "ok": true,
       "state": "ok",
-      "count": 22,
-      "previous_count": 24,
-      "reference_count": 24,
-      "ms": 17643,
-      "last_success_at": "2026-10-10T12:29:04.537Z"
+      "count": 26,
+      "previous_count": 22,
+      "reference_count": 26,
+      "ms": 13072,
+      "last_success_at": "2026-10-10T21:45:18.236Z"
     },
     "eplus": {
-      "ok": false,
-      "state": "degraded",
-      "count": 35,
-      "previous_count": 133,
-      "reference_count": 133,
-      "ms": 126127,
-      "last_success_at": "2026-10-08T23:25:18.859Z",
-      "retained_future_count": 134
+      "ok": true,
+      "state": "ok",
+      "count": 136,
+      "previous_count": 35,
+      "reference_count": 136,
+      "ms": 64405,
+      "last_success_at": "2026-10-10T21:46:22.641Z"
     },
     "lawson": {
       "ok": true,
       "state": "ok",
-      "count": 35,
-      "previous_count": 38,
+      "count": 34,
+      "previous_count": 35,
       "reference_count": 39,
-      "ms": 1327,
-      "last_success_at": "2026-10-10T12:31:11.991Z"
+      "ms": 1484,
+      "last_success_at": "2026-10-10T21:46:24.125Z"
     },
     "pia": {
       "ok": true,
       "state": "ok",
       "count": 15,
-      "previous_count": 17,
+      "previous_count": 15,
       "reference_count": 17,
-      "ms": 47362,
-      "last_success_at": "2026-10-10T12:31:59.353Z"
+      "ms": 43766,
+      "last_success_at": "2026-10-10T21:47:07.891Z"
     },
     "dive": {
       "ok": true,
@@ -64,8 +63,8 @@
       "count": 4,
       "previous_count": 4,
       "reference_count": 4,
-      "ms": 5830,
-      "last_success_at": "2026-10-10T12:32:05.183Z"
+      "ms": 1460,
+      "last_success_at": "2026-10-10T21:47:09.351Z"
     },
     "city_events": {
       "ok": true,
@@ -73,17 +72,17 @@
       "count": 3,
       "previous_count": 3,
       "reference_count": 3,
-      "ms": 8766,
-      "last_success_at": "2026-10-10T12:32:13.949Z"
+      "ms": 2109,
+      "last_success_at": "2026-10-10T21:47:11.460Z"
     },
     "published_details": {
       "ok": true,
       "state": "ok",
-      "count": 13,
+      "count": 11,
       "previous_count": 13,
       "reference_count": 14,
       "ms": 1,
-      "last_success_at": "2026-10-10T12:32:13.950Z"
+      "last_success_at": "2026-10-10T21:47:11.461Z"
     },
     "cvb": {
       "ok": false,
@@ -102,18 +101,18 @@
       "count": 0,
       "previous_count": null,
       "reference_count": 0,
-      "ms": 4864,
-      "last_success_at": "2026-10-10T12:32:19.776Z",
+      "ms": 5286,
+      "last_success_at": "2026-10-10T21:47:17.709Z",
       "retained_future_count": 0
     },
     "convention_official": {
       "ok": true,
       "state": "ok",
-      "count": 14,
-      "previous_count": 15,
+      "count": 13,
+      "previous_count": 14,
       "reference_count": 16,
-      "ms": 12403,
-      "last_success_at": "2026-10-10T12:32:32.179Z"
+      "ms": 12488,
+      "last_success_at": "2026-10-10T21:47:30.197Z"
     },
     "national_convention": {
       "ok": true,
@@ -121,17 +120,17 @@
       "count": 4,
       "previous_count": 4,
       "reference_count": 4,
-      "ms": 12051,
-      "last_success_at": "2026-10-10T12:32:44.230Z"
+      "ms": 3645,
+      "last_success_at": "2026-10-10T21:47:33.842Z"
     },
     "sports": {
       "ok": true,
       "state": "ok",
-      "count": 36,
+      "count": 35,
       "previous_count": 36,
       "reference_count": 36,
-      "ms": 28201,
-      "last_success_at": "2026-10-10T12:33:12.431Z"
+      "ms": 19350,
+      "last_success_at": "2026-10-10T21:47:53.192Z"
     }
   },
   "source_registry": {
@@ -275,12 +274,6 @@
     "end_time": 0
   },
   "degraded_sources": [
-    {
-      "id": "eplus",
-      "state": "degraded",
-      "error": null,
-      "retained_future_count": 134
-    },
     {
       "id": "cvb",
       "state": "failure",
