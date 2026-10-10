@@ -1,5 +1,6 @@
-# redeploy: 2026-10-08 temporary force-end button
-name: Deploy sales nav to Cloudflare Pages
+# Deployment moved to atushikurisu99-cmyk/taxi-sales-navi.
+# Keep this legacy workflow file and all legacy secrets intact for audit/reference.
+name: Deploy sales nav to Cloudflare Pages (disabled after repository split)
 
 on:
   workflow_dispatch:
@@ -15,6 +16,7 @@ permissions:
 
 jobs:
   deploy:
+    if: false # Prevent this public legacy repository from overwriting the dedicated repository's Pages deploy.
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
