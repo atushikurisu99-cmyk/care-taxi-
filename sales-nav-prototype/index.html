@@ -4953,7 +4953,7 @@ function openReservationEditor(){
  if(from&&from!=='reservationEdit') reservationEditReturnScreen=from;
  const ids=['resPickup','resDestination','resName','resPhone','resMemo','resTime'];
  ids.forEach(id=>{const el=document.getElementById(id);if(el)el.value=''});
- const date=document.getElementById('resDate');if(date)date.value=localDateValue();
+ const date=document.getElementById('resDate');if(date)date.value='';
  reservationTimed=false;
  show('reservationEdit');
 }
@@ -5077,8 +5077,9 @@ function saveReservation(){
  const date=document.getElementById('resDate')?.value||'';
  const time=document.getElementById('resTime')?.value||'';
  const pickup=(document.getElementById('resPickup')?.value||'').trim();
- if(!date){toast('日付を入力してください');return}
- if(!pickup){toast('お迎え場所を入力してください');return}
+ if(![date,time,pickup,'resDestination','resName','resPhone','resMemo'].some((v,i)=>i<3?!!v:!!(document.getElementById(v)?.value||'').trim())){
+  toast('いずれか1項目を入力してください');return;
+ }
  const r={
   id:'r'+Date.now(),
   date,
