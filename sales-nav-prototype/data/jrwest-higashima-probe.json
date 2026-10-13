@@ -1,7 +1,7 @@
 {
   "purpose": "technical_probe_only",
   "area": "hiroshima",
-  "generated_at": 1791852285,
+  "generated_at": 1791875333,
   "source_host": "www.train-guide.westjr.co.jp",
   "master_url": "https://www.train-guide.westjr.co.jp/api/v3/area_hiroshima_master.json",
   "traffic_url": "https://www.train-guide.westjr.co.jp/api/v3/area_hiroshima_trafficinfo.json",
@@ -20,13 +20,57 @@
         "range": "三次〜広島",
         "st": "/api/v3/geibi1_st.json"
       },
-      "update": "2026-10-13T00:44:45.333Z",
+      "update": "2026-10-13T07:08:44.522Z",
       "station_count": 21,
-      "train_count": 6,
+      "train_count": 7,
       "trains": [
         {
-          "no": "1831D",
-          "pos": "0647_####",
+          "no": "360D",
+          "pos": "0645_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "備後庄原",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "三次〜####"
+        },
+        {
+          "no": "1842D",
+          "pos": "0646_0647",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "三次",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "西三次〜志和地"
+        },
+        {
+          "no": "1859D",
+          "pos": "0652_####",
           "direction": 1,
           "displayType": "普通",
           "dest": "広島",
@@ -44,54 +88,10 @@
             "stopTime",
             "type"
           ],
-          "positionText": "志和地〜####"
+          "positionText": "井原市〜####"
         },
         {
-          "no": "1810D",
-          "pos": "0648_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "三次",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "上川立〜####"
-        },
-        {
-          "no": "5816D",
-          "pos": "0656_####",
-          "direction": 0,
-          "displayType": "快速",
-          "dest": "三次",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "白木山〜####"
-        },
-        {
-          "no": "3825D",
+          "no": "3857D",
           "pos": "0657_####",
           "direction": 1,
           "displayType": "普通",
@@ -113,8 +113,8 @@
           "positionText": "狩留家〜####"
         },
         {
-          "no": "3823D",
-          "pos": "0662_####",
+          "no": "3855D",
+          "pos": "0661_####",
           "direction": 1,
           "displayType": "普通",
           "dest": "広島",
@@ -132,14 +132,73 @@
             "stopTime",
             "type"
           ],
-          "positionText": "安芸矢口〜####"
+          "positionText": "玖村〜####"
         },
         {
-          "no": "3818D",
-          "pos": "0662_####",
+          "no": "5850D",
+          "pos": "0663_####",
           "direction": 0,
+          "displayType": "快速",
+          "dest": "三次",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "戸坂〜####"
+        },
+        {
+          "no": "3853D",
+          "pos": "0664_0122",
+          "direction": 1,
           "displayType": "普通",
-          "dest": "下深川",
+          "dest": "広島",
+          "delayMinutes": 2,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "矢賀〜広島"
+        }
+      ]
+    },
+    {
+      "code": "kabe",
+      "name": "可部線",
+      "range": "広島～あき亀山",
+      "raw": {
+        "name": "可部線",
+        "range": "広島～あき亀山",
+        "st": "/api/v3/kabe_st.json"
+      },
+      "update": "2026-10-13T07:08:44.522Z",
+      "station_count": 16,
+      "train_count": 8,
+      "trains": [
+        {
+          "no": "809M",
+          "pos": "0122_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "あき亀山",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -154,25 +213,98 @@
             "stopTime",
             "type"
           ],
-          "positionText": "安芸矢口〜####"
-        }
-      ]
-    },
-    {
-      "code": "kabe",
-      "name": "可部線",
-      "range": "広島～あき亀山",
-      "raw": {
-        "name": "可部線",
-        "range": "広島～あき亀山",
-        "st": "/api/v3/kabe_st.json"
-      },
-      "update": "2026-10-13T00:44:45.333Z",
-      "station_count": 16,
-      "train_count": 8,
-      "trains": [
+          "positionText": "広島〜####"
+        },
         {
-          "no": "772M",
+          "no": "2646M",
+          "pos": "0122_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "呉",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "広島〜####"
+        },
+        {
+          "no": "1556M",
+          "pos": "0124_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "白市",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "横川〜####"
+        },
+        {
+          "no": "2807M",
+          "pos": "0124_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "緑井",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "横川〜####"
+        },
+        {
+          "no": "808M",
+          "pos": "0209_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "広島",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "可部〜####"
+        },
+        {
+          "no": "812M",
           "pos": "0313_####",
           "direction": 0,
           "displayType": "普通",
@@ -194,33 +326,11 @@
           "positionText": "あき亀山〜####"
         },
         {
-          "no": "765M",
-          "pos": "0207_####",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "あき亀山",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "上八木〜####"
-        },
-        {
-          "no": "2767M",
+          "no": "2806M",
           "pos": "0202_####",
-          "direction": 1,
+          "direction": 0,
           "displayType": "普通",
-          "dest": "緑井",
+          "dest": "広島",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -238,11 +348,11 @@
           "positionText": "古市橋〜####"
         },
         {
-          "no": "768M",
+          "no": "805M",
           "pos": "0203_####",
-          "direction": 0,
+          "direction": 1,
           "displayType": "普通",
-          "dest": "広島",
+          "dest": "あき亀山",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -258,94 +368,6 @@
             "type"
           ],
           "positionText": "大町〜####"
-        },
-        {
-          "no": "515M",
-          "pos": "0122_####",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "大野浦",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "広島〜####"
-        },
-        {
-          "no": "1519M",
-          "pos": "0122_####",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "広島〜####"
-        },
-        {
-          "no": "766M",
-          "pos": "0122_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "広島〜####"
-        },
-        {
-          "no": "314M",
-          "pos": "0123_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "糸崎",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "新白島〜####"
         }
       ]
     },
@@ -358,13 +380,13 @@
         "range": "三原～広島",
         "st": "/api/v3/kure_st.json"
       },
-      "update": "2026-10-13T00:44:45.333Z",
+      "update": "2026-10-13T07:08:44.522Z",
       "station_count": 31,
-      "train_count": 14,
+      "train_count": 16,
       "trains": [
         {
-          "no": "624M",
-          "pos": "0188_0189",
+          "no": "644M",
+          "pos": "0195_####",
           "direction": 0,
           "displayType": "普通",
           "dest": "広",
@@ -382,57 +404,13 @@
             "stopTime",
             "type"
           ],
-          "positionText": "安芸阿賀〜呉"
+          "positionText": "小屋浦〜####"
         },
         {
-          "no": "631M",
-          "pos": "0189_0190",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 1,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "呉〜川原石"
-        },
-        {
-          "no": "2626M",
-          "pos": "0194_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "呉",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "呉ポートピア〜####"
-        },
-        {
-          "no": "629M",
+          "no": "5633M",
           "pos": "0197_####",
           "direction": 1,
-          "displayType": "普通",
+          "displayType": "快速",
           "dest": "広島",
           "delayMinutes": 0,
           "numberOfCars": null,
@@ -451,11 +429,11 @@
           "positionText": "坂〜####"
         },
         {
-          "no": "5600M",
-          "pos": "0197_0198",
+          "no": "5926M",
+          "pos": "0198_0118",
           "direction": 0,
           "displayType": "快速",
-          "dest": "広",
+          "dest": "安浦",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -470,11 +448,11 @@
             "stopTime",
             "type"
           ],
-          "positionText": "坂〜矢野"
+          "positionText": "矢野〜海田市"
         },
         {
-          "no": "112M",
-          "pos": "0178_0179",
+          "no": "124M",
+          "pos": "0186_####",
           "direction": 0,
           "displayType": "普通",
           "dest": "三原",
@@ -492,11 +470,33 @@
             "stopTime",
             "type"
           ],
-          "positionText": "竹原〜吉名"
+          "positionText": "広〜####"
         },
         {
-          "no": "117M",
-          "pos": "0183_0184",
+          "no": "653M",
+          "pos": "0186_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "五日市",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "広〜####"
+        },
+        {
+          "no": "129M",
+          "pos": "0174_0175",
           "direction": 1,
           "displayType": "普通",
           "dest": "広",
@@ -514,36 +514,58 @@
             "stopTime",
             "type"
           ],
-          "positionText": "安登〜安芸川尻"
+          "positionText": "安芸幸崎〜忠海"
         },
         {
-          "no": "119M",
-          "pos": "0107_####",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "広",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "三原〜####"
-        },
-        {
-          "no": "1518M",
-          "pos": "0118_####",
+          "no": "122M",
+          "pos": "0178_####",
           "direction": 0,
           "displayType": "普通",
-          "dest": "白市",
+          "dest": "三原",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "竹原〜####"
+        },
+        {
+          "no": "127M",
+          "pos": "0180_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "広",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "安芸津〜####"
+        },
+        {
+          "no": "2647M",
+          "pos": "0118_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "緑井",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -561,8 +583,74 @@
           "positionText": "海田市〜####"
         },
         {
-          "no": "2628M",
+          "no": "328M",
           "pos": "0119_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "糸崎",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "向洋〜####"
+        },
+        {
+          "no": "327M",
+          "pos": "0119_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "岩国",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "向洋〜####"
+        },
+        {
+          "no": "809M",
+          "pos": "0122_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "あき亀山",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "広島〜####"
+        },
+        {
+          "no": "2646M",
+          "pos": "0122_####",
           "direction": 0,
           "displayType": "普通",
           "dest": "呉",
@@ -580,11 +668,55 @@
             "stopTime",
             "type"
           ],
-          "positionText": "向洋〜####"
+          "positionText": "広島〜####"
         },
         {
-          "no": "627M",
-          "pos": "0119_####",
+          "no": "651M",
+          "pos": "0188_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "五日市",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "安芸阿賀〜####"
+        },
+        {
+          "no": "5624M",
+          "pos": "0188_####",
+          "direction": 0,
+          "displayType": "快速",
+          "dest": "広",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "安芸阿賀〜####"
+        },
+        {
+          "no": "2649M",
+          "pos": "0190_0191",
           "direction": 1,
           "displayType": "普通",
           "dest": "広島",
@@ -602,73 +734,7 @@
             "stopTime",
             "type"
           ],
-          "positionText": "向洋〜####"
-        },
-        {
-          "no": "515M",
-          "pos": "0122_####",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "大野浦",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "広島〜####"
-        },
-        {
-          "no": "1519M",
-          "pos": "0122_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "広島〜####"
-        },
-        {
-          "no": "766M",
-          "pos": "0122_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "広島〜####"
+          "positionText": "川原石〜吉浦"
         }
       ]
     },
@@ -681,34 +747,12 @@
         "range": "糸崎～南岩国",
         "st": "/api/v3/sanyo2_st.json"
       },
-      "update": "2026-10-13T00:44:45.333Z",
+      "update": "2026-10-13T07:08:44.522Z",
       "station_count": 33,
-      "train_count": 21,
+      "train_count": 24,
       "trains": [
         {
-          "no": "119M",
-          "pos": "0107_####",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "広",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "三原〜####"
-        },
-        {
-          "no": "414M",
+          "no": "428M",
           "pos": "0107_####",
           "direction": 0,
           "displayType": "普通",
@@ -730,34 +774,12 @@
           "positionText": "三原〜####"
         },
         {
-          "no": "312M",
-          "pos": "0108_0109",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "糸崎",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "本郷〜河内"
-        },
-        {
-          "no": "1523M",
-          "pos": "0113_####",
+          "no": "329M",
+          "pos": "0110_0111",
           "direction": 1,
           "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 0,
+          "dest": "南岩国",
+          "delayMinutes": 1,
           "numberOfCars": null,
           "raw_keys": [
             "delayMinutes",
@@ -771,58 +793,14 @@
             "stopTime",
             "type"
           ],
-          "positionText": "西条〜####"
+          "positionText": "入野〜白市"
         },
         {
-          "no": "1516M",
-          "pos": "0114_0115",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "白市",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "八本松〜瀬野"
-        },
-        {
-          "no": "315M",
-          "pos": "0114_0115",
+          "no": "1561M",
+          "pos": "0111_####",
           "direction": 1,
           "displayType": "普通",
           "dest": "岩国",
-          "delayMinutes": 7,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "八本松〜瀬野"
-        },
-        {
-          "no": "1521M",
-          "pos": "0114_0115",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "大野浦",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -837,14 +815,102 @@
             "stopTime",
             "type"
           ],
-          "positionText": "八本松〜瀬野"
+          "positionText": "白市〜####"
         },
         {
-          "no": "1518M",
-          "pos": "0118_####",
+          "no": "1559M",
+          "pos": "0447_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "岩国",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "寺家〜####"
+        },
+        {
+          "no": "326M",
+          "pos": "0447_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "糸崎",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "寺家〜####"
+        },
+        {
+          "no": "1554M",
+          "pos": "0115_0116",
           "direction": 0,
           "displayType": "普通",
           "dest": "白市",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "瀬野〜中野東"
+        },
+        {
+          "no": "1557M",
+          "pos": "0115_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "岩国",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "瀬野〜####"
+        },
+        {
+          "no": "5926M",
+          "pos": "0118_####",
+          "direction": 0,
+          "displayType": "快速",
+          "dest": "安浦",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -862,11 +928,11 @@
           "positionText": "海田市〜####"
         },
         {
-          "no": "2628M",
-          "pos": "0119_0120",
-          "direction": 0,
+          "no": "2647M",
+          "pos": "0118_0119",
+          "direction": 1,
           "displayType": "普通",
-          "dest": "呉",
+          "dest": "緑井",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -881,11 +947,11 @@
             "stopTime",
             "type"
           ],
-          "positionText": "向洋〜天神川"
+          "positionText": "海田市〜向洋"
         },
         {
-          "no": "627M",
-          "pos": "0119_0120",
+          "no": "327M",
+          "pos": "0120_####",
           "direction": 1,
           "displayType": "普通",
           "dest": "広島",
@@ -903,14 +969,36 @@
             "stopTime",
             "type"
           ],
-          "positionText": "向洋〜天神川"
+          "positionText": "天神川〜####"
         },
         {
-          "no": "515M",
+          "no": "328M",
+          "pos": "0120_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "糸崎",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "天神川〜####"
+        },
+        {
+          "no": "809M",
           "pos": "0122_####",
           "direction": 1,
           "displayType": "普通",
-          "dest": "大野浦",
+          "dest": "あき亀山",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -928,11 +1016,11 @@
           "positionText": "広島〜####"
         },
         {
-          "no": "314M",
-          "pos": "0123_####",
+          "no": "2646M",
+          "pos": "0122_####",
           "direction": 0,
           "displayType": "普通",
-          "dest": "糸崎",
+          "dest": "呉",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -947,121 +1035,11 @@
             "stopTime",
             "type"
           ],
-          "positionText": "新白島〜####"
+          "positionText": "広島〜####"
         },
         {
-          "no": "5602M",
-          "pos": "0125_0126",
-          "direction": 0,
-          "displayType": "快速",
-          "dest": "広",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "西広島〜新井口"
-        },
-        {
-          "no": "513M",
-          "pos": "0125_0126",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "岩国",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "西広島〜新井口"
-        },
-        {
-          "no": "1517M",
-          "pos": "0129_####",
-          "direction": 1,
-          "displayType": "普通",
-          "dest": "岩国",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "宮内串戸〜####"
-        },
-        {
-          "no": "510M",
-          "pos": "0129_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "宮内串戸〜####"
-        },
-        {
-          "no": "512M",
-          "pos": "0133_0134",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "広島",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "大野浦〜玖波"
-        },
-        {
-          "no": "1524M",
-          "pos": "0133_####",
+          "no": "1556M",
+          "pos": "0124_####",
           "direction": 0,
           "displayType": "普通",
           "dest": "白市",
@@ -1079,14 +1057,124 @@
             "stopTime",
             "type"
           ],
-          "positionText": "大野浦〜####"
+          "positionText": "横川〜####"
         },
         {
-          "no": "313M",
-          "pos": "0133_0134",
+          "no": "2807M",
+          "pos": "0124_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "緑井",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "横川〜####"
+        },
+        {
+          "no": "1555M",
+          "pos": "0124_0125",
           "direction": 1,
           "displayType": "普通",
           "dest": "岩国",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "横川〜西広島"
+        },
+        {
+          "no": "521M",
+          "pos": "0126_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "五日市",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "新井口〜####"
+        },
+        {
+          "no": "330M",
+          "pos": "0129_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "糸崎",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "宮内串戸〜####"
+        },
+        {
+          "no": "1553M",
+          "pos": "0129_0130",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "岩国",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "宮内串戸〜阿品"
+        },
+        {
+          "no": "1558M",
+          "pos": "0133_0134",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "白市",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1104,11 +1192,33 @@
           "positionText": "大野浦〜玖波"
         },
         {
-          "no": "3321M",
-          "pos": "0137_####",
+          "no": "1551M",
+          "pos": "0134_####",
           "direction": 1,
           "displayType": "普通",
-          "dest": "下関",
+          "dest": "岩国",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "玖波〜####"
+        },
+        {
+          "no": "1560M",
+          "pos": "0137_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "西条",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1126,11 +1236,33 @@
           "positionText": "岩国〜####"
         },
         {
-          "no": "316M",
-          "pos": "0137_####",
+          "no": "3337M",
+          "pos": "0137_0138",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "下関",
+          "delayMinutes": 2,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "岩国〜南岩国"
+        },
+        {
+          "no": "3330M",
+          "pos": "0138_####",
           "direction": 0,
           "displayType": "普通",
-          "dest": "糸崎",
+          "dest": "岩国",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1145,7 +1277,7 @@
             "stopTime",
             "type"
           ],
-          "positionText": "岩国〜####"
+          "positionText": "南岩国〜####"
         }
       ]
     },
@@ -1158,16 +1290,16 @@
         "range": "岩国～下関",
         "st": "/api/v3/sanyo3_st.json"
       },
-      "update": "2026-10-13T00:44:45.333Z",
+      "update": "2026-10-13T07:08:44.522Z",
       "station_count": 36,
-      "train_count": 15,
+      "train_count": 17,
       "trains": [
         {
-          "no": "3321M",
+          "no": "1560M",
           "pos": "0137_####",
-          "direction": 1,
+          "direction": 0,
           "displayType": "普通",
-          "dest": "下関",
+          "dest": "西条",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1185,12 +1317,12 @@
           "positionText": "岩国〜####"
         },
         {
-          "no": "316M",
-          "pos": "0137_####",
-          "direction": 0,
+          "no": "3337M",
+          "pos": "0137_0138",
+          "direction": 1,
           "displayType": "普通",
-          "dest": "糸崎",
-          "delayMinutes": 0,
+          "dest": "下関",
+          "delayMinutes": 2,
           "numberOfCars": null,
           "raw_keys": [
             "delayMinutes",
@@ -1204,11 +1336,11 @@
             "stopTime",
             "type"
           ],
-          "positionText": "岩国〜####"
+          "positionText": "岩国〜南岩国"
         },
         {
-          "no": "3318M",
-          "pos": "0146_####",
+          "no": "3330M",
+          "pos": "0138_####",
           "direction": 0,
           "displayType": "普通",
           "dest": "岩国",
@@ -1226,11 +1358,11 @@
             "stopTime",
             "type"
           ],
-          "positionText": "田布施〜####"
+          "positionText": "南岩国〜####"
         },
         {
-          "no": "3319M",
-          "pos": "0149_0150",
+          "no": "3335M",
+          "pos": "0144_####",
           "direction": 1,
           "displayType": "普通",
           "dest": "下関",
@@ -1248,11 +1380,33 @@
             "stopTime",
             "type"
           ],
-          "positionText": "光〜下松"
+          "positionText": "柳井港〜####"
         },
         {
-          "no": "2232D",
-          "pos": "0152_####",
+          "no": "3332M",
+          "pos": "0148_0149",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "岩国",
+          "delayMinutes": 1,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "島田〜光"
+        },
+        {
+          "no": "3334M",
+          "pos": "0155_0156",
           "direction": 0,
           "displayType": "普通",
           "dest": "岩国",
@@ -1270,35 +1424,13 @@
             "stopTime",
             "type"
           ],
-          "positionText": "徳山〜####"
+          "positionText": "戸田〜富海"
         },
         {
-          "no": "3320M",
-          "pos": "0156_0157",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "岩国",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "富海〜防府"
-        },
-        {
-          "no": "8079M",
-          "pos": "0159_0160",
+          "no": "3331M",
+          "pos": "0155_####",
           "direction": 1,
-          "displayType": "特急",
+          "displayType": "普通",
           "dest": "下関",
           "delayMinutes": 0,
           "numberOfCars": null,
@@ -1314,10 +1446,10 @@
             "stopTime",
             "type"
           ],
-          "positionText": "四辻〜新山口"
+          "positionText": "戸田〜####"
         },
         {
-          "no": "3313M",
+          "no": "3329M",
           "pos": "0160_####",
           "direction": 1,
           "displayType": "普通",
@@ -1339,8 +1471,8 @@
           "positionText": "新山口〜####"
         },
         {
-          "no": "3322M",
-          "pos": "0162_0163",
+          "no": "3336M",
+          "pos": "0160_####",
           "direction": 0,
           "displayType": "普通",
           "dest": "岩国",
@@ -1358,33 +1490,11 @@
             "stopTime",
             "type"
           ],
-          "positionText": "本由良〜厚東"
+          "positionText": "新山口〜####"
         },
         {
-          "no": "1838M",
-          "pos": "0164_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "新山口",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "宇部〜####"
-        },
-        {
-          "no": "3311M",
-          "pos": "0167_0168",
+          "no": "3411M",
+          "pos": "0164_0165",
           "direction": 1,
           "displayType": "普通",
           "dest": "下関",
@@ -1402,14 +1512,36 @@
             "stopTime",
             "type"
           ],
-          "positionText": "埴生〜小月"
+          "positionText": "宇部〜小野田"
         },
         {
-          "no": "3324M",
-          "pos": "0169_0170",
+          "no": "3340M",
+          "pos": "0166_0167",
           "direction": 0,
           "displayType": "普通",
           "dest": "岩国",
+          "delayMinutes": 3,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "厚狭〜埴生"
+        },
+        {
+          "no": "3523M",
+          "pos": "0168_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "下関",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1424,10 +1556,32 @@
             "stopTime",
             "type"
           ],
-          "positionText": "長府〜新下関"
+          "positionText": "小月〜####"
         },
         {
-          "no": "2453M",
+          "no": "3327M",
+          "pos": "0171_####",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "下関",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "幡生〜####"
+        },
+        {
+          "no": "873D",
           "pos": "0171_0172",
           "direction": 1,
           "displayType": "普通",
@@ -1449,7 +1603,29 @@
           "positionText": "幡生〜下関"
         },
         {
-          "no": "5149M",
+          "no": "3342M",
+          "pos": "0172_####",
+          "direction": 0,
+          "displayType": "普通",
+          "dest": "岩国",
+          "delayMinutes": 0,
+          "numberOfCars": null,
+          "raw_keys": [
+            "delayMinutes",
+            "dest",
+            "direction",
+            "displayType",
+            "nickname",
+            "no",
+            "notice",
+            "pos",
+            "stopTime",
+            "type"
+          ],
+          "positionText": "下関〜####"
+        },
+        {
+          "no": "5177M",
           "pos": "0172_####",
           "direction": 1,
           "displayType": "普通",
@@ -1471,7 +1647,7 @@
           "positionText": "下関〜####"
         },
         {
-          "no": "856D",
+          "no": "866D",
           "pos": "0172_####",
           "direction": 0,
           "displayType": "普通",
@@ -1503,16 +1679,16 @@
         "range": "新山口〜益田",
         "st": "/api/v3/yamaguchi_st.json"
       },
-      "update": "2026-10-13T00:44:45.333Z",
+      "update": "2026-10-13T07:08:44.522Z",
       "station_count": 28,
-      "train_count": 5,
+      "train_count": 4,
       "trains": [
         {
-          "no": "3001D",
+          "no": "2545D",
           "pos": "0360_####",
-          "direction": 0,
-          "displayType": "特急",
-          "dest": "新山口",
+          "direction": 1,
+          "displayType": "普通",
+          "dest": "益田",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1530,11 +1706,11 @@
           "positionText": "長門峡〜####"
         },
         {
-          "no": "654D",
-          "pos": "0353_####",
-          "direction": 0,
+          "no": "673D",
+          "pos": "0160_####",
+          "direction": 1,
           "displayType": "普通",
-          "dest": "新山口",
+          "dest": "山口",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1549,11 +1725,11 @@
             "stopTime",
             "type"
           ],
-          "positionText": "矢原〜####"
+          "positionText": "新山口〜####"
         },
         {
-          "no": "3002D",
-          "pos": "0363_####",
+          "no": "3006D",
+          "pos": "0160_####",
           "direction": 1,
           "displayType": "特急",
           "dest": "米子",
@@ -1571,36 +1747,14 @@
             "stopTime",
             "type"
           ],
-          "positionText": "名草〜####"
+          "positionText": "新山口〜####"
         },
         {
-          "no": "2544D",
-          "pos": "0367_####",
-          "direction": 0,
-          "displayType": "普通",
-          "dest": "山口",
-          "delayMinutes": 0,
-          "numberOfCars": null,
-          "raw_keys": [
-            "delayMinutes",
-            "dest",
-            "direction",
-            "displayType",
-            "nickname",
-            "no",
-            "notice",
-            "pos",
-            "stopTime",
-            "type"
-          ],
-          "positionText": "船平山〜####"
-        },
-        {
-          "no": "653D",
-          "pos": "0349_####",
+          "no": "671D",
+          "pos": "0355_####",
           "direction": 1,
           "displayType": "普通",
-          "dest": "山口",
+          "dest": "宮野",
           "delayMinutes": 0,
           "numberOfCars": null,
           "raw_keys": [
@@ -1615,49 +1769,73 @@
             "stopTime",
             "type"
           ],
-          "positionText": "周防下郷〜####"
+          "positionText": "山口〜####"
         }
       ]
     }
   ],
   "summary": {
     "line_count": 6,
-    "total_trains": 69,
-    "delayed_trains": 3,
+    "total_trains": 76,
+    "delayed_trains": 14,
     "delay_buckets": {
-      "1_4": 2,
-      "5_9": 1,
+      "1_4": 14,
+      "5_9": 0,
       "10_14": 0,
       "15_plus": 0
     },
-    "top_station": "八本松",
-    "top_station_level": "weak"
+    "top_station": "####",
+    "top_station_level": "watch"
   },
   "station_impacts": [
     {
-      "station": "八本松",
+      "station": "####",
+      "score": 6,
+      "delayed_trains": 6,
+      "max_delay": 1,
+      "lines": [
+        "可部線",
+        "呉線",
+        "山陽線",
+        "芸備線"
+      ],
+      "level": "watch"
+    },
+    {
+      "station": "横川",
+      "score": 3,
+      "delayed_trains": 3,
+      "max_delay": 1,
+      "lines": [
+        "可部線",
+        "山陽線"
+      ],
+      "level": "weak"
+    },
+    {
+      "station": "岩国",
       "score": 2,
-      "delayed_trains": 1,
-      "max_delay": 7,
+      "delayed_trains": 2,
+      "max_delay": 2,
       "lines": [
         "山陽線"
       ],
       "level": "weak"
     },
     {
-      "station": "瀬野",
+      "station": "南岩国",
       "score": 2,
-      "delayed_trains": 1,
-      "max_delay": 7,
+      "delayed_trains": 2,
+      "max_delay": 2,
       "lines": [
         "山陽線"
       ],
       "level": "weak"
     },
     {
-      "station": "呉",
-      "score": 1,
-      "delayed_trains": 1,
+      "station": "安芸阿賀",
+      "score": 2,
+      "delayed_trains": 2,
       "max_delay": 1,
       "lines": [
         "呉線"
@@ -1665,32 +1843,52 @@
       "level": "weak"
     },
     {
-      "station": "川原石",
+      "station": "厚狭",
       "score": 1,
       "delayed_trains": 1,
-      "max_delay": 1,
-      "lines": [
-        "呉線"
-      ],
-      "level": "weak"
-    },
-    {
-      "station": "幡生",
-      "score": 1,
-      "delayed_trains": 1,
-      "max_delay": 1,
+      "max_delay": 3,
       "lines": [
         "山陽線"
       ],
       "level": "weak"
     },
     {
-      "station": "下関",
+      "station": "埴生",
+      "score": 1,
+      "delayed_trains": 1,
+      "max_delay": 3,
+      "lines": [
+        "山陽線"
+      ],
+      "level": "weak"
+    },
+    {
+      "station": "矢賀",
+      "score": 1,
+      "delayed_trains": 1,
+      "max_delay": 2,
+      "lines": [
+        "芸備線"
+      ],
+      "level": "weak"
+    },
+    {
+      "station": "広島",
+      "score": 1,
+      "delayed_trains": 1,
+      "max_delay": 2,
+      "lines": [
+        "芸備線"
+      ],
+      "level": "weak"
+    },
+    {
+      "station": "戸坂",
       "score": 1,
       "delayed_trains": 1,
       "max_delay": 1,
       "lines": [
-        "山陽線"
+        "芸備線"
       ],
       "level": "weak"
     }
