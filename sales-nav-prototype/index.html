@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V9 -->
+<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V10 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -205,7 +205,7 @@ main{position:relative;min-height:0;overflow:hidden}
 #rideReservationCard .label,#rideReservationSub{display:none}
 #rideReservationCard .chev{font-size:20px}
 @media(max-height:740px){.payopts{height:120px;padding:0 0 64px}}
-.payopt{flex-shrink:0;scroll-snap-align:center}
+.payopt{flex-shrink:0;scroll-snap-align:start}
 .payopt{min-height:56px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
 .payopt.selected{background:#123456;border-color:#2f86ff}
 .discount-toggle{width:100%;min-height:48px;border:1px solid #3b4a55;background:#101b24;color:#d8e2e9;border-radius:12px;font-weight:850;font-size:15px}
@@ -9064,9 +9064,9 @@ function pickPay(el){
 }
 function selectCenteredPayment(){
  const wheel=document.querySelector('.payopts');if(!wheel?.clientHeight)return;
- const center=wheel.scrollTop+wheel.clientHeight/2;
+ const target=wheel.scrollTop;
  const opts=[...wheel.querySelectorAll('.payopt')];
- const selected=opts.reduce((best,el)=>!best||Math.abs(el.offsetTop+el.offsetHeight/2-center)<Math.abs(best.offsetTop+best.offsetHeight/2-center)?el:best,null);
+ const selected=opts.reduce((best,el)=>!best||Math.abs(el.offsetTop-target)<Math.abs(best.offsetTop-target)?el:best,null);
  if(selected)opts.forEach(el=>{const on=el===selected;el.classList.toggle('selected',on);el.setAttribute('aria-pressed',String(on));});
 }
 function initPaymentWheel(){
