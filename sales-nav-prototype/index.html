@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-PAYMENT-RESERVATION-V2 -->
+<!-- BUILD:2026-10-13-FORCE-REFRESH-V3 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1830,7 +1830,7 @@ html,body{
    <div id="homeEventSub" class="sub">ライブ・スポーツを確認中</div>
   </div>
 
-  <button hidden class="force-refresh-btn" type="button" onclick="forceAppRefresh()">↻ 強制更新</button>
+  <button class="force-refresh-btn" type="button" onclick="forceAppRefresh(event)">↻ 強制更新</button>
  </div>
  <div class="action home-actions">
   <button id="dutyMainButton" class="primary" onclick="handleDutyMain()">乗務開始</button>
@@ -2048,7 +2048,7 @@ html,body{
 
 <section id="today" class="screen">
  <div class="content today-content">
-  <button hidden id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
+  <button id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
   <div class="info-grid">
    <div id="jrInfoCard" class="info-card">
     <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
@@ -2651,7 +2651,7 @@ html,body{
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></span><span>乗務終了</span></div>
    <div id="menuForceDutyEnd" class="menuitem danger" onclick="forceEndDutyTemporary()" style="display:none"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/><path d="M8 8l8 8M16 8l-8 8" stroke="#071019" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>強制終了（一時）</span></div>
   </div>
-  <div class="sub" id="appVersionLabel">画面バージョン 2026.10.13.2</div>
+  <div class="sub" id="appVersionLabel">画面バージョン 2026.10.13.3</div>
  </div>
  <div class="action"><button class="primary secondary">ログアウト</button></div>
 </section>
@@ -9797,33 +9797,26 @@ refreshLocationDependentFeeds();
 setInterval(refreshLocationDependentFeeds,60000);
 setInterval(flushGpsDbWrites,5000);
 
-async function forceAppRefresh(){
- const btn=event?.currentTarget||null;
- if(btn){
-  btn.disabled=true;
-  btn.textContent='↻ 再読込中…';
+async function forceAppRefresh(ev){
+ // GitHub Pages shares its origin with Care Taxi: never remove caches or
+ // unregister service workers belonging to that origin.
+ if(currentRideStart){
+  toast('乗車を終了・保存してから強制更新してください');
+  return;
  }
+ if(historyArchiveBusy.size){
+  toast('履歴を保存中です。少し待ってから更新してください');
+  return;
+ }
+ const btn=ev?.currentTarget||null;
+ if(btn){btn.disabled=true;btn.textContent='↻ 再読込中…';}
  try{
-  // 予約・乗務記録などlocalStorageの利用者データは消さない。
-  // Cache Storage / Service Workerだけを整理し、URLへ一時パラメータを付けて
-  // 最新のHTMLをサーバーから取り直す。
-  if('caches' in window){
-   try{
-    const keys=await caches.keys();
-    await Promise.all(keys.map(k=>caches.delete(k)));
-   }catch(e){}
-  }
-  if('serviceWorker' in navigator){
-   try{
-    const regs=await navigator.serviceWorker.getRegistrations();
-    await Promise.all(regs.map(r=>r.unregister()));
-   }catch(e){}
-  }
   const u=new URL(location.href);
   u.searchParams.set('_refresh',Date.now().toString());
   location.replace(u.toString());
  }catch(e){
-  location.reload();
+  if(btn){btn.disabled=false;btn.textContent='↻ 強制更新';}
+  toast('再読込できませんでした。保存データは保持しています');
  }
 }
 
