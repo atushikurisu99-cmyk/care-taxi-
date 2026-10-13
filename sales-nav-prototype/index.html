@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V12 -->
+<!-- BUILD:2026-10-14-LEGACY-URL-FARE-FIX-V20 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -8977,16 +8977,28 @@ function trackFareSnap(r){
  }
  f.lastSnap=p;
 }
-function shadowFareFor(meters,seconds,settings,startedAt){
- const s=settings;if(!s||!(s.baseYen>0&&s.baseMeters>0&&s.stepYen>0&&s.stepMeters>0))return null;
- let yen=Number(s.baseYen)+Math.max(0,Number(s.pickupYen)||0);
- yen+=Math.ceil(Math.max(0,meters-Number(s.baseMeters))/Number(s.stepMeters))*Number(s.stepYen);
- if(Number(s.timeStepSec)>0)yen+=Math.floor(seconds/Number(s.timeStepSec))*Number(s.stepYen);
- const d=new Date(startedAt),min=d.getHours()*60+d.getMinutes();
- const parse=v=>{const m=String(v||'').match(/^(\d{2}):(\d{2})$/);return m?Number(m[1])*60+Number(m[2]):0};
- const a=parse(s.lateNightStart),b=parse(s.lateNightEnd);
- if(s.lateNightPct>0&&(a>b?(min>=a||min<b):(min>=a&&min<b)))yen*=1+Number(s.lateNightPct)/100;
- const step=Math.max(1,Number(s.stepYen));return Math.round(yen/step)*step;
+function isFareNightAt(timestamp,settings){
+ const s=settings||getVehicleFareSettings();
+ const parse=v=>{const m=String(v||'').match(/^([0-9]{2}):([0-9]{2})$/);return m?Number(m[1])*60+Number(m[2]):null};
+ const start=parse(s.lateNightStart),end=parse(s.lateNightEnd);
+ if(start===null||end===null||start===end||!(Number(s.lateNightPct)>0))return false;
+ const d=new Date(timestamp),now=d.getHours()*60+d.getMinutes();
+ return start>end?(now>=start||now<end):(now>=start&&now<end);
+}
+// 概算専用: 初乗り額は割増しない。深夜は距離短縮方式、低速時間は距離に換算して合算。
+// 低速中の走行距離を除いて時間換算距離へ置換。深夜境界の途中切替、料金メーター固有の端数処理は実メーターで確認。
+function shadowFareFor(meters,seconds,settings,startedAt,lowSpeedMeters=0){
+ const s=settings;
+ if(!s||!(Number(s.baseYen)>0&&Number(s.baseMeters)>0&&Number(s.stepYen)>0&&Number(s.stepMeters)>0))return null;
+ const base=Number(s.baseYen),step=Number(s.stepYen);
+ const night=isFareNightAt(startedAt,s),factor=night?1+Number(s.lateNightPct)/100:1;
+ const firstDistance=Number(s.baseMeters)/factor,stepDistance=Number(s.stepMeters)/factor;
+ const slowSeconds=Math.max(0,Number(seconds)||0);
+ const timeMeters=Number(s.timeStepSec)>0?slowSeconds*(Number(s.stepMeters)/Number(s.timeStepSec)):0;
+ const totalMeters=Math.max(0,(Number(meters)||0)-Math.max(0,Number(lowSpeedMeters)||0))+timeMeters;
+ // 初乗距離内なら、深夜でも初乗り額のまま。
+ const increments=Math.max(0,Math.ceil((totalMeters-firstDistance-1e-8)/stepDistance));
+ return base+increments*step+Math.max(0,Number(s.pickupYen)||0);
 }
 function finishFareShadow(ride,actualYen,paymentMethod,discount){
  if(!ride?.rideId)return;
@@ -9024,32 +9036,40 @@ function updateRideFareTracking(pos){
  rideFareTracking.lastTs=now;
  if(currentRideStart?.rideId&&now-Number(rideFareTracking.lastPersistAt||0)>=15000){rideFareTracking.lastPersistAt=now;upsertTripRecord(currentRideStart.rideId,{lowSpeedSeconds:Math.round(rideFareTracking.lowSpeedSeconds),speedAvailable:pos.coords.speed!==null&&pos.coords.speed!==undefined});}
 }
+function fareSettingsForRide(ride=currentRideStart){
+ const saved=getVehicleFareSettings();
+ return Number(saved.baseYen)>0?saved:(ride?.fareSettingsAtPickup||saved);
+}
 function estimatedRideFare(){
- if(!currentRideStart) return 0;
- const s=getVehicleFareSettings();
+ if(!currentRideStart)return 0;
+ const s=fareSettingsForRide();
  const meters=Math.max(0,currentDutyMeters()-Number(currentRideStart.pickupDutyMeters||0));
- let fare=Math.max(0,Number(s.baseYen)||0)+Math.max(0,Number(s.pickupYen)||0);
- const excess=Math.max(0,meters-Math.max(0,Number(s.baseMeters)||0));
- if(excess>0&&Number(s.stepMeters)>0&&Number(s.stepYen)>0) fare+=Math.ceil(excess/Number(s.stepMeters))*Number(s.stepYen);
- if(Number(s.timeStepSec)>0&&Number(s.stepYen)>0) fare+=Math.floor(rideFareTracking.lowSpeedSeconds/Number(s.timeStepSec))*Number(s.stepYen);
- if(Number(s.lateNightPct)>0&&isLateNightFareTime(new Date(currentRideStart.startedAt||Date.now()))) fare*=1+Number(s.lateNightPct)/100;
- const step=Math.max(1,Number(s.stepYen)||10);
- return Math.max(0,Math.round(fare/step)*step);
+ const estimate=shadowFareFor(meters,Number(rideFareTracking.lowSpeedSeconds||0),s,currentRideStart.startedAt||Date.now(),rideFareTracking.lowSpeedMeters);
+ return estimate===null?Math.max(0,Number(s.baseYen)||0)+Math.max(0,Number(s.pickupYen)||0):estimate;
 }
 function getPaymentFareValue(){return Math.max(0,Number(document.getElementById('paymentFareInput')?.value||0))}
 function preparePaymentFare(){
  saveRideTripInputs();
  initPaymentWheel();
  resetPaymentChoices();
- const settings=currentRideStart?.fareSettingsAtPickup||getVehicleFareSettings();
+ const settings=fareSettingsForRide();
  const meters=Math.max(0,currentDutyMeters()-Number(currentRideStart?.pickupDutyMeters||0));
- const estimated=shadowFareFor(meters,Number(rideFareTracking.lowSpeedSeconds||0),settings,currentRideStart?.startedAt||Date.now());
+ const estimated=shadowFareFor(meters,Number(rideFareTracking.lowSpeedSeconds||0),settings,currentRideStart?.startedAt||Date.now(),rideFareTracking.lowSpeedMeters);
  const base=Math.max(0,Number(settings.baseYen)||0);
- const fare=Math.max(base,Number(estimated)||0);
+ const fare=estimated===null?base+Math.max(0,Number(settings.pickupYen)||0):Math.max(base,estimated);
  const input=document.getElementById('paymentFareInput');
  if(input){input.value=String(fare);input.classList.add('fare-estimate');}
  const note=document.getElementById('paymentFareEstimateNote');
- if(note)note.textContent=fare>0?'設定料金からの概算です。実メーター額を確認・修正してください':'初乗り運賃が未設定です。車両設定を確認してください';
+ if(note){
+  if(fare>0){
+   const initial=Number(settings.baseYen)||0;
+   const night=isFareNightAt(currentRideStart?.startedAt||Date.now(),settings);
+   const parts=['保存済み初乗り設定 '+initial.toLocaleString('ja-JP')+'円'];
+   if(night)parts.push('深夜：距離短縮 '+Number(settings.lateNightPct)+'%');
+   if(Number(settings.pickupYen)>0)parts.push('迎車 '+Number(settings.pickupYen).toLocaleString('ja-JP')+'円');
+   note.textContent=parts.join('・')+' → 概算 '+fare.toLocaleString('ja-JP')+'円。実メーター額を確認・修正してください';
+  }else note.textContent='初乗り運賃が未設定です。車両設定を確認してください';
+ }
 }
 function adjustPaymentFare(dir){
  const input=document.getElementById('paymentFareInput');if(!input)return;
