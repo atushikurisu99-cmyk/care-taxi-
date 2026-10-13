@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-09-LIVE-CARD-NOTICE-SOUND-V20 -->
+<!-- BUILD:2026-10-13-PAYMENT-RESERVATION-V2 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -16,6 +16,7 @@
  --header:58px;--nav:98px;--action:78px;--gap:10px;
 }
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 html,body{margin:0;height:100%;overflow:hidden;background:var(--bg)}
 body{position:fixed;inset:0;font-family:-apple-system,BlinkMacSystemFont,"Hiragino Sans","Yu Gothic",sans-serif;color:var(--text);touch-action:manipulation}
 button,input{font:inherit}
@@ -191,7 +192,20 @@ main{position:relative;min-height:0;overflow:hidden}
 .drive-state{display:flex;align-items:center;justify-content:space-between;min-height:90px;background:#10251b;border-color:#25533a}
 .drive-state strong{font-size:27px}
 .drive-note{margin:auto 0;text-align:center;color:#7e909d;font-size:14px}
-.payopts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.payment-selection{display:grid;grid-template-columns:minmax(0,1fr) 108px;gap:10px;align-items:center}
+.payment-dial{min-width:0;border:1px solid #2b3a46;border-radius:14px;background:#09151f;overflow:hidden}
+.payopts{display:flex;position:relative;flex-direction:column;gap:8px;height:148px;padding:44px 0;overflow-y:auto;scroll-snap-type:y mandatory;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:none}
+.payopts::-webkit-scrollbar{display:none}
+.payment-side-controls{display:flex;flex-direction:column;gap:8px}
+.payment-side-controls .discount-toggle{min-height:56px;padding:8px;font-size:16px;line-height:1.2}
+#payment .content{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
+#paymentMemoInput{min-height:42px;font-size:16px;border:1px solid #2b3a46;border-radius:10px;padding:8px;background:#09151f;color:white}
+#rideReservationCard{align-self:flex-end;width:auto;max-width:100%;height:44px;min-height:44px;padding:8px 12px;gap:10px;border-radius:12px}
+#rideReservationCard strong{font-size:16px;line-height:1.2}
+#rideReservationCard .label,#rideReservationSub{display:none}
+#rideReservationCard .chev{font-size:20px}
+@media(max-height:740px){.payopts{height:136px;padding:38px 0}}
+.payopt{flex-shrink:0;scroll-snap-align:center}
 .payopt{min-height:60px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
 .payopt.selected{background:#123456;border-color:#2f86ff}
 .discount-toggle{width:100%;min-height:48px;border:1px solid #3b4a55;background:#101b24;color:#d8e2e9;border-radius:12px;font-weight:850;font-size:15px}
@@ -798,6 +812,7 @@ body:has(#analysis.active){touch-action:auto}
 }
 /* 予約入力レイアウト収まり修正 */
 *{box-sizing:border-box}
+[hidden]{display:none!important}
 .card,.form-card,.reservation-item,.vacant-summary-row,.reservation{
  overflow:hidden;
 }
@@ -1815,7 +1830,7 @@ html,body{
    <div id="homeEventSub" class="sub">ライブ・スポーツを確認中</div>
   </div>
 
-  <button class="force-refresh-btn" type="button" onclick="forceAppRefresh()">↻ 強制更新</button>
+  <button hidden class="force-refresh-btn" type="button" onclick="forceAppRefresh()">↻ 強制更新</button>
  </div>
  <div class="action home-actions">
   <button id="dutyMainButton" class="primary" onclick="handleDutyMain()">乗務開始</button>
@@ -1870,7 +1885,7 @@ html,body{
    </div>
   </div>
 
-  <div id="rideReservationCard" class="reservation hidden" onclick="show('schedule')"><div><div class="label">予約</div><strong id="rideReservationTitle">予約あり</strong><div id="rideReservationSub" class="sub"></div></div><span class="chev">›</span></div>
+  <div id="rideReservationCard" class="reservation hidden" role="button" tabindex="0" aria-label="予約の詳細を確認" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();show('schedule')}" onclick="show('schedule')"><div><div class="label">予約</div><strong id="rideReservationTitle">予約あり</strong><div id="rideReservationSub" class="sub"></div></div><span class="chev">›</span></div>
 
   <div class="drive-note">通知は必要な時だけ重ねて表示</div>
  </div>
@@ -1886,19 +1901,23 @@ html,body{
     <input id="paymentFareInput" class="fare-input" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="運賃">
     <button class="fare-step" type="button" onclick="adjustPaymentFare(1)" aria-label="1メーター上げる">▲</button>
    </div>
-   <div id="paymentFareEstimateNote" class="fare-estimate-note">GPS・低速時間から自動計算</div>
+   <div id="paymentFareEstimateNote" class="fare-estimate-note">実メーター料金を入力</div>
   </div>
   <div class="card">
    <h2>支払方法</h2>
-   <div class="payopts">
+   <div class="payment-selection">
+   <div class="payment-dial"><div class="payopts" aria-label="支払方法のダイヤル">
     <button class="payopt selected" data-pay="現金" onclick="pickPay(this)">現金</button>
     <button class="payopt" data-pay="キャッシュレス" onclick="pickPay(this)">キャッシュレス</button>
+    <button class="payopt" data-pay="クレジットカード" onclick="pickPay(this)">クレジットカード</button>
     <button class="payopt" data-pay="タクシーチケット" onclick="pickPay(this)">タクシーチケット</button>
-   </div>
-   <div style="margin-top:10px">
+   </div></div>
+   <div class="payment-side-controls">
+    <button id="receiptIssuedButton" class="discount-toggle" type="button" aria-pressed="false" onclick="this.classList.toggle('selected');this.setAttribute('aria-pressed',String(this.classList.contains('selected')))">領収書発行</button>
     <button id="disabilityDiscountButton" class="discount-toggle" type="button" aria-pressed="false" onclick="toggleDisabilityDiscount()">身障者割引</button>
-    <div class="payment-note">割引は支払方法と別に記録します</div>
    </div>
+   </div>
+   <label class="payment-note" for="paymentMemoInput">メモ（任意）</label><input id="paymentMemoInput" maxlength="1000" placeholder="空欄でも降車できます" style="width:100%">
   </div>
   <div class="ride-location">
    <div class="label">乗車地（GPS自動記録）</div>
@@ -1971,6 +1990,7 @@ html,body{
 <section id="reservationShare" class="screen">
  <div class="content">
   <div id="reservationShareSummary" class="share-summary"></div>
+  <label class="form-label" for="reservationRecipientUid">共有相手の利用者ID</label><input id="reservationRecipientUid" class="form-input" autocomplete="off" placeholder="相手のGoogle連携画面で確認">
   <div class="share-choice">
    <button onclick="beginAppReservationShare()">アプリで共有<small>承認・迎車・完了状態を共有</small></button>
    <button onclick="shareReservationLine()">LINEで共有<small>リンク無しの予約テキスト</small></button>
@@ -2028,7 +2048,7 @@ html,body{
 
 <section id="today" class="screen">
  <div class="content today-content">
-  <button id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
+  <button hidden id="forceRefreshButton" class="force-refresh-btn" type="button" onclick="forceRefreshLiveData()">↻ 強制更新</button>
   <div class="info-grid">
    <div id="jrInfoCard" class="info-card">
     <div class="info-top"><span class="info-key">JR</span><span id="jrInfoStatus" class="info-status">取得待ち</span></div>
@@ -2293,6 +2313,10 @@ html,body{
       <div id="analysisPickupLegend" class="analysis-pickup-legend"></div>
      </div>
     </div>
+    <div class="analysis-insight-slide">
+     <div class="analysis-section-head"><strong>同月の年別比較</strong><select id="analysisCompareMonth" aria-label="比較月" onchange="renderAnalysisYearComparison()"><option value="1">1月</option><option value="2">2月</option><option value="3">3月</option><option value="4">4月</option><option value="5">5月</option><option value="6">6月</option><option value="7">7月</option><option value="8">8月</option><option value="9">9月</option><option value="10">10月</option><option value="11">11月</option><option value="12">12月</option></select></div>
+     <div class="analysis-hour-scroll"><div id="analysisYearComparison"></div></div>
+    </div>
    </div>
   </div>
 
@@ -2328,6 +2352,7 @@ html,body{
    <button class="primary" onclick="copyValidationSummary()">検証結果をコピー</button>
    <div class="sub" style="margin-top:8px">このチャットに貼り付ければ、そのまま解析できます。</div>
    <button class="smallbtn" style="margin-top:10px" onclick="shareValidationData()">詳細JSONを共有</button>
+   <button class="smallbtn" style="margin-top:10px" onclick="shareTrafficAuditData()">交通通知ログのみ共有（位置情報なし）</button>
   </div>
   <div id="verifyList" class="list"></div>
  </div>
@@ -2379,6 +2404,9 @@ html,body{
     <button type="button" class="demo" onclick="seedDemoOperationData()">デモ数値</button>
     <button id="monthlyReportPreviewButton" type="button" onclick="toggleMonthlyReportPreview()">プレビュー</button>
     <button type="button" onclick="syncDailyReportsToGoogleSheets(false)">Google Sheetsへ同期</button>
+    <button type="button" onclick="beginPersonalDriveBackup()">明細・ログをDriveへ保存</button>
+    <button type="button" onclick="saveMonthlyReportToDrive()">月報ExcelをDriveへ保存</button>
+    <button type="button" onclick="restorePersonalRecords(false)">本人の履歴を復元</button>
     <button type="button" class="print" onclick="printMonthlyReport()">印刷</button>
     <button type="button" class="main" onclick="downloadMonthlyReportXlsx()">Excelダウンロード</button>
     <button type="button" class="mail" onclick="sendMonthlyReportMail()">メール送信</button>
@@ -2471,8 +2499,9 @@ html,body{
     </div>
 
     <div class="vehicle-area-grid">
+     <label class="vehicle-area-field">都道府県<select id="vehiclePrefecture" onchange="renderSalesAreaOptions()"></select></label>
      <label class="vehicle-area-field">営業区域
-      <select id="vehicleSalesArea" onchange="handleVehicleSalesAreaChange()"></select>
+      <select id="vehicleSalesArea" onchange="handleVehicleSalesAreaChange()"></select><input id="vehicleCustomSalesArea" class="form-input" placeholder="未収録の営業区域名（任意）">
      </label>
      <div class="vehicle-area-field">
       <span>現在地エリア</span>
@@ -2622,6 +2651,7 @@ html,body{
    <div id="menuDutyEnd" class="menuitem danger" onclick="endDuty()"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><rect x="5" y="5" width="14" height="14" rx="3"/></svg></span><span>乗務終了</span></div>
    <div id="menuForceDutyEnd" class="menuitem danger" onclick="forceEndDutyTemporary()" style="display:none"><span class="menu-icon end" aria-hidden="true"><svg viewBox="0 0 24 24" fill="currentColor"><path d="M6 6h12v12H6z"/><path d="M8 8l8 8M16 8l-8 8" stroke="#071019" stroke-width="2.2" stroke-linecap="round"/></svg></span><span>強制終了（一時）</span></div>
   </div>
+  <div class="sub" id="appVersionLabel">画面バージョン 2026.10.13.2</div>
  </div>
  <div class="action"><button class="primary secondary">ログアウト</button></div>
 </section>
@@ -2735,7 +2765,7 @@ function openNearbyLpgStands(){
   const centeredMap='https://www.google.com/maps/search/'+query+'/@'+lat.toFixed(6)+','+lon.toFixed(6)+',12z?hl=ja';
   window.location.assign(centeredMap);
  };
- if(navigator.geolocation){
+ if(featureEnabled('gps')&&navigator.geolocation){
   navigator.geolocation.getCurrentPosition(launch,()=>{
    if(latestPosition&&latestPosition.coords) launch(latestPosition);
    else toast('位置情報を取得できません。地名検索をご利用ください');
@@ -2748,6 +2778,7 @@ function openAreaLpgStands(){
  lpgMapsSearch(area+' オートガススタンド LPガス');
 }
 function show(id){
+ const screenFeature={verify:'verification',analysis:'analysis',dailyReport:'reports',reportEdit:'reports',monthlyReport:'reports',schedule:'reservations',reservationEdit:'reservations',reservationShare:'reservations',jrDetail:'jr',busDetail:'bus',eventDetail:'events'}[id];if(screenFeature&&!featureEnabled(screenFeature)){toast('この機能は利用できません');return;}
  if(id==='lpgStand')renderLpgVerified();
  hideNotice();hideSafety();
  const monthlyPreview=document.getElementById('monthlyReportPreview');
@@ -2961,7 +2992,7 @@ async function refreshSessionFromAppDevice(){
    method:'POST',
    headers:{'Content-Type':'application/json'},
    body:JSON.stringify({appDeviceToken}),
-   cache:'no-store'
+   cache:'no-store',signal:AbortSignal.timeout(15000)
   });
   const d=await r.json().catch(()=>({}));
   if(!r.ok||!d?.ok||!d?.session) return '';
@@ -2973,7 +3004,7 @@ async function ensureGoogleAuthSession(showError=false){
  let token=await loadGoogleSessionBackup();
  if(token){
   try{
-   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store',signal:AbortSignal.timeout(15000)});
    if(r.ok){
     const d=await r.json().catch(()=>({}));
     if(d?.ok) return token;
@@ -3111,6 +3142,28 @@ async function disconnectGoogleAccount(){
  renderGoogleAuthStatus(null);
  toast('この端末のGoogle連携を解除しました');
 }
+let applicationAccessPolicy=null;
+try{applicationAccessPolicy=JSON.parse(localStorage.getItem('taxi_feature_policy_v1')||'null');}catch(e){}
+function featureEnabled(name){return applicationAccessPolicy?.enabled!==false&&applicationAccessPolicy?.features?.[name]!==false;}
+function applyApplicationAccess(policy){
+ applicationAccessPolicy=policy||null;try{localStorage.setItem('taxi_feature_policy_v1',JSON.stringify(applicationAccessPolicy));}catch(e){}
+ const selectors={jr:'#jrInfoCard,#homeJrValue',bus:'#busInfoCard',events:'#liveInfoCard,#sportsInfoCard',verification:'button[onclick="show(\'verify\')"]'};
+ for(const [name,selector] of Object.entries(selectors))document.querySelectorAll(selector).forEach(el=>el.hidden=!featureEnabled(name));
+ if(!featureEnabled('gps')&&geoWatchId!==null){navigator.geolocation?.clearWatch(geoWatchId);geoWatchId=null;gpsAnalysisQueue=[];hideSafety();}
+ if(!featureEnabled('jr')||!featureEnabled('bus')||!featureEnabled('events')){noticeQueue=noticeQueue.filter(x=>featureEnabled(trafficNoticeCategory(x.kind)==='event'?'events':trafficNoticeCategory(x.kind)));hideNotice();}
+ let overlay=document.getElementById('applicationAccessBlocked');
+ if(!overlay){overlay=document.createElement('div');overlay.id='applicationAccessBlocked';overlay.style.cssText='position:fixed;inset:0;z-index:999;background:var(--bg);color:var(--text);padding:30px';overlay.textContent='現在、利用権限が停止されています。保存済みの記録は保持しています。';document.body.appendChild(overlay);}
+ overlay.hidden=applicationAccessPolicy?.enabled!==false;
+}
+function renderAccessAdministration(profile){
+ let panel=document.getElementById('accessAdministration');
+ if(!profile?.isAdministrator){if(panel)panel.hidden=true;return;}
+ if(!panel){panel=document.createElement('div');panel.id='accessAdministration';panel.className='card';panel.innerHTML='<h2>利用権限</h2><input id="accessTargetUid" class="form-input" placeholder="対象者の利用者ID"><label><input id="accessEnabled" type="checkbox" checked>全体利用</label>'+['jr','bus','events','gps','reports','reservations','analysis','verification'].map(name=>'<label style="display:block"><input type="checkbox" checked data-access-feature="'+name+'">'+({jr:'JR',bus:'バス',events:'イベント',gps:'GPS',reports:'日報・月報',reservations:'予約',analysis:'分析',verification:'GPS検証'}[name])+'</label>').join('')+'<button type="button" class="primary" onclick="saveApplicationAccess()">権限を設定</button>';document.getElementById('googleAuthDetail')?.closest('.settings-card,.card')?.after(panel);}
+ panel.hidden=false;
+}
+async function saveApplicationAccess(){
+ try{const token=await ensureGoogleAuthSession(true);if(!token)return;const features={};document.querySelectorAll('[data-access-feature]').forEach(el=>features[el.dataset.accessFeature]=el.checked);const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/access/manage',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({userId:document.getElementById('accessTargetUid').value.trim(),enabled:document.getElementById('accessEnabled').checked,features})});const d=await r.json();if(!r.ok||!d.ok)throw new Error(d.error||'access_update_failed');toast('利用権限を設定しました');}catch(e){toast('権限を設定できませんでした');}
+}
 function renderGoogleAuthStatus(profile){
  const account=document.getElementById('googleAuthAccount');
  const pill=document.getElementById('googleAuthPill');
@@ -3120,13 +3173,17 @@ function renderGoogleAuthStatus(profile){
  const testMail=document.getElementById('googleAuthTestMailBtn');
  if(!account||!pill||!detail||!connect||!disconnect||!testMail) return;
  googleAuthProfile=(profile&&profile.ok)?profile:null;
+ if(profile?.ok)applyApplicationAccess(profile.accessPolicy);
+ renderAccessAdministration(profile);
  if(profile&&profile.ok){
+  setTimeout(retryDailySync,0);
   account.textContent=profile.email||'Google連携済み';
   pill.textContent='連携済み';pill.classList.add('on');
   const folder=profile.folderId?'Drive準備済み':'Drive準備中';
   const sheet=profile.spreadsheetId?'Sheets準備済み':'Sheets準備中';
   const gmail=profile.capabilities?.gmailSend?'Gmail送信OK':'Gmail再認証が必要';
-  detail.textContent=folder+' / '+sheet+' / '+gmail;
+  detail.textContent=folder+' / '+sheet+' / '+gmail+' / 利用者ID：'+(profile.userId||'確認中');
+  if(profile.userId)setTimeout(()=>{refreshSharedReservations();if(!getDailyReports().length)restorePersonalRecords(true);},0);
   connect.textContent='再認証';
   testMail.classList.remove('hidden');
   disconnect.classList.remove('hidden');
@@ -3144,7 +3201,7 @@ async function refreshGoogleAuthStatus(){
  const token=await ensureGoogleAuthSession(false);
  if(!token){renderGoogleAuthStatus(null);return}
  try{
-  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store'});
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/me',{headers:{Authorization:'Bearer '+token},cache:'no-store',signal:AbortSignal.timeout(15000)});
   if(!r.ok) throw new Error('auth '+r.status);
   const d=await r.json();
   if(!d?.ok) throw new Error('not connected');
@@ -3212,8 +3269,9 @@ function monthlyRows(monthKey){
   .slice().sort((a,b)=>String(a.dateKey||'').localeCompare(String(b.dateKey||'')));
 }
 function reportTravelKm(r){
+ if(r?.odometerStart===null||r?.odometerStart===''||r?.odometerEnd===null||r?.odometerEnd==='')return null;
  const a=Number(r?.odometerStart),b=Number(r?.odometerEnd);
- return Number.isFinite(a)&&Number.isFinite(b)&&a>0&&b>=a?Math.round(b-a):null;
+ return Number.isFinite(a)&&Number.isFinite(b)&&a>=0&&b>=a?Math.round(b-a):null;
 }
 function monthlyTotals(rows){
  return rows.reduce((o,r)=>{
@@ -3233,6 +3291,7 @@ function monthlyDefaultBody(monthKey){
  return 'お世話になっております。\n'+y+'年'+Number(m)+'月分の月報を送付いたします。\nご確認をお願いいたします。';
 }
 function renderMonthlyReportCenter(){
+ renderMonthlySendHistory();
  const monthEl=document.getElementById('monthlyReportMonth'); if(!monthEl)return;
  if(!monthEl.value) monthEl.value=monthKeyNow();
  const monthKey=monthEl.value;
@@ -3339,19 +3398,25 @@ function sogoFrontHeader(r){
   '</tr>'+
  '</tbody></table>';
 }
+function reportFinancialSummary(r,trips=[]){
+ const actual=trips.reduce((sum,x)=>sum+Math.max(0,Number(x?.fare)||0),0);
+ const originalCash=trips.filter(x=>String(x?.paymentMethod||'')==='現金').reduce((sum,x)=>sum+Math.max(0,Number(x?.fare)||0),0);
+ const known=value=>value!==null&&value!==undefined&&value!==''&&Number.isFinite(Number(value));
+ const sales=known(r?.sales)?Math.max(0,Number(r.sales)):actual;
+ const receivable=known(r?.receivable)?Math.max(0,Number(r.receivable)):Math.max(0,actual-originalCash);
+ return {sales,receivable,cash:Math.max(0,sales-receivable)};
+}
 function sogoSummaryHtml(r){
  const trips=reportTripsForTemplate(r);
  const km=reportTravelKm(r);
- const sales=trips.reduce((sum,x)=>sum+Math.max(0,Number(x.fare)||0),0) || Math.max(0,Number(r?.sales)||0);
- const cash=trips.filter(x=>String(x.paymentMethod||'')==='現金').reduce((s,x)=>s+Math.max(0,Number(x.fare)||0),0);
- const receivable=Math.max(0,sales-cash);
+ const {sales,cash,receivable}=reportFinancialSummary(r,trips);
  const people=trips.reduce((s,x)=>s+(Number(x.passengers)||1),0);
  return '<table class="sogo-summary-table"><tbody>'+
   '<tr><td rowspan="3" class="vlabel">走行粁</td><td class="labelcell">入庫</td><td class="unit">'+escapeHtml(r?.odometerEnd??'')+' キロ</td>'+
       '<td class="labelcell">乗車粁</td><td class="unit">'+escapeHtml(r?.occupiedKm??'')+' キロ</td>'+
       '<td class="labelcell">現収</td><td class="unit">'+escapeHtml(cash?cash.toLocaleString('ja-JP'):'')+' 円</td></tr>'+
   '<tr><td class="labelcell">出庫</td><td class="unit">'+escapeHtml(r?.odometerStart??'')+' キロ</td>'+
-      '<td class="labelcell">運送回数</td><td class="unit">'+escapeHtml(r?.trips||trips.length||'')+' 回</td>'+
+      '<td class="labelcell">運送回数</td><td class="unit">'+escapeHtml(r?.trips??trips.length??'')+' 回</td>'+
       '<td class="labelcell">未収</td><td class="unit">'+escapeHtml(receivable?receivable.toLocaleString('ja-JP'):'')+' 円</td></tr>'+
   '<tr><td class="labelcell">差引</td><td class="unit">'+escapeHtml(km??'')+' キロ</td>'+
       '<td class="labelcell">輸送人員</td><td class="unit">'+escapeHtml(people||'')+' 人</td>'+
@@ -3594,9 +3659,7 @@ function sogoFrontSvg(r){
  }
 
  const km=reportTravelKm(r);
- const sales=trips.reduce((sum,z)=>sum+Math.max(0,Number(z?.fare)||0),0)||Math.max(0,Number(r?.sales)||0);
- const cash=trips.filter(z=>String(z?.paymentMethod||'')==='現金').reduce((s,z)=>s+Math.max(0,Number(z?.fare)||0),0);
- const receivable=Math.max(0,sales-cash);
+ const {sales,cash,receivable}=reportFinancialSummary(r,trips);
  const people=trips.reduce((s,z)=>s+(Number(z?.passengers)||1),0);
  const sumY=[Y((1707+1775)/2),Y((1775+1842)/2),Y((1842+1910)/2)];
 
@@ -3612,7 +3675,7 @@ function sogoFrontSvg(r){
  text+=cellText(cellBox(556,1775,704,1842,4,2),'運送回数','summary','middle',TYPE.summaryLabel,10.0);
  text+=cellText(cellBox(556,1842,704,1910,4,2),'輸送人員','summary','middle',TYPE.summaryLabel,10.0);
  text+=mixedRight(cellBox(704,1707,992,1775,8,2),(r?.occupiedKm??''),(r?.occupiedKm!==''?'キロ':''),TYPE.summaryValue,TYPE.summaryUnit,5,-0.8);
- text+=mixedRight(cellBox(704,1775,992,1842,8,2),(r?.trips||trips.length||''),((r?.trips||trips.length)?'回':''),TYPE.summaryValue,TYPE.summaryUnit,5,-0.8);
+ text+=mixedRight(cellBox(704,1775,992,1842,8,2),(r?.trips??trips.length??''),((r?.trips||trips.length)?'回':''),TYPE.summaryValue,TYPE.summaryUnit,5,-0.8);
  text+=mixedRight(cellBox(704,1842,992,1910,8,2),(people||''),(people?'人':''),TYPE.summaryValue,TYPE.summaryUnit,5,-0.8);
  text+=cellText(cellBox(992,1707,1114,1775,4,2),'現収','summary','middle',TYPE.summaryLabel,10.2);
  text+=cellText(cellBox(992,1775,1114,1842,4,2),'未収','summary','middle',TYPE.summaryLabel,10.2);
@@ -3807,10 +3870,14 @@ function monthlyWorkbook(monthKey){
  if(typeof XLSX==='undefined') throw new Error('xlsx_library_not_loaded');
  const reports=monthlyRows(monthKey),tot=monthlyTotals(reports);
  const header=['日付','出庫時刻','入庫時刻','出庫オドメーター','入庫オドメーター','走行km','営業収入','未収','乗車回数','経費合計','備考'];
- const daily=[header,...reports.map(r=>[
-  r.dateKey||'',r.startTime||'',r.endTime||'',r.odometerStart??'',r.odometerEnd??'',reportTravelKm(r)??'',
-  Math.round(Number(r.sales)||0),Math.round(Number(r.receivable)||0),Math.round(Number(r.trips)||0),reportExpenseTotal(r),r.note||''
- ])];
+ const daily=[header];
+ const [year,month]=monthKey.split('-').map(Number),days=new Date(year,month,0).getDate();
+ for(let day=1;day<=31;day++){
+  if(day>days){daily.push(Array(11).fill(''));continue;}
+  const key=monthKey+'-'+String(day).padStart(2,'0');const rows=reports.filter(r=>r.dateKey===key);const sums=monthlyTotals(rows);
+  const first=rows[0],last=rows[rows.length-1];
+  daily.push(rows.length?[key,first.startTime||'',last.endTime||'',first.odometerStart??'',last.odometerEnd??'',sums.km,sums.sales,sums.receivable,sums.trips,sums.expenses,rows.map(r=>r.note||'').filter(Boolean).join(' / ')]:[key,...Array(10).fill('')]);
+ }
  daily.push(['合計','','','','',tot.km,tot.sales,tot.receivable,tot.trips,tot.expenses,'']);
  const cash=[['日付','摘要','収入','支出','残高']];
  let balance=0;
@@ -3831,83 +3898,237 @@ function monthlyWorkbook(monthKey){
  ws2['!margins']={left:0.3,right:0.3,top:0.4,bottom:0.4,header:0.2,footer:0.2};
  XLSX.utils.book_append_sheet(wb,ws1,'運転日報集計表');
  XLSX.utils.book_append_sheet(wb,ws2,'現金出納帳');
+ const detail=XLSX.utils.aoa_to_sheet([header,...reports.map(r=>[r.dateKey||'',r.startTime||'',r.endTime||'',r.odometerStart??'',r.odometerEnd??'',reportTravelKm(r)??'',r.sales??'',r.receivable??'',r.trips??'',reportExpenseTotal(r),r.note||''])]);detail['!cols']=ws1['!cols'];XLSX.utils.book_append_sheet(wb,detail,'乗務別明細');
  return wb;
 }
 function monthlyReportFilename(monthKey){
  return monthKey.replace('-','年')+'月_相互個人タクシー協同組合.xlsx';
 }
-function monthlyWorkbookBase64(monthKey){
- const wb=monthlyWorkbook(monthKey);
- return XLSX.write(wb,{bookType:'xlsx',type:'base64'});
+let xlsxZipToolsPromise=null;
+async function loadXlsxZipTools(){
+ if(window.JSZip)return window.JSZip;
+ if(!xlsxZipToolsPromise)xlsxZipToolsPromise=new Promise((resolve,reject)=>{const script=document.createElement('script');script.src='./jszip.min.js';script.onload=()=>resolve(window.JSZip);script.onerror=()=>{xlsxZipToolsPromise=null;reject(new Error('xlsx_print_tools_unavailable'));};document.head.appendChild(script);});
+ return xlsxZipToolsPromise;
 }
-function downloadMonthlyReportXlsx(){
+async function monthlyWorkbookBase64(monthKey){
+ const wb=monthlyWorkbook(monthKey);const JSZip=await loadXlsxZipTools();
+ const zip=await JSZip.loadAsync(XLSX.write(wb,{bookType:'xlsx',type:'base64'}),{base64:true});
+ for(const file of Object.keys(zip.files).filter(name=>/^xl\/worksheets\/sheet\d+\.xml$/.test(name))){
+  let xml=await zip.file(file).async('string');
+  xml=xml.replace(/<pageSetup[^>]*\/>/g,'').replace(/<sheetPr[^>]*\/>/g,'');
+  if(!/<sheetPr[ >]/.test(xml))xml=xml.replace(/(<worksheet[^>]*>)/,'$1<sheetPr><pageSetUpPr fitToPage="1"/></sheetPr>');
+  xml=xml.replace('</worksheet>','<pageSetup paperSize="9" orientation="landscape" fitToWidth="1" fitToHeight="1"/></worksheet>');zip.file(file,xml);
+ }
+ return zip.generateAsync({type:'base64',compression:'DEFLATE'});
+}
+async function downloadMonthlyReportXlsx(){
  const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
- const rows=monthlyRows(monthKey); if(!rows.length){toast('対象月の日報がありません');return}
+ if(!monthlyRows(monthKey).length){toast('対象月の日報がありません');return;}
  try{
-  const wb=monthlyWorkbook(monthKey);
-  XLSX.writeFile(wb,monthlyReportFilename(monthKey));
-  toast('Excelを作成しました');
- }catch(e){console.error(e);toast('Excel作成に失敗しました')}
+  const base64=await monthlyWorkbookBase64(monthKey);const raw=atob(base64);const blob=new Blob([Uint8Array.from(raw,c=>c.charCodeAt(0))],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+  const url=URL.createObjectURL(blob);const a=document.createElement('a');a.href=url;a.download=monthlyReportFilename(monthKey);a.click();setTimeout(()=>URL.revokeObjectURL(url),60000);toast('Excelを作成しました');
+ }catch(e){console.warn(e);toast('Excel作成に失敗しました');}
 }
-function dailyReportsSheetValues(){
- const rows=getDailyReports().slice().sort((a,b)=>Number(a.startTs||0)-Number(b.startTs||0));
+function dailyReportsSheetValues(reports=getDailyReports()){
+ const rows=reports.slice().sort((a,b)=>Number(a.startTs||0)-Number(b.startTs||0));
  return [
-  ['日付','出庫時刻','入庫時刻','出庫オドメーター','入庫オドメーター','走行km','売上','未収','乗車回数','経費','備考','更新時刻'],
+  ['日付','出庫時刻','入庫時刻','出庫オドメーター','入庫オドメーター','走行km','売上','未収','乗車回数','経費','備考','更新時刻','乗務ID','日報JSON'],
   ...rows.map(r=>[
    r.dateKey||'',r.startTime||'',r.endTime||'',r.odometerStart??'',r.odometerEnd??'',reportTravelKm(r)??'',
    Math.round(Number(r.sales)||0),Math.round(Number(r.receivable)||0),Math.round(Number(r.trips)||0),reportExpenseTotal(r),r.note||'',
-   r.updatedAt?new Date(Number(r.updatedAt)).toISOString():''
+   r.updatedAt?new Date(Number(r.updatedAt)).toISOString():'',r.dutyId||r.id||'',JSON.stringify(r)
   ])
  ];
 }
+const DAILY_SYNC_PENDING_KEY='taxi_daily_sync_pending_v1';
+let dailySyncBusy=false;
+function retryDailySync(){if(!navigator.onLine||!getGoogleAuthToken())return;if(localStorage.getItem(DAILY_SYNC_PENDING_KEY)==='1'&&!dailySyncBusy)syncDailyReportsToGoogleSheets(true);else syncPersonalDriveBackups(true);}
+window.addEventListener('online',()=>{retryDailySync();refreshSharedReservations();});
+document.addEventListener('visibilitychange',()=>{if(!document.hidden)retryDailySync();});
+setTimeout(retryDailySync,5000);
+setInterval(()=>{if(!document.hidden){retryDailySync();if(googleAuthProfile?.ok){refreshSharedReservations();refreshGoogleAuthStatus();}}},60000);
 async function syncDailyReportsToGoogleSheets(silent=false){
- const token=await ensureGoogleAuthSession(!silent);
- if(!token){if(!silent)toast('Google連携を復元できません。設定から再連携してください');return false}
+ if(dailySyncBusy)return false;
+ dailySyncBusy=true;
+ try{localStorage.setItem(DAILY_SYNC_PENDING_KEY,'1');}catch(e){}
+ let snapshot='';
  try{
+  if(!featureEnabled('reports'))return false;
+  const token=await ensureGoogleAuthSession(!silent);
+  if(!token){if(!silent)toast('Google連携を復元できません（送信待ち）');return false;}
+  if(historyArchiveReady&&!await historyArchiveReady)throw new Error('archive_not_ready');
+  const archived=await readHistoryArchive();
+  const reports=mergeHistoryRecords(archived.daily,getDailyReports());
+  snapshot=JSON.stringify(reports);
+  const revision=localStorage.getItem('taxi_daily_sync_revision_v1')||'';
   const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/sheets/sync',{
-   method:'POST',
+   method:'POST',signal:AbortSignal.timeout(30000),
    headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
-   body:JSON.stringify({sheetName:'日報データ',values:dailyReportsSheetValues()})
+   body:JSON.stringify({sheetName:'日報データ',values:dailyReportsSheetValues(reports)})
   });
   const d=await r.json().catch(()=>({}));
   if(!r.ok||!d?.ok)throw new Error(d?.error||('HTTP '+r.status));
-  if(!silent)toast('Google Sheetsへ同期しました');
-  return true;
- }catch(e){console.error(e);if(!silent)toast('Sheets同期に失敗しました');return false}
+  // An edit made while this request was in flight must remain pending.
+  if(revision===(localStorage.getItem('taxi_daily_sync_revision_v1')||'')&&snapshot===JSON.stringify(mergeHistoryRecords(archived.daily,getDailyReports()))){
+   localStorage.removeItem(DAILY_SYNC_PENDING_KEY);
+   localStorage.setItem('taxi_daily_sync_completed_at_v1',String(Date.now()));
+   setTimeout(()=>syncPersonalDriveBackups(true),0);
+  }
+  renderDailySyncStatus();
+  if(!silent)toast(localStorage.getItem(DAILY_SYNC_PENDING_KEY)==='1'?'更新分は送信待ちです':'Google Sheetsへ同期しました');
+  return localStorage.getItem(DAILY_SYNC_PENDING_KEY)!=='1';
+ }catch(e){console.error(e);renderDailySyncStatus();if(!silent)toast('Sheets同期に失敗しました（送信待ち）');return false;}
+ finally{dailySyncBusy=false;}
+}
+const DRIVE_BACKUP_PENDING_KEY='taxi_drive_backup_pending_v1';
+let driveBackupBusy=false;
+function queuePersonalDriveBackup(dutyId){
+ if(!dutyId)return;
+ try{const queue=JSON.parse(localStorage.getItem(DRIVE_BACKUP_PENDING_KEY)||'{}');queue[dutyId]=Date.now()+'_'+Math.random().toString(36).slice(2);localStorage.setItem(DRIVE_BACKUP_PENDING_KEY,JSON.stringify(queue));}catch(e){historyStorageWarning('Drive保存待ちの記録に失敗しました');}
+}
+async function uploadPersonalDriveFile(token,key,filename,mimeType,base64){
+ const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/drive/save',{method:'POST',signal:AbortSignal.timeout(45000),headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify({key,filename,mimeType,base64})});
+ const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.id)throw new Error(d.error||'drive_save_failed');return d;
+}
+function jsonUtf8Base64(value){
+ const bytes=new TextEncoder().encode(JSON.stringify(value));let binary='';
+ for(let i=0;i<bytes.length;i+=8192)binary+=String.fromCharCode(...bytes.subarray(i,i+8192));return btoa(binary);
+}
+function beginPersonalDriveBackup(){
+ for(const report of getDailyReports())if(report.endTs)queuePersonalDriveBackup(report.dutyId);
+ return syncPersonalDriveBackups(false);
+}
+function backupRecordChunks(records){
+ const chunks=[];let current=[],bytes=0;
+ for(const record of records){const size=new TextEncoder().encode(JSON.stringify(record)).length;if(size>8*1024*1024)throw new Error('backup_record_too_large');if(current.length&&bytes+size>2*1024*1024){chunks.push(current);current=[];bytes=0;}current.push(record);bytes+=size;}
+ if(current.length||!chunks.length)chunks.push(current);return chunks;
+}
+async function syncPersonalDriveBackups(silent=true){
+ if(driveBackupBusy||!navigator.onLine)return false;
+ let queue;try{queue=JSON.parse(localStorage.getItem(DRIVE_BACKUP_PENDING_KEY)||'{}');}catch(e){return false;}
+ if(!Object.keys(queue).length){if(!silent)toast('Drive保存待ちの乗務はありません');return true;}
+ driveBackupBusy=true;
+ try{
+  if(!featureEnabled('reports'))return false;
+  const token=await ensureGoogleAuthSession(!silent);if(!token)return false;
+  if(historyArchiveReady&&!await historyArchiveReady)throw new Error('archive_not_ready');
+  if(!await flushGpsDbWrites())throw new Error('gps_storage_pending');
+  const archive=await readHistoryArchive();
+  const reports=mergeHistoryRecords(archive.daily,getDailyReports()),trips=mergeHistoryRecords(archive.trips,getTripRecords()),events=mergeHistoryRecords(archive.analytics,getAnalyticsEvents());
+  const ready=Object.entries(queue).filter(([dutyId])=>reports.some(r=>r.dutyId===dutyId&&r.endTs)).slice(0,3);
+  for(const [dutyId,revision] of ready){
+   const report=reports.find(r=>r.dutyId===dutyId);
+   const detail={schema:'taxi-duty-details-v1',dutyId,report,trips:trips.filter(x=>x.dutyId===dutyId)};
+   const detailFile=await uploadPersonalDriveFile(token,dutyId+':details',report.dateKey+'_'+dutyId+'_乗務明細.json','application/json',jsonUtf8Base64(detail));
+   const groups={events:events.filter(x=>x.dutyId===dutyId),gpsRaw:await readGpsDbStore('raw',true,dutyId),gpsAnalysis:await readGpsDbStore('analysis',true,dutyId),fareResearch:await readGpsDbStore('fare',true,dutyId)};
+   const files=[{key:dutyId+':details',...detailFile}];
+   for(const [category,records] of Object.entries(groups)){
+    const chunks=backupRecordChunks(records);
+    for(let part=0;part<chunks.length;part++){
+     const key=dutyId+':logs:'+category+':'+part;
+     const data={schema:'taxi-duty-validation-part-v1',dutyId,category,part,parts:chunks.length,recordCount:chunks[part].length,records:chunks[part]};
+     const result=await uploadPersonalDriveFile(token,key,report.dateKey+'_'+dutyId+'_'+category+'_'+(part+1)+'.json','application/json',jsonUtf8Base64(data));files.push({key,...result,recordCount:data.recordCount});
+    }
+   }
+   await uploadPersonalDriveFile(token,dutyId+':manifest',report.dateKey+'_'+dutyId+'_保存一覧.json','application/json',jsonUtf8Base64({schema:'taxi-duty-backup-manifest-v1',dutyId,revision,reportUpdatedAt:report.updatedAt,files,completedAt:new Date().toISOString()}));
+   const latest=JSON.parse(localStorage.getItem(DRIVE_BACKUP_PENDING_KEY)||'{}');if(latest[dutyId]===revision){delete latest[dutyId];localStorage.setItem(DRIVE_BACKUP_PENDING_KEY,JSON.stringify(latest));}
+  }
+  const left=Object.keys(JSON.parse(localStorage.getItem(DRIVE_BACKUP_PENDING_KEY)||'{}')).length;
+  if(!silent)toast(left?'Drive保存を進めました（残りは保存待ち）':'本人のDriveへ保存しました');return left===0;
+ }catch(e){console.warn('Drive保存待ち',e);if(!silent)toast('Drive保存に失敗しました（送信待ち）');return false;}
+ finally{driveBackupBusy=false;renderDailySyncStatus();}
+}
+let personalRestoreBusy=false;
+async function restorePersonalRecords(silent=false){
+ if(personalRestoreBusy||!featureEnabled('reports'))return;personalRestoreBusy=true;
+ try{
+  if(historyArchiveReady&&!await historyArchiveReady)throw new Error('archive_not_ready');
+  const token=await ensureGoogleAuthSession(false);if(!token)return;
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/sheets/read',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:'{}',signal:AbortSignal.timeout(30000)});
+  const d=await r.json();if(!r.ok||!d.ok)throw new Error('sheet_restore_failed');
+  const restored=[];
+  for(const row of (d.values||[]).slice(1)){
+   let report=null;try{if(row[13])report=JSON.parse(row[13]);}catch(e){}
+   if(!report){const date=String(row[0]||''),startTime=String(row[1]||'');if(!/^\d{4}-\d{2}-\d{2}$/.test(date))continue;const startTs=Date.parse(date+'T'+(startTime||'00:00')+':00+09:00');const dutyId=row[12]||'duty_'+startTs;report={id:'report_'+String(dutyId).replace(/^duty_/,''),dutyId,dateKey:date,startTs,startTime,endTime:String(row[2]||''),odometerStart:row[3]===''?null:Number(row[3]),odometerEnd:row[4]===''?null:Number(row[4]),sales:row[6]===''?null:Number(row[6]),receivable:Number(row[7])||0,trips:row[8]===''?null:Number(row[8]),note:String(row[10]||''),updatedAt:Date.parse(row[11])||0,status:'saved',legacyExpenseTotal:Number(row[9])||0,expenses:[]};}
+   if(report?.id&&report?.dutyId)restored.push(report);
+  }
+  const rows=mergeHistoryRecords(restored,getDailyReports());
+  if(restored.length&&!archiveHistoryRows(DAILY_REPORTS_KEY,'daily',rows,650))throw new Error('restore_cache_storage_pending');
+  localStorage.setItem('taxi_personal_restore_at_v1',String(Date.now()));renderSimpleSalesAnalysis();renderOdometerMissingBanner();
+  if(!silent)toast(restored.length?'本人のSheetsから日報を復元しました':'復元する日報はありません');
+ }catch(e){console.warn('本人履歴の復元未完了',e);if(!silent)toast('履歴を復元できませんでした。既存の記録は保持しています');}
+ finally{personalRestoreBusy=false;}
+}
+async function saveMonthlyReportToDrive(){
+ const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
+ if(!monthlyRows(monthKey).length){toast('対象月の日報がありません');return;}
+ try{const token=await ensureGoogleAuthSession(true);if(!token)return;await uploadPersonalDriveFile(token,'month:'+monthKey+':xlsx',monthlyReportFilename(monthKey),'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',await monthlyWorkbookBase64(monthKey));toast('月報Excelを本人のDriveへ保存しました');}catch(e){toast('月報ExcelをDriveへ保存できませんでした');}
+}
+function markDailySyncPending(){
+ try{
+  localStorage.setItem(DAILY_SYNC_PENDING_KEY,'1');
+  localStorage.setItem('taxi_daily_sync_revision_v1',String(Date.now())+'_'+Math.random().toString(36).slice(2));
+ }catch(e){historyStorageWarning('日報の同期待ち状態を保存できません');}
+ renderDailySyncStatus();
+}
+function renderDailySyncStatus(){
+ let el=document.getElementById('dailySyncStatus');
+ if(!el){const host=document.querySelector('#dailyReport .daily-v2-actions');if(!host)return;el=document.createElement('div');el.id='dailySyncStatus';el.className='sub';host.before(el);}
+ const pending=localStorage.getItem(DAILY_SYNC_PENDING_KEY)==='1';
+ let drivePending=false;try{drivePending=Object.keys(JSON.parse(localStorage.getItem(DRIVE_BACKUP_PENDING_KEY)||'{}')).length>0;}catch(e){}
+ el.textContent=pending?'端末保存・Google Sheets送信待ち':'Google Sheets同期済み';
+ if(drivePending)el.textContent+=' / Drive保存待ち';
+ if(!localStorage.getItem('taxi_daily_sync_completed_at_v1')&&!pending)el.textContent='Google Sheets未同期';
 }
 async function sendMonthlyReportMail(){
- saveMonthlyReportSettings();
+ saveMonthlyReportSettings();if(!featureEnabled('reports'))return;
  const token=await ensureGoogleAuthSession(true);
  const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();
  const rows=monthlyRows(monthKey);
  const to=String(document.getElementById('monthlyReportTo')?.value||'').trim();
  const subject=String(document.getElementById('monthlyReportSubject')?.value||monthlyDefaultSubject(monthKey)).trim();
  const bodyText=String(document.getElementById('monthlyReportBody')?.value||monthlyDefaultBody(monthKey));
- if(!rows.length){toast('対象月の日報がありません');return}
- if(!token){toast('Google連携を復元できません。設定から再連携してください');return}
- if(!to){toast('送信先メールを入力してください');return}
+ if(!rows.length){toast('対象月の日報がありません');return;}
+ if(!token){toast('Google連携を復元できません。設定から再連携してください');return;}
+ if(!to){toast('送信先メールを入力してください');return;}
+ const outboxKey='taxi_monthly_mail_outbox_v1';
+ const histKey='taxi_monthly_report_send_history_v1';
+ let outbox=null;try{outbox=JSON.parse(localStorage.getItem(outboxKey)||'null');}catch(e){}
+ if(outbox&&outbox.status==='unknown'&&!confirm('前回の送信結果は未確認です。先にGmailの送信済みを確認してください。同じ送信の結果を再確認しますか？'))return;
  const btns=[...document.querySelectorAll('#monthlyReport .monthly-report-actions button')];btns.forEach(b=>b.disabled=true);
  try{
-  const synced=await syncDailyReportsToGoogleSheets(true);
-  if(!synced) throw new Error('sheet_sync_failed');
-  const base64=monthlyWorkbookBase64(monthKey);
-  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/gmail/send',{
-   method:'POST',
-   headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},
-   body:JSON.stringify({
-    to,subject,bodyText,
-    attachments:[{filename:monthlyReportFilename(monthKey),mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',base64}]
-   })
-  });
-  const d=await r.json().catch(()=>({}));
-  if(!r.ok||!d?.ok)throw new Error(d?.error||('HTTP '+r.status));
-  const histKey='taxi_monthly_report_send_history_v1';
-  let hist=[];try{hist=JSON.parse(localStorage.getItem(histKey)||'[]')}catch(e){}
-  hist.push({monthKey,to,subject,messageId:d.messageId||'',sentAt:Date.now()});
-  try{localStorage.setItem(histKey,JSON.stringify(hist.slice(-200)))}catch(e){}
-  toast('月報をメール送信しました');
- }catch(e){console.error(e);toast('月報メール送信に失敗しました')}
- finally{btns.forEach(b=>b.disabled=false)}
+  if(!outbox||outbox.status!=='unknown'){
+   if(!await syncDailyReportsToGoogleSheets(true))throw new Error('sheet_sync_failed');
+   let hist=[];try{hist=JSON.parse(localStorage.getItem(histKey)||'[]');}catch(e){}
+   const sendNumber=hist.filter(x=>x.monthKey===monthKey).length+1;
+   const filename=monthlyReportFilename(monthKey).replace(/\.xlsx$/,'_送信'+sendNumber+'回.xlsx');
+   outbox={requestId:'mail_'+crypto.randomUUID().replace(/-/g,''),monthKey,to,subject,bodyText,sendNumber,status:'prepared',attachments:[{filename,mimeType:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',base64:await monthlyWorkbookBase64(monthKey)}]};
+   localStorage.setItem(outboxKey,JSON.stringify(outbox));
+  }
+  outbox.status='unknown';localStorage.setItem(outboxKey,JSON.stringify(outbox));
+  const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/gmail/send',{method:'POST',signal:AbortSignal.timeout(30000),headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(outbox)});
+  const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok||!d.messageId)throw new Error(d.error||'mail_result_unknown');
+  let hist=[];try{hist=JSON.parse(localStorage.getItem(histKey)||'[]');}catch(e){}
+  if(!hist.some(x=>x.requestId===outbox.requestId))hist.push({requestId:outbox.requestId,monthKey:outbox.monthKey,to:outbox.to,subject:outbox.subject,sendNumber:outbox.sendNumber,messageId:d.messageId,sentAt:Date.now()});
+  localStorage.setItem(histKey,JSON.stringify(hist));
+  logAnalyticsEvent('monthly_mail_sent',{requestId:outbox.requestId,monthKey:outbox.monthKey,messageId:d.messageId,sendNumber:outbox.sendNumber});
+  localStorage.removeItem(outboxKey);toast('月報をメール送信しました');renderMonthlySendHistory();
+ }catch(e){console.warn(e);toast(outbox?.status==='unknown'?'送信結果未確認。Gmailの送信済みを確認してください':'月報の送信準備に失敗しました');}
+ finally{btns.forEach(b=>b.disabled=false);renderMonthlySendHistory();}
+}
+async function retryUnknownMonthlyMail(){
+ if(!confirm('Gmailの送信済みに前回の月報がないことを確認しましたか？新しい送信として再送します。'))return;
+ let old=null;try{old=JSON.parse(localStorage.getItem('taxi_monthly_mail_outbox_v1')||'null');}catch(e){}
+ if(old)logAnalyticsEvent('monthly_mail_manual_retry',{requestId:old.requestId,monthKey:old.monthKey,previousResult:'unknown',userConfirmedNotSent:true});
+ localStorage.removeItem('taxi_monthly_mail_outbox_v1');await sendMonthlyReportMail();
+}
+function renderMonthlySendHistory(){
+ let el=document.getElementById('monthlySendHistory');if(!el){const host=document.querySelector('#monthlyReport .monthly-report-actions');if(!host)return;el=document.createElement('div');el.id='monthlySendHistory';el.className='sub';host.after(el);}
+ const monthKey=document.getElementById('monthlyReportMonth')?.value||monthKeyNow();let hist=[];try{hist=JSON.parse(localStorage.getItem('taxi_monthly_report_send_history_v1')||'[]');}catch(e){}
+ const rows=hist.filter(x=>x.monthKey===monthKey);const last=rows[rows.length-1];
+ el.textContent=rows.length?'送信 '+rows.length+'回 / 最終 '+new Date(last.sentAt).toLocaleString('ja-JP'):'送信履歴なし';
+ let unknown=false;try{unknown=JSON.parse(localStorage.getItem('taxi_monthly_mail_outbox_v1')||'null')?.status==='unknown';}catch(e){}
+ if(unknown){const button=document.createElement('button');button.className='smallbtn';button.textContent='Gmailを確認して再送';button.onclick=retryUnknownMonthlyMail;el.appendChild(button);}
 }
 
 const SALES_GOAL_SETTINGS_KEY='taxi_sales_goal_settings_v1';
@@ -4023,16 +4244,10 @@ function analysisTripsForReport(r){
   .sort((a,b)=>Number(a.dropoffTs||0)-Number(b.dropoffTs||0));
 }
 function analysisReportSales(r){
- const trips=analysisTripsForReport(r);
- const tripSales=trips.reduce((sum,x)=>sum+Math.max(0,Number(x.fare)||0),0);
- return tripSales||Math.max(0,Number(r?.sales)||0);
+ if(r?.sales!==null&&r?.sales!==undefined&&r?.sales!=='')return Math.max(0,Number(r.sales)||0);
+ return analysisTripsForReport(r).reduce((sum,x)=>sum+Math.max(0,Number(x.fare)||0),0);
 }
-function analysisUseDemo(){
- const rows=analysisReports();
- const realSales=rows.reduce((sum,r)=>sum+analysisReportSales(r),0);
- const fareSales=getTripRecords().reduce((sum,x)=>sum+Math.max(0,Number(x?.fare)||0),0);
- return realSales<=0&&fareSales<=0;
-}
+function analysisUseDemo(){return false;}
 function analysisBaseRows(){return analysisUseDemo()?ANALYSIS_DEMO_ROWS:analysisReports()}
 function analysisDateObj(k){return new Date(String(k)+'T12:00:00')}
 function analysisDayKey(d){
@@ -4063,7 +4278,8 @@ function analysisTripsInPeriod(){
  const {from,to}=analysisPeriodRange();
  return getTripRecords().filter(x=>{
   if(!x?.dropoffTs)return false;
-  const k=localDayKeyFromTs(x.dropoffTs);
+  const report=getDailyReports().find(r=>r.dutyId===x.dutyId);
+  const k=report?.dateKey||localDayKeyFromTs(x.pickupTs||x.dropoffTs);
   return k>=from&&k<=to;
  });
 }
@@ -4091,7 +4307,7 @@ function renderAnalysisSummary(){
  analysisUpdatePeriodHeader();
  const demo=analysisUseDemo();
  const rows=analysisRowsInPeriod();
- let total=0,count=0,fareSum=0,fareCount=0;
+ let total=0,count=0,fareSum=0,fareCount=0,averageIncomplete=false;
  for(const r of rows){
   const sales=demo?Number(r.sales||0):analysisReportSales(r);
   total+=sales;
@@ -4101,27 +4317,25 @@ function renderAnalysisSummary(){
    fareCount+=Number(r.trips||0);
   }else{
    const trips=analysisTripsForReport(r);
-   count+=trips.length;
-   for(const x of trips){
-    const fare=Math.max(0,Number(x.fare)||0);
-    if(fare>0){fareSum+=fare;fareCount++}
-   }
+   const reportCount=r.trips!==null&&r.trips!==undefined&&Number.isFinite(Number(r.trips))?Math.max(0,Number(r.trips)):trips.length;
+   count+=reportCount;fareSum+=sales;fareCount+=reportCount;if(sales>0&&!reportCount)averageIncomplete=true;
   }
  }
- const dutyCount=rows.filter(r=>(demo?Number(r.sales||0):analysisReportSales(r))>0).length;
+ const dutyCount=new Set(rows.map(r=>r.dutyId||r.id||r.dateKey)).size;
  const avgSales=dutyCount?Math.round(total/dutyCount):0;
  const avgFare=fareCount?Math.round(fareSum/fareCount):0;
  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.textContent=v};
- set('analysisTenDayTotal',yen(total));
+ set('analysisTenDayTotal',rows.length?yen(total):'記録なし');
  set('analysisAvgSales',yen(avgSales));
- set('analysisAvgFare',yen(avgFare));
+ set('analysisAvgFare',averageIncomplete?'記録不足':yen(avgFare));
  set('analysisTripCount',count+'回');
 }
 function renderAnalysisDaily(){
  const el=document.getElementById('analysisDailyBars');if(!el)return;
  const demo=analysisUseDemo();
  const badge=document.getElementById('analysisDemoBadge');if(badge)badge.style.display=demo?'inline-flex':'none';
- const rowMap=new Map(analysisRowsInPeriod().map(r=>[r.dateKey,r]));
+ const rowMap=new Map();
+ for(const r of analysisRowsInPeriod()){const prior=rowMap.get(r.dateKey);rowMap.set(r.dateKey,prior?{...r,sales:analysisReportSales(prior)+analysisReportSales(r)}:r);}
  const keys=analysisPeriodDayKeys();
  if(analysisPeriodMode==='month'){
   el.classList.add('analysis-month-line');
@@ -4133,7 +4347,8 @@ function renderAnalysisDaily(){
    const first=new Date(anchor.getFullYear(),anchor.getMonth()-offset,1,12);
    const endDay=new Date(first.getFullYear(),first.getMonth()+1,0,12).getDate();
    const currentLimit=offset===0?Math.min(endDay,anchor.getDate(),today.getFullYear()===first.getFullYear()&&today.getMonth()===first.getMonth()?today.getDate():endDay):endDay;
-   const entries=new Map(data.filter(r=>r.dateKey.slice(0,7)===analysisDayKey(first).slice(0,7)).map(r=>[r.dateKey,r]));
+   const entries=new Map();
+   for(const r of data.filter(r=>r.dateKey.slice(0,7)===analysisDayKey(first).slice(0,7))){const prior=entries.get(r.dateKey);entries.set(r.dateKey,prior?{...r,sales:analysisReportSales(prior)+analysisReportSales(r)}:r);}
    let cumulative=0;
    const points=[];
    for(let day=1;day<=currentLimit;day++){
@@ -4207,7 +4422,8 @@ function renderAnalysisHourly(){
   for(const x of analysisTripsInPeriod()){
    const fare=Math.max(0,Number(x.fare)||0);
    if(fare<=0)continue;
-   const hour=new Date(Number(x.dropoffTs)).getHours();
+   if(!x.pickupTs)continue;
+   const hour=new Date(Number(x.pickupTs)).getHours();
    const row=map.get(hour)||{hour,sales:0,trips:0};
    row.sales+=fare;row.trips++;map.set(hour,row);
   }
@@ -4385,24 +4601,26 @@ function openAnalysisDayDetail(dateKey){
  renderAnalysisDaily();
  const card=document.getElementById('analysisFactorCard');if(!card)return;
  const demo=analysisUseDemo(),demoRow=demo?ANALYSIS_DEMO_ROWS.find(x=>x.dateKey===dateKey):null;
- let sales=0,trips=[],avg=0,high=0,low=0,start='—',end='—',reserv='なし',outside='なし',weather='記録なし',jr='記録なし',event='記録なし',note='なし';
+ let sales=0,trips=[],dayTripCount=0,avg=0,high=0,low=0,start='—',end='—',reserv='なし',outside='なし',weather='記録なし',jr='記録なし',event='記録なし',note='なし';
  if(demoRow){
   sales=demoRow.sales;avg=demoRow.avg;high=demoRow.high;low=demoRow.low;start=demoRow.startTime;end=demoRow.endTime;
   reserv=demoRow.reservation;outside=demoRow.out;weather=demoRow.weather;jr=demoRow.jr;event=demoRow.event;note=demoRow.note;
-  trips=Array.from({length:demoRow.trips},()=>({}));
+  trips=Array.from({length:demoRow.trips},()=>({}));dayTripCount=trips.length;
  }else{
-  const r=analysisReports().find(x=>x.dateKey===dateKey);if(!r)return;
-  trips=analysisTripsForReport(r);
+  const reports=analysisReports().filter(x=>x.dateKey===dateKey).sort((a,b)=>Number(a.startTs||0)-Number(b.startTs||0));if(!reports.length)return;
+  const r=reports[0],last=reports[reports.length-1];
+  trips=[...new Map(reports.flatMap(x=>analysisTripsForReport(x)).map(x=>[x.rideId||x.id||JSON.stringify(x),x])).values()];
+  dayTripCount=reports.reduce((sum,x)=>sum+(x.trips!==null&&x.trips!==undefined&&Number.isFinite(Number(x.trips))?Math.max(0,Number(x.trips)):analysisTripsForReport(x).length),0);
   const fares=trips.map(x=>Math.max(0,Number(x.fare)||0)).filter(x=>x>0);
-  sales=analysisReportSales(r);avg=fares.length?Math.round(fares.reduce((a,b)=>a+b,0)/fares.length):0;
-  high=fares.length?Math.max(...fares):0;low=fares.length?Math.min(...fares):0;start=r.startTime||'—';end=r.endTime||'—';
+  sales=reports.reduce((sum,x)=>sum+analysisReportSales(x),0);avg=dayTripCount?Math.round(sales/dayTripCount):0;
+  high=fares.length?Math.max(...fares):null;low=fares.length?Math.min(...fares):null;start=r.startTime||'—';end=last.endTime||'—';
   const reservations=getReservations().filter(x=>x&&x.date===dateKey);
   const factors=analysisNoticeFactors(dateKey),outTrips=analysisOutOfPrefectureTrips(trips);
   reserv=reservations.length?reservations.length+'件'+(reservations[0]?.name?'・'+reservations[0].name:''):'なし';
   outside=outTrips.length?outTrips.length+'件・'+String(outTrips[0].dropoff?.address||'').replace(/\s+/g,' ').slice(0,32):'なし';
   weather=factors.weather.length?factors.weather.join(' / '):'記録なし';
   jr=factors.jr.length?factors.jr.join(' / '):'記録なし';
-  event=factors.event.length?factors.event.join(' / '):'記録なし';note=String(r.note||'').trim()||'なし';
+  event=factors.event.length?factors.event.join(' / '):'記録なし';note=reports.map(x=>String(x.note||'').trim()).filter(Boolean).join(' / ')||'なし';
  }
  renderAnalysisDayNav();
  const wd=['日','月','火','水','木','金','土'][analysisDateObj(dateKey).getDay()];
@@ -4410,16 +4628,37 @@ function openAnalysisDayDetail(dateKey){
  const summary=document.getElementById('analysisFactorSummary');
  if(summary)summary.innerHTML=
   '<div class="analysis-factor-stat"><span>売上</span><strong>'+yen(sales)+'</strong></div>'+
-  '<div class="analysis-factor-stat"><span>乗車回数</span><strong>'+trips.length+'回</strong></div>'+
+  '<div class="analysis-factor-stat"><span>乗車回数</span><strong>'+dayTripCount+'回</strong></div>'+
   '<div class="analysis-factor-stat"><span>平均単価</span><strong>'+yen(avg)+'</strong></div>'+
-  '<div class="analysis-factor-stat"><span>最高 / 最低</span><strong>'+yen(high)+' / '+yen(low)+'</strong></div>';
+  '<div class="analysis-factor-stat"><span>最高 / 最低</span><strong>'+(high===null?'記録なし':yen(high))+' / '+(low===null?'記録なし':yen(low))+'</strong></div>';
  renderAnalysisDayPickupPie(dateKey);
  const rows=[['出庫〜帰庫',start+' 〜 '+end],['予約',reserv],['県外',outside],['天候',weather],['JR',jr],['イベント',event],['メモ',note]];
  const list=document.getElementById('analysisFactorList');
  if(list)list.innerHTML=rows.map(x=>'<div class="analysis-factor-row"><div class="analysis-factor-key">'+escapeHtml(x[0])+'</div><div class="analysis-factor-value">'+escapeHtml(x[1])+'</div></div>').join('');
  card.classList.add('show');
 }
+function analysisComparisonForRanges(ranges){
+ const reports=analysisReports();
+ return ranges.map(range=>{
+  const rows=reports.filter(r=>r.dateKey>=range.from&&r.dateKey<=range.to);
+  const sales=rows.reduce((sum,r)=>sum+analysisReportSales(r),0);
+  const duties=new Set(rows.map(r=>r.dutyId||r.id));
+  return {...range,sales,dutyCount:duties.size,averagePerDuty:duties.size?Math.round(sales/duties.size):null,hasRecords:rows.length>0};
+ });
+}
+function analysisCompareSameMonth(month){
+ const m=Math.max(1,Math.min(12,Number(month)||new Date().getMonth()+1));
+ const years=[...new Set(analysisReports().filter(r=>Number(r.dateKey.slice(5,7))===m).map(r=>Number(r.dateKey.slice(0,4))))].sort((a,b)=>b-a);
+ return analysisComparisonForRanges(years.map(year=>({label:year+'年 '+m+'月',from:year+'-'+String(m).padStart(2,'0')+'-01',to:year+'-'+String(m).padStart(2,'0')+'-'+new Date(year,m,0).getDate()})));
+}
+function renderAnalysisYearComparison(){
+ const el=document.getElementById('analysisYearComparison');if(!el)return;
+ const select=document.getElementById('analysisCompareMonth');if(select&&!select.dataset.ready){select.value=String(new Date().getMonth()+1);select.dataset.ready='1';}
+ const rows=analysisCompareSameMonth(select?.value);
+ el.innerHTML=rows.length?rows.map(r=>'<div class="report-trip-card"><strong>'+escapeHtml(r.label)+'</strong><div>'+yen(r.sales)+' / '+r.dutyCount+'乗務</div><div class="sub">1乗務平均 '+yen(r.averagePerDuty)+'</div></div>').join(''):'<div class="analysis-empty">この月の記録なし</div>';
+}
 function renderSimpleSalesAnalysis(){
+ renderAnalysisYearComparison();
  renderAnalysisSummary();
  renderAnalysisDaily();
  renderAnalysisHourly();
@@ -4442,6 +4681,7 @@ let busSettingsActiveStop='';
 let busDestinationCatalog=null;
 let busDestinationCatalogLoaded=false;
 async function loadBusDestinationCatalog(force=false){
+ if(!trafficRegionSupported('bus')){renderUnsupportedTrafficRegion('bus');return;}
  if(busDestinationCatalogLoaded&&!force) return busDestinationCatalog;
  try{
   const r=await fetch('./data/bus-destination-catalog.json?ts='+(force?Date.now():'1'),{cache:'no-store'});
@@ -4642,12 +4882,13 @@ function selectedLiveEventsForDate(key,source=eventRealtimeData){
 function liveEventKey(e){
  return [liveEventDate(e),e?.venue||'',e?.name||'',e?.start_time||''].join('|');
 }
+const eventSuppressionLogged=new Map();
 function maybeNotifySelectedLiveEvents(d){
  if(!d||!canUseFreshSource(d.generated_at,900)) return;
  const selected=new Set(selectedLiveVenues());
  if(!selected.size) return;
  const today=localDateValue(new Date());
- for(const e of (Array.isArray(d.events)?d.events:[])){
+ for(const e of allLiveEvents(d)){
   if(!e||!selected.has(e.venue)||liveEventDate(e)!==today) continue;
   const guide=liveEndGuide(e);
   if(!guide.time) continue;
@@ -4660,10 +4901,14 @@ function maybeNotifySelectedLiveEvents(d){
   const diff=Math.round((end.getTime()-Date.now())/60000);
   // 同じ公演は終演見込み30分前の1回のみ。予定時刻後に再通知しない。
   if(diff<=0||diff>30) continue;
+  const sourceTs=e.source_role==='demand_snapshot'?demandSnapshotData?.generated_at:d.generated_at;
+  const maxAgeSec=e.source_role==='demand_snapshot'?14*3600:900;
+  const reason=e.stale_source?'retained_source_unconfirmed':Number(e.verification_count||0)<2?'insufficient_corroboration':!canUseFreshSource(sourceTs,maxAgeSec)?'stale_source':null;
+  if(reason){const key=liveEventKey(e)+'|'+reason;const last=eventSuppressionLogged.get(key)||0;if(Date.now()-last>=15*60000){eventSuppressionLogged.set(key,Date.now());if(eventSuppressionLogged.size>300)eventSuppressionLogged.delete(eventSuppressionLogged.keys().next().value);trafficAudit('event','notification_suppressed',{source:e.source_role||'worker',reason,itemId:liveEventKey(e)});}continue;}
   notifyFact('live-end-guide',{
    level:'warn',icon:'!',title:'ライブ '+guide.label+' '+guide.time+'頃',
    body:(e.name||'ライブ')+' / '+e.venue+' / 実際の終演は未確認',
-   key:liveEventKey(e)+'|end-guide',sourceTs:d.generated_at,maxAgeSec:900,minIntervalMs:48*60*60*1000
+   key:liveEventKey(e)+'|end-guide',sourceTs,maxAgeSec,minIntervalMs:48*60*60*1000
   });
  }
 }
@@ -4749,7 +4994,7 @@ function cleanLiveDisplayName(value){
 }
 function liveEndGuide(e){
  const exact=e?.end_time||'';
- if(exact) return {time:String(exact).slice(0,5),label:'終了',kind:'exact'};
+ if(exact) return {time:String(exact).slice(0,5),label:e.status==='ended'?'終了':'終了予定',kind:'exact'};
  const supplied=e?.end_time_estimate||e?.end_time_reference||'';
  if(supplied) return {time:String(supplied).slice(0,5),label:'終演見込',kind:'supplied'};
  const start=String(e?.start_time||'').match(/^(\d{1,2}):(\d{2})/);
@@ -4792,7 +5037,7 @@ function calendarEntriesForDate(key){
    title:artist,
    time:e.start_time||'',
    venue:e.venue||'',
-   endEstimate:guide.time,
+   endEstimate:guide.time,endLabel:guide.label,
    meta:e.venue||'',
    raw:e
   });
@@ -4865,9 +5110,9 @@ function openCalendarDayDetail(key){
  }else{
   list.innerHTML=entries.map(x=>{
    if(x.type==='live'){
-    const venue=x.venue?('<div class="meta">'+escapeHtml(x.venue)+'</div>'):'';
-    const startText=x.time?('開演 '+x.time):'開演 --:--';
-    const endText=x.endEstimate?('終演見込 '+x.endEstimate):'終演見込 --:--';
+    const venue=x.venue?('<div class="meta">'+escapeHtml(x.venue)+(Number(x.raw?.verification_count||0)<2?' / 未照合':'')+'</div>'):'';
+    const startText=x.time?('開演 '+x.time):'開演時刻未確認';
+    const endText=x.endEstimate?((x.endLabel||'終演見込')+' '+x.endEstimate):'終了時刻未確認';
     return '<div class="calendar-detail-item live">'+
      '<div class="kind">ライブ</div>'+
      '<div class="main">'+escapeHtml(x.title||'アーティスト確認中')+'</div>'+
@@ -4996,7 +5241,8 @@ function nextReservation(){
  const today=localDateValue(now);
  const nowTime=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
  return getReservations()
-  .filter(r=>r.date>today || r.date===today && (!r.timed || (r.time||'23:59')>=nowTime))
+  .filter(r=>!['completed','cancelled','onboard'].includes(r.shareStatus)&&!r.displayEndedDutyId&&(!r.shareId||r.sharedRole==='recipient'))
+  .filter(r=>r.date>today || r.date===today && (!r.timed || (r.time||'23:59')>=nowTime) || (!r.timed&&getDutyState().active&&(!r.date||r.date<=today)))
   .sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)))[0]||null;
 }
 function escapeHtml(v){
@@ -5031,7 +5277,8 @@ function backFromReservationEdit(){
 function renderReservations(){
  const base=getReservations().sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
  const today=localDateValue();
- const all=base.filter(r=>r.date && (reservationListMode==='today'?r.date===today:r.date>=today) && r.shareStatus!=='completed' && r.shareStatus!=='cancelled').concat(base.filter(r=>!r.date && r.shareStatus!=='completed' && r.shareStatus!=='cancelled'));
+ const visible=base.filter(r=>!r.displayEndedDutyId);
+ const all=visible.filter(r=>r.date && (reservationListMode==='today'?r.date===today:r.date>=today) && r.shareStatus!=='completed' && r.shareStatus!=='cancelled').concat(visible.filter(r=>!r.date && r.shareStatus!=='completed' && r.shareStatus!=='cancelled'));
  const title=document.getElementById('title');
  if(document.getElementById('schedule')?.classList.contains('active') && title){
   title.textContent=reservationListMode==='today'?'今日の乗務予約':'予約一覧';
@@ -5046,7 +5293,7 @@ function renderReservations(){
    const status=r.shareStatus||'';
    const statusMap={pending:'依頼中',accepted:'承認済み',heading:'迎車中',onboard:'実車中',completed:'完了',cancelled:'キャンセル'};
    const statusHtml=status?'<div class="res-status '+(status==='pending'?'pending':status==='accepted'?'accepted':status==='cancelled'?'cancelled':'active')+'">'+(statusMap[status]||escapeHtml(status))+'</div>':'';
-   const cancelBtn=(status&&status!=='completed'&&status!=='cancelled')
+   const cancelBtn=(status!=='completed'&&status!=='cancelled')
     ?'<button class="smallbtn" onclick="event.stopPropagation();cancelSharedReservation(\''+r.id+'\')">キャンセル</button>':'';
    return '<div class="reservation-item" onclick="openReservationJob(\''+r.id+'\')">'+
     '<div class="reservation-item-top"><div><div class="reservation-item-date">'+escapeHtml(reservationDateLabel(r.date))+'</div>'+
@@ -5084,23 +5331,16 @@ function renderReservations(){
  const todayKey=localDateValue(now);
  const tomorrowDate=new Date(now.getFullYear(),now.getMonth(),now.getDate()+1);
  const tomorrowKey=localDateValue(tomorrowDate);
- const activeRows=base.filter(r=>r.shareStatus!=='cancelled'&&r.shareStatus!=='completed');
+ const activeRows=base.filter(r=>r.shareStatus!=='cancelled'&&r.shareStatus!=='completed'&&!r.displayEndedDutyId&&(!r.shareId||r.sharedRole==='recipient'));
  const todayRows=activeRows.filter(r=>r.date===todayKey).sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
  const tomorrowRows=activeRows.filter(r=>r.date===tomorrowKey).sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
- const primary=todayRows[0]||tomorrowRows[0]||null;
+ const untimedRows=activeRows.filter(r=>!r.timed && (!r.date || r.date<=todayKey)).sort((a,b)=>reservationSortKey(a).localeCompare(reservationSortKey(b)));
+ const primary=todayRows[0]||untimedRows[0]||null;
+ // Undated/untimed reservations remain visible until completed or cancelled.
+ // During a paid ride only the existence of a reservation is shown.
  if(ride) ride.classList.toggle('hidden',!primary);
- if(primary&&rideTitle){
-  rideTitle.textContent=todayRows.length?'予約あり':'明日乗務・予約あり';
- }
- if(rideSub){
-  if(!primary) rideSub.textContent='';
-  else if(todayRows.length){
-   const main=[primary.timed&&primary.time?primary.time:'時間なし',primary.pickup].filter(Boolean).join(' / ');
-   rideSub.textContent=main+(tomorrowRows.length?'　明日乗務も'+tomorrowRows.length+'件':'');
-  }else{
-   rideSub.textContent=[primary.timed&&primary.time?primary.time:'時間なし',primary.pickup].filter(Boolean).join(' / ');
-  }
- }
+ if(rideTitle) rideTitle.textContent=primary?'予約あり':'';
+ if(rideSub) rideSub.textContent='';
 }
 async function saveReservation(){
  const date=document.getElementById('resDate')?.value||'';
@@ -5152,6 +5392,9 @@ function openReservationJob(id){
  const statusMap={pending:'依頼中',accepted:'承認済み',heading:'迎車中',onboard:'実車中',completed:'完了',cancelled:'キャンセル'};
  document.getElementById('jobTime').textContent=r.time||'時間未定';
  document.getElementById('jobStatus').textContent=statusMap[r.shareStatus]||'予約';
+ let accept=document.getElementById('jobAcceptReservation');if(!accept){accept=document.createElement('button');accept.id='jobAcceptReservation';accept.className='primary';document.getElementById('jobMemoWrap')?.after(accept);}
+ accept.hidden=!(r.sharedRole==='recipient'&&r.shareStatus==='pending');accept.textContent='この予約を承認';accept.onclick=()=>acceptSharedReservation(r.id);
+ const start=document.querySelector('#reservationJobSheet button[onclick="startReservationJobRide()"]');if(start)start.disabled=r.shareStatus==='pending'||r.shareStatus==='cancelled'||r.shareStatus==='completed';
  document.getElementById('jobPickup').textContent=r.pickup||'--';
  document.getElementById('jobDestination').textContent=r.destination||'未定';
  document.getElementById('jobName').textContent=r.name||'--';
@@ -5178,18 +5421,17 @@ function closeReservationJob(){
   sheet.style.transform='';
  },220);
 }
-function startReservationJobRide(){
- const all=getReservations();
- const i=all.findIndex(x=>x.id===currentReservationJobId);
- if(i>=0){
-  all[i].shareStatus='onboard';
-  all[i].shareEvents=Array.isArray(all[i].shareEvents)?all[i].shareEvents:[];
-  all[i].shareEvents.push({type:'onboard',at:Date.now()});
-  saveReservations(all);
-  renderReservations();
- }
- closeReservationJob();
- setTimeout(()=>startRideCapture(),230);
+let reservationRideToStart=null;
+async function startReservationJobRide(){
+ const all=getReservations();const i=all.findIndex(x=>x.id===currentReservationJobId);if(i<0)return;
+ const r=all[i];if(['pending','cancelled','completed'].includes(r.shareStatus)){toast('承認済みの予約を選択してください');return;}
+ if(!getDutyState().active){toast('先に乗務開始してください');return;}
+ reservationRideToStart=r.id;
+ await startRideCapture();if(!currentRideStart)return;
+ currentRideStart.reservationId=r.id;updateRideStartUI(currentRideStart);upsertTripRecord(currentRideStart.rideId,{reservationId:r.id});
+ all[i]={...r,shareStatus:'onboard',shareEvents:[...(r.shareEvents||[]),{type:'onboard',at:Date.now()}]};
+ if(await saveReservations(all)){queueReservationStatus(all[i],'onboard',currentPositionSnapshot());refreshSharedReservations();}
+ closeReservationJob();renderReservations();
 }
 function initReservationJobGestures(){
  const sheet=document.getElementById('reservationJobSheet');
@@ -5275,26 +5517,62 @@ async function shareReservationLine(){
   toast('予約をコピーしました');
  }
 }
-function beginAppReservationShare(){
- const r=getReservations().find(x=>x.id===selectedReservationShareId);
- if(!r) return;
- // 実送信はFirebase接続後に有効化する。今は共有状態の土台だけ保持。
- const state=document.getElementById('reservationShareState');
- if(state){
-  state.classList.remove('hidden');
-  state.innerHTML='<div class="label">アプリ共有</div><strong>接続準備中</strong><div class="sub">相手への送信・承認は共通DB接続後に有効になります。</div>';
- }
+const RESERVATION_SEND_QUEUE_KEY='taxi_reservation_send_queue_v1';
+let sharedReservationsBusy=false;
+async function reservationApi(input){
+ const token=await ensureGoogleAuthSession(false);if(!token)throw new Error('Google連携が必要です');
+ const r=await fetch(GOOGLE_AUTH_WORKER_URL+'/reservations',{method:'POST',headers:{Authorization:'Bearer '+token,'Content-Type':'application/json'},body:JSON.stringify(input),signal:AbortSignal.timeout(20000)});
+ const d=await r.json().catch(()=>({}));if(!r.ok||!d.ok)throw new Error(d.error||'共有情報の通信失敗');return d;
 }
-function cancelSharedReservation(id){
- const all=getReservations();
- const i=all.findIndex(r=>r.id===id);
- if(i<0) return;
- if(!confirm('この共有予約をキャンセルしますか？')) return;
- all[i].shareStatus='cancelled';
- all[i].shareEvents=Array.isArray(all[i].shareEvents)?all[i].shareEvents:[];
- all[i].shareEvents.push({type:'cancelled',at:Date.now()});
- saveReservations(all);
- renderReservations();
+async function beginAppReservationShare(){
+ const r=getReservations().find(x=>x.id===selectedReservationShareId);if(!r)return;
+ const recipientUid=String(document.getElementById('reservationRecipientUid')?.value||'').trim();
+ if(!recipientUid){toast('共有相手の利用者IDを入力してください');return;}
+ try{
+  const d=await reservationApi({op:'share',recipientUid,reservation:r});
+  const all=getReservations();const i=all.findIndex(x=>x.id===r.id);
+  if(i>=0){all[i]={...all[i],shareId:d.item.shareId,shareStatus:d.item.status,sharedRole:'owner',assignedUserId:recipientUid};if(!await saveReservations(all))return;}
+  openReservationShare(r.id);toast('共有しました。相手の承認待ちです');
+ }catch(e){toast('共有できませんでした：'+String(e.message||e));}
+}
+function queueReservationStatus(r,status,position=null){
+ if(!r?.shareId)return;
+ try{const queue=JSON.parse(localStorage.getItem(RESERVATION_SEND_QUEUE_KEY)||'[]');const key=r.shareId+'|'+status;if(!queue.some(x=>x.key===key))queue.push({key,op:'status',shareId:r.shareId,status,position});localStorage.setItem(RESERVATION_SEND_QUEUE_KEY,JSON.stringify(queue));}catch(e){historyStorageWarning('予約状態の送信待ちを保存できません');}
+}
+async function refreshSharedReservations(){
+ if(!featureEnabled('reservations')||sharedReservationsBusy||!navigator.onLine||!getGoogleAuthToken())return;
+ sharedReservationsBusy=true;
+ try{
+  await reservationDbReady;
+  const queue=JSON.parse(localStorage.getItem(RESERVATION_SEND_QUEUE_KEY)||'[]');
+  for(const item of queue){await reservationApi(item);const latest=JSON.parse(localStorage.getItem(RESERVATION_SEND_QUEUE_KEY)||'[]');localStorage.setItem(RESERVATION_SEND_QUEUE_KEY,JSON.stringify(latest.filter(x=>x.key!==item.key)));}
+  const d=await reservationApi({op:'list'});const all=getReservations();
+  for(const item of d.incoming||[]){
+   const i=all.findIndex(x=>x.shareId===item.shareId);const own=i>=0?all[i]:{};
+   const r={...own,...item.reservation,id:own.id||item.shareId,shareId:item.shareId,shareStatus:item.status,sharedRole:'recipient',ownerUid:item.ownerUid,createdAt:own.createdAt||item.updatedAt};
+   if(i<0)all.push(r);else all[i]=r;
+  }
+  for(const item of d.outgoing||[]){const i=all.findIndex(x=>x.id===item.ownerReservationId||x.shareId===item.shareId);if(i>=0)all[i]={...all[i],shareId:item.shareId,shareStatus:item.status,sharedRole:'owner',assignedUserId:item.recipientUid};}
+  if(await saveReservations(all)){renderReservations();}
+ }catch(e){console.warn('予約共有の再送待ち',e);}
+ finally{sharedReservationsBusy=false;}
+}
+async function acceptSharedReservation(id){
+ const r=getReservations().find(x=>x.id===id);if(!r||r.sharedRole!=='recipient'||r.shareStatus!=='pending')return;
+ try{const d=await reservationApi({op:'status',shareId:r.shareId,status:'accepted'});const all=getReservations().map(x=>x.id===id?{...x,shareStatus:d.item.status}:x);if(await saveReservations(all)){renderReservations();toast(d.item.status==='accepted'?'予約を承認しました':'予約状態が変更されました');}}catch(e){toast('承認できませんでした。通信復旧後に再度お試しください');}
+}
+async function cancelSharedReservation(id){
+ const all=getReservations();const i=all.findIndex(r=>r.id===id);if(i<0)return;
+ if(!confirm('この予約をキャンセルしますか？'))return;
+ const r={...all[i],shareStatus:'cancelled',shareEvents:[...(all[i].shareEvents||[]),{type:'cancelled',at:Date.now()}]};
+ all[i]=r;if(!await saveReservations(all))return;
+ queueReservationStatus(r,'cancelled');renderReservations();refreshSharedReservations();
+}
+async function completeRideReservation(ride){
+ if(!ride?.reservationId)return;
+ const all=getReservations();const i=all.findIndex(x=>x.id===ride.reservationId);if(i<0)return;
+ all[i]={...all[i],shareStatus:'completed',completedAt:Date.now(),shareEvents:[...(all[i].shareEvents||[]),{type:'completed',at:Date.now()}]};
+ if(await saveReservations(all)){queueReservationStatus(all[i],'completed');refreshSharedReservations();}
 }
 function deleteReservation(id){
  if(!confirm('この予約を削除しますか？')) return;
@@ -5311,14 +5589,16 @@ function checkReservationAutoJob(){
  const hm=String(now.getHours()).padStart(2,'0')+':'+String(now.getMinutes()).padStart(2,'0');
  const key='taxi_auto_job_'+today+'_'+hm;
  if(sessionStorage.getItem(key)==='1') return;
- const r=getReservations().find(x=>x.shareStatus==='accepted'&&x.timed&&x.date===today&&x.time===hm);
+ const r=getReservations().find(x=>!['pending','onboard','completed','cancelled'].includes(x.shareStatus)&&(!x.shareId||x.sharedRole==='recipient')&&x.timed&&x.date===today&&x.time<=hm&&!sessionStorage.getItem('taxi_auto_job_res_'+x.id));
  if(!r) return;
  sessionStorage.setItem(key,'1');
+ sessionStorage.setItem('taxi_auto_job_res_'+r.id,'1');
  openReservationJob(r.id);
 }
 let jrProbeData=null;
 let jrProbeFetchedAt=0;
 let jrProbeSource='none';
+let jrProbeError='';
 const JR_WORKER_URL=APP_LINKS.jrApiBase+'/jr/hiroshima';
 const JR_LAST_TRAIN_URL=APP_LINKS.jrApiBase+'/jr/last-trains/hiroshima';
 let jrLastTrainData=null;
@@ -5346,6 +5626,8 @@ function nowServiceMinutes(d=new Date()){
  return (h<4?h+24:h)*60+min;
 }
 async function loadJrLastTrains(force=false){
+ if(!trafficRegionSupported('jr')){renderUnsupportedTrafficRegion('jr');return;}
+ if(!featureEnabled('jr'))return;
  const now=Date.now();
  if(!force&&jrLastTrainData&&now-jrLastTrainFetchedAt<30*60*1000){
   maybeNotifyJrLastTrain();
@@ -5496,6 +5778,7 @@ function maybeNotifyJrFacts(d){
 }
 
 function renderJrProbe(){
+ if(!trafficRegionSupported('jr')){renderUnsupportedTrafficRegion('jr');return;}
  const d=jrProbeData;
  const st=document.getElementById('jrInfoStatus');
  const mid=document.getElementById('jrInfoMiddle');
@@ -5511,14 +5794,15 @@ function renderJrProbe(){
  const vfr=document.getElementById('vacantJrFactsRow');
  const vf=document.getElementById('vacantJrFacts');
  if(!d){
-  if(st) st.textContent='取得待ち';
-  if(mid) mid.textContent='検証データ待ち';
-  if(bot) bot.textContent='更新待ち';
+  const failed=jrProbeSource==='error';
+  if(st) st.textContent=failed?'通信失敗':'取得待ち';
+  if(mid) mid.textContent=failed?'JR情報を取得できません':'検証データ待ち';
+  if(bot) bot.textContent=failed?'通信環境を確認してください':'更新待ち';
   if(impact) impact.textContent='';
   if(factsEl) factsEl.textContent='';
-  if(vv) vv.textContent='取得待ち';
-  if(hv) hv.textContent='取得待ち';
-  if(hs) hs.textContent='データ確認中';
+  if(vv) vv.textContent=failed?'通信失敗':'取得待ち';
+  if(hv) hv.textContent=failed?'通信失敗':'取得待ち';
+  if(hs) hs.textContent=failed?'JR情報を取得できません':'データ確認中';
   if(vir) vir.classList.add('hidden');
   if(vfr) vfr.classList.add('hidden');
   return;
@@ -5542,6 +5826,7 @@ function renderJrProbe(){
  const totalTrains=Number(s.total_trains||0);
  const incident=ctx.incident;
  const incidentDelay=Number(incident?.max_delay||0);
+ const feedFailed=jrProbeSource==='snapshot'||jrProbeSource==='error';
  if(stale){
   label='更新待ち';
   detail='データ更新待ち';
@@ -5570,12 +5855,17 @@ function renderJrProbe(){
   card.classList.remove('state-alert','state-warn');
   if(level) card.classList.add(level);
  }
- if(st) st.textContent=label;
+ if(st) st.textContent=feedFailed?'通信失敗':label;
  if(mid) mid.textContent=detail;
- if(bot) bot.textContent=stale?(formatAgo(d.generated_at)+''):('更新 '+formatAgo(d.generated_at));
- if(hv) hv.textContent=label;
+ if(bot){
+  if(jrProbeSource==='snapshot') bot.textContent='通信失敗・保存データ '+formatAgo(d.generated_at);
+  else if(jrProbeSource==='error') bot.textContent='通信失敗';
+  else bot.textContent=stale?formatAgo(d.generated_at):('更新 '+formatAgo(d.generated_at));
+ }
+ if(hv) hv.textContent=feedFailed?'通信失敗':label;
  if(hs){
-  if(stale) hs.textContent='データ更新待ち';
+  if(jrProbeSource==='snapshot'||jrProbeSource==='error') hs.textContent='通信失敗・保存データを表示';
+  else if(stale) hs.textContent='データ更新待ち';
   else if(incident) hs.textContent=[incident.line,incident.cause,incidentDelay?incidentDelay+'分遅れ':''].filter(Boolean).join(' / ');
   else if(top&&Number(top.delayed_trains||0)>0) hs.textContent=(top.station||'駅周辺')+' 最大'+Number(top.max_delay||0)+'分';
   else if(totalTrains===0) hs.textContent='旅客列車の運行時間外';
@@ -5602,13 +5892,17 @@ function renderJrProbe(){
   if(factsEl) factsEl.textContent='';
   if(vfr) vfr.classList.add('hidden');
  }
- if(vv) vv.textContent=label;
+ if(vv) vv.textContent=feedFailed?'通信失敗':label;
  maybeNotifyJrFacts(d);
 }
 async function loadJrProbeSnapshot(force=false){
+ if(document.hidden&&!force)return;
+ if(!trafficRegionSupported('jr')){renderUnsupportedTrafficRegion('jr');return;}
+ if(!featureEnabled('jr'))return;
  const now=Date.now();
  if(!force&&jrProbeFetchedAt&&now-jrProbeFetchedAt<25000) return;
  jrProbeFetchedAt=now;
+ trafficAudit('jr','fetch_started',{source:'worker',fetchStartedAt:new Date(now).toISOString()});
 
  // 本番はCloudflare Workerのライブ取得を優先。
  // Worker障害時だけ、直近のGitHub静的スナップショットへフォールバックする。
@@ -5626,6 +5920,10 @@ async function loadJrProbeSnapshot(force=false){
    if(!live||live.ok!==true||!live.summary||!Array.isArray(live.lines)) throw new Error('worker payload invalid');
    jrProbeData=normalizeJrLivePayload(live);
    jrProbeSource='worker';
+   recordTrafficResearch('jr',live,'worker');
+    trafficAudit('jr','fetch_ok',{source:'worker',generatedAt:live.generated_at||null,count:live.lines.length});
+   recordFirstSeenFeedItems('jr',Array.isArray(live.traffic_alerts)?live.traffic_alerts:[],a=>[a.line||'',a.cause||'',a.start_time||a.started_at||''].join('|'),live.generated_at||null);
+   jrProbeError='';
    logAnalyticsEvent('feed_loaded',{feed:'jr',source:'worker',generatedAt:live.generated_at,delayed:Number(live.summary?.delayed_trains||0)});
   }finally{
    clearTimeout(timer);
@@ -5636,12 +5934,18 @@ async function loadJrProbeSnapshot(force=false){
    if(!r.ok) throw new Error('snapshot http '+r.status);
    jrProbeData=normalizeJrLivePayload(await r.json());
    jrProbeSource='snapshot';
+    trafficAudit('jr','fallback',{source:'snapshot',reason:String(e?.message||e),generatedAt:jrProbeData?.generated_at||null});
+   jrProbeError=String(e?.message||e);
    logAnalyticsEvent('feed_loaded',{feed:'jr',source:'snapshot',generatedAt:jrProbeData?.generated_at||0,delayed:Number(jrProbeData?.summary?.delayed_trains||0)});
   }catch(fallbackError){
    jrProbeSource='error';
+    trafficAudit('jr','fetch_error',{source:'worker+snapshot',reason:String(e?.message||e)+' / '+String(fallbackError?.message||fallbackError)});
+   jrProbeError=String(e?.message||e)+' / '+String(fallbackError?.message||fallbackError);
+   logAnalyticsEvent('feed_error',{feed:'jr',message:jrProbeError});
   }
  }
  renderJrProbe();
+ trafficAudit('jr','rendered',{renderedAt:new Date().toISOString(),source:jrProbeSource});
 }
 let eventRealtimeData=null;
 let sportsRealtimeData=null;
@@ -5690,6 +5994,7 @@ function eventMergeKey(e){
  return [String(e?.date||''),clean(e?.venue||''),String(e?.start_time||''),clean(e?.display_name||e?.name||'').slice(0,80)].join('|');
 }
 function allLiveEvents(source=eventRealtimeData){
+ if(!trafficRegionSupported('events'))return [];
  const worker=(Array.isArray(source?.events)?source.events:[])
   .filter(e=>e&&e.venue&&liveEventDate(e));
  const snapshot=(Array.isArray(demandSnapshotData?.events)?demandSnapshotData.events:[])
@@ -5726,9 +6031,20 @@ function allLiveEvents(source=eventRealtimeData){
  return out;
 }
 function allLiveEventsForDate(key,source=eventRealtimeData){
- return allLiveEvents(source).filter(e=>liveEventDate(e)===key);
+ return allLiveEvents(source).filter(e=>liveEventDate(e)===key&&!eventHasExpired(e));
+}
+function eventHasExpired(e,now=Date.now()){
+ const date=liveEventDate(e)||e?.date;
+ const end=e?.end_time||e?.end_time_estimate||e?.end_time_reference;
+ if(!date||!end)return false;
+ const match=String(end).match(/^(\d{1,2}):(\d{2})/);if(!match)return false;
+ const start=String(e.start_time||'').match(/^(\d{1,2}):(\d{2})/);
+ const at=new Date(date+'T00:00:00');at.setHours(Number(match[1]),Number(match[2]),0,0);
+ if(start&&Number(match[1])*60+Number(match[2])<Number(start[1])*60+Number(start[2]))at.setDate(at.getDate()+1);
+ return Number.isFinite(at.getTime())&&now>=at.getTime()+3600000;
 }
 function allSportsSchedule(){
+ if(!trafficRegionSupported('events'))return [];
  const realtime=(Array.isArray(sportsRealtimeData?.sports)?sportsRealtimeData.sports:[])
   .filter(isLocalSportsEvent);
  const snapshot=(Array.isArray(demandSnapshotData?.events)?demandSnapshotData.events:[])
@@ -5755,7 +6071,7 @@ function allSportsSchedule(){
   if(sameTime>=0) continue;
   out.push(e);
  }
- return out;
+ return out.filter(e=>!eventHasExpired(e));
 }
 function renderHomeEventSummary(){
  const hv=document.getElementById('homeEventValue');
@@ -5802,6 +6118,7 @@ function renderHomeEventSummary(){
  hs.textContent=who+' / '+where;
 }
 function renderLiveEvents(){
+ if(!trafficRegionSupported('events')){renderUnsupportedTrafficRegion('events');return;}
  const d=eventRealtimeData;
  const hasSnapshotLive=Array.isArray(demandSnapshotData?.events)&&demandSnapshotData.events.some(e=>['music','theater'].includes(String(e?.event_type||'')));
  const st=document.getElementById('liveInfoStatus');
@@ -5818,7 +6135,7 @@ function renderLiveEvents(){
  const events=selectedLiveEventsForDate(localDateValue(new Date()),d);
  const e=events[0]||null;
  if(card) card.classList.toggle('state-warn',events.length>0);
- if(st) st.textContent=events.length?events.length+'件':(selectedLiveVenues().length?'0件':'未設定');
+ if(st) st.textContent=events.length?(e?.verification_count!==undefined&&Number(e.verification_count)<2?'未照合':events.length+'件'):(selectedLiveVenues().length?'0件':'未設定');
  if(mid) mid.textContent=e?.name||(selectedLiveVenues().length?'選択会場のライブなし':'会場未選択');
  if(bot){
   if(e){
@@ -5829,9 +6146,11 @@ function renderLiveEvents(){
    bot.textContent=selectedLiveVenues().length?'選択した会場だけ表示':'設定で会場を選択';
   }
  }
+ if(eventFeedHealth.event==='error'&&st){st.textContent=events.length?'保存情報':'取得失敗';if(bot)bot.textContent+=' / 最新情報未確認';}
  renderHomeEventSummary();
 }
 function renderSportsRealtime(){
+ if(!trafficRegionSupported('events')){renderUnsupportedTrafficRegion('events');return;}
  const d=sportsRealtimeData;
  const hasSnapshotSports=Array.isArray(demandSnapshotData?.events)&&demandSnapshotData.events.some(e=>String(e?.event_type||'')==='sports');
  const st=document.getElementById('sportsInfoStatus');
@@ -5850,8 +6169,8 @@ function renderSportsRealtime(){
   .filter(x=>String(x.date||today)===today);
  const game=sports[0]||null;
  if(!game){
-  if(st) st.textContent='予定なし';
-  if(mid) mid.textContent='本日のスポーツなし';
+  if(st) st.textContent=eventFeedHealth.sports==='error'?'取得失敗':'予定なし';
+  if(mid) mid.textContent=eventFeedHealth.sports==='error'?'最新情報を確認できません':'本日のスポーツなし';
   if(bot) bot.textContent='広島市内の対象会場を確認';
   if(card) card.classList.remove('state-warn');
   renderHomeEventSummary();
@@ -5859,23 +6178,30 @@ function renderSportsRealtime(){
  }
  const statusMap={none:'予定なし',scheduled:'試合前',live:'試合中',ended:'終了'};
  let status=game.status;
- if(status==='scheduled'&&game.start_time){const n=new Date(),p=String(game.start_time).split(':');const start=new Date(n);start.setHours(Number(p[0]||0),Number(p[1]||0),0,0);if(n>=start)status='live'}
- if(st) st.textContent=statusMap[status]||'確認中';
+ if(status==='scheduled'&&game.start_time){const n=new Date(),p=String(game.start_time).split(':');const start=new Date(n);start.setHours(Number(p[0]||0),Number(p[1]||0),0,0);if(n>=start)status='in_progress_unverified'}
+ if(st) st.textContent=status==='in_progress_unverified'?'開始時刻経過':(statusMap[status]||'確認中');
  // スポーツカードはチーム固定ではなく、営業需要が発生する会場を主表示にする。
  if(mid) mid.textContent=game.venue||game.team||'スポーツイベント';
  if(bot){
   const t=game.start_time?game.start_time+'〜':'開始時刻確認中';
   const team=game.team==='広島東洋カープ'?'カープ戦':(game.team||'試合');
-  bot.textContent=team+' / '+t;
+  const guide=liveEndGuide(game);
+  bot.textContent=team+' / '+t+(guide.time?' / '+guide.label+' '+guide.time+'頃':'');
+  if(eventFeedHealth.sports==='error')bot.textContent+=' / 最新情報未確認';
  }
  if(card) card.classList.toggle('state-warn',game.status==='live'||game.status==='ended');
  renderHomeEventSummary();
  maybeNotifySportsFacts(d);
 }
+let eventFeedHealth={event:'loading',sports:'loading'};
 async function loadEventSportsRealtime(force=false){
+ if(document.hidden&&!force)return;
+ if(!trafficRegionSupported('events')){renderUnsupportedTrafficRegion('events');return;}
+ if(!featureEnabled('events'))return;
  const now=Date.now();
  if(!force&&eventSportsFetchedAt&&now-eventSportsFetchedAt<30000) return;
  eventSportsFetchedAt=now;
+ trafficAudit('event','fetch_started',{source:'snapshot+worker',fetchStartedAt:new Date(now).toISOString()});
 
  // 先に前回正常データを復元。通信失敗中でも表示を消さない。
  restoreEventFeedsFromCache();
@@ -5902,6 +6228,7 @@ async function loadEventSportsRealtime(force=false){
   const demand=await fetchSnapshot();
   if(demand?.ok&&Array.isArray(demand.events)){
    demandSnapshotData=demand;
+    trafficAudit('event','fetch_ok',{source:'snapshot',generatedAt:demand.generated_at||null,count:demand.events.length});
    logAnalyticsEvent('feed_loaded',{feed:'demand-events',source:'snapshot',generatedAt:demand.generated_at,count:demand.events.length});
    renderHomeEventSummary();
    renderEventDetail();
@@ -5923,26 +6250,41 @@ async function loadEventSportsRealtime(force=false){
   // 一時的に空データが返っても、直前の正常な未来イベントを消さない。
   if(incomingHasFuture||!existingHasFuture){
    eventRealtimeData=incoming;
+    eventFeedHealth.event='ok';
+    recordTrafficResearch('event',incoming,'worker');
+    trafficAudit('event','fetch_ok',{source:'worker',generatedAt:incoming.generated_at||null,count:incoming.events.length,fetchCompletedAt:new Date().toISOString()});
+   recordFirstSeenFeedItems('event',incoming.events,e=>[e.date||e.event_date||'',e.venue||'',e.name||e.title||''].join('|'),incoming.generated_at||null);
    writeFeedCache(EVENT_FEED_CACHE_KEY,incoming);
    logAnalyticsEvent('feed_loaded',{feed:'events',source:'worker',generatedAt:incoming.generated_at,count:incoming.events.length});
    maybeNotifySelectedLiveEvents(incoming);
   }else{
+   trafficAudit('event','fetch_suppressed',{source:'worker',reason:'empty_payload_retained_previous_cache'});
    logAnalyticsEvent('feed_error',{feed:'events',message:'empty payload retained previous cache'});
   }
  }else{
-  logAnalyticsEvent('feed_error',{feed:'events',message:String(events.reason||'invalid payload; using cache')});
+  eventFeedHealth.event='error';
+  trafficAudit('event','fetch_error',{source:'worker',reason:String(events.reason||'invalid payload; using cache')});
+   logAnalyticsEvent('feed_error',{feed:'events',message:String(events.reason||'invalid payload; using cache')});
  }
 
  if(sports.status==='fulfilled'&&sports.value?.ok&&Array.isArray(sports.value.sports)){
   sportsRealtimeData=sports.value;
   writeFeedCache(SPORTS_FEED_CACHE_KEY,sports.value);
+  eventFeedHealth.sports='ok';
+  recordTrafficResearch('sports',sports.value,'worker');
+  trafficAudit('sports','fetch_ok',{source:'worker',generatedAt:sports.value.generated_at||null,count:sports.value.sports.length,fetchCompletedAt:new Date().toISOString()});
+  recordFirstSeenFeedItems('sports',sports.value.sports,e=>[e.date||'',e.venue||'',e.name||e.title||e.home_team||''].join('|'),sports.value.generated_at||null);
   logAnalyticsEvent('feed_loaded',{feed:'sports',source:'worker',generatedAt:sports.value.generated_at,count:sports.value.sports.length});
  }else{
+  eventFeedHealth.sports='error';
+  trafficAudit('sports','fetch_error',{source:'worker',reason:String(sports.reason||'invalid payload; using cache')});
   logAnalyticsEvent('feed_error',{feed:'sports',message:String(sports.reason||'invalid payload; using cache')});
  }
 
  renderLiveEvents();
  renderSportsRealtime();
+ trafficAudit('event','rendered',{renderedAt:new Date().toISOString()});
+ trafficAudit('sports','rendered',{renderedAt:new Date().toISOString()});
  renderHomeEventSummary();
  renderEventDetail();
  if(document.getElementById('calendar')?.classList.contains('active')) renderCalendar();
@@ -5950,6 +6292,7 @@ async function loadEventSportsRealtime(force=false){
 
 let busRealtimeData=null;
 let busRealtimeFetchedAt=0;
+let busRealtimeState={status:'loading',source:'none',workerError:'',snapshotError:''};
 
 function formatAgo(ts){
  const sec=Math.max(0,Math.floor(Date.now()/1000-Number(ts||0)));
@@ -5988,29 +6331,29 @@ function realtimeStopFact(lastBus){
  if(!op) return null;
  const tu=(Array.isArray(op.trip_updates)?op.trip_updates:[])
   .find(x=>String(x.trip_id||'')===String(lastBus.trip_id||''));
- if(!tu) return null;
- const stu=(Array.isArray(tu.stop_updates)?tu.stop_updates:[])
+ const stu=(Array.isArray(tu?.stop_updates)?tu.stop_updates:[])
   .find(x=>String(x.stop_id||'')===String(lastBus.stop_id||''));
- if(!stu) return null;
- const epoch=(Number(stu.departure_time)||Number(stu.arrival_time)||0)*1000;
+ const predictedEpoch=(Number(stu?.departure_time)||Number(stu?.arrival_time)||0)*1000;
+ const epoch=predictedEpoch||gtfsScheduledEpoch(lastBus);
  if(!epoch) return null;
  const mins=Math.round((epoch-Date.now())/60000);
- return {
-  realtime:true,
-  passed:epoch<=Date.now(),
-  minutes_to_departure:mins,
-  epoch,
-  delay_sec:Number(stu.departure_delay??stu.arrival_delay??tu.delay_sec??0)||0
- };
+ const targetSequence=Number(lastBus.stop_sequence||stu?.stop_sequence||0);
+ const serviceDate=String(lastBus.service_date||'').replace(/-/g,'');
+ const vehicle=(op.vehicle_positions||[]).find(v=>String(v.trip_id||'')===String(lastBus.trip_id||'')&&(!v.start_date||v.start_date===serviceDate)&&Number(v.timestamp)>0&&Math.abs(Date.now()/1000-Number(v.timestamp))<=120);
+ const passageVerified=!!(vehicle&&targetSequence>0&&Number(vehicle.stop_sequence)>targetSequence&&Math.abs(Date.now()-epoch)<=7200000);
+ if(!predictedEpoch&&!passageVerified)return null;
+ return {realtime:true,passed:passageVerified,passageVerified,expected_departure_elapsed:epoch<=Date.now(),minutes_to_departure:mins,epoch,vehicleObservedAt:vehicle?.timestamp||null,evidence:passageVerified?'fresh_vehicle_beyond_stop':'predicted_stop_time',delay_sec:Number(stu?.departure_delay??stu?.arrival_delay??tu?.delay_sec??0)||0};
 }
+
 function busLastBusFact(stop,destination){
  const row=busCatalogDestinationRow(stop,destination);
  const last=row&&typeof row==='object'?row.last_bus:null;
- if(!last) return null;
+ if(!last) return {kind:'no_time_data'};
  const live=realtimeStopFact(last);
  if(live){
   return {
    ...live,
+   kind:live.passed||live.expected_departure_elapsed?'ended':'upcoming',
    scheduled_time:last.scheduled_time,
    service_date:last.service_date,
    operator:last.operator,
@@ -6018,10 +6361,11 @@ function busLastBusFact(stop,destination){
   };
  }
  const epoch=gtfsScheduledEpoch(last);
- if(!epoch) return {scheduled_time:last.scheduled_time,service_date:last.service_date};
+ if(!epoch) return {kind:'no_time_data',scheduled_time:last.scheduled_time,service_date:last.service_date};
  const mins=Math.round((epoch-Date.now())/60000);
  return {
   realtime:false,
+   kind:epoch<=Date.now()?'ended':'upcoming',
   scheduled_elapsed:epoch<Date.now(),
   minutes_to_departure:mins,
   epoch,
@@ -6032,12 +6376,12 @@ function busLastBusFact(stop,destination){
  };
 }
 function busLastBusStatusText(fact){
- if(!fact) return '本日の終バスなし';
- if(fact.realtime&&fact.passed) return '終バス通過';
+ if(!fact||fact.kind==='no_time_data') return '時刻データなし';
+ if(fact.passageVerified||fact.realtime&&fact.passed)return '運行終了';
+ if(fact.kind==='ended'||fact.scheduled_elapsed)return '予定時刻経過';
  const mins=Number(fact.minutes_to_departure);
- if(fact.scheduled_elapsed&&!fact.realtime) return '終バス時刻経過';
  if(Number.isFinite(mins)){
-  if(mins<=0) return fact.realtime?'終バスまもなく':'終バス時刻経過';
+  if(mins<=0)return '予定時刻経過';
   if(mins<=15) return '終バスまで約'+Math.max(1,Math.round(mins))+'分';
   return '終バス '+Math.round(mins)+'分後';
  }
@@ -6050,7 +6394,7 @@ function maybeNotifySelectedLastBuses(facts){
  for(const row of facts){
   const f=row.fact;
   if(!f) continue;
-  const keyBase=today+'|'+row.stop+'|'+row.destination;
+  const keyBase=(f.service_date||today)+'|'+row.stop+'|'+row.destination+'|'+(f.trip_id||'');
   if(f.realtime&&f.passed){
    notifyFact('bus-last-passed',{
     level:'info',icon:'!',title:'終バス通過',
@@ -6072,6 +6416,7 @@ function maybeNotifySelectedLastBuses(facts){
  }
 }
 function renderBusRealtime(){
+ if(!trafficRegionSupported('bus')){renderUnsupportedTrafficRegion('bus');return;}
  const card=document.getElementById('busInfoCard');
  const st=document.getElementById('busInfoStatus');
  const mid=document.getElementById('busInfoMiddle');
@@ -6089,7 +6434,13 @@ function renderBusRealtime(){
  const d=busRealtimeData;
  const generated=d?.generated_at||0;
  const facts=pairs.map(p=>({...p,fact:busLastBusFact(p.stop,p.destination)}));
- // 終バスは利用者が必要時に確認する情報とし、自動通知しない。
+ const feedFailed=busRealtimeState.status==='error'||busRealtimeState.status==='snapshot';
+ const feedPartial=busRealtimeState.status==='partial';
+ const upcoming=facts.filter(x=>x.fact?.kind==='upcoming');
+ const ended=facts.filter(x=>x.fact?.kind==='ended');
+ const noTime=facts.filter(x=>!x.fact||x.fact.kind==='no_time_data');
+ // 通過確認と予測時刻を区別し、確認できた事実だけ自動通知する。
+ if(!feedFailed&&!feedPartial&&canUseFreshSource(generated,120))maybeNotifySelectedLastBuses(facts);
  const urgent=facts.find(x=>{
   if(!x.fact) return false;
   if(x.fact.realtime&&x.fact.passed===true) return true;
@@ -6097,27 +6448,56 @@ function renderBusRealtime(){
   return Number.isFinite(m)&&m>0&&m<=15;
  });
 
- if(card) card.classList.toggle('state-warn',!!urgent);
+ if(card) card.classList.toggle('state-warn',!!urgent||feedFailed||feedPartial);
 
- if(hv) hv.textContent=count?count+'件設定':(hasStops?'方面未設定':'未設定');
+ if(hv){
+  if(!count) hv.textContent=hasStops?'方面未設定':'未設定';
+  else if(feedFailed) hv.textContent='通信失敗';
+  else if(!upcoming.length&&ended.length) hv.textContent='予定時刻経過';
+  else if(!upcoming.length&&noTime.length) hv.textContent='時刻データなし';
+  else hv.textContent=count+'件設定';
+ }
  if(hs){
   if(!count) hs.textContent=hasStops?'選んだバス停の方面を設定':'設定からバス停・方面を選択';
+  else if(feedFailed) hs.textContent='時刻表データで表示中';
+  else if(feedPartial) hs.textContent='一部事業者の通信に失敗';
   else if(urgent) hs.textContent=busLastBusStatusText(urgent.fact)+' / '+urgent.stop;
+  else if(!upcoming.length&&ended.length) hs.textContent='予定時刻経過・実通過未確認';
+  else if(!upcoming.length&&noTime.length) hs.textContent='選択した方面の時刻データなし';
   else hs.textContent='タップして終バスを確認';
  }
 
- if(st) st.textContent=count?'終バス':(hasStops?'方面未設定':'未設定');
+ if(st){
+  if(!count) st.textContent=hasStops?'方面未設定':'未設定';
+  else if(feedFailed) st.textContent='通信失敗';
+  else if(feedPartial) st.textContent='一部通信失敗';
+  else if(!upcoming.length&&ended.length) st.textContent='予定時刻経過';
+  else if(!upcoming.length&&noTime.length) st.textContent='時刻データなし';
+  else st.textContent='終バス';
+ }
  if(mid){
   if(!count) mid.textContent=hasStops?'選んだバス停の方面を設定':'バス停・方面を選択';
+  else if(feedFailed) mid.textContent='リアルタイム情報を取得できません';
+  else if(feedPartial) mid.textContent='取得できた事業者の情報を表示';
   else if(urgent) mid.textContent=urgent.stop+' / '+urgent.destination;
+  else if(!upcoming.length&&ended.length) mid.textContent=noTime.length?'確認済み方面の予定時刻経過':'選択方面は全便終了（時刻表）';
+  else if(!upcoming.length&&noTime.length) mid.textContent='選択した方面の時刻を確認できません';
   else mid.textContent=count+'件の終バスを確認';
  }
  if(bot){
   if(!count) bot.textContent=hasStops?'方面を選択してください':'設定画面から選択';
+  else if(feedFailed) bot.textContent='保存済みの時刻表データを表示';
+  else if(feedPartial) bot.textContent='一部事業者は通信失敗';
   else if(urgent) bot.textContent=busLastBusStatusText(urgent.fact);
-  else bot.textContent='通知なし・タップで詳細';
+  else if(!upcoming.length&&ended.length) bot.textContent='時刻表上は全便終了';
+  else if(!upcoming.length&&noTime.length) bot.textContent='時刻データなし';
+  else bot.textContent='終バス通知は自動';
  }
- if(upd) upd.textContent=generated?formatAgo(generated):'設定済み';
+ if(upd){
+  if(feedFailed) upd.textContent='通信失敗';
+  else if(feedPartial) upd.textContent='一部通信失敗';
+  else upd.textContent=generated?formatAgo(generated):'設定済み';
+ }
 
  if(list){
   if(!count){
@@ -6125,10 +6505,16 @@ function renderBusRealtime(){
    list.innerHTML='<div class="verify-empty" onclick="show(\'settings\')" style="cursor:pointer">設定画面で<br><strong style="color:#fff">'+msg+'</strong><br><span style="display:inline-block;margin-top:8px;color:#8ec0ff">設定を開く ›</span></div>';
   }else{
    const grouped={};
-   for(const row of facts.filter(x=>x.fact&&Number(x.fact.minutes_to_departure)>0).sort((a,b)=>Number(a.fact.minutes_to_departure)-Number(b.fact.minutes_to_departure))){
+   for(const row of facts.sort((a,b)=>{
+    const rank=x=>x.fact?.kind==='upcoming'?0:(x.fact?.kind==='ended'?1:2);
+    return rank(a)-rank(b)||(Number(a.fact?.minutes_to_departure)||0)-(Number(b.fact?.minutes_to_departure)||0);
+   })){
     (grouped[row.stop]||(grouped[row.stop]=[])).push(row);
    }
-   list.innerHTML=(Object.keys(grouped).length?Object.entries(grouped).map(([stop,rows])=>
+   const feedMessage=feedFailed
+    ?'<div class="verify-empty" style="margin-bottom:10px"><strong>通信失敗</strong><br>リアルタイム情報を取得できないため、保存済みの時刻表データを表示しています。</div>'
+    :(feedPartial?'<div class="verify-empty" style="margin-bottom:10px"><strong>一部通信失敗</strong><br>取得できた事業者の情報だけを表示しています。</div>':'');
+   list.innerHTML=feedMessage+(Object.keys(grouped).length?Object.entries(grouped).map(([stop,rows])=>
     '<div class="verify-card">'+
      '<div class="verify-head"><strong>'+escapeHtml(stop)+'</strong><span class="badge">'+rows.length+'件</span></div>'+
      rows.map(row=>{
@@ -6136,14 +6522,18 @@ function renderBusRealtime(){
       return '<div class="verify-row"><span>'+escapeHtml(row.destination)+'</span><strong>'+escapeHtml(status)+'</strong></div>';
      }).join('')+
     '</div>'
-   ).join(''):'<div class="verify-empty">本日の終バスは終了、または時刻データがありません。</div>');
+   ).join(''):'<div class="verify-empty">時刻データなし</div>');
   }
  }
 }
 async function loadBusRealtime(force=false){
+ if(document.hidden&&!force)return;
+ if(!trafficRegionSupported('bus')){renderUnsupportedTrafficRegion('bus');return;}
+ if(!featureEnabled('bus'))return;
  const now=Date.now();
  if(!force&&busRealtimeFetchedAt&&now-busRealtimeFetchedAt<30000) return;
  busRealtimeFetchedAt=now;
+ trafficAudit('bus','fetch_started',{source:'worker',fetchStartedAt:new Date(now).toISOString()});
  const busWorkerUrl=JR_WORKER_URL.replace('/api/jr/hiroshima','/api/bus/hiroshima')+'?ts='+now;
  let source='worker';
  try{
@@ -6152,13 +6542,24 @@ async function loadBusRealtime(force=false){
   let next=await r.json();
   if(!next?.ok||!next?.generated_at||!next?.summary) throw new Error('worker invalid payload');
   busRealtimeData=next;
+  recordTrafficResearch('bus',next,'worker');
+  recordFirstSeenFeedItems('bus',(next.operators||[]).flatMap(op=>(op.trip_updates||op.stop_updates||[]).map(row=>({...row,operatorId:op.id}))),e=>[e.operatorId,e.trip_id||e.tripId||'',e.stop_id||'',e.event_time||''].join('|'),next.generated_at);
+   trafficAudit('bus','fetch_ok',{source:'worker',generatedAt:next.generated_at||null,partial:!!next.partial,count:Number(next.summary?.alerts||0)});
+  busRealtimeState={
+   status:next.partial||Number(next.summary?.operators_failed||0)>0?'partial':'ok',
+   source:'worker',workerError:'',snapshotError:''
+  };
  }catch(workerErr){
   source='snapshot';
   try{
    const r=await fetch('./data/bus-realtime.json?ts='+now,{cache:'no-store'});
    if(!r.ok) throw new Error('snapshot http '+r.status);
    busRealtimeData=await r.json();
+    trafficAudit('bus','fallback',{source:'snapshot',reason:String(workerErr?.message||workerErr),generatedAt:busRealtimeData?.generated_at||null});
+   busRealtimeState={status:'snapshot',source:'snapshot',workerError:String(workerErr?.message||workerErr),snapshotError:''};
   }catch(snapshotErr){
+   busRealtimeState={status:'error',source:'none',workerError:String(workerErr?.message||workerErr),snapshotError:String(snapshotErr?.message||snapshotErr)};
+    trafficAudit('bus','fetch_error',{source:'worker+snapshot',reason:String(workerErr?.message||workerErr)+' / '+String(snapshotErr?.message||snapshotErr)});
    logAnalyticsEvent('feed_error',{feed:'bus',message:'worker='+String(workerErr?.message||workerErr)+' / snapshot='+String(snapshotErr?.message||snapshotErr)});
   }
  }
@@ -6166,24 +6567,196 @@ async function loadBusRealtime(force=false){
   logAnalyticsEvent('feed_loaded',{feed:'bus',source,generatedAt:busRealtimeData?.generated_at||0,alerts:Number(busRealtimeData?.summary?.alerts||0),delayed:Number(busRealtimeData?.summary?.delayed_trips||0)});
  }
  renderBusRealtime();
+ trafficAudit('bus','rendered',{renderedAt:new Date().toISOString(),source:busRealtimeState?.source||'unknown'});
 }
+
+const TRAFFIC_AUDIT_KEY='taxi_traffic_audit_v1';
+function trafficAudit(category,status,details={}){
+ try{
+  if(!category) return;
+  const rows=JSON.parse(localStorage.getItem(TRAFFIC_AUDIT_KEY)||'[]');
+  if(!Array.isArray(rows)) return;
+  const clean={};
+  for(const key of ['source','sourcePublishedAt','sourceUpdatedAt','generatedAt','fetchStartedAt','fetchCompletedAt','firstObservedAt','renderedAt','notificationRequestedAt','itemId','reason','kind','notificationKey','count','partial']){
+   if(details[key]!==undefined) clean[key]=details[key];
+  }
+  const observedAt=new Date().toISOString();
+  if(status==='fetch_ok' && clean.itemId){
+   const previous=rows.find(r=>r.category===category&&r.itemId===clean.itemId&&r.status==='fetch_ok');
+   clean.firstObservedAt=clean.firstObservedAt||previous?.firstObservedAt||previous?.at||observedAt;
+  }
+  rows.push({recordId:'traffic_'+Date.now()+'_'+Math.random().toString(36).slice(2),at:observedAt,category,status,...clean});
+  // Keep the source rows until IndexedDB confirms the archive transaction.
+  // Never delete the only copy while an asynchronous write is pending.
+  localStorage.setItem(TRAFFIC_AUDIT_KEY,JSON.stringify(rows));
+  if(rows.length>3000) scheduleTrafficAuditArchive();
+ }
+ catch(e){}
+}
+function upgradeTrafficAuditDatabase(req){
+ const db=req.result;
+ const store=db.objectStoreNames.contains('records')?req.transaction.objectStore('records'):db.createObjectStore('records',{keyPath:'id',autoIncrement:true});
+ if(!store.indexNames.contains('recordKey'))store.createIndex('recordKey','recordKey',{unique:true});
+ if(!db.objectStoreNames.contains('first_seen')){
+  db.createObjectStore('first_seen',{keyPath:'key'});const earliest=new Map();const cursor=store.openCursor();
+  cursor.onsuccess=()=>{const row=cursor.result;if(row){const r=row.value;if(r.itemId&&r.status==='fetch_ok'){const key=r.category+'|'+r.itemId;if(!earliest.has(key))earliest.set(key,{key,at:r.firstObservedAt||r.at});}row.continue();}else for(const value of earliest.values())req.transaction.objectStore('first_seen').put(value);};
+ }
+}
+let trafficArchivePending=false;
+function scheduleTrafficAuditArchive(){
+ if(trafficArchivePending||typeof indexedDB==='undefined') return;
+ trafficArchivePending=true;
+ try{
+  const req=indexedDB.open('taxi-traffic-audit-archive',3);
+   req.onupgradeneeded=()=>upgradeTrafficAuditDatabase(req);
+  req.onerror=()=>{trafficArchivePending=false;};
+  req.onsuccess=()=>{
+   const db=req.result;
+   const current=getTrafficAudit();
+   const overflow=current.slice(0,Math.max(0,current.length-2500));
+   if(!overflow.length){db.close();trafficArchivePending=false;return;}
+   try{
+    const tx=db.transaction('records','readwrite');
+    const store=tx.objectStore('records');
+    overflow.forEach(row=>{const recordKey=row.recordId||JSON.stringify(row);const lookup=store.index('recordKey').getKey(recordKey);lookup.onsuccess=()=>{if(lookup.result===undefined)store.add({...row,recordKey});};});
+    tx.oncomplete=()=>{
+     // A later observation may have been appended while the transaction ran.
+     // Remove only the exact archived prefix, preserving concurrent new entries.
+     try{
+      const latest=getTrafficAudit();
+      if(overflow.every((row,i)=>JSON.stringify(row)===JSON.stringify(latest[i]))){
+       localStorage.setItem(TRAFFIC_AUDIT_KEY,JSON.stringify(latest.slice(overflow.length)));
+      }
+     }catch(e){}
+     db.close();trafficArchivePending=false;
+     // Retry on the next observation; avoid an infinite quota-failure loop.
+    };
+    tx.onerror=()=>{db.close();trafficArchivePending=false;};
+    tx.onabort=()=>{db.close();trafficArchivePending=false;};
+   }catch(e){db.close();trafficArchivePending=false;}
+  };
+ }catch(e){trafficArchivePending=false;}
+}
+const trafficResearchVersions=new Map();
+function recordTrafficResearch(category,payload,source){
+ const dutyId=currentDutyId();if(!dutyId||!payload)return;
+ const generatedAt=payload.generated_at||null;
+ const key=dutyId+'|'+category+'|'+source;
+ if(generatedAt&&trafficResearchVersions.get(key)===generatedAt)return;
+ trafficResearchVersions.set(key,generatedAt);
+ const t=Date.now();
+ queueGpsDbWrite('analysis',{id:'feed_'+category+'_'+source+'_'+dutyId+'_'+(generatedAt||t),schema:'traffic-research-snapshot-v1',kind:'traffic_snapshot',dutyId,t,source,category,sourceGeneratedAt:generatedAt,firstObservedAt:new Date(t).toISOString(),publishedAt:null,data:payload,publicDemandPrediction:false});
+}
+async function recordFirstSeenFeedItems(category,items,keyFn,generatedAt){
+ if(!Array.isArray(items)||!items.length)return;
+ const firstRows=getTrafficAudit().filter(r=>r.category===category&&r.status==='fetch_ok'&&r.itemId);
+ try{
+  const db=await new Promise((resolve,reject)=>{const req=indexedDB.open('taxi-traffic-audit-archive',3);req.onupgradeneeded=()=>upgradeTrafficAuditDatabase(req);req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});
+  await new Promise((resolve,reject)=>{
+   const tx=db.transaction('first_seen','readwrite'),store=tx.objectStore('first_seen');const observations=[];const batchKeys=new Set();
+   for(const item of items.slice(0,250)){
+    const itemId=String(keyFn(item)||'').slice(0,180);if(!itemId)continue;
+    const key=category+'|'+itemId;if(batchKeys.has(key))continue;batchKeys.add(key);const lookup=store.get(key);
+    lookup.onsuccess=()=>{if(lookup.result)return;const at=firstRows.find(r=>r.itemId===itemId)?.firstObservedAt||new Date().toISOString();store.put({key,at});observations.push({item,itemId,at});};
+   }
+   tx.oncomplete=()=>{for(const {item,itemId,at} of observations)trafficAudit(category,'fetch_ok',{itemId,source:'worker',firstObservedAt:at,generatedAt:generatedAt||null,sourceUpdatedAt:item.source_updated_at||item.updated_at||null,sourcePublishedAt:item.source_published_at||item.published_at||null,fetchCompletedAt:new Date().toISOString()});resolve();};tx.onabort=()=>reject(tx.error);tx.onerror=()=>{};
+  });db.close();
+ }catch(e){trafficAudit(category,'audit_storage_error',{reason:'first_seen_index_unavailable'});}
+}
+function trafficAuditExport(){
+ const rows=getTrafficAudit();
+ return {schema:'traffic-notification-audit-v1',exportedAt:new Date().toISOString(),records:rows,summary:rows.reduce((a,r)=>{const k=r.category+':'+r.status;a[k]=(a[k]||0)+1;return a;},{})};
+}
+function getTrafficAudit(){
+ try{const rows=JSON.parse(localStorage.getItem(TRAFFIC_AUDIT_KEY)||'[]');return Array.isArray(rows)?rows:[]}catch(e){return[]}
+}
+
 const ANALYTICS_EVENT_KEY='taxi_analytics_events_v1';
 const ANALYTICS_TRIP_KEY='taxi_trip_records_v1';
 const LAST_DROPOFF_KEY='taxi_last_dropoff_snapshot_v1';
 const ANALYTICS_SCHEMA='taxi-sales-nav-analytics-v1';
 
-function getAnalyticsEvents(){
- try{return JSON.parse(localStorage.getItem(ANALYTICS_EVENT_KEY)||'[]')}catch(e){return[]}
+function getAnalyticsEvents(){return mergeHistoryRecords(historyArchiveCache.analytics,readHistoryLocal(ANALYTICS_EVENT_KEY));}
+// Archive full historical records before trimming the in-memory/localStorage cache.
+// The archive uses append-only IndexedDB; a failed transaction leaves the source untouched.
+const HISTORY_ARCHIVE_DB='taxi-history-archive-v1';
+const historyArchiveBusy=new Set();
+const historyArchiveCache={analytics:[],trips:[],daily:[]};
+let historyArchiveReady=null;
+let historyWarningAt=0;
+function historyStorageWarning(message){
+ console.warn(message);
+ if(Date.now()-historyWarningAt>30000){historyWarningAt=Date.now();toast(message);}
 }
-function saveAnalyticsEvents(rows){
- try{localStorage.setItem(ANALYTICS_EVENT_KEY,JSON.stringify(rows.slice(-6000)))}catch(e){}
+function mergeHistoryRecords(...collections){
+ const records=new Map();
+ for(const rows of collections)for(const row of rows||[]){
+  if(!row)continue;
+  const key=row.id||row.tripId||row.rideId||JSON.stringify(row);
+  const prior=records.get(key);
+  if(!prior||Number(row.updatedAt||row.dropoffTs||0)>=Number(prior.updatedAt||prior.dropoffTs||0))records.set(key,row);
+ }
+ return [...records.values()];
 }
-function getTripRecords(){
- try{return JSON.parse(localStorage.getItem(ANALYTICS_TRIP_KEY)||'[]')}catch(e){return[]}
+function openHistoryArchive(){
+ return new Promise((resolve,reject)=>{
+  if(typeof indexedDB==='undefined'){reject(new Error('IndexedDB unavailable'));return;}
+  const req=indexedDB.open(HISTORY_ARCHIVE_DB,2);
+  req.onupgradeneeded=()=>{
+   const db=req.result;
+   for(const name of ['analytics','trips','daily']){
+    const store=db.objectStoreNames.contains(name)?req.transaction.objectStore(name):db.createObjectStore(name,{keyPath:'archiveId',autoIncrement:true});
+    if(!store.indexNames.contains('recordKey'))store.createIndex('recordKey','recordKey',{unique:true});
+   }
+  };
+  req.onerror=()=>reject(req.error||new Error('archive open failed'));
+  req.onblocked=()=>{historyStorageWarning('履歴の保存待ちです。他の営業ナビ画面を閉じてください');};
+  req.onsuccess=()=>{const db=req.result;db.onversionchange=()=>db.close();resolve(db);};
+ });
 }
-function saveTripRecords(rows){
- try{localStorage.setItem(ANALYTICS_TRIP_KEY,JSON.stringify(rows.slice(-2000)))}catch(e){}
+function archiveHistoryRows(storageKey,storeName,rows,keepCount){
+ if(!Array.isArray(rows))return false;
+ // Serialize only the hot cache or changed versions, not the complete archive.
+ const archived=new Map(historyArchiveCache[storeName].map(row=>[row.id||row.tripId||row.rideId||JSON.stringify(row),row]));
+ rows=rows.filter(row=>{const prior=archived.get(row.id||row.tripId||row.rideId||JSON.stringify(row));return !prior||JSON.stringify(prior)!==JSON.stringify(row);});
+ let locallySaved=true;
+ try{localStorage.setItem(storageKey,JSON.stringify(rows));}
+ catch(e){locallySaved=false;historyStorageWarning('端末の保存容量が不足しています。履歴を書き出してください');}
+ const pending=locallySaved?rows.slice(0,Math.max(0,rows.length-keepCount)):rows.slice();
+ if(!pending.length)return locallySaved;
+ if(historyArchiveBusy.has(storeName))return locallySaved;
+ historyArchiveBusy.add(storeName);
+ openHistoryArchive().then(db=>{
+  const tx=db.transaction(storeName,'readwrite');const store=tx.objectStore(storeName);
+  // Exact-record identity also survives a crash after commit but before cache trimming.
+  for(const record of pending){
+   const recordKey=JSON.stringify(record);
+   const lookup=store.index('recordKey').getKey(recordKey);
+   lookup.onsuccess=()=>{if(lookup.result===undefined)store.add({recordKey,record});};
+  }
+  tx.oncomplete=()=>{
+   historyArchiveCache[storeName]=mergeHistoryRecords(historyArchiveCache[storeName],pending);
+   let trimmed=false;
+   if(locallySaved)try{
+    const latest=readHistoryLocal(storageKey);
+    if(pending.every((v,i)=>JSON.stringify(v)===JSON.stringify(latest[i]))){localStorage.setItem(storageKey,JSON.stringify(latest.slice(pending.length)));trimmed=true;}
+   }catch(e){historyStorageWarning('履歴の整理に失敗しました。記録は保持しています');}
+   db.close();historyArchiveBusy.delete(storeName);
+   // No immediate retry when trimming failed: that would loop under quota failure.
+   const remaining=readHistoryLocal(storageKey);
+   if(trimmed&&remaining.length>keepCount)archiveHistoryRows(storageKey,storeName,remaining,keepCount);
+  };
+  const failed=()=>{db.close();historyArchiveBusy.delete(storeName);historyStorageWarning('履歴の退避に失敗しました。元の記録を保持しています');};
+  tx.onabort=failed;tx.onerror=()=>{};
+ }).catch(e=>{historyArchiveBusy.delete(storeName);historyStorageWarning('履歴の退避に失敗しました。元の記録を保持しています');});
+ return locallySaved;
 }
+function readHistoryLocal(key){
+ try{const rows=JSON.parse(localStorage.getItem(key)||'[]');return Array.isArray(rows)?rows:[];}catch(e){return [];}
+}
+function saveAnalyticsEvents(rows){archiveHistoryRows(ANALYTICS_EVENT_KEY,'analytics',rows,4500);}
+function getTripRecords(){return mergeHistoryRecords(historyArchiveCache.trips,readHistoryLocal(ANALYTICS_TRIP_KEY));}
+function saveTripRecords(rows){return archiveHistoryRows(ANALYTICS_TRIP_KEY,'trips',rows,1500);}
 function currentDutyId(){
  const d=getDutyState();
  return d.active&&d.start?'duty_'+String(d.start):null;
@@ -6198,13 +6771,14 @@ function currentPositionSnapshot(){
 }
 function logAnalyticsEvent(type,data={}){
  const now=Date.now();
- const rows=getAnalyticsEvents();
+ const rows=readHistoryLocal(ANALYTICS_EVENT_KEY);
  rows.push({
   schema:ANALYTICS_SCHEMA,
+  context:{weather:(()=>{try{return JSON.parse(localStorage.getItem('taxi_weather_cache')||'null');}catch(e){return null;}})(),jrGeneratedAt:jrProbeData?.generated_at||null,busGeneratedAt:busRealtimeData?.generated_at||null,eventsGeneratedAt:eventRealtimeData?.generated_at||demandSnapshotData?.generated_at||null,sportsGeneratedAt:sportsRealtimeData?.generated_at||null},
   id:'ev_'+now+'_'+Math.random().toString(36).slice(2,8),
   t:now,
   iso:new Date(now).toISOString(),
-  dutyId:currentDutyId(),
+  dutyId:data.dutyId||currentDutyId(),
   type,
   screen:currentScreenId(),
   position:currentPositionSnapshot(),
@@ -6225,11 +6799,12 @@ function currentDutyMeters(){
 }
 function upsertTripRecord(rideId,patch){
  if(!rideId) return;
- const rows=getTripRecords();
- const idx=rows.findIndex(x=>x.rideId===rideId);
- if(idx>=0) rows[idx]={...rows[idx],...patch};
- else rows.push({schema:ANALYTICS_SCHEMA,rideId,...patch});
- saveTripRecords(rows);
+ const rows=readHistoryLocal(ANALYTICS_TRIP_KEY);
+ let idx=rows.findIndex(x=>x.rideId===rideId);
+ if(idx<0){const old=historyArchiveCache.trips.find(x=>x.rideId===rideId);if(old){rows.push(old);idx=rows.length-1;}}
+ if(idx>=0) rows[idx]={...rows[idx],...patch,updatedAt:Date.now()};
+ else rows.push({schema:ANALYTICS_SCHEMA,rideId,...patch,updatedAt:Date.now()});
+ return saveTripRecords(rows);
 }
 
 
@@ -6254,14 +6829,10 @@ function displayDayFromTs(ts){
  const d=new Date(Number(ts)||Date.now());
  return (d.getMonth()+1)+'月'+d.getDate()+'日';
 }
-function getDailyReports(){
- try{
-  const v=JSON.parse(localStorage.getItem(DAILY_REPORTS_KEY)||'[]');
-  return Array.isArray(v)?v:[];
- }catch(e){return[]}
-}
+function getDailyReports(){return mergeHistoryRecords(historyArchiveCache.daily,readHistoryLocal(DAILY_REPORTS_KEY));}
 function saveDailyReports(rows){
- try{localStorage.setItem(DAILY_REPORTS_KEY,JSON.stringify(rows.slice(-800)))}catch(e){}
+ markDailySyncPending();
+ return archiveHistoryRows(DAILY_REPORTS_KEY,'daily',rows,650);
 }
 const DEFAULT_EXPENSE_ITEMS=[
  {id:'exp_fuel',name:'燃料'},
@@ -6352,7 +6923,7 @@ function ensureDailyReportForDuty(startTs){
   createdAt:Date.now(),
   updatedAt:Date.now()
  };
- rows.push(r);saveDailyReports(rows);
+ rows.push(r);if(!saveDailyReports(rows))return null;
  return r;
 }
 function getReportById(id){
@@ -6362,14 +6933,18 @@ function updateReport(id,patch){
  const rows=getDailyReports();
  const i=rows.findIndex(x=>x.id===id);
  if(i<0) return null;
- rows[i]={...rows[i],...patch,updatedAt:Date.now()};
- saveDailyReports(rows);
+ const before=rows[i];
+ rows[i]={...rows[i],...patch,...(Object.prototype.hasOwnProperty.call(patch,'expenses')?{legacyExpenseTotal:null}:{}),updatedAt:Date.now()};
+ if(!saveDailyReports(rows))return null;
+ queuePersonalDriveBackup(rows[i].dutyId);
+ if(JSON.stringify(before)!==JSON.stringify(rows[i]))logAnalyticsEvent('daily_report_revision',{reportId:id,dutyId:before.dutyId,before,after:rows[i]});
  return rows[i];
 }
 function openDailyReportForDutyEnd(){
  const d=getDutyState();
  if(!d.active){openLatestReport();return}
  const r=ensureDailyReportForDuty(d.start);
+ if(!r)return;
  activeReportId=r.id;
  reportOdometerWarned=false;
  reportEndDutyPending=true;
@@ -6395,6 +6970,7 @@ function openLatestMissingOdometer(){
  activeReportId=rows[0].id;reportOdometerWarned=false;reportEndDutyPending=false;reportReturnScreen='home';show('dailyReport');
 }
 function reportExpenseTotal(r){
+ if(!r?.expenses?.length&&r?.legacyExpenseTotal!=null)return Math.max(0,Number(r.legacyExpenseTotal)||0);
  return (Array.isArray(r?.expenses)?r.expenses:[]).reduce((sum,x)=>sum+Math.max(0,Number(x.amount)||0),0);
 }
 function renderExpenseMasterSelect(){
@@ -6552,6 +7128,8 @@ function renderDailyReport(){
   rows.querySelectorAll('[data-remove-expense]').forEach(el=>el.addEventListener('click',()=>removeExpenseLine(el.dataset.removeExpense)));
  }
  renderExpenseMasterSelect();
+ renderDailySyncStatus();
+ for(const id of ['reportStartTime','reportEndTime','reportOdometerStart','reportOdometerEnd','reportSalesInput','reportTripsInput']){const el=document.getElementById(id);if(el){const missing=el.value===''&&r.status==='incomplete';el.style.borderColor=missing?'var(--red)':'';el.setAttribute('aria-invalid',String(missing));}}
 }
 function saveDailyReport(){
  const r=getReportById(activeReportId);if(!r)return;
@@ -6565,7 +7143,9 @@ function saveDailyReport(){
   ['reportTripsInput','乗車回数']
  ];
  const missing=required.filter(([id])=>val(id)==='');
- if(missing.length){
+ if(missing.length&&!reportOdometerWarned){
+  reportOdometerWarned=true;
+  for(const [id] of missing){const el=document.getElementById(id);if(el){el.style.borderColor='var(--red)';el.setAttribute('aria-invalid','true');}}
   const first=document.getElementById(missing[0][0]);
   toast('未入力：'+missing.map(x=>x[1]).join('・'));
   if(first){
@@ -6579,9 +7159,9 @@ function saveDailyReport(){
   if(nullable&&raw==='') return null;
   return Math.max(0,Math.round(Number(raw)||0));
  };
- const odometerStart=num('reportOdometerStart');
- const odometerEnd=num('reportOdometerEnd');
- if(odometerEnd<odometerStart){
+ const odometerStart=num('reportOdometerStart',true);
+ const odometerEnd=num('reportOdometerEnd',true);
+ if(odometerEnd!==null&&odometerStart!==null&&odometerEnd<odometerStart){
   toast('入庫オドメーターは出庫オドメーター以上で入力してください');
   const el=document.getElementById('reportOdometerEnd');
   if(el){el.focus();el.scrollIntoView({behavior:'smooth',block:'center'});}
@@ -6594,18 +7174,22 @@ function saveDailyReport(){
   endTime:val('reportEndTime'),
   odometerStart,
   odometerEnd,
-  sales:num('reportSalesInput'),
+  sales:num('reportSalesInput',true),
   receivable:num('reportReceivableInput'),
-  trips:num('reportTripsInput'),
+  trips:num('reportTripsInput',true),
   note:document.getElementById('reportNoteInput')?.value||'',
   endTs:endedAt,
-  status:'saved',
+  gpsObservedMeters:r.dutyId===currentDutyId()?currentDutyMeters():(r.gpsObservedMeters??null),
+  gpsSummaryAtSave:r.dutyId===currentDutyId()?gpsQualitySummary():(r.gpsSummaryAtSave??null),
+  status:missing.length?'incomplete':'saved',
+  missingFields:missing.map(x=>x[0]),
   savedAt:Date.now(),
-  manual:{...(r.manual||{}),startTime:true,endTime:true,odometerStart:true,odometerEnd:true,sales:true,receivable:true,trips:true}
+  manual:{...(r.manual||{}),startTime:true,endTime:true,odometerStart:!!r.manual?.odometerStart||odometerStart!==r.odometerStart,odometerEnd:true,sales:true,receivable:true,trips:true}
  });
- try{localStorage.setItem(LAST_ODOMETER_KEY,String(odometerEnd))}catch(e){}
+ if(!rr){toast('日報を保存できません。画面を閉じずに再保存してください');return;}
+ syncLatestReportOdometer(rr);
  linkNextReportOdometer(rr);
- logAnalyticsEvent('daily_report_saved',{reportId:r.id,odometerMissing:false,expenseTotal:reportExpenseTotal(rr)});
+ logAnalyticsEvent('daily_report_saved',{reportId:r.id,odometerMissing:odometerEnd===null,expenseTotal:reportExpenseTotal(rr)});
  if(getGoogleAuthToken()) syncDailyReportsToGoogleSheets(true);
  if(reportEndDutyPending){
   finalizeDutyAfterReport(rr);
@@ -6617,6 +7201,11 @@ function saveDailyReport(){
   show(reportReturnScreen||'menu');
  }
  renderOdometerMissingBanner();
+}
+function syncLatestReportOdometer(source){
+ if(!source||source.odometerEnd===null||source.odometerEnd==='')return;
+ const latest=getDailyReports().slice().sort((a,b)=>Number(b.startTs||0)-Number(a.startTs||0))[0];
+ if(latest?.id===source.id)try{localStorage.setItem(LAST_ODOMETER_KEY,String(source.odometerEnd));}catch(e){}
 }
 function linkNextReportOdometer(source){
  if(source.odometerEnd===null||source.odometerEnd==='') return;
@@ -6644,6 +7233,9 @@ function finalizeDutyAfterReport(r){
   localStorage.setItem('taxi_last_duty_end',String(endedAt));
   localStorage.setItem('taxi_last_duty_duration',dur);
  }catch(e){}
+ queuePersonalDriveBackup(r.dutyId);
+ const reservations=getReservations().map(x=>!x.timed&&(!x.date||x.date<=localDateValue())?{...x,displayEndedDutyId:r.dutyId}:x);saveReservations(reservations);
+ setTimeout(()=>syncPersonalDriveBackups(true),0);
  saveDutyState(false);
  currentRideStart=null;
  renderDutyUI();
@@ -6724,6 +7316,7 @@ function renderReportTripEditList(r){
   return '<div class="report-trip-card">'+
    '<div class="report-trip-top"><span class="report-trip-no">'+(i+1)+'件目</span><span class="report-trip-time">'+hm(x.pickupTs)+' → '+hm(x.dropoffTs)+'</span><span class="report-trip-pay">'+pay+escapeHtml(discount)+'</span></div>'+
    '<div class="report-trip-route"><span class="mark">乗</span><strong>'+pickup+'</strong><span class="mark">降</span><strong>'+dropoff+'</strong></div>'+
+   (x.memo?'<div class="sub">'+escapeHtml(x.memo)+'</div>':'')+
    '<div class="report-trip-meta"><span>GPS自動記録</span><span>'+escapeHtml([acc1,acc2].filter(Boolean).join(' / ')||'精度情報なし')+'</span></div>'+
   '</div>';
  }).join('');
@@ -6737,7 +7330,8 @@ function saveReportEdit(){
  };
  const startOdo=num('editOdometerStart',true);
  const endOdo=num('editOdometerEnd',true);
- const manual={...(r.manual||{}),odometerStart:true,startTime:true,endTime:true,sales:true,receivable:true,trips:true};
+ if(startOdo!==null&&endOdo!==null&&endOdo<startOdo){toast('入庫オドメーターは出庫以上で入力してください');return;}
+ const manual={...(r.manual||{}),odometerStart:!!r.manual?.odometerStart||startOdo!==r.odometerStart,startTime:true,endTime:true,sales:true,receivable:true,trips:true};
  const rr=updateReport(r.id,{
   startTime:document.getElementById('editStartTime')?.value||'',
   endTime:document.getElementById('editEndTime')?.value||'',
@@ -6749,8 +7343,9 @@ function saveReportEdit(){
   note:document.getElementById('editNote')?.value||'',
   manual
  });
+ if(!rr){toast('日報の修正を保存できませんでした');return;}
  if(endOdo!==null){
-  try{localStorage.setItem(LAST_ODOMETER_KEY,String(endOdo))}catch(e){}
+  syncLatestReportOdometer(rr);
   linkNextReportOdometer(rr);
  }
  toast('日報に反映しました');
@@ -6759,7 +7354,7 @@ function saveReportEdit(){
 }
 function renderOdometerMissingBanner(){
  const el=document.getElementById('odometerMissingBanner');if(!el)return;
- const rows=getDailyReports().filter(x=>x.status==='saved'&&(x.odometerEnd===null||x.odometerEnd===''))
+ const rows=getDailyReports().filter(x=>(x.status==='saved'||x.status==='incomplete')&&(x.odometerEnd===null||x.odometerEnd===''))
   .sort((a,b)=>Number(b.startTs||0)-Number(a.startTs||0));
  if(!rows.length){el.classList.remove('show');return}
  const r=rows[0];
@@ -6854,7 +7449,7 @@ function renderDutyUI(){
   badge.textContent=stateLabelFor(active.id);
  }
 }
-function handleDutyMain(){
+async function handleDutyMain(){
  const d=getDutyState();
  if(d.active){show('vacant');return}
  if(latestKnownOdometer()===null){
@@ -6864,9 +7459,10 @@ function handleDutyMain(){
   if(!Number.isFinite(n)||n<0){toast('オドメーターを正しく入力してください');return}
   try{localStorage.setItem(LAST_ODOMETER_KEY,String(n))}catch(e){}
  }
+ if(!await flushGpsDbWrites()){toast('前乗務のGPSログが保存待ちです。書き出し後に再度お試しください');return;}
  const startedAt=Date.now();
  saveDutyState(true,startedAt);
- ensureDailyReportForDuty(startedAt);
+ if(!ensureDailyReportForDuty(startedAt)){saveDutyState(false);toast('乗務の保存に失敗しました');return;}
  resetDutyDistance(startedAt);
  resetGpsQualityLog();
  try{localStorage.removeItem(LAST_DROPOFF_KEY)}catch(e){}
@@ -6915,7 +7511,7 @@ const GPS_STATE_EVENT_KEY='taxi_gps_state_event_log_v2';
 const GPS_ROAD_EVENT_KEY='taxi_gps_road_event_log_v1';
 const GPS_PERF_EVENT_KEY='taxi_gps_perf_event_log_v1';
 const GPS_DB_NAME='taxi-sales-nav-gps-v1';
-const GPS_DB_VERSION=2;
+const GPS_DB_VERSION=3;
 const GPS_TILE_CACHE_MAX=36;
 let lastLocationErrorState=null;
 let recentMotionPoints=[];
@@ -6931,6 +7527,7 @@ let matchedRoadHistory=[];
 let safetyMatchState={key:null,pendingOn:0,pendingOff:0,active:false};
 
 async function loadJarticSpeedData(){
+ if(!featureEnabled('gps')||!trafficRegionSupported('jr'))return;
  try{
   const r=await fetch('./data/jartic-hiroshima-speed.json?ts='+Date.now(),{cache:'no-store'});
   if(!r.ok) return;
@@ -6986,6 +7583,7 @@ function compactRoadProps(props={}){
  };
 }
 function normBearing(v){
+ if(v===null||v===undefined||v==='')return null;
  const n=Number(v);
  if(!Number.isFinite(n)) return null;
  return ((n%360)+360)%360;
@@ -7030,6 +7628,7 @@ function roadKey(f){
  return 'unknown:'+JSON.stringify(p).slice(0,80);
 }
 function pushCappedLog(key,item,max=800){
+ if(item?.id&&getDutyState().active)queueGpsDbWrite('analysis',{...item,kind:'gps_diagnostic',diagnosticCategory:key,dutyId:currentDutyId()});
  try{
   const a=JSON.parse(localStorage.getItem(key)||'[]');
   a.push(item);
@@ -7050,9 +7649,10 @@ function openGpsDb(){
     if(!db.objectStoreNames.contains('raw')) db.createObjectStore('raw',{keyPath:'id'});
     if(!db.objectStoreNames.contains('analysis')) db.createObjectStore('analysis',{keyPath:'id'});
      if(!db.objectStoreNames.contains('fare')) db.createObjectStore('fare',{keyPath:'id'});
+    for(const name of ['raw','analysis','fare']){const store=req.transaction.objectStore(name);if(!store.indexNames.contains('dutyId'))store.createIndex('dutyId','dutyId',{unique:false});}
    };
-   req.onsuccess=()=>resolve(req.result);
-   req.onerror=()=>resolve(null);
+   req.onsuccess=()=>{const db=req.result;db.onversionchange=()=>{db.close();gpsDbPromise=null;};resolve(db);};
+   req.onerror=()=>{gpsDbPromise=null;resolve(null);};
   }catch(e){resolve(null)}
  });
  return gpsDbPromise;
@@ -7063,18 +7663,28 @@ function queueGpsDbWrite(store,value){
  if(gpsDbWriteQueue.length>=20) flushGpsDbWrites();
  else if(!gpsDbFlushTimer) gpsDbFlushTimer=setTimeout(flushGpsDbWrites,1200);
 }
+let gpsFlushPromise=null;
 async function flushGpsDbWrites(){
- if(gpsDbFlushTimer){clearTimeout(gpsDbFlushTimer);gpsDbFlushTimer=null}
- const batch=gpsDbWriteQueue.splice(0,80);
- if(!batch.length) return;
- const db=await openGpsDb();
- if(!db) return;
- try{
-  const stores=[...new Set(batch.map(x=>x.store))];
-  const tx=db.transaction(stores,'readwrite');
-  for(const x of batch) tx.objectStore(x.store).put(x.value);
- }catch(e){}
- if(gpsDbWriteQueue.length) gpsDbFlushTimer=setTimeout(flushGpsDbWrites,100);
+ if(gpsFlushPromise)return gpsFlushPromise;
+ if(gpsDbFlushTimer){clearTimeout(gpsDbFlushTimer);gpsDbFlushTimer=null;}
+ gpsFlushPromise=(async()=>{
+  while(gpsDbWriteQueue.length){
+   const batch=gpsDbWriteQueue.slice(0,80);
+   const db=await openGpsDb();
+   if(!db){historyStorageWarning('GPSログを保存できません。記録を送信・書き出ししてください');return false;}
+   try{
+    await new Promise((resolve,reject)=>{
+     const stores=[...new Set(batch.map(x=>x.store))];
+     const tx=db.transaction(stores,'readwrite');
+     for(const x of batch)tx.objectStore(x.store).put(x.value);
+     tx.oncomplete=resolve;tx.onabort=()=>reject(tx.error||new Error('GPS transaction aborted'));tx.onerror=()=>{};
+    });
+    gpsDbWriteQueue.splice(0,batch.length);
+   }catch(e){historyStorageWarning('GPSログの保存に失敗しました。未保存分を保持しています');return false;}
+  }
+  return true;
+ })();
+ try{return await gpsFlushPromise;}finally{gpsFlushPromise=null;}
 }
 async function clearGpsDb(){
  const db=await openGpsDb();
@@ -7085,16 +7695,17 @@ async function clearGpsDb(){
   tx.objectStore('analysis').clear();
  }catch(e){}
 }
-async function readGpsDbStore(store){
+async function readGpsDbStore(store,strict=false,dutyId=null){
  const db=await openGpsDb();
- if(!db) return [];
- return await new Promise(resolve=>{
+ if(!db){if(strict)throw new Error('gps_db_unavailable');return [];}
+ return await new Promise((resolve,reject)=>{
   try{
    const tx=db.transaction(store,'readonly');
-   const req=tx.objectStore(store).getAll();
+   const objectStore=tx.objectStore(store);
+   const req=dutyId?objectStore.index('dutyId').getAll(dutyId):objectStore.getAll();
    req.onsuccess=()=>resolve(Array.isArray(req.result)?req.result:[]);
-   req.onerror=()=>resolve([]);
-  }catch(e){resolve([])}
+   req.onerror=()=>strict?reject(req.error||new Error('gps_read_failed')):resolve([]);
+  }catch(e){if(strict)reject(e);else resolve([]);}
  });
 }
 function axisBearingDiff(a,b){
@@ -7332,9 +7943,9 @@ function updateDutyDistance(pos){
   s.last=cur; saveDutyDistanceState(s); renderDutyDistance(); return;
  }
  const dt=(now-(s.last.time||now))/1000;
- const d=metersBetween(s.last.lat,s.last.lon,lat,lon);
+ const d=metersBetween(s.last.lon,s.last.lat,lon,lat);
  // 実地検証用。極端なGPS飛び・低精度・長い欠測は距離へ加算しない。
- const plausible=acc<=35 && dt>0 && dt<=30 && d<=Math.max(180,dt*55);
+ const plausible=acc<=35 && Number(s.last.accuracy)<=35 && dt>0 && dt<=30 && d<=Math.max(180,dt*55);
  if(plausible && d>=2){
   s.meters=(Number(s.meters)||0)+d;
  }
@@ -7360,6 +7971,7 @@ function getGpsInterruptionLog(){
  try{return JSON.parse(localStorage.getItem(GPS_INTERRUPTION_KEY)||'[]')}catch(e){return[]}
 }
 function saveGpsInterruptionLog(log){
+ const last=log[log.length-1];if(last)queueGpsDbWrite('analysis',{...last,id:'gap_'+(last.startTs||last.t)+'_'+(last.resumeTs||''),kind:'gps_interruption',dutyId:currentDutyId()});
  try{localStorage.setItem(GPS_INTERRUPTION_KEY,JSON.stringify(log.slice(-1000)))}catch(e){}
 }
 function getGpsStateEventLog(){
@@ -7368,6 +7980,7 @@ function getGpsStateEventLog(){
 function getGpsRoadEventLog(){return getCappedLog(GPS_ROAD_EVENT_KEY)}
 function getGpsPerfEventLog(){return getCappedLog(GPS_PERF_EVENT_KEY)}
 function saveGpsStateEventLog(log){
+ const last=log[log.length-1];if(last)queueGpsDbWrite('analysis',{...last,id:'state_'+last.t+'_'+last.kind,kind:'gps_state_event',dutyId:currentDutyId()});
  try{localStorage.setItem(GPS_STATE_EVENT_KEY,JSON.stringify(log.slice(-1500)))}catch(e){}
 }
 function recordGpsStateEvent(kind,detail={}){
@@ -7754,11 +8367,12 @@ function renderWeatherData(data){
  const icon=document.getElementById('weatherIcon');
  const nowEl=document.getElementById('weatherNow');
  const nextEl=document.getElementById('weatherNext');
- if(!icon||!nowEl||!nextEl||!data) return;
+ if(!icon||!nowEl||!nextEl)return;
+ if(!data||data.temp===null||!Number.isFinite(Number(data.temp))){nowEl.textContent='現在地未取得';nextEl.textContent='位置情報を取得後に天気を更新';return;}
  const [ic,label]=weatherLabel(data.code);
  icon.textContent=ic;
  nowEl.textContent=Math.round(data.temp)+'℃';
- nextEl.textContent=data.next||'向こう12時間に目立つ雨予報なし';
+ nextEl.textContent=(data.stale?'保存データ（最新未確認） / ':'')+(data.next||'雨予報未取得');
  renderWeatherDetail();
 }
 function renderWeatherDetail(){
@@ -7768,15 +8382,15 @@ function renderWeatherDetail(){
  const next=document.getElementById('weatherDetailNext');
  const week=document.getElementById('weatherWeek');
  if(!now||!ic||!next) return;
- if(!d){
-  now.textContent='取得中…';ic.textContent='--';next.textContent='現在地から更新';
+ if(!d||d.temp===null||!Number.isFinite(Number(d.temp))){
+  now.textContent='現在地未取得';ic.textContent='--';next.textContent='位置情報を取得後に更新';
   if(week) week.innerHTML='<div class="sub">週間予報を取得中…</div>';
   return;
  }
  const [icon]=weatherLabel(d.code);
  now.textContent=Math.round(d.temp)+'℃';
  ic.textContent=icon;
- next.textContent=d.next||'向こう12時間に目立つ雨予報なし';
+ next.textContent=(d.stale?'保存データ（最新未確認） / ':'')+(d.next||'雨予報未取得');
  if(week){
   const daily=Array.isArray(d.daily)?d.daily:[];
   if(!daily.length){
@@ -7798,6 +8412,7 @@ function renderWeatherDetail(){
  }
 }
 function renderJrDetail(){
+ if(!trafficRegionSupported('jr')){const el=document.getElementById('jrDetailSummary');if(el)el.textContent='この区域のJR情報は取得未対応';return;}
  const map=[['jrInfoStatus','jrDetailStatus'],['jrInfoMiddle','jrDetailMiddle'],['jrInfoBottom','jrDetailBottom'],['jrInfoImpact','jrDetailImpact'],['jrInfoFacts','jrDetailFacts']];
  map.forEach(([src,dst])=>{const s=document.getElementById(src),d=document.getElementById(dst);if(s&&d)d.textContent=s.textContent||''});
 }
@@ -7876,6 +8491,7 @@ async function updateCurrentWeather(pos,force=false){
  try{
   const d=await fetchJsonWithTimeout(url,6500);
   const current=d.current||{};
+  if(current.temperature_2m===null||current.weather_code===null||!Number.isFinite(Number(current.temperature_2m))||!Number.isFinite(Number(current.weather_code)))throw new Error('weather_current_missing');
   const times=d.hourly?.time||[];
   const probs=d.hourly?.precipitation_probability||[];
   const precs=d.hourly?.precipitation||[];
@@ -7891,17 +8507,19 @@ async function updateCurrentWeather(pos,force=false){
   const result={
    ...cached,
    savedAt:now,
-   currentSavedAt:now,
+   currentSavedAt:now,stale:false,source:'open-meteo',sourceUpdatedAt:current.time||null,
    temp:Number(current.temperature_2m),
    code:Number(current.weather_code),
    precipitation:Number(current.precipitation||0),
    wind:Number(current.wind_speed_10m||0),
    next:next||'向こう12時間に目立つ雨予報なし'
   };
-  writeWeatherCache(result);
+  writeWeatherCache({...readWeatherCache(),...result});
+  recordTrafficResearch('weather',{generated_at:now,source_updated_at:current.time||null,current,hourly:d.hourly||null},'open-meteo');
   renderWeatherData(result);
  }catch(e){
-  if(cached&&Number.isFinite(Number(cached.temp))) renderWeatherData(cached);
+  logAnalyticsEvent('weather_fetch_failed',{reason:String(e?.message||e)});
+  if(cached.temp!==null&&cached.temp!==undefined&&Number.isFinite(Number(cached.temp))){cached.stale=true;writeWeatherCache(cached);renderWeatherData(cached);}
   else{
    const nowEl=document.getElementById('weatherNow');
    const nextEl=document.getElementById('weatherNext');
@@ -7936,7 +8554,7 @@ async function updateWeeklyWeather(pos,force=false){
   const mins=Array.isArray(daily.temperature_2m_min)?daily.temperature_2m_min:[];
   const pops=Array.isArray(daily.precipitation_probability_max)?daily.precipitation_probability_max:[];
   const result={
-   ...cached,
+   ...readWeatherCache(),
    savedAt:now,
    weeklySavedAt:now,
    daily:dates.slice(0,7).map((date,i)=>({
@@ -7947,7 +8565,7 @@ async function updateWeeklyWeather(pos,force=false){
     pop:Number(pops[i])
    }))
   };
-  writeWeatherCache(result);
+  writeWeatherCache({...readWeatherCache(),...result});
   renderWeatherDetail();
  }catch(e){
   renderWeatherDetail();
@@ -7962,6 +8580,7 @@ async function updateWeather(pos,force=false){
  ]);
 }
 function handlePosition(pos){
+ if(!featureEnabled('gps'))return;
  const cycleStart=performance.now();
  latestPosition=pos;
  const a=Math.round(pos.coords.accuracy||9999);
@@ -8011,6 +8630,7 @@ function handleLocationError(err){
  recordGpsStateEvent('location_error',{error:lastLocationErrorState});
  const area=document.getElementById('vacantArea');
  if(area) area.textContent='判定不能';
+ if(!latestPosition){const nowEl=document.getElementById('weatherNow');const nextEl=document.getElementById('weatherNext');if(nowEl)nowEl.textContent='現在地取得不能';if(nextEl)nextEl.textContent='位置情報の許可・受信状況を確認';}
  if(err && err.code===1) setLocationUI('位置情報OFF','タップして許可を確認','bad');
  else if(err && err.code===2) setLocationUI('位置情報 取得不能','現在地を取得できません','bad');
  else if(err && err.code===3) setLocationUI('位置情報 取得遅延','再取得しています','warn');
@@ -8018,6 +8638,7 @@ function handleLocationError(err){
 }
 
 function startLocation(){
+ if(!featureEnabled('gps'))return;
  if(!navigator.geolocation){
    setLocationUI('位置情報 非対応','このブラウザでは利用できません','bad');
    return;
@@ -8070,11 +8691,23 @@ const VEHICLE_FARE_PATTERNS={
 function getVehicleProfile(){
  try{return JSON.parse(localStorage.getItem(VEHICLE_PROFILE_KEY)||'{}')||{}}catch(e){return{}}
 }
+const NATIONAL_PREFECTURES=['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
+function trafficRegionSupported(category){
+ const p=getVehicleProfile();if((p.prefecture||'広島県')!=='広島県')return false;
+ if(!p.salesArea)return true;
+ return p.salesArea==='広島交通圏';
+}
+function renderUnsupportedTrafficRegion(category){
+ const names=category==='events'?['live','sports']:[category];
+ for(const name of names){const st=document.getElementById(name+'InfoStatus'),mid=document.getElementById(name+'InfoMiddle'),bot=document.getElementById(name+'InfoBottom');if(st)st.textContent='未対応';if(mid)mid.textContent='この区域は取得未対応';if(bot)bot.textContent=getVehicleProfile().salesArea||getVehicleProfile().prefecture||'';}
+}
 function renderSalesAreaOptions(selected=''){
- const el=document.getElementById('vehicleSalesArea');if(!el)return;
- const opts=['<option value="">選択してください</option>'].concat(HIROSHIMA_SALES_AREAS.map(v=>'<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>'));
- el.innerHTML=opts.join('');
- el.value=HIROSHIMA_SALES_AREAS.includes(selected)?selected:'';
+ const el=document.getElementById('vehicleSalesArea'),pref=document.getElementById('vehiclePrefecture');if(!el)return;
+ const p=getVehicleProfile();if(pref&&!pref.options.length){pref.innerHTML=NATIONAL_PREFECTURES.map(name=>'<option>'+name+'</option>').join('');pref.value=p.prefecture||'広島県';}
+ const province=pref?.value||p.prefecture||'広島県';
+ const areas=province==='広島県'?HIROSHIMA_SALES_AREAS:[province];
+ const choices=[...new Set([...areas,...(selected?[selected]:[])])];
+ el.innerHTML=['<option value="">選択してください</option>',...choices.map(v=>'<option value="'+escapeHtml(v)+'">'+escapeHtml(v)+'</option>')].join('');el.value=selected;
 }
 function renderVehicleLocalArea(label=''){
  const el=document.getElementById('vehicleLocalArea');
@@ -8109,7 +8742,9 @@ function renderVehicleProfile(){
  set('vehicleInspectionExpiry',p.inspectionExpiry||'');
  const odo=latestKnownOdometer();
  set('vehicleCurrentOdometer',odo??'');
+ const pref=document.getElementById('vehiclePrefecture');if(pref&&pref.options.length)pref.value=p.prefecture||'広島県';
  renderSalesAreaOptions(p.salesArea||'');
+ const custom=document.getElementById('vehicleCustomSalesArea');if(custom)custom.value='';
  renderVehicleLocalArea(p.localAreaLabel||'');
  const fare=getVehicleFareSettings();
  renderVehicleFarePatternOptions(p.salesArea||'',fare.area===p.salesArea?fare.patternId:'');
@@ -8129,12 +8764,15 @@ function saveVehicleProfile(silent=false){
   closingDay=n;
  }
  const inspectionExpiry=String(document.getElementById('vehicleInspectionExpiry')?.value||'');
- const salesArea=String(document.getElementById('vehicleSalesArea')?.value||'');
+ const salesArea=String(document.getElementById('vehicleCustomSalesArea')?.value||document.getElementById('vehicleSalesArea')?.value||'').trim();
+ const prefecture=String(document.getElementById('vehiclePrefecture')?.value||'広島県');
  const localAreaLabel=String(document.getElementById('vehicleLocalArea')?.textContent||'').trim();
  const odometerRaw=String(document.getElementById('vehicleCurrentOdometer')?.value||'').trim();
  const currentOdometer=odometerRaw===''?null:Number(odometerRaw);
- const p={registrationNumber,vehicleType,closingDay,inspectionExpiry,salesArea,localAreaLabel:localAreaLabel==='未取得'?'':localAreaLabel,updatedAt:Date.now()};
- try{localStorage.setItem(VEHICLE_PROFILE_KEY,JSON.stringify(p))}catch(e){}
+ const p={registrationNumber,vehicleType,closingDay,inspectionExpiry,salesArea,prefecture,localAreaLabel:localAreaLabel==='未取得'?'':localAreaLabel,updatedAt:Date.now()};
+ try{localStorage.setItem(VEHICLE_PROFILE_KEY,JSON.stringify(p))}catch(e){toast('車両設定を保存できませんでした');return false;}
+ for(const category of ['jr','bus','events'])if(!trafficRegionSupported(category))renderUnsupportedTrafficRegion(category);
+ refreshLiveFeedsNow(true);
  if(Number.isFinite(currentOdometer)&&currentOdometer>=0){
   try{localStorage.setItem(LAST_ODOMETER_KEY,String(currentOdometer))}catch(e){}
  }
@@ -8291,7 +8929,7 @@ function trackFareRaw(r){
  f.samples++;f.accuracyTotal+=r.accuracy||0;if(r.visibility==='hidden')f.hiddenSamples++;
  const p={t:r.measuredAt,lat:r.lat,lon:r.lon,accuracy:r.accuracy};
  if(f.lastRaw){
-  const dt=(p.t-f.lastRaw.t)/1000,d=metersBetween(p.lat,p.lon,f.lastRaw.lat,f.lastRaw.lon);
+  const dt=(p.t-f.lastRaw.t)/1000,d=metersBetween(p.lon,p.lat,f.lastRaw.lon,f.lastRaw.lat);
   if(dt>0&&dt<=30&&p.accuracy<=35&&f.lastRaw.accuracy<=35&&d<=Math.max(180,dt*55)){f.rawMeters+=d;f.rawGood++}
   else{f.rawBad++;if(dt>30)f.gapSeconds+=dt}
  }
@@ -8302,7 +8940,7 @@ function trackFareSnap(r){
  if(!s.accepted||!s.snapped){f.snapBad++;f.lastSnap=null;return}
  const p={t:r.measuredAt,lat:s.snapped.lat,lon:s.snapped.lon};
  if(f.lastSnap){
-  const dt=(p.t-f.lastSnap.t)/1000,d=metersBetween(p.lat,p.lon,f.lastSnap.lat,f.lastSnap.lon);
+  const dt=(p.t-f.lastSnap.t)/1000,d=metersBetween(p.lon,p.lat,f.lastSnap.lon,f.lastSnap.lat);
   if(dt>0&&dt<=30&&d<=Math.max(180,dt*55)){f.snapMeters+=d;f.snapGood++}else f.snapBad++;
  }
  f.lastSnap=p;
@@ -8349,10 +8987,10 @@ function updateRideFareTracking(pos){
   const dt=Math.max(0,Math.min(20,(now-rideFareTracking.lastTs)/1000));
   const speedMs=Number(pos.coords.speed);
   const limit=Math.max(0,Number(getVehicleFareSettings().lowSpeedKmh)||0)/3.6;
-  if(Number.isFinite(speedMs)&&speedMs<=limit) rideFareTracking.lowSpeedSeconds+=dt;
+  if(pos.coords.speed!==null&&pos.coords.speed!==undefined&&Number.isFinite(speedMs)&&speedMs<=limit) rideFareTracking.lowSpeedSeconds+=dt;
  }
  rideFareTracking.lastTs=now;
- if(currentRideStart?.rideId) upsertTripRecord(currentRideStart.rideId,{lowSpeedSeconds:Math.round(rideFareTracking.lowSpeedSeconds)});
+ if(currentRideStart?.rideId&&now-Number(rideFareTracking.lastPersistAt||0)>=15000){rideFareTracking.lastPersistAt=now;upsertTripRecord(currentRideStart.rideId,{lowSpeedSeconds:Math.round(rideFareTracking.lowSpeedSeconds),speedAvailable:pos.coords.speed!==null&&pos.coords.speed!==undefined});}
 }
 function estimatedRideFare(){
  if(!currentRideStart) return 0;
@@ -8368,6 +9006,7 @@ function estimatedRideFare(){
 }
 function getPaymentFareValue(){return Math.max(0,Number(document.getElementById('paymentFareInput')?.value||0))}
 function preparePaymentFare(){
+ initPaymentWheel();
  resetPaymentChoices();
  const input=document.getElementById('paymentFareInput');
  if(input) input.value='0';
@@ -8379,7 +9018,24 @@ function adjustPaymentFare(dir){
  const step=Math.max(10,Number(getVehicleFareSettings().stepYen)||10);
  input.value=String(Math.max(0,Number(input.value||0)+(dir>0?step:-step)));
 }
-function pickPay(el){document.querySelectorAll('.payopt').forEach(x=>x.classList.remove('selected'));el.classList.add('selected')}
+function pickPay(el){
+ if(!el)return;
+ document.querySelectorAll('.payopt').forEach(x=>{const selected=x===el;x.classList.toggle('selected',selected);x.setAttribute('aria-pressed',String(selected));});
+ const wheel=el.closest('.payopts');if(wheel)wheel.scrollTo({top:el.offsetTop-(parseFloat(getComputedStyle(wheel).paddingTop)||0),behavior:'instant'});
+}
+function selectCenteredPayment(){
+ const wheel=document.querySelector('.payopts');if(!wheel?.clientHeight)return;
+ const center=wheel.scrollTop+wheel.clientHeight/2;
+ const opts=[...wheel.querySelectorAll('.payopt')];
+ const selected=opts.reduce((best,el)=>!best||Math.abs(el.offsetTop+el.offsetHeight/2-center)<Math.abs(best.offsetTop+best.offsetHeight/2-center)?el:best,null);
+ if(selected)opts.forEach(el=>{const on=el===selected;el.classList.toggle('selected',on);el.setAttribute('aria-pressed',String(on));});
+}
+function initPaymentWheel(){
+ const wheel=document.querySelector('.payopts');if(!wheel||wheel.dataset.ready)return;
+ wheel.dataset.ready='1';let timer=null;
+ wheel.addEventListener('scroll',()=>{clearTimeout(timer);timer=setTimeout(selectCenteredPayment,160);},{passive:true});
+ wheel.addEventListener('keydown',e=>{if(!['ArrowUp','ArrowDown'].includes(e.key))return;e.preventDefault();const opts=[...wheel.querySelectorAll('.payopt')],index=opts.findIndex(x=>x.classList.contains('selected'));pickPay(opts[Math.max(0,Math.min(opts.length-1,index+(e.key==='ArrowDown'?1:-1)))]);});
+}
 function toggleDisabilityDiscount(){
  const b=document.getElementById('disabilityDiscountButton');if(!b)return;
  const on=!b.classList.contains('selected');
@@ -8387,8 +9043,11 @@ function toggleDisabilityDiscount(){
  b.setAttribute('aria-pressed',on?'true':'false');
 }
 function resetPaymentChoices(){
+ const memo=document.getElementById('paymentMemoInput');if(memo)memo.value='';
+ const receipt=document.getElementById('receiptIssuedButton');if(receipt){receipt.classList.remove('selected');receipt.setAttribute('aria-pressed','false');}
+ const wheel=document.querySelector('.payopts');if(wheel)wheel.scrollTop=0;
  const opts=[...document.querySelectorAll('.payopt')];
- opts.forEach((x,i)=>x.classList.toggle('selected',i===0));
+ opts.forEach((x,i)=>{x.classList.toggle('selected',i===0);x.setAttribute('aria-pressed',String(i===0));});
  const b=document.getElementById('disabilityDiscountButton');
  if(b){b.classList.remove('selected');b.setAttribute('aria-pressed','false')}
 }
@@ -8429,20 +9088,23 @@ function sourceAgeSeconds(ts){
 function canUseFreshSource(ts,maxAgeSec=600){
  return Number(ts)>0 && sourceAgeSeconds(ts)<=maxAgeSec;
 }
+function trafficNoticeCategory(kind){return kind.startsWith('jr')?'jr':kind.startsWith('bus')?'bus':/^(sports|live|event)/.test(kind)?'event':null;}
 function notifyFact(kind,{level='info',icon='!',title='',body='',key='',sourceTs=0,maxAgeSec=600,minIntervalMs=120000}={}){
  if(!getDutyState().active) return false;
- if(sourceTs && !canUseFreshSource(sourceTs,maxAgeSec)) return false;
+ const feature=trafficNoticeCategory(kind)==='event'?'events':trafficNoticeCategory(kind);if(feature&&(!featureEnabled(feature)||!trafficRegionSupported(feature)))return false;
+ if(sourceTs && !canUseFreshSource(sourceTs,maxAgeSec)){trafficAudit(trafficNoticeCategory(kind),'notification_suppressed',{kind,notificationKey:key,reason:'stale_source',sourceUpdatedAt:new Date(Number(sourceTs)*1000).toISOString()});return false;}
  if(!title||!body||!key) return false;
 
  const now=Date.now();
  const all=getNoticeState();
  const prev=all[kind]||{};
- if(prev.key===key && now-Number(prev.at||0)<minIntervalMs) return false;
+ if(prev.key===key && now-Number(prev.at||0)<minIntervalMs){trafficAudit(trafficNoticeCategory(kind),'notification_suppressed',{kind,notificationKey:key,reason:'duplicate'});return false;}
 
  all[kind]={key,at:now,sourceTs:Number(sourceTs||0),title,body};
  saveNoticeState(all);
  logAnalyticsEvent('notice_candidate_sent',{kind,key,sourceTs,title,body});
- showNotice(level,icon,title,body,7000,kind);
+ trafficAudit(trafficNoticeCategory(kind),'notification_requested',{kind,notificationKey:key,notificationRequestedAt:new Date().toISOString(),sourceUpdatedAt:sourceTs?new Date(sourceTs*1000).toISOString():null});
+ showNotice(level,icon,title,body,7000,kind,key);
  return true;
 }
 function normalizeJrLivePayload(d){
@@ -8541,17 +9203,17 @@ function playNoticePon(){
 let noticeQueue=[];
 let noticeActive=false;
 
-function showNotice(level,icon,title,body,duration=5500,kind=''){
- const item={level,icon,title,body,duration,kind};
+function showNotice(level,icon,title,body,duration=5500,kind='',notificationKey=''){
+ const item={level,icon,title,body,duration,kind,notificationKey};
  // 同じ種類が待機中なら最新内容へ置き換え、異種通知は順番に表示。
  if(kind){
   const idx=noticeQueue.findIndex(x=>x.kind===kind);
-  if(idx>=0) noticeQueue[idx]=item;
+  if(idx>=0){trafficAudit(trafficNoticeCategory(kind),'notification_suppressed',{kind,notificationKey:noticeQueue[idx].notificationKey,reason:'replaced_in_queue'});noticeQueue[idx]=item;}
   else noticeQueue.push(item);
  }else{
   noticeQueue.push(item);
  }
- if(noticeQueue.length>8) noticeQueue=noticeQueue.slice(-8);
+ if(noticeQueue.length>8){for(const old of noticeQueue.slice(0,-8))trafficAudit(trafficNoticeCategory(old.kind),'notification_suppressed',{kind:old.kind,notificationKey:old.notificationKey,reason:'queue_capacity'});noticeQueue=noticeQueue.slice(-8);}
  showNextNotice();
 }
 function showNextNotice(){
@@ -8566,6 +9228,7 @@ function showNextNotice(){
  n.querySelector('#nicon').textContent=item.icon;
  n.querySelector('#ntitle').textContent=item.title;
  n.querySelector('#nbody').textContent=item.body;
+ requestAnimationFrame(()=>{if(n.classList.contains('show')&&n.querySelector('#ntitle').textContent===item.title)trafficAudit(trafficNoticeCategory(item.kind),'in_app_notice_shown',{kind:item.kind,notificationKey:item.notificationKey,renderedAt:new Date().toISOString()});});
  clearTimeout(nt);
  nt=setTimeout(hideNotice,item.duration);
 }
@@ -8720,6 +9383,7 @@ function formatRideElapsed(ms){
 }
 function updateRideStartUI(rec){
  if(!rec) return;
+ try{localStorage.setItem('taxi_active_ride_v1',JSON.stringify({...rec,dutyId:currentDutyId()}));}catch(e){historyStorageWarning('実車状態を保存できません');}
  const addr=visiblePlaceLabel(rec).replace(/…|\.\.\.$/g,'');
  const startedAt=Number(rec.startedAt||0);
  const timeLabel=startedAt?new Date(startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'―';
@@ -8732,6 +9396,8 @@ function updateRideStartUI(rec){
  if(p) p.textContent=addr;
 }
 async function startRideCapture(){
+ if(currentRideStart?.rideId){show('ride');return;}
+ if(historyArchiveReady&&!await historyArchiveReady)return;
  if(!getDutyState().active){toast('先に乗務開始してください');show('home');return}
 
  const rideStartedAt=Date.now();
@@ -8756,7 +9422,7 @@ async function startRideCapture(){
    pickupDutyMeters:currentDutyMeters(),
   fareSettingsAtPickup:{...getVehicleFareSettings()}
  };
- upsertTripRecord(rideId,{
+ const rideSaved=upsertTripRecord(rideId,{
   dutyId:currentDutyId(),
   pickupTs:rideStartedAt,
   pickupIso:new Date(rideStartedAt).toISOString(),
@@ -8770,6 +9436,8 @@ async function startRideCapture(){
   lowSpeedSeconds:0,
   paymentMethod:null
  });
+ if(!rideSaved){currentRideStart=null;toast('乗車を保存できません。再度お試しください');return;}
+ updateRideStartUI(currentRideStart);
  logAnalyticsEvent('ride_start',{rideId,vacantSeconds,vacantMeters});
 
  // 乗車操作はGPS待ちにしない。まず実車画面へ即時切替。
@@ -8814,13 +9482,13 @@ async function startRideCapture(){
   renderVerify();
  };
 
- if(latestPosition){
+ if(featureEnabled('gps')&&latestPosition&&Date.now()-Number(latestPosition.timestamp||0)<=10000&&Number(latestPosition.coords?.accuracy)<=35){
   await saveRidePoint(latestPosition);
   return;
  }
 
  startLocation();
- if(navigator.geolocation){
+ if(featureEnabled('gps')&&navigator.geolocation){
   navigator.geolocation.getCurrentPosition(
    p=>{ latestPosition=p; saveRidePoint(p); },
    ()=>{ 
@@ -8837,19 +9505,27 @@ async function startRideCapture(){
  }
 }
 async function finishRide(){
+ selectCenteredPayment();
  const rideBeforeFinish=currentRideStart;
+ if(!rideBeforeFinish?.rideId)return;
+ const dropoffAt=Date.now();
  const confirmedFare=getPaymentFareValue();
  const selectedPayment=document.querySelector('.payopt.selected');
  const confirmedMethod=selectedPayment?(selectedPayment.dataset.pay||selectedPayment.textContent.trim()):null;
  const confirmedDiscount=!!document.getElementById('disabilityDiscountButton')?.classList.contains('selected');
+ const saved=upsertTripRecord(rideBeforeFinish.rideId,{dropoffTs:dropoffAt,dropoffIso:new Date(dropoffAt).toISOString(),fare:confirmedFare,paymentMethod:confirmedMethod,disabilityDiscount:confirmedDiscount,receiptIssued:!!document.getElementById('receiptIssuedButton')?.classList.contains('selected'),memo:document.getElementById('paymentMemoInput')?.value||'',dropoff:null,dropoffLocationStatus:'pending'});
+ if(!saved){toast('乗車明細を保存できません。画面を閉じずに再保存してください');return;}
+ await completeRideReservation(rideBeforeFinish);
  finishFareShadow(rideBeforeFinish,confirmedFare,confirmedMethod,confirmedDiscount);
+ saveLastDropoffSnapshot({t:dropoffAt,dutyMeters:currentDutyMeters(),lat:null,lon:null,accuracy:null});
+ logAnalyticsEvent('ride_end',{rideId:rideBeforeFinish.rideId,paymentMethod:confirmedMethod,disabilityDiscount:confirmedDiscount,dropoffAt});
  currentRideStart=null;
+ try{localStorage.removeItem('taxi_active_ride_v1');}catch(e){}
 
  // 降車操作は位置取得・住所変換を待たず即時反映。
  show(getDutyState().active?'vacant':'home');
 
  const recordDropoff=async(p)=>{
-  const dropoffAt=Date.now();
   const rec={
    type:'降車',
    time:new Date(dropoffAt).toLocaleString('ja-JP',{hour12:false}),
@@ -8866,12 +9542,13 @@ async function finishRide(){
    dropoffTs:dropoffAt,
    dropoffIso:new Date(dropoffAt).toISOString(),
    dropoff:{lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy,address:rec.address},
+   dropoffLocationStatus:'acquired',
    fare:confirmedFare,
    paymentMethod,
    disabilityDiscount
   });
   saveLastDropoffSnapshot({t:dropoffAt,dutyMeters:currentDutyMeters(),lat:rec.lat,lon:rec.lon,accuracy:rec.accuracy});
-  logAnalyticsEvent('ride_end',{rideId,paymentMethod,disabilityDiscount});
+  logAnalyticsEvent('dropoff_location_acquired',{rideId,dropoffAt});
   const log=getVerifyLog();
   log.unshift(rec);
   saveVerifyLog(log);
@@ -8886,16 +9563,16 @@ async function finishRide(){
   renderVerify();
  };
 
- if(latestPosition){
+ if(featureEnabled('gps')&&latestPosition&&Date.now()-Number(latestPosition.timestamp||0)<=10000&&Number(latestPosition.coords?.accuracy)<=35){
   updateWeather(latestPosition,true);
   recordDropoff(latestPosition);
- }else if(navigator.geolocation){
+ }else if(featureEnabled('gps')&&navigator.geolocation){
   navigator.geolocation.getCurrentPosition(
    p=>{latestPosition=p;updateWeather(p,true);recordDropoff(p)},
-   ()=>{},
+   e=>{upsertTripRecord(rideBeforeFinish.rideId,{dropoffLocationStatus:'unavailable',dropoffLocationError:String(e.code||'gps_error')});logAnalyticsEvent('dropoff_location_failed',{rideId:rideBeforeFinish.rideId,reason:String(e.code||'gps_error')});},
    {enableHighAccuracy:true,maximumAge:0,timeout:10000}
   );
- }
+ }else upsertTripRecord(rideBeforeFinish.rideId,{dropoffLocationStatus:'unavailable',dropoffLocationError:'unsupported'});
 }
 function buildValidationExport(){
  const duty=getDutyState();
@@ -8905,7 +9582,7 @@ function buildValidationExport(){
  return {
   schema:'taxi-sales-nav-validation-v4',
   exportedAt:new Date().toISOString(),
-  build:'2026-10-04-GPS-150-LIGHT-1',
+  build:'2026-10-13-RELIABILITY-63',
   duty:{
    active:!!duty.active,
    start:duty.start||null
@@ -8924,6 +9601,8 @@ function buildValidationExport(){
   warningAndPointLog:verify,
   analyticsSchema:ANALYTICS_SCHEMA,
   analyticsEvents:getAnalyticsEvents(),
+   trafficNotificationAudit:getTrafficAudit(),
+   trafficNotificationAuditSummary:trafficAuditExport().summary,
   tripRecords:getTripRecords(),
   note:'150点軽量GPS検証。取得処理と解析を分離し、IndexedDBへ生GPSを保存。時系列道路マッチング、3〜8候補、方向・継続性・ヒステリシス、確信度、確定道路後の30km/h連続確認、GPS途切れと処理負荷を追跡。'
  };
@@ -8967,15 +9646,82 @@ async function copyValidationSummary(){
   toast('検証結果をコピーしました');
  }
 }
+async function readArchivedTrafficAudit(){
+ if(typeof indexedDB==='undefined') return [];
+ return new Promise(resolve=>{
+  try{
+   const req=indexedDB.open('taxi-traffic-audit-archive',3);
+   req.onupgradeneeded=()=>upgradeTrafficAuditDatabase(req);
+   req.onerror=()=>resolve([]);
+   req.onsuccess=()=>{
+    const db=req.result;const tx=db.transaction('records','readonly');const read=tx.objectStore('records').getAll();
+    read.onsuccess=()=>{resolve(read.result.map(({id,recordKey,...row})=>row));db.close();};
+    read.onerror=()=>{resolve([]);db.close();};
+   };
+  }catch(e){resolve([]);}
+ });
+}
+async function readHistoryArchive(){
+ const output={analytics:[],trips:[],daily:[]};
+ const db=await openHistoryArchive();
+ try{
+  await Promise.all(Object.keys(output).map(name=>new Promise((resolve,reject)=>{
+   const tx=db.transaction(name,'readonly');const req=tx.objectStore(name).getAll();
+   req.onsuccess=()=>{output[name]=mergeHistoryRecords((req.result||[]).map(x=>x.record));};
+   tx.oncomplete=resolve;tx.onabort=()=>reject(tx.error||new Error('archive read failed'));
+  })));
+  return output;
+ }finally{db.close();}
+}
+async function hydrateHistoryArchive(){
+ try{
+  const output=await readHistoryArchive();
+  for(const name of Object.keys(output))historyArchiveCache[name]=mergeHistoryRecords(output[name],historyArchiveCache[name]);
+  renderSimpleSalesAnalysis();renderOdometerMissingBanner();
+  return true;
+ }catch(e){historyStorageWarning('過去の履歴を読み出せません。再読み込みしてください');return false;}
+}
+async function shareTrafficAuditData(){
+ const archive=await readArchivedTrafficAudit();
+ const live=getTrafficAudit();
+ const records=[...new Map(archive.concat(live).map(row=>[row.recordId||JSON.stringify(row),row])).values()];
+ const summary={};
+ for(const row of records){
+  const k=String(row.category||'unknown')+':'+String(row.status||'unknown');
+  summary[k]=(summary[k]||0)+1;
+ }
+ const payload={schema:'taxi-traffic-audit-v2',exportedAt:new Date().toISOString(),recordCount:records.length,summary,records};
+ const d=new Date(),pad=n=>String(n).padStart(2,'0');
+ const name='taxi-traffic-audit_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+'.json';
+ const blob=new Blob([JSON.stringify(payload,null,2)],{type:'application/json'});
+ try{
+  const file=new File([blob],name,{type:'application/json'});
+  if(navigator.canShare?.({files:[file]})&&navigator.share){
+   await navigator.share({files:[file],title:'交通通知検証ログ'});
+   return;
+  }
+ }catch(e){if(e?.name==='AbortError')return;}
+ const url=URL.createObjectURL(blob);
+ const a=document.createElement('a');a.href=url;a.download=name;
+ document.body.appendChild(a);a.click();a.remove();
+ setTimeout(()=>URL.revokeObjectURL(url),60000);
+ toast('交通通知ログを保存しました');
+}
 async function shareValidationData(){
- await flushGpsDbWrites();
+ const flushed=await flushGpsDbWrites();
  const data=buildValidationExport();
- const rawFull=await readGpsDbStore('raw');
- const analysisFull=await readGpsDbStore('analysis');
+ data.gpsPendingWrites=gpsDbWriteQueue.map(x=>({store:x.store,value:x.value}));
+ data.gpsStorageComplete=flushed;
+ data.storageReadErrors=[];
+ try{data.historyArchive=await readHistoryArchive();}catch(e){data.historyArchive=null;data.storageReadErrors.push('history_archive_read_failed');}
+ data.trafficNotificationAuditArchive=await readArchivedTrafficAudit();
+ const read=async(name)=>{try{return await readGpsDbStore(name,true);}catch(e){data.storageReadErrors.push(name+'_read_failed');return null;}};
+ const rawFull=await read('raw');
+ const analysisFull=await read('analysis');
  data.gpsRawFull=rawFull;
  data.gpsAnalysisFull=analysisFull;
- data.fareShadowFull=await readGpsDbStore('fare');
- data.storage={engine:'IndexedDB+memory-ring',rawCount:rawFull.length,analysisCount:analysisFull.length};
+ data.fareShadowFull=await read('fare');
+ data.storage={engine:'IndexedDB+memory-ring',rawCount:rawFull?.length??null,analysisCount:analysisFull?.length??null,complete:flushed&&data.storageReadErrors.length===0};
  const d=new Date();
  const pad=n=>String(n).padStart(2,'0');
  const name='taxi-nav-validation_'+d.getFullYear()+pad(d.getMonth()+1)+pad(d.getDate())+'_'+pad(d.getHours())+pad(d.getMinutes())+'.json';
@@ -9171,9 +9917,24 @@ window.addEventListener('pageshow',()=>{
 });
 window.addEventListener('focus',refreshLiveFeedsNow);
 
+applyApplicationAccess(applicationAccessPolicy);
+historyArchiveReady=hydrateHistoryArchive();
+function restorableActiveRide(){
+ if(!getDutyState().active)return null;
+ const dutyId=currentDutyId(),trips=getTripRecords();
+ let saved=null;try{saved=JSON.parse(localStorage.getItem('taxi_active_ride_v1')||'null');}catch(e){}
+ const current=saved&&trips.find(x=>x.rideId===saved.rideId&&x.dutyId===dutyId&&!x.dropoffTs);
+ if(current&&saved.dutyId===dutyId)return {ride:saved,trip:current,legacy:false};
+ const open=trips.filter(x=>x.dutyId===dutyId&&x.pickupTs&&!x.dropoffTs);
+ if(open.length!==1)return null;
+ const trip=open[0],point=trip.pickup||{};
+ return {legacy:true,trip,ride:{type:'乗車',rideId:trip.rideId,startedAt:trip.pickupTs,time:new Date(trip.pickupTs).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit',hour12:false}),lat:point.lat??null,lon:point.lon??null,accuracy:point.accuracy??null,address:point.address||'乗車地点の住所未確認',pickupDutyMeters:trip.pickupDutyMeters??null,fareSettingsAtPickup:trip.fareSettingsAtPickup||getVehicleFareSettings(),dutyId}};
+}
+historyArchiveReady.then(ok=>{if(!ok)return;try{const restored=restorableActiveRide();if(restored){const {ride,trip,legacy}=restored;currentRideStart=ride;rideFareTracking={lastTs:0,lowSpeedSeconds:Number(trip.lowSpeedSeconds)||0};beginFareTrack(ride.rideId);logAnalyticsEvent('ride_restored',{rideId:ride.rideId,legacyTripRecord:legacy});show('ride');updateRideStartUI(ride);}}catch(e){historyStorageWarning('実車状態の復元を確認できません');}});
 resumeGooglePairing();
 refreshGoogleAuthStatus();
 window.addEventListener('message',()=>{resumeGooglePairing()});
 </script>
 </body>
 </html>
+
