@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V10 -->
+<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V11 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -9965,6 +9965,8 @@ async function forceAppRefresh(ev){
   if(!response.ok)throw new Error('HTTP '+response.status);
   const html=await response.text();
   if(!html.includes('id="vacantForceRefreshButton"'))throw new Error('outdated response');
+  // Reflect the cache-busting URL even when replacing the document in place.
+  history.replaceState(history.state,'',u.pathname+u.search+u.hash);
   document.open();
   document.write(html);
   document.close();
