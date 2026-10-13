@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-FARE-COLOR-V7 -->
+<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V8 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -556,8 +556,16 @@ main{position:relative;min-height:0;overflow:hidden}
 .ride-distance-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:12px;font-weight:700}
 .ride-distance-row strong{font-size:26px;white-space:nowrap}
 .ride-entry-row,.ride-waypoint-row{display:grid;grid-template-columns:80px minmax(0,1fr);align-items:center;gap:12px}
-.ride-entry-row label,.ride-waypoint-row label{font-size:14px;font-weight:700}
-.ride-entry-row select,.ride-waypoint-row input{min-width:0;width:100%;height:48px;border:1px solid #334754;border-radius:12px;background:#101e2a;color:#fff;padding:0 12px;font-size:16px}
+.ride-field-label{font-size:14px;font-weight:700}
+.ride-passenger-buttons{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px;min-width:0}
+.ride-passenger-btn{min-width:0;height:48px;border:1px solid #415564;border-radius:12px;background:#10202e;color:#fff;font-size:17px;font-weight:800;touch-action:manipulation}
+.ride-passenger-btn.selected{background:#17416b;border:2px solid #2f86ff;color:#fff}
+.ride-waypoint-controls{min-width:0;display:grid;gap:8px}
+.ride-waypoint-btn{width:100%;height:50px;border:1px solid #2f86ff;border-radius:12px;background:#10253a;color:#fff;font-size:17px;font-weight:800;touch-action:manipulation}
+.ride-waypoint-btn:disabled{opacity:.55}
+.ride-waypoint-list{display:grid;gap:5px;min-width:0;font-size:13px;color:var(--muted)}
+.ride-waypoint-list:empty{display:none}
+.ride-waypoint-item{overflow-wrap:anywhere;line-height:1.4}
 /* 営業情報画面 */
 .today-content{gap:12px}
 .force-refresh-btn{
@@ -1898,8 +1906,8 @@ html,body{
   <div class="ride-trip-details">
    <div class="ride-pickup-row"><div><div class="label">乗車時刻</div><strong id="rideStartMeta">--:--</strong></div><div class="ride-pickup-place"><div class="label">乗車地</div><strong id="rideStartAddress">場所を確認中…</strong></div></div>
    <div class="ride-distance-row"><span>乗車後の走行距離</span><strong id="rideDistanceValue">0.0 km</strong></div>
-   <div class="ride-entry-row"><label for="ridePassengers">乗車人数</label><select id="ridePassengers" onchange="saveRideTripInputs()"><option value="1">1人</option><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option><option value="5">5人</option><option value="6">6人</option><option value="7">7人</option><option value="8">8人</option></select></div>
-   <div class="ride-waypoint-row"><label for="rideWaypoints">経由地</label><input id="rideWaypoints" maxlength="250" placeholder="経由地があれば入力" onchange="saveRideTripInputs()" onblur="saveRideTripInputs()"></div>
+   <div class="ride-entry-row"><div class="ride-field-label">乗車人数</div><div id="ridePassengerButtons" class="ride-passenger-buttons" role="group" aria-label="乗車人数"></div></div>
+   <div class="ride-waypoint-row"><div class="ride-field-label">経由地</div><div class="ride-waypoint-controls"><button type="button" class="ride-waypoint-btn" id="rideAddWaypoint" onclick="addRideWaypoint()">＋ 経由</button><div id="rideWaypointList" class="ride-waypoint-list" aria-live="polite"></div></div></div>
   </div>
 
   <div id="rideReservationCard" class="reservation hidden" role="button" tabindex="0" aria-label="予約の詳細を確認" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();show('schedule')}" onclick="show('schedule')"><div><div class="label">予約</div><strong id="rideReservationTitle">予約あり</strong><div id="rideReservationSub" class="sub"></div></div><span class="chev">›</span></div>
@@ -2509,6 +2517,7 @@ html,body{
     <div class="vehicle-fare-grid">
      <label>登録番号<input id="vehicleRegistrationNumber" type="text" inputmode="text" placeholder="広島 300 あ 12-34"></label>
      <label>車種<input id="vehicleTypeName" type="text" inputmode="text" placeholder="クラウン"></label>
+     <label>乗車定員（運転手含む）<select id="vehicleSeatCount"><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option><option value="5" selected>5人</option><option value="6">6人</option><option value="7">7人</option><option value="8">8人</option><option value="9">9人</option><option value="10">10人</option></select></label>
      <label>現在のオドメーター<input id="vehicleCurrentOdometer" type="number" min="0" step="1" inputmode="numeric" placeholder="例 52340"></label>
      <label>車検満了日<input id="vehicleInspectionExpiry" type="date"></label>
      <label>締め日<input id="vehicleClosingDay" type="text" inputmode="numeric" value="末日" placeholder="末日 または 1〜31"></label>
@@ -8707,6 +8716,10 @@ const VEHICLE_FARE_PATTERNS={
 function getVehicleProfile(){
  try{return JSON.parse(localStorage.getItem(VEHICLE_PROFILE_KEY)||'{}')||{}}catch(e){return{}}
 }
+function configuredMaxPassengers(){
+ const count=Number(getVehicleProfile().seatCount||5);
+ return Math.max(1,Math.min(9,(Number.isInteger(count)?count:5)-1));
+}
 const NATIONAL_PREFECTURES=['北海道','青森県','岩手県','宮城県','秋田県','山形県','福島県','茨城県','栃木県','群馬県','埼玉県','千葉県','東京都','神奈川県','新潟県','富山県','石川県','福井県','山梨県','長野県','岐阜県','静岡県','愛知県','三重県','滋賀県','京都府','大阪府','兵庫県','奈良県','和歌山県','鳥取県','島根県','岡山県','広島県','山口県','徳島県','香川県','愛媛県','高知県','福岡県','佐賀県','長崎県','熊本県','大分県','宮崎県','鹿児島県','沖縄県'];
 function trafficRegionSupported(category){
  const p=getVehicleProfile();if((p.prefecture||'広島県')!=='広島県')return false;
@@ -8754,6 +8767,7 @@ function renderVehicleProfile(){
  const set=(id,v)=>{const el=document.getElementById(id);if(el)el.value=v??''};
  set('vehicleRegistrationNumber',p.registrationNumber||'');
  set('vehicleTypeName',p.vehicleType||'');
+ set('vehicleSeatCount',p.seatCount||5);
  set('vehicleClosingDay',p.closingDay==='month-end'||!p.closingDay?'末日':p.closingDay);
  set('vehicleInspectionExpiry',p.inspectionExpiry||'');
  const odo=latestKnownOdometer();
@@ -8785,7 +8799,8 @@ function saveVehicleProfile(silent=false){
  const localAreaLabel=String(document.getElementById('vehicleLocalArea')?.textContent||'').trim();
  const odometerRaw=String(document.getElementById('vehicleCurrentOdometer')?.value||'').trim();
  const currentOdometer=odometerRaw===''?null:Number(odometerRaw);
- const p={registrationNumber,vehicleType,closingDay,inspectionExpiry,salesArea,prefecture,localAreaLabel:localAreaLabel==='未取得'?'':localAreaLabel,updatedAt:Date.now()};
+ const seatCount=Math.max(2,Math.min(10,Number(document.getElementById('vehicleSeatCount')?.value||5)));
+ const p={registrationNumber,vehicleType,seatCount,closingDay,inspectionExpiry,salesArea,prefecture,localAreaLabel:localAreaLabel==='未取得'?'':localAreaLabel,updatedAt:Date.now()};
  try{localStorage.setItem(VEHICLE_PROFILE_KEY,JSON.stringify(p))}catch(e){toast('車両設定を保存できませんでした');return false;}
  for(const category of ['jr','bus','events'])if(!trafficRegionSupported(category))renderUnsupportedTrafficRegion(category);
  refreshLiveFeedsNow(true);
@@ -8793,6 +8808,7 @@ function saveVehicleProfile(silent=false){
   try{localStorage.setItem(LAST_ODOMETER_KEY,String(currentOdometer))}catch(e){}
  }
  if(!silent) toast('車両設定を保存しました');
+ if(currentRideStart?.rideId)renderRidePassengerButtons(currentRideStart);
  return true;
 }
 function salesAreaCandidatesFromAddress(a={}){
@@ -9405,13 +9421,91 @@ function formatRideElapsed(ms){
  return h>0?h+'時間'+String(m).padStart(2,'0')+'分':min+'分';
 }
 function saveRideTripInputs(){
+ if(!currentRideStart?.rideId)return false;
+ const rec=currentRideStart;
+ const passengers=Math.max(1,Number(rec.passengers||1));
+ const waypoints=String(rec.waypoints||'');
+ const waypointRecords=Array.isArray(rec.waypointRecords)?rec.waypointRecords:[];
+ try{localStorage.setItem('taxi_active_ride_v1',JSON.stringify({...rec,dutyId:currentDutyId()}))}catch(e){historyStorageWarning('乗車入力を保存できません');return false}
+ if(!upsertTripRecord(rec.rideId,{passengers,waypoints,waypointRecords})){historyStorageWarning('乗車人数・経由地を記録できません');return false}
+ return true;
+}
+function renderRidePassengerButtons(rec){
+ const wrap=document.getElementById('ridePassengerButtons');
+ if(!wrap||!rec)return;
+ const max=Math.max(1,Math.min(9,Number(rec.maxPassengers||configuredMaxPassengers()),Number.MAX_SAFE_INTEGER));
+ const current=Math.max(1,Number(rec.passengers||1));
+ const limit=Math.max(max,current);
+ wrap.style.gridTemplateColumns='repeat('+Math.ceil(limit/2)+',minmax(0,1fr))';
+ wrap.innerHTML=Array.from({length:limit},(_,i)=>{
+  const n=i+1;
+  return '<button type="button" class="ride-passenger-btn'+(n===current?' selected':'')+'" aria-pressed="'+(n===current)+'" onclick="setRidePassengers('+n+')">'+n+'</button>';
+ }).join('');
+}
+function setRidePassengers(count){
  if(!currentRideStart?.rideId)return;
- const passengers=Math.max(1,Number(document.getElementById('ridePassengers')?.value||1));
- const waypoints=String(document.getElementById('rideWaypoints')?.value||'').trim();
- currentRideStart.passengers=passengers;
- currentRideStart.waypoints=waypoints;
- try{localStorage.setItem('taxi_active_ride_v1',JSON.stringify({...currentRideStart,dutyId:currentDutyId()}))}catch(e){historyStorageWarning('乗車入力を保存できません')}
- if(!upsertTripRecord(currentRideStart.rideId,{passengers,waypoints}))historyStorageWarning('乗車人数・経由地を記録できません');
+ const max=Number(currentRideStart.maxPassengers||configuredMaxPassengers());
+ const n=Number(count);
+ if(!Number.isInteger(n)||n<1||n>max)return;
+ currentRideStart.passengers=n;
+ saveRideTripInputs();
+ renderRidePassengerButtons(currentRideStart);
+}
+function renderRideWaypointList(rec){
+ const el=document.getElementById('rideWaypointList');
+ if(!el)return;
+ const points=Array.isArray(rec?.waypointRecords)?rec.waypointRecords:[];
+ el.textContent='';
+ points.forEach((point,i)=>{
+  const div=document.createElement('div');
+  div.className='ride-waypoint-item';
+  const at=new Date(Number(point.ts||Date.now())).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'});
+  div.textContent=(i+1)+'回目 '+at+' / '+String(point.address||'位置取得中');
+  el.appendChild(div);
+ });
+ if(!points.length&&rec?.waypoints){
+  const div=document.createElement('div');
+  div.className='ride-waypoint-item';
+  div.textContent=String(rec.waypoints);
+  el.appendChild(div);
+ }
+}
+let lastRideWaypointTap=0;
+function addRideWaypoint(){
+ const rec=currentRideStart;
+ if(!rec?.rideId)return;
+ const now=Date.now();
+ if(now-lastRideWaypointTap<1200)return;
+ lastRideWaypointTap=now;
+ const point={id:'via_'+now,ts:now,lat:null,lon:null,accuracy:null,address:'位置取得中'};
+ const list=Array.isArray(rec.waypointRecords)?rec.waypointRecords.slice():[];
+ list.push(point);
+ rec.waypointRecords=list;
+ saveRideTripInputs();
+ renderRideWaypointList(rec);
+ const apply=(data)=>{
+  if(currentRideStart?.rideId!==rec.rideId)return;
+  const target=(rec.waypointRecords||[]).find(x=>x.id===point.id);
+  if(!target)return;
+  Object.assign(target,data);
+  rec.waypoints=rec.waypointRecords.map(x=>x.address).join(' / ');
+  saveRideTripInputs();
+  renderRideWaypointList(rec);
+ };
+ const accept=async(pos)=>{
+  const c=pos?.coords;
+  if(!c||!Number.isFinite(c.latitude)||!Number.isFinite(c.longitude)){apply({address:'GPS取得不能'});return;}
+  const lat=c.latitude,lon=c.longitude;
+  apply({lat,lon,accuracy:Math.round(c.accuracy||0),address:coordFallbackLabel(lat,lon)});
+  const addr=await reverseGeocode(lat,lon);
+  apply({address:addr});
+ };
+ if(!featureEnabled('gps')||!navigator.geolocation){apply({address:'GPS利用不可'});return;}
+ if(latestPosition?.coords&&now-Number(latestPosition.timestamp||0)<=10000&&Number(latestPosition.coords.accuracy)<=35){
+  accept(latestPosition);
+ }else{
+  navigator.geolocation.getCurrentPosition(p=>{latestPosition=p;accept(p)},()=>apply({address:'GPS取得不能'}),{enableHighAccuracy:true,maximumAge:0,timeout:10000});
+ }
 }
 function updateRideDistanceUI(){
  if(!currentRideStart?.rideId)return;
@@ -9430,10 +9524,8 @@ function updateRideStartUI(rec){
  const p=document.getElementById('paymentStartAddress');
  if(a) a.textContent=addr;
  if(m) m.textContent=meta;
- const people=document.getElementById('ridePassengers');
- if(people&&String(people.value)!==String(rec.passengers||1))people.value=String(rec.passengers||1);
- const waypoints=document.getElementById('rideWaypoints');
- if(waypoints&&document.activeElement!==waypoints&&waypoints.value!==String(rec.waypoints||''))waypoints.value=String(rec.waypoints||'');
+ renderRidePassengerButtons(rec);
+ renderRideWaypointList(rec);
  updateRideDistanceUI();
  if(p) p.textContent=addr;
 }
@@ -9463,7 +9555,9 @@ async function startRideCapture(){
    address:'位置情報を確認中…',
    pickupDutyMeters:currentDutyMeters(),
    passengers:1,
+   maxPassengers:configuredMaxPassengers(),
    waypoints:'',
+   waypointRecords:[],
   fareSettingsAtPickup:{...getVehicleFareSettings()}
  };
  const rideSaved=upsertTripRecord(rideId,{
@@ -9479,6 +9573,7 @@ async function startRideCapture(){
   pickupDutyMeters:currentRideStart.pickupDutyMeters,
   passengers:1,
   waypoints:'',
+  waypointRecords:[],
   lowSpeedSeconds:0,
   paymentMethod:null
  });
@@ -9559,10 +9654,11 @@ async function finishRide(){
  if(confirmedFare<=0){toast('運賃を確認してください');return;}
  const passengers=Math.max(1,Number(rideBeforeFinish.passengers||1));
  const waypoints=String(rideBeforeFinish.waypoints||'');
+ const waypointRecords=Array.isArray(rideBeforeFinish.waypointRecords)?rideBeforeFinish.waypointRecords:[];
  const selectedPayment=document.querySelector('.payopt.selected');
  const confirmedMethod=selectedPayment?(selectedPayment.dataset.pay||selectedPayment.textContent.trim()):null;
  const confirmedDiscount=!!document.getElementById('disabilityDiscountButton')?.classList.contains('selected');
- const saved=upsertTripRecord(rideBeforeFinish.rideId,{dropoffTs:dropoffAt,dropoffIso:new Date(dropoffAt).toISOString(),fare:confirmedFare,passengers,waypoints,paymentMethod:confirmedMethod,disabilityDiscount:confirmedDiscount,receiptIssued:!!document.getElementById('receiptIssuedButton')?.classList.contains('selected'),memo:document.getElementById('paymentMemoInput')?.value||'',dropoff:null,dropoffLocationStatus:'pending'});
+ const saved=upsertTripRecord(rideBeforeFinish.rideId,{dropoffTs:dropoffAt,dropoffIso:new Date(dropoffAt).toISOString(),fare:confirmedFare,passengers,waypoints,waypointRecords,paymentMethod:confirmedMethod,disabilityDiscount:confirmedDiscount,receiptIssued:!!document.getElementById('receiptIssuedButton')?.classList.contains('selected'),memo:document.getElementById('paymentMemoInput')?.value||'',dropoff:null,dropoffLocationStatus:'pending'});
  if(!saved){toast('乗車明細を保存できません。画面を閉じずに再保存してください');return;}
  await completeRideReservation(rideBeforeFinish);
  finishFareShadow(rideBeforeFinish,confirmedFare,confirmedMethod,confirmedDiscount);
