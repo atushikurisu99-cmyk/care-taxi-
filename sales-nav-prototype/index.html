@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V8 -->
+<!-- BUILD:2026-10-13-RIDE-TAP-INPUT-V9 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -194,7 +194,7 @@ main{position:relative;min-height:0;overflow:hidden}
 .drive-note{margin:auto 0;text-align:center;color:#7e909d;font-size:14px}
 .payment-selection{display:grid;grid-template-columns:minmax(0,1fr) 108px;gap:10px;align-items:center}
 .payment-dial{min-width:0;border:1px solid #2b3a46;border-radius:14px;background:#09151f;overflow:hidden}
-.payopts{display:flex;position:relative;flex-direction:column;gap:8px;height:120px;padding:32px 0;overflow-y:auto;scroll-snap-type:y mandatory;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:none}
+.payopts{display:flex;position:relative;flex-direction:column;gap:8px;height:120px;padding:0 0 64px;overflow-y:auto;scroll-snap-type:y mandatory;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:none}
 .payopts::-webkit-scrollbar{display:none}
 .payment-side-controls{display:flex;flex-direction:column;gap:8px}
 .payment-side-controls .discount-toggle{height:56px;min-height:56px;padding:8px;font-size:16px;line-height:1.2}
@@ -204,7 +204,7 @@ main{position:relative;min-height:0;overflow:hidden}
 #rideReservationCard strong{font-size:16px;line-height:1.2}
 #rideReservationCard .label,#rideReservationSub{display:none}
 #rideReservationCard .chev{font-size:20px}
-@media(max-height:740px){.payopts{height:120px;padding:32px 0}}
+@media(max-height:740px){.payopts{height:120px;padding:0 0 64px}}
 .payopt{flex-shrink:0;scroll-snap-align:center}
 .payopt{min-height:56px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
 .payopt.selected{background:#123456;border-color:#2f86ff}
