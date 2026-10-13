@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-RIDE-PAYMENT-V6 -->
+<!-- BUILD:2026-10-13-FARE-COLOR-V7 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -1764,6 +1764,7 @@ html,body{
  header .badge{font-size:15px;min-width:82px;padding:8px 12px}
  .header-duty-meta{font-size:9px}
 }
+.fare-input.fare-estimate{color:#354550;-webkit-text-fill-color:#354550}
 </style>
 <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
@@ -1913,7 +1914,7 @@ html,body{
    <div class="label">運賃</div>
    <div class="fare-editor">
     <button class="fare-step" type="button" onclick="adjustPaymentFare(-1)" aria-label="1メーター下げる">▼</button>
-    <input id="paymentFareInput" class="fare-input" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="運賃">
+    <input id="paymentFareInput" class="fare-input" type="number" min="0" step="10" inputmode="numeric" value="0" aria-label="運賃" oninput="this.classList.remove('fare-estimate')">
     <button class="fare-step" type="button" onclick="adjustPaymentFare(1)" aria-label="1メーター上げる">▲</button>
    </div>
    <div id="paymentFareEstimateNote" class="fare-estimate-note">実メーター料金を入力</div>
@@ -9030,13 +9031,14 @@ function preparePaymentFare(){
  const base=Math.max(0,Number(settings.baseYen)||0);
  const fare=Math.max(base,Number(estimated)||0);
  const input=document.getElementById('paymentFareInput');
- if(input)input.value=String(fare);
+ if(input){input.value=String(fare);input.classList.add('fare-estimate');}
  const note=document.getElementById('paymentFareEstimateNote');
  if(note)note.textContent=fare>0?'設定料金からの概算です。実メーター額を確認・修正してください':'初乗り運賃が未設定です。車両設定を確認してください';
 }
 function adjustPaymentFare(dir){
  const input=document.getElementById('paymentFareInput');if(!input)return;
  const step=Math.max(10,Number(getVehicleFareSettings().stepYen)||10);
+ input.classList.remove('fare-estimate');
  input.value=String(Math.max(0,Number(input.value||0)+(dir>0?step:-step)));
 }
 function pickPay(el){
