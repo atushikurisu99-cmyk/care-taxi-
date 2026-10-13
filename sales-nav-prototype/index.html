@@ -8,7 +8,7 @@
 <meta http-equiv="Pragma" content="no-cache">
 <meta http-equiv="Expires" content="0">
 <title>タクシー営業ナビ</title>
-<!-- BUILD:2026-10-13-FORCE-REFRESH-V5 -->
+<!-- BUILD:2026-10-13-RIDE-PAYMENT-V6 -->
 <style>
 :root{
  --bg:#071019;--panel:#0c1721;--panel2:#101e2a;--line:#21303c;--text:#f5f8fa;--muted:#9aabb7;
@@ -194,19 +194,19 @@ main{position:relative;min-height:0;overflow:hidden}
 .drive-note{margin:auto 0;text-align:center;color:#7e909d;font-size:14px}
 .payment-selection{display:grid;grid-template-columns:minmax(0,1fr) 108px;gap:10px;align-items:center}
 .payment-dial{min-width:0;border:1px solid #2b3a46;border-radius:14px;background:#09151f;overflow:hidden}
-.payopts{display:flex;position:relative;flex-direction:column;gap:8px;height:148px;padding:44px 0;overflow-y:auto;scroll-snap-type:y mandatory;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:none}
+.payopts{display:flex;position:relative;flex-direction:column;gap:8px;height:120px;padding:32px 0;overflow-y:auto;scroll-snap-type:y mandatory;touch-action:pan-y;overscroll-behavior:contain;scrollbar-width:none}
 .payopts::-webkit-scrollbar{display:none}
 .payment-side-controls{display:flex;flex-direction:column;gap:8px}
-.payment-side-controls .discount-toggle{min-height:56px;padding:8px;font-size:16px;line-height:1.2}
+.payment-side-controls .discount-toggle{height:56px;min-height:56px;padding:8px;font-size:16px;line-height:1.2}
 #payment .content{overflow-y:auto;overflow-x:hidden;overscroll-behavior:contain}
 #paymentMemoInput{min-height:42px;font-size:16px;border:1px solid #2b3a46;border-radius:10px;padding:8px;background:#09151f;color:white}
 #rideReservationCard{align-self:flex-end;width:auto;max-width:100%;height:44px;min-height:44px;padding:8px 12px;gap:10px;border-radius:12px}
 #rideReservationCard strong{font-size:16px;line-height:1.2}
 #rideReservationCard .label,#rideReservationSub{display:none}
 #rideReservationCard .chev{font-size:20px}
-@media(max-height:740px){.payopts{height:136px;padding:38px 0}}
+@media(max-height:740px){.payopts{height:120px;padding:32px 0}}
 .payopt{flex-shrink:0;scroll-snap-align:center}
-.payopt{min-height:60px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
+.payopt{min-height:56px;background:#111d27;border:1px solid #2b3a46;color:white;border-radius:14px;font-weight:800;font-size:16px}
 .payopt.selected{background:#123456;border-color:#2f86ff}
 .discount-toggle{width:100%;min-height:48px;border:1px solid #3b4a55;background:#101b24;color:#d8e2e9;border-radius:12px;font-weight:850;font-size:15px}
 .discount-toggle.selected{background:#4a3512;border-color:#b6842d;color:#ffe4a1}
@@ -548,6 +548,16 @@ main{position:relative;min-height:0;overflow:hidden}
 .ride-state-main{display:flex;align-items:center;justify-content:space-between;gap:12px}
 .ride-state-main .ride-from{font-size:20px;font-weight:900;line-height:1.2;text-align:right;max-width:62%;white-space:normal;writing-mode:horizontal-tb;word-break:keep-all;overflow:visible;text-overflow:clip}
 
+/* 実車中：状態の重複カードをなくし、必要な乗車情報だけ表示 */
+.ride-trip-details{display:grid;gap:12px;padding:10px 2px}
+.ride-pickup-row{display:grid;grid-template-columns:80px minmax(0,1fr);gap:12px;align-items:start}
+.ride-pickup-row strong{font-size:18px;line-height:1.35;display:block;overflow-wrap:anywhere}
+.ride-pickup-place{min-width:0}
+.ride-distance-row{display:flex;align-items:baseline;justify-content:space-between;gap:8px;border-top:1px solid var(--line);padding-top:12px;font-weight:700}
+.ride-distance-row strong{font-size:26px;white-space:nowrap}
+.ride-entry-row,.ride-waypoint-row{display:grid;grid-template-columns:80px minmax(0,1fr);align-items:center;gap:12px}
+.ride-entry-row label,.ride-waypoint-row label{font-size:14px;font-weight:700}
+.ride-entry-row select,.ride-waypoint-row input{min-width:0;width:100%;height:48px;border:1px solid #334754;border-radius:12px;background:#101e2a;color:#fff;padding:0 12px;font-size:16px}
 /* 営業情報画面 */
 .today-content{gap:12px}
 .force-refresh-btn{
@@ -1884,16 +1894,15 @@ html,body{
 
 <section id="ride" class="screen">
  <div class="content">
-  <div class="card drive-state">
-   <div class="ride-state-main">
-    <div><div class="label">状態</div><strong>実車中</strong><div id="rideStartMeta" class="sub">乗車地点を固定中</div></div>
-    <div><div class="label" style="text-align:right">乗車地</div><div id="rideStartAddress" class="ride-from">場所を確認中…</div></div>
-   </div>
+  <div class="ride-trip-details">
+   <div class="ride-pickup-row"><div><div class="label">乗車時刻</div><strong id="rideStartMeta">--:--</strong></div><div class="ride-pickup-place"><div class="label">乗車地</div><strong id="rideStartAddress">場所を確認中…</strong></div></div>
+   <div class="ride-distance-row"><span>乗車後の走行距離</span><strong id="rideDistanceValue">0.0 km</strong></div>
+   <div class="ride-entry-row"><label for="ridePassengers">乗車人数</label><select id="ridePassengers" onchange="saveRideTripInputs()"><option value="1">1人</option><option value="2">2人</option><option value="3">3人</option><option value="4">4人</option><option value="5">5人</option><option value="6">6人</option><option value="7">7人</option><option value="8">8人</option></select></div>
+   <div class="ride-waypoint-row"><label for="rideWaypoints">経由地</label><input id="rideWaypoints" maxlength="250" placeholder="経由地があれば入力" onchange="saveRideTripInputs()" onblur="saveRideTripInputs()"></div>
   </div>
 
   <div id="rideReservationCard" class="reservation hidden" role="button" tabindex="0" aria-label="予約の詳細を確認" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();show('schedule')}" onclick="show('schedule')"><div><div class="label">予約</div><strong id="rideReservationTitle">予約あり</strong><div id="rideReservationSub" class="sub"></div></div><span class="chev">›</span></div>
 
-  <div class="drive-note">通知は必要な時だけ重ねて表示</div>
  </div>
  <div class="action"><button class="primary pay" onclick="preparePaymentFare();show('payment')">支払</button></div>
 </section>
@@ -9012,12 +9021,18 @@ function estimatedRideFare(){
 }
 function getPaymentFareValue(){return Math.max(0,Number(document.getElementById('paymentFareInput')?.value||0))}
 function preparePaymentFare(){
+ saveRideTripInputs();
  initPaymentWheel();
  resetPaymentChoices();
+ const settings=currentRideStart?.fareSettingsAtPickup||getVehicleFareSettings();
+ const meters=Math.max(0,currentDutyMeters()-Number(currentRideStart?.pickupDutyMeters||0));
+ const estimated=shadowFareFor(meters,Number(rideFareTracking.lowSpeedSeconds||0),settings,currentRideStart?.startedAt||Date.now());
+ const base=Math.max(0,Number(settings.baseYen)||0);
+ const fare=Math.max(base,Number(estimated)||0);
  const input=document.getElementById('paymentFareInput');
- if(input) input.value='0';
+ if(input)input.value=String(fare);
  const note=document.getElementById('paymentFareEstimateNote');
- if(note) note.textContent='実メーター料金を入力';
+ if(note)note.textContent=fare>0?'設定料金からの概算です。実メーター額を確認・修正してください':'初乗り運賃が未設定です。車両設定を確認してください';
 }
 function adjustPaymentFare(dir){
  const input=document.getElementById('paymentFareInput');if(!input)return;
@@ -9387,18 +9402,37 @@ function formatRideElapsed(ms){
  const h=Math.floor(min/60),m=min%60;
  return h>0?h+'時間'+String(m).padStart(2,'0')+'分':min+'分';
 }
+function saveRideTripInputs(){
+ if(!currentRideStart?.rideId)return;
+ const passengers=Math.max(1,Number(document.getElementById('ridePassengers')?.value||1));
+ const waypoints=String(document.getElementById('rideWaypoints')?.value||'').trim();
+ currentRideStart.passengers=passengers;
+ currentRideStart.waypoints=waypoints;
+ try{localStorage.setItem('taxi_active_ride_v1',JSON.stringify({...currentRideStart,dutyId:currentDutyId()}))}catch(e){historyStorageWarning('乗車入力を保存できません')}
+ if(!upsertTripRecord(currentRideStart.rideId,{passengers,waypoints}))historyStorageWarning('乗車人数・経由地を記録できません');
+}
+function updateRideDistanceUI(){
+ if(!currentRideStart?.rideId)return;
+ const el=document.getElementById('rideDistanceValue');
+ if(el)el.textContent=(Math.max(0,currentDutyMeters()-Number(currentRideStart.pickupDutyMeters||0))/1000).toFixed(1)+' km';
+}
 function updateRideStartUI(rec){
  if(!rec) return;
  try{localStorage.setItem('taxi_active_ride_v1',JSON.stringify({...rec,dutyId:currentDutyId()}));}catch(e){historyStorageWarning('実車状態を保存できません');}
  const addr=visiblePlaceLabel(rec).replace(/…|\.\.\.$/g,'');
  const startedAt=Number(rec.startedAt||0);
  const timeLabel=startedAt?new Date(startedAt).toLocaleTimeString('ja-JP',{hour:'2-digit',minute:'2-digit'}):'―';
- const meta='乗車 '+timeLabel+' / 経過 '+(startedAt?formatRideElapsed(Date.now()-startedAt):'―');
+ const meta=timeLabel;
  const a=document.getElementById('rideStartAddress');
  const m=document.getElementById('rideStartMeta');
  const p=document.getElementById('paymentStartAddress');
  if(a) a.textContent=addr;
  if(m) m.textContent=meta;
+ const people=document.getElementById('ridePassengers');
+ if(people&&String(people.value)!==String(rec.passengers||1))people.value=String(rec.passengers||1);
+ const waypoints=document.getElementById('rideWaypoints');
+ if(waypoints&&document.activeElement!==waypoints&&waypoints.value!==String(rec.waypoints||''))waypoints.value=String(rec.waypoints||'');
+ updateRideDistanceUI();
  if(p) p.textContent=addr;
 }
 async function startRideCapture(){
@@ -9426,6 +9460,8 @@ async function startRideCapture(){
    accuracy:null,
    address:'位置情報を確認中…',
    pickupDutyMeters:currentDutyMeters(),
+   passengers:1,
+   waypoints:'',
   fareSettingsAtPickup:{...getVehicleFareSettings()}
  };
  const rideSaved=upsertTripRecord(rideId,{
@@ -9439,6 +9475,8 @@ async function startRideCapture(){
   vacantMeters,
   fare:null,
   pickupDutyMeters:currentRideStart.pickupDutyMeters,
+  passengers:1,
+  waypoints:'',
   lowSpeedSeconds:0,
   paymentMethod:null
  });
@@ -9516,10 +9554,13 @@ async function finishRide(){
  if(!rideBeforeFinish?.rideId)return;
  const dropoffAt=Date.now();
  const confirmedFare=getPaymentFareValue();
+ if(confirmedFare<=0){toast('運賃を確認してください');return;}
+ const passengers=Math.max(1,Number(rideBeforeFinish.passengers||1));
+ const waypoints=String(rideBeforeFinish.waypoints||'');
  const selectedPayment=document.querySelector('.payopt.selected');
  const confirmedMethod=selectedPayment?(selectedPayment.dataset.pay||selectedPayment.textContent.trim()):null;
  const confirmedDiscount=!!document.getElementById('disabilityDiscountButton')?.classList.contains('selected');
- const saved=upsertTripRecord(rideBeforeFinish.rideId,{dropoffTs:dropoffAt,dropoffIso:new Date(dropoffAt).toISOString(),fare:confirmedFare,paymentMethod:confirmedMethod,disabilityDiscount:confirmedDiscount,receiptIssued:!!document.getElementById('receiptIssuedButton')?.classList.contains('selected'),memo:document.getElementById('paymentMemoInput')?.value||'',dropoff:null,dropoffLocationStatus:'pending'});
+ const saved=upsertTripRecord(rideBeforeFinish.rideId,{dropoffTs:dropoffAt,dropoffIso:new Date(dropoffAt).toISOString(),fare:confirmedFare,passengers,waypoints,paymentMethod:confirmedMethod,disabilityDiscount:confirmedDiscount,receiptIssued:!!document.getElementById('receiptIssuedButton')?.classList.contains('selected'),memo:document.getElementById('paymentMemoInput')?.value||'',dropoff:null,dropoffLocationStatus:'pending'});
  if(!saved){toast('乗車明細を保存できません。画面を閉じずに再保存してください');return;}
  await completeRideReservation(rideBeforeFinish);
  finishFareShadow(rideBeforeFinish,confirmedFare,confirmedMethod,confirmedDiscount);
@@ -9802,6 +9843,7 @@ setInterval(()=>loadEventSportsRealtime(false),30000);
 refreshLocationDependentFeeds();
 setInterval(refreshLocationDependentFeeds,60000);
 setInterval(flushGpsDbWrites,5000);
+setInterval(()=>{if(document.getElementById('ride')?.classList.contains('active'))updateRideDistanceUI()},3000);
 
 async function forceAppRefresh(ev){
  // GitHub Pages shares its origin with Care Taxi: never remove caches or
