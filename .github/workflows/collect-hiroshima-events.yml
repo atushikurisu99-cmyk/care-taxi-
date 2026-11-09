@@ -2,14 +2,6 @@ name: Collect Hiroshima taxi demand events
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 18 * * *"
-    - cron: "17 6 * * *"
-  push:
-    branches: [main]
-    paths:
-      - "scripts/collect-hiroshima-events.cjs"
-      - ".github/workflows/collect-hiroshima-events.yml"
 
 permissions:
   contents: write
