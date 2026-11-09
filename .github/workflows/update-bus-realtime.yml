@@ -3,12 +3,6 @@ name: Update Hiroshima bus realtime
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "*/5 * * * *"
-  push:
-    paths:
-      - "tools/update_hiroshima_bus.py"
-      - ".github/workflows/update-bus-realtime.yml"
 
 permissions:
   contents: write
