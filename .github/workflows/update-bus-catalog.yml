@@ -2,12 +2,6 @@ name: Update Hiroshima bus destination catalog
 
 on:
   workflow_dispatch:
-  schedule:
-    - cron: "17 18 * * *"
-  push:
-    paths:
-      - "tools/update_hiroshima_bus_catalog.py"
-      - ".github/workflows/update-bus-catalog.yml"
 
 permissions:
   contents: write
