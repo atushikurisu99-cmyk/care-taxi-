@@ -1,10 +1,6 @@
 name: Update JARTIC Hiroshima speed data
 
 on:
-  push:
-    paths:
-      - "tools/update_jartic_hiroshima.py"
-      - ".github/workflows/update-jartic-speed.yml"
   workflow_dispatch:
 
 permissions:
